@@ -1,8 +1,119 @@
+<ion-menu side="start" menuId="first" contentId="main">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>App Countries</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-accordion-group>
+      <ion-accordion value="cuenta">
+        <ion-item slot="header" color="light">
+          <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+          <ion-label>Cuenta</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          
+          <ion-list lines="none">
+            <ion-item>
+              <ion-button (click)="onClick()" fill="clear" shape="round">
+                Editar usuario
+              </ion-button>                
+            </ion-item>
+
+            <ion-item>
+              <ion-button (click)="onClick()" expand="block" fill="clear" shape="round">
+                Cambiar clave
+              </ion-button>
+            </ion-item>
+
+          </ion-list>
+          
+
+        </div>
+      </ion-accordion>
+      <ion-accordion value="registros">
+        <ion-item slot="header" color="light">
+          <ion-icon slot="start" name="calendar-outline"></ion-icon>
+          <ion-label>Registros</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          
+          <ion-list lines="none">
+            <ion-item>
+              <ion-button (click)="onClick()" fill="clear" shape="round">
+                Ingresos y Autorizaciones
+              </ion-button>                
+            </ion-item>
+
+            <ion-item>
+              <ion-button (click)="onClick()" expand="block" fill="clear" shape="round">
+                Reservas de Eventos
+              </ion-button>
+            </ion-item>
+
+            <ion-item>
+              <ion-button (click)="onClick()" expand="block" fill="clear" shape="round">
+                Boton de panico
+              </ion-button>
+            </ion-item>
+
+          </ion-list>
+          
+
+        </div>
+      </ion-accordion>
+      <ion-accordion value="vigiladores">
+        <ion-item slot="header" color="light">
+          <ion-icon slot="start" name="shield-half-outline"></ion-icon>
+          <ion-label>Vigiladores</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          
+          <ion-list lines="none">
+            <ion-item>
+              <ion-button (click)="onClick()" fill="clear" shape="round">
+                Ubicacion de Guardias
+              </ion-button>                
+            </ion-item>
+
+            <ion-item>
+              <ion-button (click)="onClick()" expand="block" fill="clear" shape="round">
+                Nomina y Horarios
+              </ion-button>
+            </ion-item>
+
+          </ion-list>
+          
+
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+
+    <ion-list lines="none">
+      <ion-button slot="start" (click)="onClick()" expand="block" fill="clear">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Cerrar sesion
+      </ion-button>
+    </ion-list>
+
+  </ion-content>
+</ion-menu>
+
+<ion-router-outlet id="main"></ion-router-outlet>
+
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Eventos
-    </ion-title>
+
+    <ion-button (click)="openFirst('first')" slot="start" fill="clear">
+      <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+    </ion-button>
+
+    <!-- <ion-title>Eventos</ion-title> -->
+
+    <ion-button slot="end" fill="clear">
+      <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+    </ion-button>
+
   </ion-toolbar>
 </ion-header>
 
