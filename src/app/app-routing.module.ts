@@ -21,7 +21,12 @@ const routes: Routes = [
   {
     path: 'editar-perfil',
     loadChildren: () => import('./pages/account/edit/edit.module').then( m => m.EditPageModule)
+  },
+  {
+    path: 'cambiar-clave',
+    loadChildren: () => import('./pages/account/password-change/password-change.module').then( m => m.PasswordChangePageModule)
   }
+
 
 
 ];
