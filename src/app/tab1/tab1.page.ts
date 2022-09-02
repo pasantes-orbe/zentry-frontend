@@ -27,20 +27,6 @@ export class Tab1Page {
     }, 3000);
   }
 
-  openFirst(id: string) {
-    this.menu.enable(true, id);
-    this.menu.open(id);
-  }
-
-  openEnd() {
-    this.menu.open('end');
-  }
-
-  openCustom() {
-    this.menu.enable(true, 'custom');
-    this.menu.open('custom');
-  }
-
   public isLoading(): boolean {
     return this.loading;
   }

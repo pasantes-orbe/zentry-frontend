@@ -17,7 +17,12 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  },
+  {
+    path: 'editar-perfil',
+    loadChildren: () => import('./pages/account/edit/edit.module').then( m => m.EditPageModule)
   }
+
 
 ];
 @NgModule({

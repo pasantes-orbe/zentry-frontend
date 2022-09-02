@@ -1,0 +1,54 @@
+<app-navbar-back title="Editar Usuario"></app-navbar-back>
+
+<ion-content>
+
+    <div class="container">
+        <ion-card class="text-center">
+            <div class="content">
+                <ion-button class="avatar" (click)="onClick()" fill="clear">
+                    <ion-avatar>
+                        <img src="assets/logos/user.png" />
+                    </ion-avatar>
+                    <ion-icon slot="icon-only" class="shadow" name="create-outline"></ion-icon>
+                </ion-button>
+
+                <form>
+                    <ion-item>
+                        <ion-label position="floating">Nombre Completo</ion-label>
+                        <ion-input required type="text"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label position="floating">Dirección <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input required  type="text"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label position="floating">Telefono <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input required  type="text"></ion-input>
+                    </ion-item>                    
+                    <ion-item>
+                        <ion-label position="floating">Email <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input required  type="text"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label class="ion-text-wrap birthday" position="stacked">Cumpleaños</ion-label>
+                        <ion-datetime-button
+                        datetime="datetime"
+                        ></ion-datetime-button>
+                    </ion-item>
+                    <ion-modal [keepContentsMounted]="true">
+                        <ng-template>
+                          <ion-datetime id="datetime"></ion-datetime>
+                        </ng-template>
+                      </ion-modal>
+                    <ion-button class="mt-4 mb-4" expand="block" size="large" color="primary" shape="round" type="submit">
+                        <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
+                        Guardar
+                    </ion-button>
+                </form>
+            </div>
+
+        </ion-card>
+    </div>
+
+
+</ion-content>
