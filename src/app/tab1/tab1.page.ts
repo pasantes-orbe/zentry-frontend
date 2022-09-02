@@ -17,6 +17,10 @@ export class Tab1Page {
     this.getData();
   }
 
+  protected doRefresh(event){
+    console.log(event);
+  }
+
   private getData(){
     setTimeout(() => {
       this.setLoading(false);

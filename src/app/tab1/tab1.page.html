@@ -6,30 +6,28 @@
   </ion-header>
   <ion-content>
     <ion-accordion-group>
-      <ion-accordion value="cuenta" >
+      <ion-accordion value="cuenta">
         <ion-item slot="header">
           <ion-icon slot="start" name="person-circle-outline"></ion-icon>
           <ion-label>Cuenta</ion-label>
         </ion-item>
         <div class="ion-padding" slot="content">
-          
+
           <ion-list lines="none">
             <ion-item>
-              <ion-button 
-              fill="clear" shape="round">
+              <ion-button fill="clear" shape="round">
                 Editar usuario
-              </ion-button>                
+              </ion-button>
             </ion-item>
 
             <ion-item>
-              <ion-button 
-              expand="block" fill="clear" shape="round">
+              <ion-button expand="block" fill="clear" shape="round">
                 Cambiar clave
               </ion-button>
             </ion-item>
 
           </ion-list>
-          
+
 
         </div>
       </ion-accordion>
@@ -39,31 +37,28 @@
           <ion-label>Registros</ion-label>
         </ion-item>
         <div class="ion-padding" slot="content">
-          
+
           <ion-list lines="none">
             <ion-item>
-              <ion-button 
-              fill="clear" shape="round">
+              <ion-button fill="clear" shape="round">
                 Ingresos y Autorizaciones
-              </ion-button>                
+              </ion-button>
             </ion-item>
 
             <ion-item>
-              <ion-button 
-              expand="block" fill="clear" shape="round">
+              <ion-button expand="block" fill="clear" shape="round">
                 Reservas de Eventos
               </ion-button>
             </ion-item>
 
             <ion-item>
-              <ion-button 
-              expand="block" fill="clear" shape="round">
+              <ion-button expand="block" fill="clear" shape="round">
                 Boton de panico
               </ion-button>
             </ion-item>
 
           </ion-list>
-          
+
 
         </div>
       </ion-accordion>
@@ -73,24 +68,22 @@
           <ion-label>Vigiladores</ion-label>
         </ion-item>
         <div class="ion-padding" slot="content">
-          
+
           <ion-list lines="none">
             <ion-item>
-              <ion-button 
-              fill="clear" shape="round">
+              <ion-button fill="clear" shape="round">
                 Ubicacion de Guardias
-              </ion-button>                
+              </ion-button>
             </ion-item>
 
             <ion-item>
-              <ion-button 
-              expand="block" fill="clear" shape="round">
+              <ion-button expand="block" fill="clear" shape="round">
                 Nomina y Horarios
               </ion-button>
             </ion-item>
 
           </ion-list>
-          
+
 
         </div>
       </ion-accordion>
@@ -133,15 +126,17 @@
 
 <ion-content [fullscreen]="true">
   <ion-progress-bar type="indeterminate" *ngIf="isLoading()"></ion-progress-bar>
-  <!-- <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header> -->
 
-  <app-incomes></app-incomes>
-  <app-incomes></app-incomes>
-  <app-incomes></app-incomes>
+  <ion-row>
+    <ion-col size-sm="6">
+      <app-incomes></app-incomes>
+
+    </ion-col>
+    <ion-col size-sm="6">
+      <app-reservations></app-reservations>
+
+    </ion-col>
+  </ion-row>
 
   <!-- <app-explore-container name="Tab 1 page"></app-explore-container> -->
 </ion-content>
