@@ -7,8 +7,21 @@ import { MenuController } from '@ionic/angular';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page {
+  private loading: boolean;
 
-  constructor(private menu: MenuController) {}
+
+
+
+  constructor(private menu: MenuController) { 
+    this.setLoading(true);
+    this.getData();
+  }
+
+  private getData(){
+    setTimeout(() => {
+      this.setLoading(false);
+    }, 3000);
+  }
 
   openFirst(id: string) {
     this.menu.enable(true, id);
@@ -24,4 +37,11 @@ export class Tab1Page {
     this.menu.open('custom');
   }
 
+  public isLoading(): boolean {
+    return this.loading;
+  }
+
+  public setLoading(loading: boolean): void {
+    this.loading = loading;
+  }
 }
