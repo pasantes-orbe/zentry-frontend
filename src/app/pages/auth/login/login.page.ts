@@ -18,7 +18,7 @@ export class LoginPage implements OnInit {
   }
 
 
-  private showPassword(input): void{
+  protected showPassword(input): void{
 
     (this.getPasswordType(input) === "password")
     ? this.setPasswordType(input, "text")
