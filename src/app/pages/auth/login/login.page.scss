@@ -1,0 +1,16 @@
+
+$mobile: 80px;
+$desktop: 130px;
+
+ion-avatar{
+    width: $desktop;
+    height: $desktop;
+}
+
+ion-card{
+    box-shadow: none;
+}
+
+ion-item{
+    margin-bottom: 20px;
+}
