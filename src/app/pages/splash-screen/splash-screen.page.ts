@@ -19,8 +19,7 @@ export class SplashScreenPage implements OnInit {
   ionViewWillEnter(){
     
     setTimeout(() => {
-      console.log("hola");
-      this.router.navigate["/login"];      
+      this.router.navigate(["/login"]);      
     }, 3000);
 
   }
