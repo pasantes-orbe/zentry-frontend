@@ -1,7 +1,7 @@
 <ion-card *ngIf="!isLoading()">
   <div class="table-responsive container">
   
-    <h5>Reserva de Eventos</h5>
+  <h5>Reserva de Eventos</h5>
   
   <table class="table">
     <thead>
@@ -35,6 +35,18 @@
   
   </div>
   
+  <div class="buttons text-center mt-2 mb-2">
+    <ion-button fill="clear" >
+      <ion-icon slot="end" name="search-outline"></ion-icon>
+      Ver Todos
+    </ion-button>
+    
+    <ion-button shape="round">
+      <ion-icon slot="end" name="add"></ion-icon>
+      Agregar
+    </ion-button>
+    
+  </div>
     
   </ion-card>
 

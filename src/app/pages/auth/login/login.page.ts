@@ -12,6 +12,7 @@ export class LoginPage implements OnInit {
 
   @ViewChild('passwordShowIcon') passIcon;
 
+
   constructor(
     private _router: Router,
     private _modalCtrl: ModalController

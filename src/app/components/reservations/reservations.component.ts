@@ -10,8 +10,6 @@ export class ReservationsComponent implements OnInit {
   private loading: boolean;
   private data: any;
 
-
-
   constructor() {
     this.setLoading(true);
     this.loadData();
