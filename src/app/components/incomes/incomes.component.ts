@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-incomes',
@@ -6,6 +6,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./incomes.component.scss'],
 })
 export class IncomesComponent implements OnInit {
+
+  @Input('readonly') readonly: boolean;
+
 
   private loading: boolean;
   private data: any;
@@ -19,7 +22,7 @@ export class IncomesComponent implements OnInit {
 
   ngOnInit() { }
 
-  private loadData(): void{
+  private loadData(): void {
     setTimeout(() => {
       this.setLoading(false);
     }, 3000);
@@ -29,7 +32,7 @@ export class IncomesComponent implements OnInit {
     return this.data;
   }
 
-  public setData(data: any): void {
+  private setData(data: any): void {
     this.data = data;
   }
 
@@ -37,8 +40,16 @@ export class IncomesComponent implements OnInit {
     return this.loading;
   }
 
-  public setLoading(loading: boolean): void {
+  private setLoading(loading: boolean): void {
     this.loading = loading;
+  }
+
+  public isReadOnly(): boolean {
+    return this.readonly;
+  }
+
+  private setReadOnly(readonly: boolean): void {
+    this.readonly = readonly;
   }
 
 

@@ -25,7 +25,12 @@ const routes: Routes = [
   {
     path: 'cambiar-clave',
     loadChildren: () => import('./pages/account/password-change/password-change.module').then( m => m.PasswordChangePageModule)
+  },
+  {
+    path: 'ingresos-y-autorizaciones',
+    loadChildren: () => import('./pages/registrations/incomes/incomes.module').then( m => m.IncomesPageModule)
   }
+
 
 
 
