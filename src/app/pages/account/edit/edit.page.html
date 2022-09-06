@@ -15,19 +15,19 @@
                 <form>
                     <ion-item>
                         <ion-label position="floating">Nombre Completo</ion-label>
-                        <ion-input required type="text"></ion-input>
+                        <ion-input required value="Jhon Doe" type="text"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-label position="floating">Dirección <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input required  type="text"></ion-input>
+                        <ion-label position="floating">Dirección</ion-label>
+                        <ion-input required value="Entre Rios 142 P.9 Of. A" type="text"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-label position="floating">Telefono <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input required  type="text"></ion-input>
+                        <ion-label position="floating">Telefono</ion-label>
+                        <ion-input required value="3624000000" type="text"></ion-input>
                     </ion-item>                    
                     <ion-item>
-                        <ion-label position="floating">Email <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input required  type="text"></ion-input>
+                        <ion-label position="floating">Email</ion-label>
+                        <ion-input required value="alejandro@orbesoftware.com.ar" type="text"></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-label class="ion-text-wrap birthday" position="stacked">Cumpleaños</ion-label>
@@ -36,7 +36,7 @@
 
                     <ion-modal [keepContentsMounted]="true">
                         <ng-template>
-                            <ion-datetime (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
+                            <ion-datetime value="2003-10-13T11:51:00-03:00" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
                             <span slot="title">ELIGE LA FECHA DE TU CUMPLEAÑOS</span>
                             </ion-datetime>
                         </ng-template>
