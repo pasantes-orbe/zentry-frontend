@@ -38,5 +38,7 @@ export class RecoverPasswordComponent {
     this.userInput = userInput;
   }
 
-
+  public send(){
+    
+  }
 }
