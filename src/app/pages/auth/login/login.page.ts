@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { RecoverPasswordComponent } from 'src/app/modals/auth/recover-password/recover-password.component';
+import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +11,6 @@ import { RecoverPasswordComponent } from 'src/app/modals/auth/recover-password/r
 export class LoginPage implements OnInit {
 
   @ViewChild('passwordShowIcon') passIcon;
-
 
   constructor(
     private _router: Router,
@@ -24,7 +23,7 @@ export class LoginPage implements OnInit {
   async openModal() {
     
     const modal = await this._modalCtrl.create({
-      component: RecoverPasswordComponent,
+      component: PasswordRecoverPage,
     });
 
     modal.present();

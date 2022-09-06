@@ -29,7 +29,11 @@ const routes: Routes = [
   {
     path: 'ingresos-y-autorizaciones',
     loadChildren: () => import('./pages/registrations/incomes/incomes.module').then( m => m.IncomesPageModule)
+  },  {
+    path: 'password-recover',
+    loadChildren: () => import('./modals/auth/password-recover/password-recover.module').then( m => m.PasswordRecoverPageModule)
   }
+
 
 
 
