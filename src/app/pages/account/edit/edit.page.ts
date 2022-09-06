@@ -12,9 +12,9 @@ export class EditPage implements OnInit {
   ngOnInit() {
   }
 
-  getDate({detail}){
+  getDate(event){
     
-    const { value } = detail;
+    const { value } = event.detail;
 
     console.log(value);
     
