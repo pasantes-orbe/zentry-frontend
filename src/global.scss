@@ -39,6 +39,12 @@ h1,h2,h3,h4,h5,h6{
     color: var(--ion-color-primary);
 }
 
+ion-datetime {
+    --title-color: var(--ion-color-secondary);
+    --background: #fff;
+    color: var(--ion-color-secondary);
+}
+
 .flex-center{
     display: flex;
     align-items: center;

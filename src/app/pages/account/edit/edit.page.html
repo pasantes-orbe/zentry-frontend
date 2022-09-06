@@ -31,15 +31,17 @@
                     </ion-item>
                     <ion-item>
                         <ion-label class="ion-text-wrap birthday" position="stacked">Cumpleaños</ion-label>
-                        <ion-datetime-button
-                        datetime="datetime"
-                        ></ion-datetime-button>
+                        <ion-datetime-button datetime="datetime"></ion-datetime-button>
                     </ion-item>
+
                     <ion-modal [keepContentsMounted]="true">
                         <ng-template>
-                          <ion-datetime id="datetime"></ion-datetime>
+                            <ion-datetime (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
+                            <span slot="title">ELIGE LA FECHA DE TU CUMPLEAÑOS</span>
+                            </ion-datetime>
                         </ng-template>
-                      </ion-modal>
+                    </ion-modal>
+
                     <ion-button class="mt-4 mb-4" expand="block" size="large" color="primary" shape="round" type="submit">
                         <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
                         Guardar

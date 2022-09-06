@@ -12,4 +12,12 @@ export class EditPage implements OnInit {
   ngOnInit() {
   }
 
+  getDate({detail}){
+    
+    const { value } = detail;
+
+    console.log(value);
+    
+  }
+
 }
