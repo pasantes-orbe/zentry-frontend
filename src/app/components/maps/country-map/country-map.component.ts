@@ -11,21 +11,10 @@ export class CountryMapComponent implements AfterViewInit {
   private map: any;
   private tileLayer: any;
 
-
-
-
-
-  constructor() {
-
-  }
+  constructor() { }
 
   ngAfterViewInit(): void {
     this.initMap();
-
-  }
-
-  onMapReady($event) {
-    console.log("LISTO");
   }
 
   public getTileLayer(): any {
@@ -34,20 +23,15 @@ export class CountryMapComponent implements AfterViewInit {
 
   public setTileLayer(url: any): void {
     this.tileLayer = L.tileLayer(url,
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      });
   }
 
 
   private initMap(): void {
 
-    // let tileLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-    //   {
-    //     attribution: false
-    //   });
-
-    this.setTileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
+    this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
 
     this.map = L.map('map',
       {
@@ -58,22 +42,28 @@ export class CountryMapComponent implements AfterViewInit {
       }
     ).setView([-27.568994, -58.755599], 15);
 
-    this.map.dragging.disable();
+    this.getMap().dragging.disable();
 
-    L.marker([-27.568994, -58.755599]).addTo(this.getMap())
-    .bindPopup('Ejemplo de guardia');
+    this.addPoint(-27.5622, -58.7488, "Vigilador: <b>Juan Pérez</b> <br> Horario: 22:00hs - 06:00hs");
+    this.addPoint(-27.5594, -58.7516, "Vigilador: <b>Carlos Gómez</b> <br> Horario: 06:00hs - 12:00hs");
+    this.addPoint(-27.5628, -58.7560, "Vigilador: <b>Alejandro Chicala</b> <br> Horario: 12:00hs - 17:00hs");
+    this.addPoint(-27.568994, -58.755599, "<img class='guard-avatar' src='img.png' /> <br> Vigilador: <b>Javier Bernal</b> <br> Horario: 17:00hs - 22:00hs");
 
     setTimeout(() => {
-      this.map.invalidateSize(true);
+      this.getMap().invalidateSize(true);
     }, 100);
 
-    // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: false}).addTo(this.map);
+  }
 
-
-
-    // L.marker([-27.563145, -58.752776]).addTo(this.map).bindPopup("<b>Hello world!</b><br>I am a popup.");
-
-
+  public addPoint(lat: number, lng: number, html: string = null): void {
+    L.circle([lat, lng], {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 40
+    })
+      .bindPopup(html)
+      .addTo(this.getMap());
   }
 
   public getMap() {
