@@ -5,15 +5,16 @@ import { IonicModule } from '@ionic/angular';
 import { ReservationsComponent } from './reservations/reservations.component';
 import { NavbarDefaultComponent } from './navbars/navbar-default/navbar-default.component';
 import { NavbarBackComponent } from './navbars/navbar-back/navbar-back.component';
+import { CountryMapComponent } from './maps/country-map/country-map.component';
 
 
 
 @NgModule({
-  declarations: [IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent],
+  declarations: [CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent],
   imports: [
     CommonModule,
     IonicModule
   ],
-  exports: [IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent]
+  exports: [CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent]
 })
 export class ComponentsModule { }
