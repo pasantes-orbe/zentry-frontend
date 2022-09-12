@@ -34,7 +34,7 @@
   
   </div>
   
-  <div class="buttons text-center mt-2 mb-2">
+  <div *ngIf="!isReadOnly()" class="buttons text-center mt-2 mb-2">
     <ion-button fill="clear" >
       <ion-icon slot="end" name="search-outline"></ion-icon>
       Ver Todos
