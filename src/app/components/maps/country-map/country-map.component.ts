@@ -31,7 +31,13 @@ export class CountryMapComponent implements AfterViewInit {
 
   private initMap(): void {
 
-    this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    if(prefersDark.matches){
+      this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
+    } else {
+      this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png');
+    }
+
 
     this.map = L.map('map',
       {
@@ -60,7 +66,7 @@ export class CountryMapComponent implements AfterViewInit {
       color: 'red',
       fillColor: '#f03',
       fillOpacity: 0.5,
-      radius: 40
+      radius: 15
     })
       .bindPopup(html)
       .addTo(this.getMap());
