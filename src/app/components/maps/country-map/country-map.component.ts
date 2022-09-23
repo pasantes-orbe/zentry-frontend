@@ -80,5 +80,9 @@ export class CountryMapComponent implements AfterViewInit {
     this.map = map;
   }
 
+  antipanic(){
+    const box = document.querySelector('.box');
+    (document.querySelector('.box') as HTMLElement).style.display = 'block';
+  }
 
 }
