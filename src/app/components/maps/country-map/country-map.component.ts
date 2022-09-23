@@ -68,7 +68,7 @@ export class CountryMapComponent implements AfterViewInit {
       fillOpacity: 0.5,
       radius: 15
     })
-      .bindPopup(html)
+      .bindPopup(html, {closeButton: false})
       .addTo(this.getMap());
   }
 

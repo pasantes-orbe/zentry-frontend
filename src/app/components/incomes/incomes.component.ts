@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-incomes',
@@ -15,12 +16,16 @@ export class IncomesComponent implements OnInit {
 
 
 
-  constructor() {
+  constructor(private router: Router) {
     this.setLoading(true);
     this.loadData();
   }
 
   ngOnInit() { }
+
+  protected navigate(url: string): void {
+    this.router.navigate([url]);
+  }
 
   private loadData(): void {
     setTimeout(() => {

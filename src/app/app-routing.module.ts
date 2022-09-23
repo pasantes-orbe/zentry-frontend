@@ -29,10 +29,20 @@ const routes: Routes = [
   {
     path: 'ingresos-y-autorizaciones',
     loadChildren: () => import('./pages/registrations/incomes/incomes.module').then( m => m.IncomesPageModule)
-  },  {
+  },
+  {
     path: 'password-recover',
     loadChildren: () => import('./modals/auth/password-recover/password-recover.module').then( m => m.PasswordRecoverPageModule)
+  },
+  {
+    path: 'ingresos-autorizados',
+    loadChildren: () => import('./pages/incomes/auth-incomes/auth-incomes.module').then( m => m.AuthIncomesPageModule)
+  },
+  {
+    path: 'nueva-autorizacion',
+    loadChildren: () => import('./pages/incomes/new-income/new-income.module').then( m => m.NewIncomePageModule)
   }
+
 
 
 
