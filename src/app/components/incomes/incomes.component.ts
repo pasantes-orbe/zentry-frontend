@@ -9,12 +9,14 @@ import { Router } from '@angular/router';
 export class IncomesComponent implements OnInit {
 
   @Input('readonly') readonly: boolean;
+  @Input('nobuttons') nobuttons: boolean;
+
+
+
 
 
   private loading: boolean;
   private data: any;
-
-
 
   constructor(private router: Router) {
     this.setLoading(true);
@@ -55,6 +57,14 @@ export class IncomesComponent implements OnInit {
 
   private setReadOnly(readonly: boolean): void {
     this.readonly = readonly;
+  }
+
+  public isNobuttons(): boolean {
+    return this.nobuttons;
+  }
+
+  public setNobuttons(nobuttons: boolean): void {
+    this.nobuttons = nobuttons;
   }
 
 
