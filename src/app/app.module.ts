@@ -9,11 +9,13 @@ import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     FormsModule,
+    HttpClientModule,
     ReactiveFormsModule,
     BrowserModule,
     IonicModule.forRoot(),

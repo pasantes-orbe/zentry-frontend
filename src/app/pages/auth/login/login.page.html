@@ -2,6 +2,10 @@
 <ion-content>
 
   <div class="flex-center">
+
+    <ion-text *ngIf="getErrorMessage()" color="danger">
+      <p>{{getErrorMessage()}}</p>
+    </ion-text>
     
     <ion-card>
       <ion-card-header >
@@ -12,54 +16,37 @@
     
       <ion-card-content>
        
-        <form formGroup="loginForm">
+        <form [formGroup]="getForm()" (keyup.enter)="login($event)" (ngSubmit)="login($event)">
 
           <ion-item>
             <!-- <ion-label position="floating">Usuario</ion-label> -->
-            <ion-input required type="text" placeholder="Usuario"></ion-input>
+            <ion-input required type="text" placeholder="Usuario" formControlName="user" ></ion-input>
           </ion-item>
 
           <ion-item>
             <!-- <ion-label position="floating">Contraseña</ion-label> -->
             <ion-icon #passwordShowIcon button (click)="showPassword(password)" slot="end" name="eye-outline"></ion-icon>
-            <ion-input #password required type="password" placeholder="Contraseña"></ion-input>
+            <ion-input #password required type="password" formControlName="password" placeholder="Contraseña"></ion-input>
           </ion-item>
 
           <ion-button (click)="openModal()" expand="block" fill="clear" shape="round">
             <small>Reestablecer Contraseña</small>
           </ion-button>
 
-          <ion-button routerLink="/home" block color="primary" type="submit" shape="round" size="full">
+          <ion-button [disabled]="getForm().invalid" block color="primary" type="submit" shape="round" size="full">
             Iniciar Sesión
           </ion-button>
+
+          <!-- TODO: HACER FUNCIONAR EL SPINNER AL HACER SUBMIT -->
+          <!-- <div class="text-center mt-4">
+            <ion-spinner name="crescent"></ion-spinner>
+          </div> -->
+
         </form>
         
       </ion-card-content>
     </ion-card>
 
   </div>
-
-
-  <!-- <ion-modal [isOpen]="isModalOpen">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Modal</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="setOpen(false)">
-              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding">
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni illum quidem recusandae ducimus quos
-          reprehenderit. Veniam, molestias quos, dolorum consequuntur nisi deserunt omnis id illo sit cum qui. Eaque,
-          dicta.
-        </p>
-      </ion-content>
-    </ng-template>
-  </ion-modal> -->
 
 </ion-content>

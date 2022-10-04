@@ -1,7 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
+import { LoginService } from 'src/app/services/auth/login.service';
+import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
 
 @Component({
   selector: 'app-login',
@@ -12,16 +15,64 @@ export class LoginPage implements OnInit {
 
   @ViewChild('passwordShowIcon') passIcon;
 
+  private formBuilder: FormBuilder;
+  private form: FormGroup;
+
+  private errorMessage: any;
+
+
+
   constructor(
     private _router: Router,
-    private _modalCtrl: ModalController
-  ) {}
+    private _modalCtrl: ModalController,
+    protected _formBuilder: FormBuilder,
+    private _loginService: LoginService,
+    private _authStorage: AuthStorageService
+  ) {
+    this.formBuilder = _formBuilder;
+    this.form = this.createForm();
+  }
 
   ngOnInit() {
   }
 
+  private createForm(): FormGroup {
+    return this.formBuilder.group({
+      user: ['', [Validators.required]],
+      password: ['', [Validators.required]]
+    });
+  }
+
+  public getForm(): FormGroup {
+    return this.form;
+  }
+
+  login(ev) {
+
+    const user = {
+      email: this.getForm().get('user').value,
+      password: this.getForm().get('password').value
+    }
+
+    this._loginService.login(user).subscribe(
+      data => {
+        this.setErrorMessage(false);
+        console.log("DATA", data);
+        // TODO: Guardar en storage el JWT del usuario antes de redireccionarlo.
+        this._authStorage.saveJWT(data['token']);
+        this._router.navigate(['/home']);
+        
+
+      },
+      fail => {
+        console.log("ERR", fail);
+        this.setErrorMessage(fail.error.msg);
+      }
+    );
+  }
+
   async openModal() {
-    
+
     const modal = await this._modalCtrl.create({
       component: PasswordRecoverPage,
     });
@@ -57,6 +108,15 @@ export class LoginPage implements OnInit {
   private setPasswordType(input, type): void {
     input.type = type;
   }
+
+  public getErrorMessage(): any {
+    return this.errorMessage;
+  }
+
+  public setErrorMessage(errorMessage: any): void {
+    this.errorMessage = errorMessage;
+  }
+
 
 
 
