@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 import { LoginService } from 'src/app/services/auth/login.service';
+import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
 
 @Component({
@@ -27,7 +28,8 @@ export class LoginPage implements OnInit {
     private _modalCtrl: ModalController,
     protected _formBuilder: FormBuilder,
     private _loginService: LoginService,
-    private _authStorage: AuthStorageService
+    private _authStorage: AuthStorageService,
+    protected _loading: LoadingService
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -49,11 +51,18 @@ export class LoginPage implements OnInit {
 
   login(ev) {
 
+    if(!this.getForm().valid) return;
+
+    this._loading.startLoading("Aguarde un momento...");
+
     const user = {
       email: this.getForm().get('user').value,
       password: this.getForm().get('password').value
     }
 
+    setTimeout(() => {
+      
+    
     this._loginService.login(user).subscribe(
       data => {
         this.setErrorMessage(false);
@@ -66,9 +75,20 @@ export class LoginPage implements OnInit {
       },
       fail => {
         console.log("ERR", fail);
+        const { status, error } = fail;
+
+        if(status == 0){          
+          return this.setErrorMessage("Error de conexión con el servidor");
+        }
         this.setErrorMessage(fail.error.msg);
+
       }
     );
+
+    this._loading.stopLoading();
+
+  }, 1000);
+
   }
 
   async openModal() {
