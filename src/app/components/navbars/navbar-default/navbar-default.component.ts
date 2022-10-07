@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
+import { UserInterface } from 'src/app/interfaces/user-interface';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 @Component({
   selector: 'app-navbar-default',
@@ -9,12 +11,18 @@ import { MenuController } from '@ionic/angular';
 })
 export class NavbarDefaultComponent implements OnInit {
 
+  protected user: UserInterface;
+
   constructor(
     private menu: MenuController,
-    private router: Router
-    ) { }
+    private router: Router,
+    private _userStorage: UserStorageService
+  ) { }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    this.setUser(await this._userStorage.getUser());
+    //TODO:
+  }
 
   protected navigate(url: string): void {
     this.router.navigate([url]);
@@ -38,6 +46,16 @@ export class NavbarDefaultComponent implements OnInit {
     this.router.navigate(["/"]);
   }
 
-  
+
+  public getUser(): UserInterface {
+    return this.user;
+  }
+
+  private setUser(user: UserInterface): void {
+    this.user = user;
+  }
+
+
+
 
 }

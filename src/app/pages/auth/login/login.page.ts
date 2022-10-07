@@ -6,6 +6,7 @@ import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/passwo
 import { LoginService } from 'src/app/services/auth/login.service';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,8 @@ export class LoginPage implements OnInit {
     protected _formBuilder: FormBuilder,
     private _loginService: LoginService,
     private _authStorage: AuthStorageService,
-    protected _loading: LoadingService
+    protected _loading: LoadingService,
+    private _userStorage: UserStorageService
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -66,11 +68,10 @@ export class LoginPage implements OnInit {
     this._loginService.login(user).subscribe(
       data => {
         this.setErrorMessage(false);
-        console.log("DATA", data);
-        // TODO: Guardar en storage el JWT del usuario antes de redireccionarlo.
+
         this._authStorage.saveJWT(data['token']);
+        this._userStorage.saveUser(data['user']);
         this._router.navigate(['/home']);
-        
 
       },
       fail => {
