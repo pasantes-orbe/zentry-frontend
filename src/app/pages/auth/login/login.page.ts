@@ -43,6 +43,7 @@ export class LoginPage implements OnInit {
 
   private async ionViewWillEnter() {
 
+    this.setErrorMessage(false);
     // Redireccionar si ya esta almacenado el usuario en storage
     const user = await this._userStorage.getUser();
 
@@ -54,24 +55,28 @@ export class LoginPage implements OnInit {
     if (!this.getForm().valid) return;
 
     this._loading.startLoading("Aguarde un momento...");
+    this.setErrorMessage(false);
 
     const user = {
       email: this.getForm().get('user').value,
       password: this.getForm().get('password').value
     }
 
-    setTimeout(() => {
+    // setTimeout(() => {
 
 
       this._loginService.login(user).subscribe(
         data => {
-          this.setErrorMessage(false);
 
           this._authStorage.saveJWT(data['token']);
           this._userStorage.saveUser(data['user']);
 
+          
+
           const { name } = data['user'].role;
           this._redirectService.redirectByRole(name);
+          this.setErrorMessage("Iniciando sesion...");
+          this._loading.stopLoading();
 
         },
         fail => {
@@ -82,13 +87,14 @@ export class LoginPage implements OnInit {
             return this.setErrorMessage("Error de conexión con el servidor");
           }
           this.setErrorMessage(fail.error.msg);
+          this._loading.stopLoading();
 
         }
       );
 
-      this._loading.stopLoading();
+      
 
-    }, 1000);
+    // }, 1000);
 
   }
 
