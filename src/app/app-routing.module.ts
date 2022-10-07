@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AdminGuard } from './guards/admin.guard';
 import { OwnerGuard } from './guards/owner.guard';
+import { SecurityGuard } from './guards/security.guard';
 
 const routes: Routes = [
   {
@@ -43,7 +45,19 @@ const routes: Routes = [
   {
     path: 'nueva-autorizacion',
     loadChildren: () => import('./pages/incomes/new-income/new-income.module').then( m => m.NewIncomePageModule)
+  },
+  {
+    path: 'vigiladores/home',
+    loadChildren: () => import('./pages/guards/home/home.module').then( m => m.HomePageModule),
+    canActivate: [SecurityGuard]
+  },
+  {
+    path: 'admin/home',
+    loadChildren: () => import('./pages/admin/home/home.module').then( m => m.HomePageModule),
+    canActivate: [AdminGuard]
   }
+
+
 
 
 

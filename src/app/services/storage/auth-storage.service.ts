@@ -6,7 +6,8 @@ import { Preferences } from '@capacitor/preferences';
 })
 export class AuthStorageService {
 
-  constructor() { }
+  constructor(
+  ) { }
 
   public async saveJWT(jwt: string): Promise<void>{
     await Preferences.set({
@@ -21,6 +22,10 @@ export class AuthStorageService {
     return JSON.parse(value);
     
   }
+
+  
+
+
 
 
 }

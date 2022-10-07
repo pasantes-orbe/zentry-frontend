@@ -54,9 +54,7 @@ export class LoginService {
       }
     });
 
-    console.log(resp.status);
     if(resp.status == 200) return true;
-
     return false;
   }
 

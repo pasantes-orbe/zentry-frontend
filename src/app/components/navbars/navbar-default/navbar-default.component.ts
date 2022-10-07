@@ -43,6 +43,7 @@ export class NavbarDefaultComponent implements OnInit {
   }
 
   protected signOut(): void {
+    this._userStorage.signOut();
     this.router.navigate(["/"]);
   }
 

@@ -32,7 +32,12 @@ export class UserStorageService {
     this.user = user;
   }
 
+  public async signOut(): Promise<void>{
 
+    await Preferences.remove({key: 'JWT'});
+    await Preferences.remove({key: 'USER'});
+
+  }
 
 
 }

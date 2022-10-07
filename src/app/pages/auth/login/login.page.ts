@@ -5,6 +5,7 @@ import { ModalController } from '@ionic/angular';
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 import { LoginService } from 'src/app/services/auth/login.service';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
+import { RedirectService } from 'src/app/services/helpers/redirect.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
@@ -31,13 +32,64 @@ export class LoginPage implements OnInit {
     private _loginService: LoginService,
     private _authStorage: AuthStorageService,
     protected _loading: LoadingService,
-    private _userStorage: UserStorageService
+    private _userStorage: UserStorageService,
+    private _redirectService: RedirectService
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  private async ionViewWillEnter() {
+
+    // Redireccionar si ya esta almacenado el usuario en storage
+    const user = await this._userStorage.getUser();
+
+    if (user) this._redirectService.redirectByRole(user['role'].name);
+  }
+
+  login() {
+
+    if (!this.getForm().valid) return;
+
+    this._loading.startLoading("Aguarde un momento...");
+
+    const user = {
+      email: this.getForm().get('user').value,
+      password: this.getForm().get('password').value
+    }
+
+    setTimeout(() => {
+
+
+      this._loginService.login(user).subscribe(
+        data => {
+          this.setErrorMessage(false);
+
+          this._authStorage.saveJWT(data['token']);
+          this._userStorage.saveUser(data['user']);
+
+          const { name } = data['user'].role;
+          this._redirectService.redirectByRole(name);
+
+        },
+        fail => {
+          console.log("ERR", fail);
+          const { status, error } = fail;
+
+          if (status == 0) {
+            return this.setErrorMessage("Error de conexión con el servidor");
+          }
+          this.setErrorMessage(fail.error.msg);
+
+        }
+      );
+
+      this._loading.stopLoading();
+
+    }, 1000);
+
   }
 
   private createForm(): FormGroup {
@@ -51,46 +103,6 @@ export class LoginPage implements OnInit {
     return this.form;
   }
 
-  login(ev) {
-
-    if(!this.getForm().valid) return;
-
-    this._loading.startLoading("Aguarde un momento...");
-
-    const user = {
-      email: this.getForm().get('user').value,
-      password: this.getForm().get('password').value
-    }
-
-    setTimeout(() => {
-      
-    
-    this._loginService.login(user).subscribe(
-      data => {
-        this.setErrorMessage(false);
-
-        this._authStorage.saveJWT(data['token']);
-        this._userStorage.saveUser(data['user']);
-        this._router.navigate(['/home']);
-
-      },
-      fail => {
-        console.log("ERR", fail);
-        const { status, error } = fail;
-
-        if(status == 0){          
-          return this.setErrorMessage("Error de conexión con el servidor");
-        }
-        this.setErrorMessage(fail.error.msg);
-
-      }
-    );
-
-    this._loading.stopLoading();
-
-  }, 1000);
-
-  }
 
   async openModal() {
 
