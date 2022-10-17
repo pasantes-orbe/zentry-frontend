@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Check In</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h3 class="text-center">REGISTRAR INGRESO</h3>
+
+  <form [formGroup]="getForm()" (ngSubmit)="submitIncome()">
+    <ion-item>
+      <ion-label position="floating">Nombre Completo <ion-text color="danger">*</ion-text></ion-label>
+      <ion-input [(ngModel)]="getIncomeData().fullname" required formControlName="fullname" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">DNI <ion-text color="danger">*</ion-text></ion-label>
+      <ion-input [(ngModel)]="getIncomeData().DNI" required formControlName="DNI" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Propietario Autoriza <ion-text color="danger">*</ion-text></ion-label>
+      <ion-input [(ngModel)]="getIncomeData().owner" required formControlName="owner" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label class="ion-text-wrap mb-3" position="stacked">Fecha y hora de ingreso</ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+    </ion-item>
+
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+          <ion-datetime [(ngModel)]="getIncomeData().date" presentation="date-time" formControlName="date" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime">
+          <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
+          </ion-datetime>
+      </ng-template>
+    </ion-modal>
+
+    <!-- <ion-item>
+      <ion-label class="mb-4" position="floating">Hora Ingreso <ion-text color="danger">*</ion-text></ion-label>
+      <ion-datetime-button datetime="hora-ingreso"></ion-datetime-button>
+    </ion-item>
+    
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime presentation="date-time" (ionChange)="getIncomeTime($event)" color="primary" [showDefaultTitle]="true" id="hora-ingreso">
+          <span slot="title">ENTRADA</span>
+        </ion-datetime>
+      </ng-template>
+    </ion-modal> -->
+
+    <ion-item>
+      <ion-label position="floating">Transporte</ion-label>
+      <ion-select (ionChange)="select($event)" placeholder="Seleccionar">
+        <ion-select-option value="Vehículo">Vehículo</ion-select-option>
+        <ion-select-option value="Motocicleta">Motocicleta</ion-select-option>
+        <ion-select-option value="Camión">Camión</ion-select-option>
+        <ion-select-option value="Bicicleta">Bicicleta</ion-select-option>
+        <ion-select-option value="A pie">A pie</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="getIncomeData().transport != '' && (getIncomeData().transport != 'Bicicleta' && getIncomeData().transport != 'A pie')">
+      <ion-label position="floating">Patente</ion-label>
+      <ion-input [(ngModel)]="getIncomeData().patent" formControlName="patent" required type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label  position="floating">Observaciones</ion-label>
+      <ion-textarea (ionChange)="setObservations($event)" rows="5"></ion-textarea>
+    </ion-item>
+    {{hello}}
+    <ion-button block color="primary" type="submit" [disabled]="getForm().invalid">
+      Ingresar
+    </ion-button>
+  </form>
+
+</ion-content>

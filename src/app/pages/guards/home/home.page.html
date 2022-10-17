@@ -1,7 +1,29 @@
-<app-navbar-default></app-navbar-default>
+<!-- <app-navbar-guards></app-navbar-guards>
 
 <ion-content class="ion-padding">
 
   <h3 class="text-center">PANEL PARA VIGILADORES</h3>
 
-</ion-content>
+  <app-incomes-guards></app-incomes-guards> -->
+
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="checkin">
+        <ion-icon color="success" name="arrow-forward-circle-outline"></ion-icon>
+        <ion-label color="success">CHECK IN</ion-label>
+      </ion-tab-button>
+  
+      <ion-tab-button tab="autorizaciones">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <ion-label>AUTORIZACIONES</ion-label>
+      </ion-tab-button>
+  
+      <ion-tab-button tab="checkout">
+        <ion-icon color="danger" name="arrow-back-circle-outline"></ion-icon>
+        <ion-label color="danger">CHECK OUT</ion-label>
+      </ion-tab-button>
+
+    </ion-tab-bar>
+  </ion-tabs>
+
+<!-- </ion-content> -->

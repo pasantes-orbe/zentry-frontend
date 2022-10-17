@@ -49,13 +49,25 @@ const routes: Routes = [
   {
     path: 'vigiladores/home',
     loadChildren: () => import('./pages/guards/home/home.module').then( m => m.HomePageModule),
-    canActivate: [SecurityGuard]
+    // canActivate: [SecurityGuard] TODO: ACTIVAR GUARD
   },
   {
     path: 'admin/home',
     loadChildren: () => import('./pages/admin/home/home.module').then( m => m.HomePageModule),
     canActivate: [AdminGuard]
+  },  {
+    path: 'authorizations',
+    loadChildren: () => import('./pages/guards/authorizations/authorizations.module').then( m => m.AuthorizationsPageModule)
+  },
+  {
+    path: 'checkin',
+    loadChildren: () => import('./pages/guards/checkin/checkin.module').then( m => m.CheckinPageModule)
+  },
+  {
+    path: 'checkout',
+    loadChildren: () => import('./pages/guards/checkout/checkout.module').then( m => m.CheckoutPageModule)
   }
+
 
 
 
