@@ -13,7 +13,6 @@ export class CheckinPage implements OnInit {
   private form: FormGroup;
 
   protected incomeData: CheckinInterface;
-  protected hello: string;
 
   protected dateNow: String = new Date().toISOString();
 
@@ -57,8 +56,8 @@ export class CheckinPage implements OnInit {
 
   private createForm(): FormGroup {
     return this.formBuilder.group({
-      fullname: ['', [Validators.required]],
-      DNI: ['', [Validators.required]],
+      fullname: ['', [Validators.required, Validators.minLength(3)]],
+      DNI: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(9), Validators.pattern("^[0-9]*$")]],
       owner: ['', [Validators.required]],
       date: ['', [Validators.required]],
       patent: ''

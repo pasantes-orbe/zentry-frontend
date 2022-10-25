@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { AuthStorageService } from './auth-storage.service';
 import { Preferences } from '@capacitor/preferences';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class UserStorageService {
   public user: UserInterface;
 
   constructor(
+    private _router: Router
   ) { }
 
   public async saveUser(user: UserInterface) {
@@ -36,6 +38,9 @@ export class UserStorageService {
 
     await Preferences.remove({key: 'JWT'});
     await Preferences.remove({key: 'USER'});
+
+    
+    this._router.navigate(["/"]);
 
   }
 

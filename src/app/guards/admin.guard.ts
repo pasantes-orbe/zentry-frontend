@@ -25,11 +25,10 @@ export class AdminGuard implements CanActivate, RoleGuard {
         validJWT => {
   
           if(!validJWT){
-            this._router.navigate(['/']);
+            this._router.navigate(['/login']);
             return false;
           }
           
-          console.log(validJWT);
   
           return true;        
         }

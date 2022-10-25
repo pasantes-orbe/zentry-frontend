@@ -16,7 +16,7 @@ export class NavbarDefaultComponent implements OnInit {
   constructor(
     private menu: MenuController,
     private router: Router,
-    private _userStorage: UserStorageService
+    protected _userStorage: UserStorageService
   ) { }
 
   async ngOnInit() {
@@ -41,12 +41,6 @@ export class NavbarDefaultComponent implements OnInit {
     this.menu.enable(true, 'custom');
     this.menu.open('custom');
   }
-
-  protected signOut(): void {
-    this._userStorage.signOut();
-    this.router.navigate(["/"]);
-  }
-
 
   public getUser(): UserInterface {
     return this.user;

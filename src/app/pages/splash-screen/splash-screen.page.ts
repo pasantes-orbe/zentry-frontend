@@ -25,9 +25,8 @@ export class SplashScreenPage implements OnInit {
   async ionViewWillEnter(){
     
     setTimeout(async () => {
-
+      
       const user = await this._userStorage.getUser();
-    
       if(user){
         this._redirectService.redirectByRole(user['role'].name)
       } else {

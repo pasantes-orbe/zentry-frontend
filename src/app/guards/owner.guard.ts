@@ -24,9 +24,8 @@ export class OwnerGuard implements CanActivate, RoleGuard {
     
     return this._loginService.isRole(this.roleType).then(
       validJWT => {
-
         if(!validJWT){
-          this._router.navigate(['/']);
+          this._router.navigate(['/login']);
           return false;
         }
 

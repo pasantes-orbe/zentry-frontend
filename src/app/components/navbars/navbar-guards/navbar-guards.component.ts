@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 @Component({
   selector: 'app-navbar-guards',
@@ -10,7 +11,8 @@ import { MenuController } from '@ionic/angular';
 export class NavbarGuardsComponent implements OnInit {
 
   constructor(
-    private router: Router, 
+    private router: Router,
+    protected _userStorage: UserStorageService,
     private menu: MenuController
     ) { }
 

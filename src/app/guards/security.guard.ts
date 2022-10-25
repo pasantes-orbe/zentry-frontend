@@ -25,7 +25,7 @@ export class SecurityGuard implements CanActivate, RoleGuard {
       validJWT => {
 
         if(!validJWT){
-          this._router.navigate(['/']);
+          this._router.navigate(['/login']);
           return false;
         }
 

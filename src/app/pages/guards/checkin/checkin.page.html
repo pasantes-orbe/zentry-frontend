@@ -8,13 +8,13 @@
 
   <h3 class="text-center">REGISTRAR INGRESO</h3>
 
-  <form [formGroup]="getForm()" (ngSubmit)="submitIncome()">
+  <form [formGroup]="getForm()" (ngSubmit)="submitIncome()" >
     <ion-item>
       <ion-label position="floating">Nombre Completo <ion-text color="danger">*</ion-text></ion-label>
       <ion-input [(ngModel)]="getIncomeData().fullname" required formControlName="fullname" type="text"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label position="floating">DNI <ion-text color="danger">*</ion-text></ion-label>
+      <ion-label position="floating">DNI <small>(Sólo números)</small> <ion-text color="danger">*</ion-text></ion-label>
       <ion-input [(ngModel)]="getIncomeData().DNI" required formControlName="DNI" type="text"></ion-input>
     </ion-item>
     <ion-item>
@@ -34,19 +34,6 @@
           </ion-datetime>
       </ng-template>
     </ion-modal>
-
-    <!-- <ion-item>
-      <ion-label class="mb-4" position="floating">Hora Ingreso <ion-text color="danger">*</ion-text></ion-label>
-      <ion-datetime-button datetime="hora-ingreso"></ion-datetime-button>
-    </ion-item>
-    
-    <ion-modal [keepContentsMounted]="true">
-      <ng-template>
-        <ion-datetime presentation="date-time" (ionChange)="getIncomeTime($event)" color="primary" [showDefaultTitle]="true" id="hora-ingreso">
-          <span slot="title">ENTRADA</span>
-        </ion-datetime>
-      </ng-template>
-    </ion-modal> -->
 
     <ion-item>
       <ion-label position="floating">Transporte</ion-label>
@@ -68,10 +55,9 @@
       <ion-label  position="floating">Observaciones</ion-label>
       <ion-textarea (ionChange)="setObservations($event)" rows="5"></ion-textarea>
     </ion-item>
-    {{hello}}
-    <ion-button block color="primary" type="submit" [disabled]="getForm().invalid">
-      Ingresar
-    </ion-button>
+      <ion-button size="large"  block color="primary" type="submit" [disabled]="getForm().invalid">
+        Ingresar
+      </ion-button>
   </form>
 
 </ion-content>

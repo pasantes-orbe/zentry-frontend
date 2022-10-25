@@ -6,4 +6,44 @@
 
 <ion-content class="ion-padding">
 
+  <ion-card>
+    <div class="table-responsive container">
+    
+      <h5>Ingresos Autorizados</h5>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">CheckOut</th>
+          <th scope="col" class="name">Nombre</th>
+          <th scope="col">DNI</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Hora</th>
+          <th scope="col">Autorizado Por</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let guest of checkOutList; let i = index">
+          
+          <td>
+            <ion-button (click)="checkOut(guest)" color="danger" expand="block" fill="clear" shape="round">
+              <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+            </ion-button>
+          </td>
+          <td>{{guest.name}}</td>
+          <td>{{guest.dni}}</td>
+          <td>{{guest.date}}</td>
+          <td>{{guest.time}}</td>
+          <td> {{guest.authorizedBy.name}} </td>
+        </tr>
+        <tr>
+        
+      </tbody>
+    </table>   
+    
+    
+    </div>
+    
+    </ion-card>
+
 </ion-content>
