@@ -1,0 +1,42 @@
+<app-navbar-back title="Reserva de Eventos"></app-navbar-back>
+
+<ion-content class="ion-padding">
+
+  <form >
+    <ion-item>
+      <ion-label position="floating">Seleccionar Lugar</ion-label>
+      <ion-select (ionChange)="select($event)" placeholder="Seleccionar">
+        <ion-select-option value="Club House">Club House</ion-select-option>
+        <ion-select-option value="Salón de Fiestas">Salón de Fiestas</ion-select-option>
+        <ion-select-option value="Predio Deportivo">Predio Deportivo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!--  -->
+    <ion-item>
+      <ion-label class="ion-text-wrap mb-3" position="stacked">Fecha y hora de ingreso</ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+    </ion-item>
+
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+          <ion-datetime presentation="date-time" color="primary" [showDefaultTitle]="true"  id="datetime">
+          <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
+          </ion-datetime>
+      </ng-template>
+    </ion-modal>
+    <!--  -->
+
+    <ion-item>
+      <ion-label position="stacked">Aclaraciones / Detalles</ion-label>
+      <ion-textarea rows="4" placeholder="Aclara al administrador el motivo de la reserva"></ion-textarea>
+    </ion-item>
+
+    <div class="text-center">
+      <ion-button (click)="reservation()" shape="round" block color="primary" type="submit">
+        Solicitar Reserva
+      </ion-button>
+    </div>
+  </form>
+
+</ion-content>

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header mode="ios" [translucent]="true">
   <ion-toolbar>
     <ion-title>Check In</ion-title>
   </ion-toolbar>
@@ -55,7 +55,8 @@
       <ion-label  position="floating">Observaciones</ion-label>
       <ion-textarea (ionChange)="setObservations($event)" rows="5"></ion-textarea>
     </ion-item>
-      <ion-button size="large"  block color="primary" type="submit" [disabled]="getForm().invalid">
+    
+      <ion-button size="large" block color="primary" type="submit" [disabled]="getForm().invalid">
         Ingresar
       </ion-button>
   </form>

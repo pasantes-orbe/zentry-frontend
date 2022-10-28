@@ -56,6 +56,17 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/home/home.module').then( m => m.HomePageModule),
     canActivate: [AdminGuard]
   },
+  {
+    path: 'reservar',
+    loadChildren: () => import('./pages/event-reservation/event-reservation.module').then( m => m.EventReservationPageModule)
+  },
+  {
+    path: 'checkin-y-checkout',
+    loadChildren: () => import('./pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.module').then( m => m.CheckInAndCheckOutPageModule),
+    canActivate: [SecurityGuard]
+  },
+
+
   // {
   //   path: 'authorizations',
   //   loadChildren: () => import('./pages/guards/authorizations/authorizations.module').then( m => m.AuthorizationsPageModule)

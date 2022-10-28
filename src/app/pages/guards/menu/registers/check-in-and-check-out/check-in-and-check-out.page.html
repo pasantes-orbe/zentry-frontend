@@ -1,0 +1,46 @@
+<app-navbar-back title="Registro de CheckIn & CheckOut"></app-navbar-back>
+
+<ion-content class="ion-padding">
+
+  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI" (ionChange)="search($event)" [debounce]="250"></ion-searchbar>
+
+  <ion-list>
+    <div class="register" *ngFor="let register of registers">
+      <ion-item lines="none">
+        <!-- CHECKIN -->
+        <ion-icon  color="success" slot="start" [name]="icons.checkIn"></ion-icon>
+        <ion-text>
+          <p>{{register.checkIn.name}} {{register.checkIn.lastname}}</p>
+          <small>{{register.checkIn.dni}}</small>
+        </ion-text>
+        <ion-text slot="end">
+          <p>{{register.checkIn.time}} hs</p>
+          <small>{{register.checkIn.date}}</small>
+        </ion-text> 
+      </ion-item>
+  
+      <ion-item lines="none" *ngIf="!isEmptyObject(register.checkOut)">
+        <!-- CHECKOUT -->
+        <ion-icon color="danger" slot="start" [name]="icons.checkOut"></ion-icon>
+        <ion-text>
+          <p>{{register.checkOut.name}} {{register.checkOut.lastname}}</p>
+          <small>{{register.checkOut.dni}}</small>
+        </ion-text>
+        <ion-text slot="end">
+          <p>{{register.checkOut.time}} hs</p>
+          <small>{{register.checkOut.date}}</small>
+        </ion-text>
+      </ion-item>
+
+      <ion-item lines="none" *ngIf="isEmptyObject(register.checkOut)">
+        <!-- CHECKOUT EMPTY -->
+        <ion-icon color="danger" slot="start" [name]="icons.noCheckOut"></ion-icon>
+        <ion-text>
+          <small>No se registró CheckOut</small>
+        </ion-text>        
+      </ion-item>
+    </div>
+
+  </ion-list>
+
+</ion-content>

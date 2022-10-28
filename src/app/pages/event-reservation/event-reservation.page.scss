@@ -1,0 +1,19 @@
+ion-item{
+    margin-bottom: 15px;
+    --background: none!important;
+    
+    ion-label{
+        margin-bottom: 10px;
+        color: var(--ion-color-gray);
+    }
+
+    ion-datetime-button,
+    ion-select,
+    ion-textarea{
+        width: 100%;
+        border: 1px solid #d4d4d4;
+        padding: 10px 20px;
+        border-radius: 4px;
+    }
+
+}

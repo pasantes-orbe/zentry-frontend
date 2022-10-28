@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NavigationService } from 'src/app/helpers/navigation.service';
 
 @Component({
   selector: 'app-incomes',
@@ -11,23 +12,15 @@ export class IncomesComponent implements OnInit {
   @Input('readonly') readonly: boolean;
   @Input('nobuttons') nobuttons: boolean;
 
-
-
-
-
   private loading: boolean;
   private data: any;
 
-  constructor(private router: Router) {
+  constructor(private Navigation: NavigationService) {
     this.setLoading(true);
     this.loadData();
   }
 
   ngOnInit() { }
-
-  protected navigate(url: string): void {
-    this.router.navigate([url]);
-  }
 
   private loadData(): void {
     setTimeout(() => {

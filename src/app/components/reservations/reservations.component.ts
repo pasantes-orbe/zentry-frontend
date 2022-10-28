@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { NavigationService } from 'src/app/helpers/navigation.service';
 
 @Component({
   selector: 'app-reservations',
   templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss'],
+  styleUrls: ['./reservations.component.scss']
 })
 export class ReservationsComponent implements OnInit {
 
   private loading: boolean;
   private data: any;
 
-  constructor() {
+  constructor(private Navigation: NavigationService) {
     this.setLoading(true);
     this.loadData();
   }

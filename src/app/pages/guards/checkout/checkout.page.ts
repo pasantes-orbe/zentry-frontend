@@ -50,7 +50,7 @@ export class CheckoutPage implements OnInit {
 
     const alert = await this.alertController.create({
       header: 'Confirmar Check Out',
-      message: `Persona: ${e.name}\n\nDNI: ${e.dni}`,
+      message: `Persona: ${e.name}<br>DNI: ${e.dni}`,
       buttons: [
         {
           text:'Check Out',

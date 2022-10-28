@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
+import { NavigationService } from 'src/app/helpers/navigation.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 @Component({
@@ -13,14 +14,11 @@ export class NavbarGuardsComponent implements OnInit {
   constructor(
     private router: Router,
     protected _userStorage: UserStorageService,
-    private menu: MenuController
+    private menu: MenuController,
+    private Navigation: NavigationService
     ) { }
 
   ngOnInit() {}
-
-  protected navigate(url: string): void {
-    this.router.navigate([url]);
-  }
 
   protected openFirst(id: string): void {
     this.menu.enable(true, id);

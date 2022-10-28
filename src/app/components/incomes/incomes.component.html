@@ -35,12 +35,12 @@
   </div>
   
   <div *ngIf="!isReadOnly() && !isNobuttons()" class="buttons text-center mt-2 mb-2">
-    <ion-button (click)="navigate('/ingresos-autorizados')" fill="clear" >
+    <ion-button (click)="Navigation.navigate('ingresos-autorizados')" fill="clear" >
       <ion-icon slot="end" name="search-outline"></ion-icon>
       Ver Todos
     </ion-button>
     
-    <ion-button (click)="navigate('/nueva-autorizacion')"shape="round">
+    <ion-button (click)="Navigation.navigate('nueva-autorizacion')"shape="round">
       <ion-icon slot="end" name="add"></ion-icon>
       Agregar {{isNobuttons()}}
     </ion-button>
