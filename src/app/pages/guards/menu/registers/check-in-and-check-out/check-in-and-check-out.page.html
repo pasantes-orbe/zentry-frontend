@@ -2,10 +2,9 @@
 
 <ion-content class="ion-padding">
 
-  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI" (ionChange)="search($event)" [debounce]="250"></ion-searchbar>
-
+  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey" [debounce]="250"></ion-searchbar>
   <ion-list>
-    <div class="register" *ngFor="let register of registers">
+    <div class="register" *ngFor="let register of registers | filter: searchKey">
       <ion-item lines="none">
         <!-- CHECKIN -->
         <ion-icon  color="success" slot="start" [name]="icons.checkIn"></ion-icon>

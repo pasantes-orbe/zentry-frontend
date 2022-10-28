@@ -18,3 +18,10 @@ div.register{
     border-bottom: 1px solid var(--ion-color-gray);
 
 }
+
+ion-list,
+ion-searchbar{
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
