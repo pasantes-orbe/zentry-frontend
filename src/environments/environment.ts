@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  URL: "http://localhost:3000"
+  // URL: "http://localhost:3000"
+  URL: "https://countriesapp-8shm.onrender.com"
 };
 
 /*

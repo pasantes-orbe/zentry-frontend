@@ -1,0 +1,55 @@
+<app-navbar-default></app-navbar-default>
+
+<ion-content>
+
+  <ion-segment [(ngModel)]="type" mode="ios" value="propiedades" [swipeGesture]="true">
+    <ion-segment-button value="propiedades" checked>
+      <ion-label>Propiedades</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="vigiladores">
+      <ion-label>Vigiladores</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  
+  <div *ngIf="type == 'propiedades'">
+    
+    <ion-button routerLink="/admin/ver-propiedades" color="secondary" size="large" expand="block" shape="round">
+      Ver todas las Propiedades
+    </ion-button>
+
+    <ion-button routerLink="/admin/ver-propietarios" color="secondary" size="large" expand="block" shape="round">
+      Ver todos los Propietarios
+    </ion-button>
+    
+    <ion-button routerLink="/admin/ver-amenities" color="secondary" size="large" expand="block" shape="round">
+      Lugares de Reserva
+    </ion-button>
+
+    <ion-button disabled color="secondary" size="large" expand="block" shape="round">
+      Invitados Recurrentes
+    </ion-button>
+
+    
+  </div>
+
+  <div *ngIf="type == 'vigiladores'">
+    
+    <ion-button color="secondary" size="large" expand="block" shape="round">
+      Ver todos los vigiladores
+    </ion-button>
+
+    <ion-button routerLink="/admin/registro-checkin-y-checkout" color="secondary" size="large" expand="block" shape="round">
+      Registro de CheckIn & CheckOut
+    </ion-button>
+
+    <ion-button color="secondary" size="large" expand="block" shape="round">
+      Registro de Botón Antipánico
+    </ion-button>
+
+  </div>
+
+  
+
+
+</ion-content>

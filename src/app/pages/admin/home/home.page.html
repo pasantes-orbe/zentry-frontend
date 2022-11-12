@@ -1,7 +1,33 @@
-<app-navbar-default></app-navbar-default>
+<!-- <app-navbar-default></app-navbar-default> -->
 
 <ion-content class="ion-padding">
 
-  <h1 class="text-center">ADMINISTRACION DEL COUNTRY</h1>
+  <div class="text-center">
+    <h1 class="text-center">Hola, Admin</h1>
+    <h3>Seleccioná un country</h3>
+  </div>
+
+  
+
+  <ion-row>
+
+    <ion-col>
+      <ion-card button >
+        <ion-card-header>
+          <ion-card-title>Nuevo Country</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+    </ion-col>
+
+    <ion-col class="col-6" *ngFor="let i of [1,1,1,1,1,1,1,1]">
+      <ion-card routerLink="/admin/country-dashboard" button >
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+              
+        <ion-card-content>
+          Catalinas Country
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
 
 </ion-content>

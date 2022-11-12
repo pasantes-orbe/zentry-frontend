@@ -1,0 +1,30 @@
+<app-navbar-back title="Panel de Administración"></app-navbar-back>
+
+<ion-content>
+
+  <div class="text-center">
+    <ion-button class="top-button" (click)="onClick()" expand="block">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Nuevo Lugar de Reserva
+    </ion-button>
+  </div>
+
+  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre"></ion-searchbar>
+
+  <ion-row>
+    <ion-col class="col-6" *ngFor="let i of [1,1,1,1,1,1,1,1] | filter: searchKey">
+      <!-- routerLink="/admin/country-dashboard" -->
+      <ion-card 
+      button >
+        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+              
+        <ion-card-content>
+          <h3>
+            Club House
+          </h3>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+</ion-content>

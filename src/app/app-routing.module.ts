@@ -65,6 +65,26 @@ const routes: Routes = [
     loadChildren: () => import('./pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.module').then( m => m.CheckInAndCheckOutPageModule),
     canActivate: [SecurityGuard]
   },
+  {
+    path: 'admin/country-dashboard',
+    loadChildren: () => import('./pages/admin/country-dashboard/country-dashboard.module').then( m => m.CountryDashboardPageModule)
+  },
+  {
+    path: 'admin/ver-propiedades',
+    loadChildren: () => import('./pages/admin/country-properties/view/view.module').then( m => m.ViewPageModule)
+  },
+  {
+    path: 'admin/ver-propietarios',
+    loadChildren: () => import('./pages/admin/country-owners/view/view.module').then( m => m.ViewPageModule)
+  },
+  {
+    path: 'admin/ver-amenities',
+    loadChildren: () => import('./pages/admin/country-amenities/view-all/view-all.module').then( m => m.ViewAllPageModule)
+  },
+  {
+    path: 'admin/registro-checkin-y-checkout',
+    loadChildren: () => import('./pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.module').then( m => m.CheckinOutHistorialPageModule)
+  },
 
 
   // {

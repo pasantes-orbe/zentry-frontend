@@ -1,0 +1,42 @@
+<app-navbar-back title="Panel de Administración"></app-navbar-back>
+
+<ion-content>
+
+  <div class="text-center">
+    <ion-button class="top-button" (click)="onClick()" expand="block">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Nueva Propiedad
+    </ion-button>
+  </div>
+
+  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre, Propietario/s"></ion-searchbar>
+
+  <table class="table text-center">
+    <thead>
+      <tr>
+        <th scope="col">Propiedad N°</th>
+        <th scope="col">Dirección</th>
+        <th scope="col">Propietario/s</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of [1,1,1] | filter: searchKey ; let i = index">
+        <td class="text-center">{{i + 1}}</td>
+        <td>Entre Rios 142</td>
+        <td>
+          <ion-list lines="none">
+            <ion-item>
+              <ion-label>Perez, Juan</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label>Gomez, María</ion-label>
+            </ion-item>
+          </ion-list>
+        </td>
+      </tr>
+      <tr>
+      
+    </tbody>
+  </table>
+
+</ion-content>
