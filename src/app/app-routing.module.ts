@@ -85,6 +85,10 @@ const routes: Routes = [
     path: 'admin/registro-checkin-y-checkout',
     loadChildren: () => import('./pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.module').then( m => m.CheckinOutHistorialPageModule)
   },
+  {
+    path: 'admin/todos-los-guardias',
+    loadChildren: () => import('./pages/admin/guard-segment/all-guards/all-guards.module').then( m => m.AllGuardsPageModule)
+  },
 
 
   // {

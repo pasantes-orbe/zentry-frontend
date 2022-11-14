@@ -1,14 +1,24 @@
-<app-navbar-default></app-navbar-default>
+<app-navbar-admin></app-navbar-admin>
 
-<ion-content>
+<ion-content class="ion-padding">
+
+  <ion-fab slot="fixed" horizontal="center" vertical="bottom">
+    <ion-fab-button routerLink="/admin/home">
+      <ion-icon name="repeat-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
   <ion-segment [(ngModel)]="type" mode="ios" value="propiedades" [swipeGesture]="true">
+    <ion-segment-button value="eventos">
+      <ion-label>Eventos</ion-label>
+    </ion-segment-button>
     <ion-segment-button value="propiedades" checked>
       <ion-label>Propiedades</ion-label>
     </ion-segment-button>
     <ion-segment-button value="vigiladores">
       <ion-label>Vigiladores</ion-label>
     </ion-segment-button>
+    
   </ion-segment>
 
   
@@ -22,10 +32,6 @@
       Ver todos los Propietarios
     </ion-button>
     
-    <ion-button routerLink="/admin/ver-amenities" color="secondary" size="large" expand="block" shape="round">
-      Lugares de Reserva
-    </ion-button>
-
     <ion-button disabled color="secondary" size="large" expand="block" shape="round">
       Invitados Recurrentes
     </ion-button>
@@ -35,7 +41,7 @@
 
   <div *ngIf="type == 'vigiladores'">
     
-    <ion-button color="secondary" size="large" expand="block" shape="round">
+    <ion-button routerLink="/admin/todos-los-guardias" color="secondary" size="large" expand="block" shape="round">
       Ver todos los vigiladores
     </ion-button>
 
@@ -43,8 +49,20 @@
       Registro de CheckIn & CheckOut
     </ion-button>
 
-    <ion-button color="secondary" size="large" expand="block" shape="round">
+    <ion-button disabled color="secondary" size="large" expand="block" shape="round">
       Registro de Botón Antipánico
+    </ion-button>
+
+  </div>
+
+  <div *ngIf="type == 'eventos'">
+
+    <ion-button routerLink="/admin/ver-amenities" color="secondary" size="large" expand="block" shape="round">
+      Lugares de Reserva
+    </ion-button>
+    
+    <ion-button disabled color="secondary" size="large" expand="block" shape="round">
+      Registro de eventos
     </ion-button>
 
   </div>

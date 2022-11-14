@@ -1,11 +1,14 @@
 ion-button{
+    font-size: 1em;
+    max-width: 500px;
+    margin: 0 auto;
     margin-bottom: 1.2em;
 }
 
 ion-segment{
     width: 80%;
     
-    --background: #e9e9e9;
+    --background: var(--ion-color-light);
     // padding: 10px;
     margin: 20px auto;
     ion-segment-button{
