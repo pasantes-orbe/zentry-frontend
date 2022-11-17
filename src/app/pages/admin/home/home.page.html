@@ -12,7 +12,7 @@
   <ion-row>
 
     <ion-col>
-      <ion-card class="text-center" button >
+      <ion-card routerLink="/admin/agregar-country" class="text-center" button >
         <ion-card-header>
           <ion-card-title>
             <ion-label><ion-icon slot="icon-only" name="add"></ion-icon></ion-label>
@@ -22,7 +22,7 @@
       </ion-card>
     </ion-col>
 
-    <ion-col class="col-6" *ngFor="let i of [1,1,1,1,1,1,1,1]">
+    <ion-col class="col-6" *ngFor="let i of [1,1,1]">
       <ion-card routerLink="/admin/country-dashboard" button >
         <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
               

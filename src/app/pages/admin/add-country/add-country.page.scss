@@ -1,0 +1,22 @@
+.map-container {
+    position: relative;
+    width: 100vw;
+    height: 300px;    
+  }
+  
+  .map-frame {
+    border: 2px solid black;
+    height: 100%;
+  }
+  
+  #map {
+    height: 100%;
+  }
+
+  ion-item{
+    margin: 20px 0;
+}
+
+ion-button{
+  margin: 20px 0;
+}

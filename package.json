@@ -29,6 +29,7 @@
     "@capacitor/status-bar": "4.0.1",
     "@ionic/angular": "^6.1.9",
     "leaflet": "^1.8.0",
+    "leaflet-defaulticon-compatibility": "^0.1.1",
     "ng2-search-filter": "^0.5.1",
     "rxjs": "~6.6.0",
     "sweetalert2": "^11.4.33",

@@ -1,0 +1,41 @@
+<app-navbar-back title="Volver"></app-navbar-back>
+
+
+<ion-content class="ion-padding">
+
+  <form [formGroup]="getForm()" (ngSubmit)="addCountry()">
+
+    <ion-card button>
+      <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="">
+      <ion-input type="file" name="countryAvatar" placeholder="Awesome Input"></ion-input>
+    </ion-card>
+
+
+    <ion-item>
+      <ion-label position="floating">Nombre del Country</ion-label>
+      <ion-input type="text" [(ngModel)]="countryName" required formControlName="countryName" ></ion-input>
+    </ion-item>
+
+      <ion-label position="floating">Ubicá el mapa en el Country 
+      <!--   | {{lat}} {{lng}}  -->
+      </ion-label>
+      <!-- <ion-button (click)="viewCoord()" expand="block" fill="clear" shape="round">
+        Click me
+      </ion-button> -->
+      
+
+      <div class="map-container">
+        <div class="map-frame">
+          <div id="map"></div>
+        </div>
+      </div>
+
+
+        <ion-button type="submit" [disabled]="getForm().invalid" expand="block" shape="round">
+          <ion-icon slot="start" name="add"></ion-icon>
+          Agregar Country
+        </ion-button>
+
+  </form>
+
+</ion-content>

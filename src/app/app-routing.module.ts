@@ -67,28 +67,40 @@ const routes: Routes = [
   },
   {
     path: 'admin/country-dashboard',
-    loadChildren: () => import('./pages/admin/country-dashboard/country-dashboard.module').then( m => m.CountryDashboardPageModule)
+    loadChildren: () => import('./pages/admin/country-dashboard/country-dashboard.module').then( m => m.CountryDashboardPageModule),
+    canActivate: [AdminGuard]
   },
   {
     path: 'admin/ver-propiedades',
-    loadChildren: () => import('./pages/admin/country-properties/view/view.module').then( m => m.ViewPageModule)
+    loadChildren: () => import('./pages/admin/country-properties/view/view.module').then( m => m.ViewPageModule),
+    canActivate: [AdminGuard]
   },
   {
     path: 'admin/ver-propietarios',
-    loadChildren: () => import('./pages/admin/country-owners/view/view.module').then( m => m.ViewPageModule)
+    loadChildren: () => import('./pages/admin/country-owners/view/view.module').then( m => m.ViewPageModule),
+    canActivate: [AdminGuard]
   },
   {
     path: 'admin/ver-amenities',
-    loadChildren: () => import('./pages/admin/country-amenities/view-all/view-all.module').then( m => m.ViewAllPageModule)
+    loadChildren: () => import('./pages/admin/country-amenities/view-all/view-all.module').then( m => m.ViewAllPageModule),
+    canActivate: [AdminGuard]
   },
   {
     path: 'admin/registro-checkin-y-checkout',
-    loadChildren: () => import('./pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.module').then( m => m.CheckinOutHistorialPageModule)
+    loadChildren: () => import('./pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.module').then( m => m.CheckinOutHistorialPageModule),
+    canActivate: [AdminGuard]
   },
   {
     path: 'admin/todos-los-guardias',
-    loadChildren: () => import('./pages/admin/guard-segment/all-guards/all-guards.module').then( m => m.AllGuardsPageModule)
+    loadChildren: () => import('./pages/admin/guard-segment/all-guards/all-guards.module').then( m => m.AllGuardsPageModule),
+    canActivate: [AdminGuard]
   },
+  {
+    path: 'admin/agregar-country',
+    loadChildren: () => import('./pages/admin/add-country/add-country.module').then( m => m.AddCountryPageModule),
+    canActivate: [AdminGuard]
+  },
+
 
 
   // {
