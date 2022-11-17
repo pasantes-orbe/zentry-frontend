@@ -1,13 +1,6 @@
 <app-navbar-back title="Panel de Administración"></app-navbar-back>
 
-<ion-content class="ion-padding">
-
-  <div class="text-center">
-    <ion-button class="top-button" (click)="onClick()" expand="block">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Nuevo Propietario
-    </ion-button>
-  </div>
+<ion-content>
 
   <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre o N° de propiedad"></ion-searchbar>
 
@@ -17,6 +10,7 @@
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
         <th scope="col">Propiedad N°</th>
+        <th scope="col">Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -26,8 +20,12 @@
         <td>
           {{i+1}}
         </td>
+        <td>
+          <ion-button color="danger" expand="block" fill="clear" shape="round">
+            <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+          </ion-button>
+        </td>
       </tr>
-      <tr>
       
     </tbody>
   </table>

@@ -100,6 +100,21 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/add-country/add-country.module').then( m => m.AddCountryPageModule),
     canActivate: [AdminGuard]
   },
+  {
+    path: 'admin/invitados-recurrentes',
+    loadChildren: () => import('./pages/admin/country-recurrents/country-recurrents.module').then( m => m.CountryRecurrentsPageModule)
+  },
+  {
+    path: 'admin/registro-de-eventos',
+    loadChildren: () => import('./pages/admin/events-segment/events-historial/events-historial.module').then( m => m.EventsHistorialPageModule)
+  },
+  {
+    path: 'admin/registro-de-antipanico',
+    loadChildren: () => import('./pages/admin/guard-segment/antipanic-historial/antipanic-historial.module').then( m => m.AntipanicHistorialPageModule)
+  },
+
+
+
 
 
 

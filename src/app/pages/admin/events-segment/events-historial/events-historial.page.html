@@ -1,0 +1,28 @@
+<app-navbar-back title="Panel de Administración"></app-navbar-back>
+
+<ion-content>
+
+  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por estado, lugar, fecha o nombre"></ion-searchbar>
+
+  <table class="table text-center">
+    <thead>
+      <tr>
+        <th scope="col">Estado</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Lugar</th>
+        <th scope="col">Reservado por</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of [1,1,1] | filter: searchKey ; let i = index">
+        <td *ngIf="i % 2 == 0"><ion-badge color="success">Aprobado</ion-badge></td>
+        <td *ngIf="i % 2 != 0"><ion-badge color="danger">Rechazado</ion-badge></td>
+        <td>17/11/2022</td>
+        <td class="text-center">Club House</td>
+        <td>Chicala, Alejandro</td>
+      </tr>
+      
+    </tbody>
+  </table>
+
+</ion-content>
