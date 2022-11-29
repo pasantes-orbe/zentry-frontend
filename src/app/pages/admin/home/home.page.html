@@ -22,12 +22,14 @@
       </ion-card>
     </ion-col>
 
-    <ion-col class="col-6" *ngFor="let i of [1,1,1]">
+    <ion-col class="col-6" *ngFor="let country of getCountries()">
       <ion-card routerLink="/admin/country-dashboard" button >
-        <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+        <!-- <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" /> -->
+        <img alt="Silhouette of mountains" [src]="country.avatar" />
+
               
         <ion-card-content>
-          Catalinas Country
+          {{country.name}}
         </ion-card-content>
       </ion-card>
     </ion-col>

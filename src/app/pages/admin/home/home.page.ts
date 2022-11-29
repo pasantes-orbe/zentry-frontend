@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CountriesService } from 'src/app/services/countries/countries.service';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +8,39 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomePage implements OnInit {
 
-  constructor() { }
+  private countries;
+
+
+
+  constructor(private _CountriesService: CountriesService) { }
 
   ngOnInit() {
+
+    this.ionViewWillEnter();
+
   }
+
+  ionViewWillEnter() {
+    this.getCountriesFromDB();
+  }
+
+  private getCountriesFromDB() {
+
+    this._CountriesService.getAll().subscribe(
+      data => {
+        this.countries = data;
+      }
+    )
+
+  }
+
+  public getCountries(): undefined {
+    return this.countries;
+  }
+
+  public setCountries(countries: undefined): void {
+    this.countries = countries;
+  }
+
 
 }

@@ -3,8 +3,9 @@ import 'leaflet/dist/leaflet.css';
 
 import * as L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-add-country',
@@ -45,7 +46,7 @@ export class AddCountryPage implements AfterViewInit {
     
   }
 
-  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService) { 
+  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient) { 
     this.formBuilder = _formBuilder;
       this.form = this.createForm();
       this.data = {  
@@ -56,6 +57,8 @@ export class AddCountryPage implements AfterViewInit {
   private createForm(): FormGroup {
     return this.formBuilder.group({
       countryName: ['', [Validators.required, Validators.minLength(3)]],
+      countryAvatar: new FormControl('', [Validators.required]),
+      fileSource: new FormControl('', [Validators.required])
     });
   }
 
@@ -100,20 +103,47 @@ export class AddCountryPage implements AfterViewInit {
     this.lng = lng;
   }
 
+  onFileChange(event) {
+    if (event.target.files.length > 0) {
+
+      
+      const file = event.target.files[0];
+      this.form.patchValue({
+        fileSource: file
+      });
+    }
+  }
+
   protected addCountry(){
     this.setCoords();
+
 
     console.log(this.getForm().value.countryName);
     console.log(this.lat, this.lng);
 
+
+    const formData = new FormData();
+    formData.append('avatar', this.form.get('fileSource').value);
+    formData.append('name', this.getForm().value.countryName);
+    formData.append('latitude', this.lat);
+    formData.append('longitude', this.lng);
+
     this._alertService.setLoading();
 
-    setTimeout(() => {
+    this.http.post('http://localhost:3000/api/countries', formData)
+      .subscribe(res => {
+        console.log(res);
         this._alertService.removeLoading();
 
         this._alertService.showAlert("¡Listo!", "El country se agregó con éxito")
+      })
 
-    }, 2000);
+    // setTimeout(() => {
+    //     this._alertService.removeLoading();
+
+    //     this._alertService.showAlert("¡Listo!", "El country se agregó con éxito")
+
+    // }, 2000);
 
   }
 

@@ -7,7 +7,7 @@
 
     <ion-card button>
       <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="">
-      <ion-input type="file" name="countryAvatar" placeholder="Awesome Input"></ion-input>
+      <ion-input (change)="onFileChange($event)" formControlName="countryAvatar" type="file" name="countryAvatar" placeholder="Awesome Input"></ion-input>
     </ion-card>
 
 
