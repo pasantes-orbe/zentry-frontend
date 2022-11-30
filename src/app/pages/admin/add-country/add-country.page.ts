@@ -6,6 +6,8 @@ import 'leaflet-defaulticon-compatibility';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { CountriesService } from 'src/app/services/countries/countries.service';
 
 @Component({
   selector: 'app-add-country',
@@ -18,6 +20,8 @@ export class AddCountryPage implements AfterViewInit {
   public lat;
   public lng;
   public marker;
+
+  public newImg: any = "https://ionicframework.com/docs/img/demos/card-media.png";
 
   public countryName: string;
   private formBuilder: FormBuilder;
@@ -46,7 +50,7 @@ export class AddCountryPage implements AfterViewInit {
     
   }
 
-  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient) { 
+  constructor(private _countries: CountriesService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router) { 
     this.formBuilder = _formBuilder;
       this.form = this.createForm();
       this.data = {  
@@ -104,6 +108,14 @@ export class AddCountryPage implements AfterViewInit {
   }
 
   onFileChange(event) {
+
+
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = e => this.newImg = reader.result;
+    
+    reader.readAsDataURL(file);
+
     if (event.target.files.length > 0) {
 
       
@@ -114,37 +126,9 @@ export class AddCountryPage implements AfterViewInit {
     }
   }
 
-  protected addCountry(){
+  protected addCountry(): void{
     this.setCoords();
-
-
-    console.log(this.getForm().value.countryName);
-    console.log(this.lat, this.lng);
-
-
-    const formData = new FormData();
-    formData.append('avatar', this.form.get('fileSource').value);
-    formData.append('name', this.getForm().value.countryName);
-    formData.append('latitude', this.lat);
-    formData.append('longitude', this.lng);
-
-    this._alertService.setLoading();
-
-    this.http.post('http://localhost:3000/api/countries', formData)
-      .subscribe(res => {
-        console.log(res);
-        this._alertService.removeLoading();
-
-        this._alertService.showAlert("¡Listo!", "El country se agregó con éxito")
-      })
-
-    // setTimeout(() => {
-    //     this._alertService.removeLoading();
-
-    //     this._alertService.showAlert("¡Listo!", "El country se agregó con éxito")
-
-    // }, 2000);
-
+    this._countries.addCountry(this.getForm().get('fileSource').value, this.getForm().value.countryName, this.lat, this.lng);
   }
 
   public getForm(): FormGroup {

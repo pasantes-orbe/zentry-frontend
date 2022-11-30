@@ -3,32 +3,40 @@
 
 <ion-content class="ion-padding">
 
+  <h2 class="text-center">Añadir nuevo Country</h2>
+
   <form [formGroup]="getForm()" (ngSubmit)="addCountry()">
 
-    <ion-card button>
-      <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="">
-      <ion-input (change)="onFileChange($event)" formControlName="countryAvatar" type="file" name="countryAvatar" placeholder="Awesome Input"></ion-input>
-    </ion-card>
-
+    <ion-label position="floating">Ubicá el marcador en el Country
+    </ion-label>
+    
+    <div class="map-container">
+      <div class="map-frame">
+        <div id="map"></div>
+      </div>
+    </div>
 
     <ion-item>
       <ion-label position="floating">Nombre del Country</ion-label>
       <ion-input type="text" [(ngModel)]="countryName" required formControlName="countryName" ></ion-input>
     </ion-item>
 
-      <ion-label position="floating">Ubicá el mapa en el Country 
-      <!--   | {{lat}} {{lng}}  -->
-      </ion-label>
-      <!-- <ion-button (click)="viewCoord()" expand="block" fill="clear" shape="round">
-        Click me
-      </ion-button> -->
-      
+    
 
-      <div class="map-container">
-        <div class="map-frame">
-          <div id="map"></div>
-        </div>
-      </div>
+    <hr>
+
+    <ion-label position="floating">Añadir una imagen</ion-label>
+
+    <ion-card button>
+      <img [src]=" newImg " alt="">
+      <ion-input (change)="onFileChange($event)" formControlName="countryAvatar" type="file" name="countryAvatar" placeholder="Awesome Input"></ion-input>
+    </ion-card>
+
+
+    
+
+      
+      
 
 
         <ion-button type="submit" [disabled]="getForm().invalid" expand="block" shape="round">
