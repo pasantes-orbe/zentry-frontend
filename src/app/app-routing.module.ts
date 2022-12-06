@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes, CanActivate } from '@angular/router';
 import { AdminGuard } from './guards/admin.guard';
 import { OwnerGuard } from './guards/owner.guard';
 import { SecurityGuard } from './guards/security.guard';
@@ -75,6 +75,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/country-properties/view/view.module').then( m => m.ViewPageModule),
     canActivate: [AdminGuard]
   },
+
   {
     path: 'admin/ver-propietarios',
     loadChildren: () => import('./pages/admin/country-owners/view/view.module').then( m => m.ViewPageModule),
@@ -112,6 +113,12 @@ const routes: Routes = [
     path: 'admin/registro-de-antipanico',
     loadChildren: () => import('./pages/admin/guard-segment/antipanic-historial/antipanic-historial.module').then( m => m.AntipanicHistorialPageModule)
   },
+  {
+    path: 'admin/nueva-propiedad',
+    loadChildren: () => import('./pages/admin/country-properties/add-property/add-property.module').then( m => m.AddPropertyPageModule),
+    canActivate: [AdminGuard]
+  },
+
 
 
 
