@@ -128,6 +128,12 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/country-owners/add-country-owner/add-country-owner.module').then( m => m.AddCountryOwnerPageModule),
     canActivate: [AdminGuard]
   },
+  {
+    path: 'admin/nuevo-vigilador',
+    loadChildren: () => import('./pages/admin/guard-segment/add-guard/add-guard.module').then( m => m.AddGuardPageModule),
+    canActivate: [AdminGuard]
+  },
+
 
 
 

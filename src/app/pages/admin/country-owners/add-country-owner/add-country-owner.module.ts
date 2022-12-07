@@ -17,7 +17,7 @@ import { ComponentsModule } from 'src/app/components/components.module';
         IonicModule,
         AddCountryOwnerPageRoutingModule,
         ComponentsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ]
 })
 export class AddCountryOwnerPageModule {}

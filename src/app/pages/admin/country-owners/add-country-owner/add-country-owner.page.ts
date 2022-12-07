@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RegisterService } from 'src/app/services/auth/register.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 
 @Component({
@@ -11,13 +12,13 @@ import { AlertService } from 'src/app/services/helpers/alert.service';
 })
 export class AddCountryOwnerPage implements OnInit {
 
-  public newImg: any = "https://ionicframework.com/docs/img/demos/card-media.png";
+  public newImg: any = 'https://ionicframework.com/docs/img/demos/card-media.png';
 
   @ViewChild('passwordShowIcon') passIcon;
   private formBuilder: FormBuilder;
   private form: FormGroup;
-  
-  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router) {
+
+  constructor(private _registerOwner: RegisterService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
@@ -42,9 +43,18 @@ export class AddCountryOwnerPage implements OnInit {
     }
   }
 
-  public getForm(): FormGroup {
-    return this.form;
-  }
+register(){
+  this._registerOwner.register(this.getForm().get('ownerName').value,
+                                this.getForm().get('ownerLastname').value,
+                                this.getForm().get('ownerDNI').value,
+                                this.getForm().get('ownerEmail').value,
+                                this.getForm().get('ownerPassword').value,
+                                this.getForm().get('ownerPhone').value,
+                                this.getForm().get('ownerBirthdate').value,
+                                this.getForm().get('fileSource').value,
+                                );
+}
+
 
   private createForm(): FormGroup{
     return this.formBuilder.group({
@@ -54,24 +64,29 @@ export class AddCountryOwnerPage implements OnInit {
       ownerEmail: ['', Validators.required],
       ownerPassword: ['', Validators.required],
       ownerPhone: ['', Validators.required],
-      ownerBirthdate: ['', Validators.required],
+      ownerBirthdate: ['',Validators.required],
       ownerAvatar: new FormControl('', [Validators.required]),
-      fileSource: new FormControl('', [Validators.required])
+      fileSource: new FormControl('', [Validators.required]),
     });
 }
 
+public getForm(): FormGroup {
+  return this.form;
+}
+
+
 private changeIcon(input): void {
-  (this.getPasswordType(input) === "password")
-    ? this.passIcon.name = "eye-outline"
-    : this.passIcon.name = "eye-off-outline"
+  (this.getPasswordType(input) === 'password')
+    ? this.passIcon.name = 'eye-outline'
+    : this.passIcon.name = 'eye-off-outline';
 
 }
 
 protected showPassword(input): void {
 
-  (this.getPasswordType(input) === "password")
-    ? this.setPasswordType(input, "text")
-    : this.setPasswordType(input, "password");
+  (this.getPasswordType(input) === 'password')
+    ? this.setPasswordType(input, 'text')
+    : this.setPasswordType(input, 'password');
 
   this.changeIcon(input);
 

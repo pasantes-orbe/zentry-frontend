@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
+import { AmenitieService } from '../../../../services/amenities/amenitie.service';
 
 
 
@@ -15,7 +16,7 @@ import { LoadingService } from 'src/app/services/helpers/loading.service';
 
 export class AddAmenityPage implements OnInit {
 
-
+public newImg: any = 'https://ionicframework.com/docs/img/demos/card-media.png';
 private formBuilder: FormBuilder;
 private form: FormGroup;
 private errorMessage: any;
@@ -23,8 +24,8 @@ private errorMessage: any;
 constructor(
   protected _formBuilder: FormBuilder,
   protected _loading: LoadingService,
-
-  private _alertService: AlertService
+  private _alertService: AlertService,
+  private _amenitie: AmenitieService
 ){
   this.formBuilder = _formBuilder;
   this.form = this.createForm();
@@ -32,46 +33,39 @@ constructor(
 
 ngOnInit(): void {}
 
-guardarAmenitie(){
-  if (!this.getForm().valid) return;
-  
-  this._loading.startLoading("Aguarde un momento...");
-  console.log(this.form.value)
-  this.setErrorMessage(false);
-  
-  const amenitie = {
-    name: this.getForm().get('name').value,
-    address: this.getForm().get('address').value,
-    image : this.getForm().get('image').value,
-  }
-
-  //this._amenitiesService.guardarAmenitie(amenitie).subscribe(
-   // data => {
-    //  this._loading.stopLoading();
-     // this._alertService.showAlert('Hola', 'El mensaje ha sido enviado');
-   // },
-  //)
-
+saveAmenitie(){
+  this._amenitie.addAmenitiy(this.getForm().get('name').value,
+  this.getForm().get('address').value,
+  this.getForm().get('fileSource').value,);
 }
 
 private createForm(): FormGroup {
   return this.formBuilder.group({
     name: ['', [Validators.required]],
     address: ['', [Validators.required]],
-    image: ['hola.jpg']
+    amenitieAvatar: new FormControl('', [Validators.required]),
+    fileSource: new FormControl('', [Validators.required]),
   });
 }
+onFileChange(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = e => this.newImg = reader.result;
 
+  reader.readAsDataURL(file);
+
+  if (event.target.files.length > 0) {
+
+
+    const file = event.target.files[0];
+    this.form.patchValue({
+      fileSource: file
+    });
+  }
+}
 public getForm(): FormGroup {
   return this.form;
 }
 
-public getErrorMessage(): any {
-  return this.errorMessage;
-}
-
-public setErrorMessage(errorMessage: any): void {
-  this.errorMessage = errorMessage;
-}
 
 }

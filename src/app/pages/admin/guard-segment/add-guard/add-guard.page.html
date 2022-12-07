@@ -1,0 +1,89 @@
+<app-navbar-back title="Nuevo Vigilador"></app-navbar-back>
+
+<ion-content>
+  <ion-grid>
+    <form [formGroup]="getForm()">
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="12">
+      <ion-item>
+        <ion-label>Nombre</ion-label>
+        <ion-input  type="text" formControlName="vigilatorName"></ion-input>
+      </ion-item>
+    </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12">
+      <ion-item>
+        <ion-label>Apellido</ion-label>
+        <ion-input formControlName="vigilatorLastname"></ion-input>
+      </ion-item>
+    </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12">
+      <ion-item>
+        <ion-label>DNI</ion-label>
+        <ion-input type="number" placeholder="0" formControlName="vigilatorDNI"></ion-input>
+      </ion-item>
+    </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12">
+      <ion-item>
+        <ion-label>email</ion-label>
+        <ion-input type="string" placeholder="orbesoftware@gmail.com" formControlName="vigilatorEmail"></ion-input>
+      </ion-item>
+    </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12">
+        <ion-item>
+          <!-- <ion-label position="floating">Contraseña</ion-label> -->
+          <ion-icon #passwordShowIcon button slot="end" (click)="showPassword(password)" slot="end" name="eye-outline">
+          </ion-icon>
+          <ion-label>Contraseña</ion-label>
+          <ion-input #password required type="password" placeholder="" formControlName="vigilatorPassword">
+          </ion-input>
+        </ion-item>
+    </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12">
+      <ion-item>
+        <ion-label>phone</ion-label>
+        <ion-input type="string" placeholder="3624748702" formControlName="vigilatorPhone"></ion-input>
+      </ion-item>
+    </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12">
+      <ion-item>
+        <ion-label>Fecha de Nacimiento</ion-label>
+        <ion-input type="date" placeholder="" formControlName="vigilatorBirthdate"></ion-input>
+      </ion-item>
+      </ion-col>
+    </ion-row>
+
+
+    <ion-row class="ion-justify-content-center">
+      <ion-card button>
+        <img [src]="newImg" alt="">
+        <ion-input (change)="onFileChange($event)" name="vigilatorAvatar" type="file" placeholder="Awesome Input"></ion-input>
+      </ion-card>
+    </ion-row>
+
+    <ion-button type="submit" disabled="disabled" expand="block" shape="round">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Añadir Vigilador
+    </ion-button>
+
+
+  </form>
+  </ion-grid>
+  </ion-content>
