@@ -32,9 +32,15 @@ export class PropertiesService {
     this._http.post(`${environment.URL}/api/properties`, formData, httpOptions)
       .subscribe(res => {
         console.log(res);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Listo!", "La propiedad se agregó con éxito");
+        this._router.navigate(['/admin/country-dashboard']);
   },
   (err) =>{
-    console.log(err);
+        console.log(err);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("Ocurrió", "La propiedad no pudo ser agregada correctamente");
+        this._router.navigate(['/admin/country-dashboard']);
   }
   );
 

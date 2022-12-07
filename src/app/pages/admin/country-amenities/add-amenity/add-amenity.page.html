@@ -1,0 +1,40 @@
+<app-navbar-back title="Nuevo Lugar de Reserva"></app-navbar-back>
+<ion-content>
+<ion-grid class="ion-padding">
+  <form form [formGroup]="getForm()" (keyup.enter)="guardarAmenitie()" (ngSubmit)="guardarAmenitie()">
+    <ion-row class="ion-justify-content-center">
+    <ion-col size="12">
+    <ion-item counter="true">
+      <ion-label position="floating">Nombre del Lugar de Reserva</ion-label>
+      <ion-input maxlength="50" required type="text" formControlName="name"></ion-input>
+    </ion-item>
+  </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-justify-content-center">  
+    <ion-col size="12">
+    <ion-item counter="true">
+      <ion-label position="floating">Dirección</ion-label>
+      <ion-input maxlength="50" required type="text" formControlName="address"></ion-input>
+    </ion-item>
+    </ion-col>  
+  </ion-row>
+
+  <ion-row >
+    <ion-card button>
+      <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="">
+      <ion-input type="file" name="countryAvatar" placeholder="Awesome Input"></ion-input>
+    </ion-card>
+  </ion-row>
+
+  <ion-button type="submit" [disabled]="getForm().invalid" expand="block" shape="round">
+    <ion-icon slot="start" name="add"></ion-icon>
+    Añadir Lugar de Reserva
+  </ion-button>
+
+    <app-loader [loading]="_loading.isLoading()" [msg]="_loading.getMessage()"></app-loader>
+    
+  </form>
+</ion-grid>
+
+</ion-content>

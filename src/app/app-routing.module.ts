@@ -118,6 +118,18 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/country-properties/add-property/add-property.module').then( m => m.AddPropertyPageModule),
     canActivate: [AdminGuard]
   },
+  {
+    path: 'admin/nuevo-lugar-de-reserva',
+    loadChildren: () => import('./pages/admin/country-amenities/add-amenity/add-amenity.module').then( m => m.AddAmenityPageModule),
+    canActivate: [AdminGuard]
+  },
+  {
+    path: 'admin/nuevo-propietario',
+    loadChildren: () => import('./pages/admin/country-owners/add-country-owner/add-country-owner.module').then( m => m.AddCountryOwnerPageModule),
+    canActivate: [AdminGuard]
+  },
+
+
 
 
 

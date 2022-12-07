@@ -1,5 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AlertService } from 'src/app/services/helpers/alert.service';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
 
 @Component({
@@ -17,12 +20,9 @@ export class AddPropertyPage implements OnInit {
   private form: FormGroup;
 
 
-  constructor(protected _formBuilder: FormBuilder, private _properties: PropertiesService,) {
+  constructor(protected _formBuilder: FormBuilder, private _properties: PropertiesService, protected _alertService: AlertService, private http: HttpClient, private _router: Router) {
       this.formBuilder = _formBuilder;
       this.form = this.createForm();
-      this.data = {
-        countryName: ''
-    };
    }
 
   ngOnInit() {
@@ -61,9 +61,7 @@ export class AddPropertyPage implements OnInit {
       propertyAvatar: new FormControl('', [Validators.required]),
       fileSource: new FormControl('', [Validators.required])
     });
-
   }
-
 
 
 }
