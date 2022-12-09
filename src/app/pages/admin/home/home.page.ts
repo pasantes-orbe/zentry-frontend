@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CountriesService } from 'src/app/services/countries/countries.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +13,7 @@ export class HomePage implements OnInit {
 
 
 
-  constructor(private _CountriesService: CountriesService) { }
+  constructor(private _CountriesService: CountriesService, private _countryStorage: CountryStorageService) { }
 
   ngOnInit() {
 
@@ -42,5 +43,8 @@ export class HomePage implements OnInit {
     this.countries = countries;
   }
 
+  saveIdLocalStorage(id){
+    this._countryStorage.saveCountryID(id);
+  }
 
 }

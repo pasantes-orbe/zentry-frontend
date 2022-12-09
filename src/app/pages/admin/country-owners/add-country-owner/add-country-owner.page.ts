@@ -24,6 +24,7 @@ export class AddCountryOwnerPage implements OnInit {
   }
 
   ngOnInit() {
+
   }
 
   onFileChange(event) {
@@ -52,7 +53,7 @@ register(){
                                 this.getForm().get('ownerPhone').value,
                                 this.getForm().get('ownerBirthdate').value,
                                 this.getForm().get('fileSource').value,
-                                );
+                                'propietario');
 }
 
 

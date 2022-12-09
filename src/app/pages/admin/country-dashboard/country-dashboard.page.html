@@ -1,7 +1,11 @@
 <app-navbar-admin></app-navbar-admin>
+<!----  <ion-content *ngIf="!country; else divDashboard">
+  <ion-label> No existe dashboard</ion-label>
+</ion-content> -->
 
+
+ <!--<ng-template #divDashboard> -->
 <ion-content class="ion-padding">
-
   <ion-fab slot="fixed" horizontal="center" vertical="bottom">
     <ion-fab-button routerLink="/admin/home">
       <ion-icon name="repeat-outline"></ion-icon>
@@ -16,7 +20,7 @@
       <ion-label>Propiedades</ion-label>
     </ion-segment-button>
     <ion-segment-button value="vigiladores">
-      <ion-label>Vigiladores</ion-label>
+      <ion-label>vigiladores</ion-label>
     </ion-segment-button>
     
   </ion-segment>
@@ -35,8 +39,6 @@
     <ion-button routerLink="/admin/invitados-recurrentes" color="secondary" size="large" expand="block" shape="round">
       Invitados Recurrentes
     </ion-button>
-
-    
   </div>
 
   <div *ngIf="type == 'vigiladores'">
@@ -71,3 +73,5 @@
 
 
 </ion-content>
+
+<!--</ng-template> -->

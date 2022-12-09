@@ -6,7 +6,12 @@ import { CountryDashboardPage } from './country-dashboard.page';
 const routes: Routes = [
   {
     path: '',
-    component: CountryDashboardPage
+    component: CountryDashboardPage,
+    children: [
+      {
+        path: ':id', component: CountryDashboardPage
+      },
+    ]
   }
 ];
 
@@ -15,3 +20,4 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class CountryDashboardPageRoutingModule {}
+//localhost:8100/admin/country-dashboard

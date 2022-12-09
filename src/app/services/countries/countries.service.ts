@@ -1,15 +1,18 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
+import { AuthStorageService } from '../storage/auth-storage.service';
+import { CountryInteface } from '../../interfaces/country-interface';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CountriesService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router) { }
+  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _authStorageService: AuthStorageService) { }
 
 
   public getAll(){
@@ -39,4 +42,7 @@ export class CountriesService {
 
   }
 
+  public getByID(id:number): Observable<CountryInteface>{
+    return this._http.get<CountryInteface>(`${environment.URL}/api/countries/${ id }`);
+  }
 }

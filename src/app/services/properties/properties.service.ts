@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { AuthStorageService } from '../storage/auth-storage.service';
+import { CountryStorageService } from '../storage/country-storage.service';
 
 
 @Injectable({
@@ -11,11 +12,12 @@ import { AuthStorageService } from '../storage/auth-storage.service';
 })
 export class PropertiesService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _authStorageService: AuthStorageService) { }
+  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _authStorageService: AuthStorageService, private _countryStorageService: CountryStorageService) { }
 
   public async addCountry(avatar: File, name: string, address: string, propertyNumber: any){
-    const countryID: any = 1;
+    const countryID = await this._countryStorageService.getCountryID(); 
     const token = await this._authStorageService.getJWT();
+
     const formData = new FormData();
     formData.append('avatar', avatar);
     formData.append('name', name);
@@ -25,9 +27,10 @@ export class PropertiesService {
 
     const httpOptions = {
       headers: new HttpHeaders({
-        'Authorization': 'Token' + token,
+        'Authorization': token,
       }),
     };
+
     this._alertService.setLoading();
     this._http.post(`${environment.URL}/api/properties`, formData, httpOptions)
       .subscribe(res => {
@@ -40,5 +43,11 @@ export class PropertiesService {
   );
 
 };
+
+public getAll(){
+
+  return this._http.get(`${environment.URL}/api/properties`);
+
+}
 
 }

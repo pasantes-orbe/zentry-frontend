@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { RegisterService } from '../../../../services/auth/register.service';
 
 @Component({
   selector: 'app-add-guard',
@@ -17,7 +18,7 @@ export class AddGuardPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
 
-  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router) {
+  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router, private _registerService: RegisterService) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
@@ -42,6 +43,18 @@ export class AddGuardPage implements OnInit {
     }
   }
 
+  addGuard(){
+    this._registerService.register(this.getForm().get('vigilatorName').value,
+    this.getForm().get('vigilatorLastname').value,
+    this.getForm().get('vigilatorDNI').value,
+    this.getForm().get('vigilatorEmail').value,
+    this.getForm().get('vigilatorPassword').value,
+    this.getForm().get('vigilatorPhone').value,
+    this.getForm().get('vigilatorBirthdate').value,
+    this.getForm().get('fileSource').value,
+    'vigilador')
+
+  }
   public getForm(): FormGroup {
     return this.form;
   }

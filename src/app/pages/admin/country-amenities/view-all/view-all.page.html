@@ -9,10 +9,10 @@
     </ion-button>
   </div>
 
-  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre"></ion-searchbar>
+  <ion-searchbar mode="ios" animated debounce="500" placeholder="Buscar por Nombre"></ion-searchbar>
 
   <ion-row>
-    <ion-col class="col-6" *ngFor="let i of [1,1,1,1,1,1,1,1] | filter: searchKey">
+    <ion-col class="col-6" *ngFor="let amenitie of getAmenities()">
       <!-- routerLink="/admin/country-dashboard" -->
       <ion-card 
       button >
@@ -20,7 +20,7 @@
               
         <ion-card-content>
           <h3>
-            Club House
+            {{amenitie.name}}
           </h3>
         </ion-card-content>
       </ion-card>
