@@ -133,6 +133,13 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/guard-segment/add-guard/add-guard.module').then( m => m.AddGuardPageModule),
     canActivate: [AdminGuard]
   },
+  {
+    path: 'admin/asignar-propiedad',
+    loadChildren: () => import('./pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.module').then( m => m.AssignCountryToOwnerPageModule),
+    canActivate: [AdminGuard]
+  },
+
+  
 
 
 

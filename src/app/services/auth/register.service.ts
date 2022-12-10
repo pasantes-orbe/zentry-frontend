@@ -59,7 +59,12 @@ export class RegisterService {
         console.log(res)
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", `El usuario ${rol} fue creado con éxito`);
-        this._router.navigate(['/admin/country-dashboard']);
+        if (rol === 'propietario'){
+          this._router.navigate(['/admin/asignar-propiedad'])
+          console.log(res);
+        } else{
+          this._router.navigate(['/admin/country-dashboard']);
+        }
       });
   }
   )

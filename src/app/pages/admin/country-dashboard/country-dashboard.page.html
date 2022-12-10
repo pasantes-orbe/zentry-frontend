@@ -1,10 +1,10 @@
-<app-navbar-admin></app-navbar-admin>
-<!----  <ion-content *ngIf="!country; else divDashboard">
+<!--<app-navbar-admin></app-navbar-admin>
+ <ion-content *ngIf="!this.country; else divDashboard">
   <ion-label> No existe dashboard</ion-label>
 </ion-content> -->
 
 
- <!--<ng-template #divDashboard> -->
+ <!-- <ng-template #divDashboard>--> 
 <ion-content class="ion-padding">
   <ion-fab slot="fixed" horizontal="center" vertical="bottom">
     <ion-fab-button routerLink="/admin/home">
@@ -29,7 +29,7 @@
   <div *ngIf="type == 'propiedades'">
     
     <ion-button routerLink="/admin/ver-propiedades" color="secondary" size="large" expand="block" shape="round">
-      Ver todas las Propiedades
+      Ver todas las propiedades 
     </ion-button>
 
     <ion-button routerLink="/admin/ver-propietarios" color="secondary" size="large" expand="block" shape="round">
@@ -74,4 +74,4 @@
 
 </ion-content>
 
-<!--</ng-template> -->
+<!--</ng-template>--> 

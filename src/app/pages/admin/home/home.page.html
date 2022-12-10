@@ -23,7 +23,7 @@
     </ion-col>
 
     <ion-col class="col-6" *ngFor="let country of getCountries()">
-      <ion-card (click)="saveIdLocalStorage(country.id)" [routerLink]="['/admin/country-dashboard/', country.id]" button >
+      <ion-card (click)="saveCountryLocalStorage(country)" [routerLink]="['/admin/country-dashboard/', country.id]" button >
         <!-- <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" /> -->
         <img alt="Silhouette of mountains" [src]="country.avatar" />
         <ion-card-content>

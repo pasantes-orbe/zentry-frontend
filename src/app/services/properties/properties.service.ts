@@ -15,15 +15,15 @@ export class PropertiesService {
   constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _authStorageService: AuthStorageService, private _countryStorageService: CountryStorageService) { }
 
   public async addCountry(avatar: File, name: string, address: string, propertyNumber: any){
-    const countryID = await this._countryStorageService.getCountryID(); 
+    const country = await this._countryStorageService.getCountry(); 
     const token = await this._authStorageService.getJWT();
-
+    const countryID = country.id;
     const formData = new FormData();
     formData.append('avatar', avatar);
     formData.append('name', name);
     formData.append('address', address);
     formData.append('number', propertyNumber);
-    formData.append('id_country', countryID);
+    formData.append('id_country', countryID.toString());
 
     const httpOptions = {
       headers: new HttpHeaders({

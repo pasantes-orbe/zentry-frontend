@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { CountryInteface } from '../../interfaces/country-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -8,18 +9,25 @@ export class CountryStorageService {
 
   constructor(
   ) { }
+  public country: CountryInteface;
 
-  public async saveCountryID (countryID): Promise<void>{
+  public async saveCountry (country: CountryInteface): Promise<void>{
+    this.setCountry(country);
+
     await Preferences.set({
-      key: 'countryID',
-      value: countryID
+      key: 'COUNTRY',
+      value: JSON.stringify(country)
     });
   }
 
-  public async getCountryID(): Promise<string>{
-    const { value } = await Preferences.get({ key: 'countryID' });
+  public async getCountry(): Promise<CountryInteface>{
+    const { value } = await Preferences.get({ key: 'COUNTRY' });
     return JSON.parse(value);
     
+  }
+
+  private setCountry(country: CountryInteface): void {
+    this.country = country;
   }
 }
 

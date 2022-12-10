@@ -15,7 +15,8 @@ export class AmenitieService {
 
    async addAmenitiy(name: string, address: string, avatar: File){
 
-    const countryID = await this._countryStorageService.getCountryID()
+    const country = await this._countryStorageService.getCountry()
+    const countryID = country.id;
     const formData = new FormData();
     formData.append('name', name);
     formData.append('address', address);
@@ -27,8 +28,8 @@ export class AmenitieService {
       .subscribe(res => {
         console.log(res);
         this._alertService.removeLoading();
-        this._alertService.showAlert("¡Listo!", "El country se agregó con éxito");
-        this._router.navigate(['/admin/home']);
+        this._alertService.showAlert("¡Listo!", "El Lugar de Reserva se agregó con éxito");
+        this._router.navigate([`/admin/country-dashboard/${countryID}`]);
       });
    }
 
