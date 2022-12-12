@@ -13,7 +13,7 @@ export class ViewAllPage implements OnInit {
   constructor(private _amenitiesService: AmenitieService) { }
 
   ngOnInit() {
-   this.ionViewWillEnter(); 
+   this.ionViewWillEnter();
   }
 
   ionViewWillEnter() {
@@ -22,11 +22,8 @@ export class ViewAllPage implements OnInit {
 
   private getCountriesFromDB() {
 
-    this._amenitiesService.getAll().subscribe(
-      data => {
-        this.amenities = data;
-      }
-    )
+    this._amenitiesService.getAll().then(data => data.subscribe(amenities => {this.amenities = amenities
+    console.log(amenities)}))
 
   }
 

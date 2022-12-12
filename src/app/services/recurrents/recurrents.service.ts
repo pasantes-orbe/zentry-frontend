@@ -1,0 +1,48 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
+import { AlertService } from '../helpers/alert.service';
+import { RecurrentsInterface } from '../../interfaces/recurrents-interface';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RecurrentsService {
+
+  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router,) { }
+
+  public addRecurrent(id_property, name, lastname, dni){
+
+
+    const formData = new FormData();
+    formData.append('id_property', id_property);
+    formData.append('guest_name', name);
+    formData.append('guest_lastname', lastname);
+    formData.append('dni', dni);
+    this._alertService.setLoading();
+
+    this._http.post(`${environment.URL}/api/recurrents`, formData)
+      .subscribe(res => {
+        console.log(res);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
+        this._router.navigate(['/admin/home']);
+      });
+  }
+
+  public getAll(): Observable<RecurrentsInterface[]> {
+
+  return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents`);
+
+  }
+
+  public patchStatus(id_property, recurrentStatus){
+    const recurrentStatusNew = !recurrentStatus
+    return this._http.patch(`${environment.URL}/api/recurrents/${id_property}`,
+    {
+      status: recurrentStatusNew
+    })
+  }
+}

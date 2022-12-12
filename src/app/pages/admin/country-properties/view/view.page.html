@@ -20,13 +20,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let propertie of getProperties() ; let i = index">
-        <td class="text-center">{{i + 1}}</td>
-        <td>{{propertie.name}} </td>
+      <tr *ngFor="let propertie of properties ; let i = index">
+        <td class="text-center">{{propertie.number}}</td>
+        <td>{{propertie.address}}</td>
         <td>
           <ion-list lines="none">
             <ion-item>
-              <ion-label>Perez, Juan</ion-label>
+              <ion-label>Perez Juan</ion-label>
             </ion-item>
             <ion-item>
               <ion-label>Gomez, María</ion-label>

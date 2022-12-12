@@ -7,7 +7,12 @@ const routes: Routes = [
   {
     path: '',
     component: CountryRecurrentsPage
-  }
+  },
+  {
+    path: 'add-recurrent',
+    loadChildren: () => import('./add-recurrent/add-recurrent.module').then( m => m.AddRecurrentPageModule)
+  },
+
 ];
 
 @NgModule({

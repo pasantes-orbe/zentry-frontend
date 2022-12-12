@@ -21,9 +21,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of [1,1,1,1,1,1]; let i = index">
-        <td class="text-center">Chicala</td>
-        <td>Alejandro</td>
+      <tr *ngFor="let guard of guards; let i = index">
+        <td class="text-center">{{guard.name}}</td>
+        <td>{{guard.lastname}}</td>
         <td *ngIf="i % 2 == 0">
           <ion-icon color="success" slot="icon-only" name="checkmark-outline"></ion-icon>
         </td>

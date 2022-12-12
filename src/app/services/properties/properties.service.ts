@@ -5,6 +5,8 @@ import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { AuthStorageService } from '../storage/auth-storage.service';
 import { CountryStorageService } from '../storage/country-storage.service';
+import { PropertyInterface } from '../../interfaces/property-interface';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -13,10 +15,10 @@ import { CountryStorageService } from '../storage/country-storage.service';
 export class PropertiesService {
 
   constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _authStorageService: AuthStorageService, private _countryStorageService: CountryStorageService) { }
-
+  
   public async addCountry(avatar: File, name: string, address: string, propertyNumber: any){
-    const country = await this._countryStorageService.getCountry(); 
     const token = await this._authStorageService.getJWT();
+    const country = await this._countryStorageService.getCountry(); 
     const countryID = country.id;
     const formData = new FormData();
     formData.append('avatar', avatar);
@@ -44,10 +46,25 @@ export class PropertiesService {
 
 };
 
-public getAll(){
+public async getAll(): Promise<Observable<PropertyInterface[]>> {
+  const token = await this._authStorageService.getJWT();
+  const httpOptions = {
+    headers: new HttpHeaders({
+      'Authorization': token,
+    }),
+  };
+  return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties`, httpOptions);
 
-  return this._http.get(`${environment.URL}/api/properties`);
+}
 
+public async getByID(id) : Promise<Observable<PropertyInterface>> {
+  const token = await this._authStorageService.getJWT();
+  const httpOptions = {
+    headers: new HttpHeaders({
+      'Authorization': token,
+    }),
+  };
+  return this._http.get<PropertyInterface>(`${environment.URL}/api/properties/${id}`, httpOptions);
 }
 
 }

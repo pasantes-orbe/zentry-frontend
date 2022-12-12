@@ -10,26 +10,28 @@
   </div>
 
   <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre o N° de propiedad"></ion-searchbar>
-
+  <div class="table-responsive container">
   <table class="table text-center">
     <thead>
       <tr>
+        <th scope="col">Email</th>
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
+        <th scope="col">DNI</th>
         <th scope="col">Propiedad N°</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of [1,1,1] | filter: searchKey ; let i = index">
-        <td class="text-center">Chicala</td>
-        <td>Alejandro</td>
-        <td>
-          {{i+1}}
-        </td>
+      <tr *ngFor="let owner of owners; let i = index">
+        <td>{{owner.user.email}}</td>
+        <td>{{owner.user.lastname}}</td>
+        <td>{{owner.user.name}}</td>
+        <td>{{owner.user.dni}}</td>
+        <td>{{owner.property.name}}</td>
       </tr>
       <tr>
       
     </tbody>
   </table>
-
+  </div>
 </ion-content>

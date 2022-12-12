@@ -1,0 +1,53 @@
+<app-navbar-back title="Nuevo Invitado"></app-navbar-back>
+
+<ion-content>
+  <ion-grid class="ion-padding">
+    <form form [formGroup]="getForm()" (keyup.enter)="saveRecurrent()" (ngSubmit)="saveRecurrent()">
+      <ion-row class="ion-justify-content-center">
+      <ion-col size="12">
+      <ion-item counter="true">
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input maxlength="50" required type="text" formControlName="name"></ion-input>
+      </ion-item>
+    </ion-col>
+    </ion-row>
+  
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12">
+      <ion-item counter="true">
+        <ion-label position="floating">Apellido</ion-label>
+        <ion-input maxlength="50" required type="text" formControlName="lastname" ></ion-input>
+      </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12">
+      <ion-item counter="true">
+        <ion-label position="floating">DNI</ion-label>
+        <ion-input maxlength="50" required type="number" formControlName="dni"></ion-input>
+      </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-searchbar placeholder="Busque una Propiedad para Asignar" [debounce]="1000" (ionChange)="getProperties($event.detail.value)"></ion-searchbar>
+    <ion-list *ngIf="property">
+      <ion-radio-group formControlName="property" (ionChange)="mostrarEvento($event)">
+        <ion-item>
+          <ion-label>{{property.name}}</ion-label>
+          <ion-radio slot="end" [value]="property.id"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-list>
+
+    <ion-button [disabled]="getForm().invalid" type="submit" expand="block" shape="round">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Añadir Lugar de Reserva
+    </ion-button>
+  
+  
+    </form>
+  </ion-grid>
+  
+  </ion-content>
+  

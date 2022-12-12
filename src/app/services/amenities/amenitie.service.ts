@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { CountryStorageService } from '../storage/country-storage.service';
+import { AmenitieInterface } from '../../interfaces/amenitie-interface';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +36,11 @@ export class AmenitieService {
    }
 
 
-   public getAll(){
-      return this._http.get(`${environment.URL}/api/amenities/`);
+   public async getAll(): Promise<Observable<AmenitieInterface[]>> {
+      const country = await this._countryStorageService.getCountry()
+      const countryID = country.id;
+
+      return this._http.get<AmenitieInterface[]>(`${environment.URL}/api/amenities/${countryID}`);
    }
+
 }

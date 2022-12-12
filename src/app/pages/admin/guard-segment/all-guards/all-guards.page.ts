@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { GuardsService } from '../../../../services/guards/guards.service';
+import { GuardInterface } from '../../../../interfaces/guard-interface';
 
 @Component({
   selector: 'app-all-guards',
@@ -6,10 +8,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./all-guards.page.scss'],
 })
 export class AllGuardsPage implements OnInit {
+  protected guards: GuardInterface[]
 
-  constructor() { }
+  constructor(private _guardsService: GuardsService ) { }
 
   ngOnInit() {
+    this._guardsService.getAll().subscribe(guards => this.guards = guards)
   }
 
 }
