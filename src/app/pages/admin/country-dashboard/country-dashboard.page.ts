@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { CountriesService } from '../../../services/countries/countries.service';
 import { CountryInteface } from '../../../interfaces/country-interface';
 import { CountryStorageService } from '../../../services/storage/country-storage.service';
+import { NavbarAdminComponent } from 'src/app/components/navbars/navbar-admin/navbar-admin.component';
 
 @Component({
   selector: 'app-country-dashboard',
@@ -11,6 +12,8 @@ import { CountryStorageService } from '../../../services/storage/country-storage
   styleUrls: ['./country-dashboard.page.scss'],
 })
 export class CountryDashboardPage implements OnInit{
+
+  @ViewChild(NavbarAdminComponent) navbar: NavbarAdminComponent;
 
   type = "propiedades";
 
@@ -22,8 +25,8 @@ export class CountryDashboardPage implements OnInit{
  //   this.ionViewWillEnter()
   }
 
-  //ionViewWillEnter(){
-    //this.getCountryFromStorage()
+  async ionViewWillEnter(){
+    await this.navbar.ngOnInit();
   }
   
 
@@ -37,7 +40,7 @@ export class CountryDashboardPage implements OnInit{
 
 
 
-
+}
 
 
 

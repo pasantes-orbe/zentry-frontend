@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
 import { UserInterface } from 'src/app/interfaces/user-interface';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 @Component({
@@ -12,14 +13,17 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 export class NavbarAdminComponent implements OnInit {
 
   protected user: UserInterface;
+  protected countryName: string = "";
 
   constructor(
     private menu: MenuController,
     private router: Router,
-    protected _userStorage: UserStorageService
+    protected _userStorage: UserStorageService,
+    protected _countryStorage: CountryStorageService
   ) { }
 
   async ngOnInit() {
+    this.countryName =  await (await this._countryStorage.getCountry()).name;
     this.setUser(await this._userStorage.getUser());
     console.log("A", await this._userStorage.getUser());
     //TODO:
