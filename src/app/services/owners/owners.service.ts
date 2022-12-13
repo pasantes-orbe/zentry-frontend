@@ -5,6 +5,9 @@ import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { OwnerResponse } from '../../interfaces/ownerResponse-interface';
 import { Observable } from 'rxjs';
+import { OwnerInterface } from '../../interfaces/owner-interface';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,5 +18,24 @@ export class OwnersService {
 
   public getAll(): Observable<OwnerResponse[]>{
     return this._http.get<OwnerResponse[]>(`${environment.URL}/api/owners`)
+  }
+
+  public getAllByRole(): Observable<OwnerInterface[]>{
+    return this._http.get<OwnerInterface[]>(`${environment.URL}/api/users?role=propietario`)
+  }
+
+  public relationWithProperty(user_id, property_id){
+    const formData = new FormData();
+    formData.append('id_user', user_id);
+    formData.append('id_property', property_id);
+    this._alertService.setLoading();
+    this._http.post(`${environment.URL}/api/owners`, formData).subscribe(
+      res => {
+        console.log(res);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Listo!", "La propiedad se asignó con éxito al usuario");
+        this._router.navigate(['/admin/home']);
+      }
+    )
   }
 }

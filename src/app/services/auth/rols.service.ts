@@ -23,6 +23,7 @@ export class RolsService {
      data.filter(data => data.name == nombreDeRol)
     )
     )
+    
     return respuesta
   }
 

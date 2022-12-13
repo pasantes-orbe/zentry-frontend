@@ -1,12 +1,61 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>assign-country-to-owner</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-navbar-back title="Asignar Propiedad"></app-navbar-back>
 
 <ion-content>
-  <ion-button  (click)="mostrarUserID()" expand="block" shape="round">
+
+<form form [formGroup]="getForm()" >
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col>
+  <ion-searchbar placeholder="Buscar por DNI"  [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" > </ion-searchbar>
+  <ion-list >
+    <ion-radio-group formControlName="user_id" >
+      <ion-item *ngFor="let owner of owners | filter: searchKey ; let i = index ">
+        <ion-label>{{owner.name}} {{owner.lastname}}             -       {{owner.dni}}</ion-label>
+        <ion-radio  slot="end" [value]="owner.id"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-col>
+</ion-row>
+<hr>
+
+<ion-row>
+  <ion-col>
+    <div class="ion-text-center">
+      <h3>Elija una propiedad para asignar al usuario</h3>
+    </div>
+</ion-col>
+</ion-row>
+
+<ion-row class="ion-justify-content-center">
+  <ion-col>
+  <ion-searchbar placeholder="Buscar por Numero de Propiedad" [(ngModel)]="searchKey1" [ngModelOptions]="{standalone: true}" ></ion-searchbar>
+  <ion-list >
+    <ion-radio-group formControlName="property_id">
+      <ion-item *ngFor="let property of properties | filter: searchKey1 ; let i = index "> 
+        <ion-avatar>
+          <img alt="Avatar" [src]="property.avatar" />
+        </ion-avatar>
+        <ion-label>{{property.name}} - <b>Nº </b>  {{property.number}}</ion-label>
+        <ion-radio slot="end" [value]="property.id"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-col>
+</ion-row>
+
+<ion-row class="ion-justify-content-center">
+  <ion-col>
+  <ion-button  (click)="asignarPropiedadAlUsuario()" expand="block" shape="round">
     <ion-icon slot="start" name="add"></ion-icon>
-    Agregar Country
+    Asignar Country al Propietario
   </ion-button>
+</ion-col>
+</ion-row>
+
+</ion-grid>
+
+</form>
+
+  
 </ion-content>
