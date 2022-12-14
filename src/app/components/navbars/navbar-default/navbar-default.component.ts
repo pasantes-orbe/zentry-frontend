@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
+import { OwnerStorageService } from '../../../services/storage/owner-interface-storage';
 
 @Component({
   selector: 'app-navbar-default',
@@ -16,7 +17,8 @@ export class NavbarDefaultComponent implements OnInit {
   constructor(
     private menu: MenuController,
     private router: Router,
-    protected _userStorage: UserStorageService
+    protected _userStorage: UserStorageService,
+    protected _ownerStorage: OwnerStorageService
   ) { }
 
   async ngOnInit() {

@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { AlertService } from '../helpers/alert.service';
 import { OwnerResponse } from '../../interfaces/ownerResponse-interface';
 import { Observable } from 'rxjs';
 import { OwnerInterface } from '../../interfaces/owner-interface';
+import { AlertService } from '../helpers/alert.service';
 
 
 
@@ -24,17 +24,24 @@ export class OwnersService {
     return this._http.get<OwnerInterface[]>(`${environment.URL}/api/users?role=propietario`)
   }
 
+  public getByID(id): Observable<OwnerInterface>{
+
+    return this._http.get<OwnerInterface>(`${environment.URL}/api/owners/${id}`)
+
+  }
+
   public relationWithProperty(user_id, property_id){
     const formData = new FormData();
     formData.append('id_user', user_id);
     formData.append('id_property', property_id);
     this._alertService.setLoading();
+
     this._http.post(`${environment.URL}/api/owners`, formData).subscribe(
       res => {
         console.log(res);
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "La propiedad se asignó con éxito al usuario");
-        this._router.navigate(['/admin/home']);
+        this._router.navigate(['/admin/ver-propietarios']);
       }
     )
   }

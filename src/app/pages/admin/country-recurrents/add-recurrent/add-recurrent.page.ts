@@ -14,7 +14,7 @@ import { RecurrentsService } from '../../../../services/recurrents/recurrents.se
 export class AddRecurrentPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
-  protected property: PropertyInterface
+  protected properties: PropertyInterface[]
   protected termino: string;
   protected selectedValue;
 
@@ -45,17 +45,15 @@ export class AddRecurrentPage implements OnInit {
   }
 
   public getProperties(termino){
-  this._propertiesService.getByID(termino).then(data => data.subscribe(property => this.property = property))  
-  }
-  public mostrarEvento(event){
-    console.log(event)
+  this._propertiesService.getBySearchTerm(termino).then(data => data.subscribe(properties => this.properties = properties))  
   }
 
   public saveRecurrent(){
-    this._recurrentsService.addRecurrent( this.getForm().get('property').value,
-                                          this.getForm().get('name').value,
-                                          this.getForm().get('lastname').value,
-                                          this.getForm().get('dni').value)
+     this._recurrentsService.addRecurrent( this.getForm().get('property').value,
+                                           this.getForm().get('name').value,
+                                           this.getForm().get('lastname').value,
+                                           this.getForm().get('dni').value)
+    
 
   }
 

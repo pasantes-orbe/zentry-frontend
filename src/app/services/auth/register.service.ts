@@ -62,7 +62,9 @@ export class RegisterService {
         if (rol === 'propietario'){
           this._router.navigate(['/admin/asignar-propiedad'])
           console.log(res);
-        } else{
+        } else if(rol == 'vigilador'){
+          this._router.navigate(['/admin/todos-los-guardias']);
+        } else {
           this._router.navigate(['/admin/country-dashboard']);
         }
       });

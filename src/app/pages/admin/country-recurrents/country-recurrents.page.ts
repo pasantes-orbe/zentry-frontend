@@ -8,18 +8,18 @@ import { RecurrentsInterface } from '../../../interfaces/recurrents-interface';
   styleUrls: ['./country-recurrents.page.scss'],
 })
 export class CountryRecurrentsPage implements OnInit {
-  recurrents: RecurrentsInterface[]
+   protected recurrents: RecurrentsInterface[]
 
   constructor(private _recurrentsService: RecurrentsService) { }
 
   ngOnInit() {
-    this._recurrentsService.getAll().subscribe(recurrents => this.recurrents = recurrents)
+    this._recurrentsService.getRecurrentsByCountry().then(data => data.subscribe((recurrents) => this.recurrents = recurrents))
   }
   
   public cambiarStatus(recurrent, i){
     this._recurrentsService.patchStatus(recurrent.id, recurrent.status).subscribe(data => {console.log(data)
       this.recurrents[i].status = !recurrent.status;
-                                                                                          })
+                                                                                  })
     //recurrent.status = !recurrent.status
     }
 }

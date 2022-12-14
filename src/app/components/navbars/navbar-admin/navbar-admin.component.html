@@ -31,13 +31,23 @@
 
         </div>
       </ion-accordion>
-            
+
+      <ion-accordion value="Solicitud de Contrasena" toggleIcon="none">
+        <ion-item slot="header" (click)="navigate('/admin/solicitudes-de-contrasena')">
+          <ion-icon slot="start" name="Solicitud de Contrasena"></ion-icon>
+          <ion-label>Solicitud de Contraseña</ion-label>
+        </ion-item>
+      </ion-accordion>
+
       <ion-accordion value="cerrar-sesion" toggleIcon="none">
         <ion-item (click)="_userStorage.signOut()" slot="header">
           <ion-icon slot="start" name="log-out-outline"></ion-icon>
           <ion-label>Cerrar Sesion</ion-label>
         </ion-item>
       </ion-accordion>
+
+     
+
     </ion-accordion-group>
 
     <!-- <ion-list lines="none">

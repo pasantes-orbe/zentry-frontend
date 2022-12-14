@@ -1,25 +1,25 @@
-import { Injectable } from '@angular/core';
-import { Preferences } from '@capacitor/preferences';
+// import { Injectable } from '@angular/core';
+// import { Preferences } from '@capacitor/preferences';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class OwnerStorageService {
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class OwnerStorageService {
 
-  constructor(
-  ) { }
+//   constructor(
+//   ) { }
 
-  public async saveCountryID (ownerID): Promise<void>{
-    await Preferences.set({
-      key: 'ownerID',
-      value: ownerID
-    });
-  }
+//   public async saveCountryID (ownerID): Promise<void>{
+//     await Preferences.set({
+//       key: 'ownerID',
+//       value: ownerID
+//     });
+//   }
 
-  public async getCountryID(): Promise<string>{
-    const { value } = await Preferences.get({ key: 'ownerID' });
-    return JSON.parse(value);
+//   public async getCountryID(): Promise<string>{
+//     const { value } = await Preferences.get({ key: 'ownerID' });
+//     return JSON.parse(value);
     
-  }
-}
+//   }
+// }
 

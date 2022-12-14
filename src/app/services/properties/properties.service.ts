@@ -39,7 +39,7 @@ export class PropertiesService {
         console.log(res);
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "La propiedad se agregó con éxito");
-        this._router.navigate(['/admin/country-dashboard']);
+        this._router.navigate([`/admin/ver-propiedades`]);
   },
 
   );
@@ -48,6 +48,8 @@ export class PropertiesService {
 
 public async getAll(): Promise<Observable<PropertyInterface[]>> {
   const token = await this._authStorageService.getJWT();
+  const country = await this._countryStorageService.getCountry()
+  const countryID = country.id
   const httpOptions = {
     headers: new HttpHeaders({
       'Authorization': token,
@@ -57,14 +59,17 @@ public async getAll(): Promise<Observable<PropertyInterface[]>> {
 
 }
 
-public async getByID(id) : Promise<Observable<PropertyInterface>> {
+public async getBySearchTerm(searchTerm) : Promise<Observable<PropertyInterface[]>> {
   const token = await this._authStorageService.getJWT();
+  const country = await this._countryStorageService.getCountry()
+  const countryID = country.id;
+
   const httpOptions = {
     headers: new HttpHeaders({
       'Authorization': token,
     }),
   };
-  return this._http.get<PropertyInterface>(`${environment.URL}/api/properties/${id}`, httpOptions);
+  return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties/${countryID}/${searchTerm}`, httpOptions);
 }
 
 }

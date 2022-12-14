@@ -1,5 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AlertController, MenuController } from '@ionic/angular';
+import { UserStorageService } from '../services/storage/user-storage.service';
+import { AuthStorageService } from '../services/storage/auth-storage.service';
+import { UserInterface } from '../interfaces/user-interface';
+import { OwnersService } from '../services/owners/owners.service';
+import { OwnerInterface } from '../interfaces/owner-interface';
+import { OwnerStorageService } from '../services/storage/owner-interface-storage';
 import swal from'sweetalert2';
 
 @Component({
@@ -7,24 +13,44 @@ import swal from'sweetalert2';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
-export class Tab1Page {
+export class Tab1Page implements OnInit{
   private loading: boolean;
-
-
+  private user: UserInterface;
+  private userID;
+  protected owner: OwnerInterface
 
 
   constructor(
     private menu: MenuController,
     private alertController: AlertController,
+    private _userStorageService: UserStorageService,
+    private _ownerStorageService: OwnerStorageService,
+    private _ownersService: OwnersService
     ) { 
     this.setLoading(true);
     this.getData();
 
     
-    this.presentAlert();
+    this.presentAlert();  
 
   }
 
+  async ngOnInit() {
+    console.log("ONINIT")
+    const user = await this._userStorageService.getUser()
+    this.userID = user.id;
+    this._ownersService.getByID(this.userID).subscribe((owner) => {
+      this.owner = owner
+      this._ownerStorageService.saveOwner(owner)
+    })
+  }
+    
+  public async ionViewWillEnter(){
+
+    console.log("IONWENTER")
+
+    await this.ngOnInit() 
+  }
   async presentAlert(){
     const alert = await this.alertController.create({
       header: 'Solicitud de Ingreso',

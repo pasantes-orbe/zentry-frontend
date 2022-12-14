@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { OwnerStorageService } from '../../../../services/storage/owner-created-storage.service';
 import { OwnersService } from '../../../../services/owners/owners.service';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
 import { PropertyInterface } from '../../../../interfaces/property-interface';
@@ -23,7 +22,7 @@ export class AssignCountryToOwnerPage implements OnInit {
   protected properties: PropertyInterface[];
 
 
-  constructor(   protected _loading: LoadingService, private _alertService: AlertService, private _ownerStorage: OwnerStorageService, protected _formBuilder: FormBuilder, private _ownersService: OwnersService, private _propertiesService: PropertiesService) {
+  constructor(   protected _loading: LoadingService, protected _formBuilder: FormBuilder, private _ownersService: OwnersService, private _propertiesService: PropertiesService) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
    }

@@ -5,13 +5,14 @@ import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { RecurrentsInterface } from '../../interfaces/recurrents-interface';
 import { Observable } from 'rxjs';
+import { CountryStorageService } from '../storage/country-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecurrentsService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router,) { }
+  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) { }
 
   public addRecurrent(id_property, name, lastname, dni){
 
@@ -28,15 +29,23 @@ export class RecurrentsService {
         console.log(res);
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
-        this._router.navigate(['/admin/home']);
+        this._router.navigate(['/admin/invitados-recurrentes']);
       });
+  }
+
+  public async getRecurrentsByCountry(): Promise<Observable<RecurrentsInterface[]>> {
+    const country = await this._countryStorageService.getCountry();
+    const countryID = country.id;
+
+    return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents/get-by-country/${countryID}`);
+  
   }
 
   public getAll(): Observable<RecurrentsInterface[]> {
 
-  return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents`);
-
-  }
+    return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents`);
+  
+    }
 
   public patchStatus(id_property, recurrentStatus){
     const recurrentStatusNew = !recurrentStatus

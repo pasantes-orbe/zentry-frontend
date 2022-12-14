@@ -31,7 +31,7 @@ export class AmenitieService {
         console.log(res);
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Lugar de Reserva se agregó con éxito");
-        this._router.navigate([`/admin/country-dashboard/${countryID}`]);
+        this._router.navigate([`/admin/ver-amenities`]);
       });
    }
 

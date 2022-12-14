@@ -138,6 +138,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.module').then( m => m.AssignCountryToOwnerPageModule),
     canActivate: [AdminGuard]
   },
+  {
+    path: 'admin/solicitudes-de-contrasena',
+    loadChildren: () => import('./pages/admin/password-requests/password-requests/password-requests.module').then( m => m.PasswordRequestsPageModule)
+  },
+
   
  
 

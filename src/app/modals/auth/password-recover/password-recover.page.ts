@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
 import { AlertController, IonModal, ModalController } from '@ionic/angular';
 import { EmailHelperService } from 'src/app/services/helpers/email-helper.service';
+import { PasswordRecoverService } from '../../../services/auth/password-recover.service';
 
 @Component({
   selector: 'app-password-recover',
@@ -21,7 +22,8 @@ export class PasswordRecoverPage implements OnInit {
     private _modalCtrl: ModalController,
     private formBuilder: UntypedFormBuilder,
     protected _emailHelper: EmailHelperService,
-    private _alertController: AlertController
+    private _alertController: AlertController,
+    private _passwordRecoverService: PasswordRecoverService,
   ) {
     this.buildFormData();
   }
@@ -42,13 +44,14 @@ export class PasswordRecoverPage implements OnInit {
     })
 
     await alert.present();
+    this._passwordRecoverService.requestNewPassword(this.getFormData().get('userInput').value)
 
   }
 
   private buildFormData(): void {
     this.formData = this.formBuilder.group({
       userInput: new UntypedFormControl(this.userInput, Validators.required)
-    });
+    })
   }
 
   public getFormData(): FormGroup {
