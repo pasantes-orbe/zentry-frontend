@@ -35,7 +35,7 @@ export class AddRecurrentPage implements OnInit {
     return this.formBuilder.group({
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
-      dni: ['', [Validators.required]],
+      dni: ['', [Validators.required,Validators.max(99999999)]],
       property: ['', [Validators.required]],
     })
   }
@@ -45,7 +45,7 @@ export class AddRecurrentPage implements OnInit {
   }
 
   public getProperties(termino){
-  this._propertiesService.getBySearchTerm(termino).then(data => data.subscribe(properties => this.properties = properties))  
+  this._propertiesService.getBySearchTerm(termino).then(data => data.subscribe((properties) => {this.properties = properties}))  
   }
 
   public saveRecurrent(){

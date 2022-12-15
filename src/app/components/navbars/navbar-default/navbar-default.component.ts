@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { MenuController } from '@ionic/angular';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
-import { OwnerStorageService } from '../../../services/storage/owner-interface-storage';
+import { OwnerStorageService } from '../../../services/storage/owner-interface-storage.service';
 
 @Component({
   selector: 'app-navbar-default',

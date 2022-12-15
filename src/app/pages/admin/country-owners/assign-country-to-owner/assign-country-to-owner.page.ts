@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Property } from '../../../../interfaces/recurrents-interface';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-assign-country-to-owner',
@@ -22,7 +23,7 @@ export class AssignCountryToOwnerPage implements OnInit {
   protected properties: PropertyInterface[];
 
 
-  constructor(   protected _loading: LoadingService, protected _formBuilder: FormBuilder, private _ownersService: OwnersService, private _propertiesService: PropertiesService) {
+  constructor(private _alertService: AlertService, private _router: Router, protected _formBuilder: FormBuilder, private _ownersService: OwnersService, private _propertiesService: PropertiesService) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
    }
@@ -32,9 +33,7 @@ export class AssignCountryToOwnerPage implements OnInit {
     this._propertiesService.getAll().then(data => data.subscribe(properties => this.properties = properties))
   }
 
-  public getOwnerByNameOrID(event){
-    console.log(event)
-  }
+
   
   public createForm(): FormGroup{
     return this.formBuilder.group({

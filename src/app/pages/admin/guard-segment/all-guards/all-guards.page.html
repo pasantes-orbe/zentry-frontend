@@ -21,7 +21,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let guard of guards; let i = index">
+      <tr *ngFor="let guard of guards | filter: searchKey ; let i = index">
         <td class="text-center">{{guard.name}}</td>
         <td>{{guard.lastname}}</td>
         <td *ngIf="i % 2 == 0">

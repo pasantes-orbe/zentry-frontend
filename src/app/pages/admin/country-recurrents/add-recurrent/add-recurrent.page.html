@@ -33,12 +33,15 @@
       <ion-searchbar placeholder="Busque una Propiedad para Asignar" [debounce]="1000" (ionChange)="getProperties($event.detail.value)"></ion-searchbar>
       <ion-list>
         <ion-radio-group formControlName="property">
-          <ion-item *ngFor="let property of properties">
+          <ion-item *ngFor="let property of properties" >
             <ion-label>{{property.name}}</ion-label>
             <ion-radio slot="end" [value]="property.id"></ion-radio>
           </ion-item>
         </ion-radio-group>
       </ion-list>
+      
+  
+      
 
     <ion-button [disabled]="getForm().invalid" type="submit" expand="block" shape="round">
       <ion-icon slot="start" name="add"></ion-icon>

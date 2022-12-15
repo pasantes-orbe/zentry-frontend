@@ -55,9 +55,9 @@ export class AddPropertyPage implements OnInit {
 
   private createForm(): FormGroup{
     return this.formBuilder.group({
-      propertyName: ['', [Validators.required, Validators.minLength(3)]],
+      propertyName: ['', [Validators.required, Validators.minLength(5)]],
       propertyAddress:['', [Validators.required, Validators.minLength(5)]],
-      propertyNumber:['', Validators.required],
+      propertyNumber:['', [Validators.required, Validators.max(10000)]],
       propertyAvatar: new FormControl('', [Validators.required]),
       fileSource: new FormControl('', [Validators.required])
     });

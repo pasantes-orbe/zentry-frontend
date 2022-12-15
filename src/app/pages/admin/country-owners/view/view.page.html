@@ -14,16 +14,14 @@
   <table class="table text-center">
     <thead>
       <tr>
-        <th scope="col">Email</th>
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
         <th scope="col">DNI</th>
-        <th scope="col">Propiedad N°</th>
+        <th scope="col">Propiedad</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let owner of owners; let i = index">
-        <td>{{owner.user.email}}</td>
+      <tr *ngFor="let owner of owners| filter: searchKey ; let i = index">
         <td>{{owner.user.lastname}}</td>
         <td>{{owner.user.name}}</td>
         <td>{{owner.user.dni}}</td>

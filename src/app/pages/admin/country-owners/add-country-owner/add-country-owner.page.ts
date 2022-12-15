@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { RegisterService } from 'src/app/services/auth/register.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { EmailHelperService } from 'src/app/services/helpers/email-helper.service';
 
 @Component({
   selector: 'app-add-country-owner',
@@ -18,7 +19,7 @@ export class AddCountryOwnerPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
 
-  constructor(private _registerOwner: RegisterService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router) {
+  constructor(private _registerOwner: RegisterService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router, private _emailHelperService: EmailHelperService ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
@@ -61,10 +62,10 @@ register(){
     return this.formBuilder.group({
       ownerName: ['', [Validators.required, Validators.minLength(3)]],
       ownerLastname:['', [Validators.required, Validators.minLength(5)]],
-      ownerDNI:['', Validators.required],
-      ownerEmail: ['', Validators.required],
-      ownerPassword: ['', Validators.required],
-      ownerPhone: ['', Validators.required],
+      ownerDNI:['', [Validators.required, Validators.max(99999999)]],
+      ownerEmail: ['', [Validators.required, Validators.pattern(this._emailHelperService.getEmailPattern())]],
+      ownerPassword: ['', [Validators.required, Validators.minLength(4)]],
+      ownerPhone: ['', [Validators.required, Validators.max(10000000000)]],
       ownerBirthdate: ['',Validators.required],
       ownerAvatar: new FormControl('', [Validators.required]),
       fileSource: new FormControl('', [Validators.required]),

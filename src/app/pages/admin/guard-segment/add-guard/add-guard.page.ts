@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { EmailHelperService } from 'src/app/services/helpers/email-helper.service';
 import { RegisterService } from '../../../../services/auth/register.service';
 
 @Component({
@@ -18,7 +19,7 @@ export class AddGuardPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
 
-  constructor(protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router, private _registerService: RegisterService) {
+  constructor(private _emailHelperService: EmailHelperService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router, private _registerService: RegisterService) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
@@ -63,10 +64,10 @@ export class AddGuardPage implements OnInit {
     return this.formBuilder.group({
       vigilatorName: ['', [Validators.required, Validators.minLength(3)]],
       vigilatorLastname:['', [Validators.required, Validators.minLength(5)]],
-      vigilatorDNI:['', Validators.required],
-      vigilatorEmail: ['', Validators.required],
-      vigilatorPassword: ['', Validators.required],
-      vigilatorPhone: ['', Validators.required],
+      vigilatorDNI:['',[Validators.required, Validators.max(99999999)]],
+      vigilatorEmail: ['', [Validators.required, Validators.pattern(this._emailHelperService.getEmailPattern())]],
+      vigilatorPassword: ['', [Validators.required, Validators.minLength(4)]],
+      vigilatorPhone: ['', [Validators.required, Validators.max(10000000000)]],
       vigilatorBirthdate: ['', Validators.required],
       vigilatorAvatar: new FormControl('', [Validators.required]),
       fileSource: new FormControl('', [Validators.required])

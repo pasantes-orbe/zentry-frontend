@@ -2,13 +2,11 @@
 
 <ion-content class="ion-padding">
 
-  <form >
+  <form form  [formGroup]="getForm()"(keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
     <ion-item>
       <ion-label position="floating">Seleccionar Lugar</ion-label>
-      <ion-select (ionChange)="select($event)" placeholder="Seleccionar">
-        <ion-select-option value="Club House">Club House</ion-select-option>
-        <ion-select-option value="Salón de Fiestas">Salón de Fiestas</ion-select-option>
-        <ion-select-option value="Predio Deportivo">Predio Deportivo</ion-select-option>
+      <ion-select formControlName="amenitieID"  placeholder="Seleccionar">
+        <ion-select-option *ngFor="let amenitie of amenities; let i = index" [value]="amenitie.id" >{{amenitie.name}}</ion-select-option>
       </ion-select>
     </ion-item>
 
@@ -18,9 +16,9 @@
       <ion-datetime-button datetime="datetime"></ion-datetime-button>
     </ion-item>
 
-    <ion-modal [keepContentsMounted]="true">
+    <ion-modal  [keepContentsMounted]="true">
       <ng-template>
-          <ion-datetime presentation="date-time" color="primary" [showDefaultTitle]="true"  id="datetime">
+          <ion-datetime formControlName="fecha" presentation="date-time" color="primary" [showDefaultTitle]="true"  id="datetime">
           <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
           </ion-datetime>
       </ng-template>
@@ -29,11 +27,11 @@
 
     <ion-item>
       <ion-label position="stacked">Aclaraciones / Detalles</ion-label>
-      <ion-textarea rows="4" placeholder="Aclara al administrador el motivo de la reserva"></ion-textarea>
+      <ion-textarea formControlName="detalles" rows="4" placeholder="Aclara al administrador el motivo de la reserva"></ion-textarea>
     </ion-item>
 
     <div class="text-center">
-      <ion-button (click)="reservation()" shape="round" block color="primary" type="submit">
+      <ion-button type="sumbit" shape="round" block color="primary" type="submit" [disabled]="getForm().invalid">
         Solicitar Reserva
       </ion-button>
     </div>

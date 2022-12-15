@@ -5,8 +5,13 @@ import { AuthStorageService } from '../services/storage/auth-storage.service';
 import { UserInterface } from '../interfaces/user-interface';
 import { OwnersService } from '../services/owners/owners.service';
 import { OwnerInterface } from '../interfaces/owner-interface';
-import { OwnerStorageService } from '../services/storage/owner-interface-storage';
+import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
 import swal from'sweetalert2';
+import { OwnerResponse } from '../interfaces/ownerResponse-interface';
+import { AmenitieInterface } from '../interfaces/amenitie-interface';
+import { AmenitieService } from '../services/amenities/amenitie.service';
+import { ReservationsInterface } from '../interfaces/reservations-interface';
+import { ReservationsService } from '../services/amenities/reservations.service';
 
 @Component({
   selector: 'app-tab1',
@@ -17,7 +22,8 @@ export class Tab1Page implements OnInit{
   private loading: boolean;
   private user: UserInterface;
   private userID;
-  protected owner: OwnerInterface
+  protected owner: OwnerResponse
+  protected reservations: ReservationsInterface[]
 
 
   constructor(
@@ -25,7 +31,8 @@ export class Tab1Page implements OnInit{
     private alertController: AlertController,
     private _userStorageService: UserStorageService,
     private _ownerStorageService: OwnerStorageService,
-    private _ownersService: OwnersService
+    private _ownersService: OwnersService,
+    private _reservationsService: ReservationsService
     ) { 
     this.setLoading(true);
     this.getData();
@@ -43,6 +50,8 @@ export class Tab1Page implements OnInit{
       this.owner = owner
       this._ownerStorageService.saveOwner(owner)
     })
+
+    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => this.reservations = reservations ))
   }
     
   public async ionViewWillEnter(){

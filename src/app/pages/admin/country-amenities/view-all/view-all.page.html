@@ -9,14 +9,14 @@
     </ion-button>
   </div>
 
-  <ion-searchbar mode="ios" animated debounce="500" placeholder="Buscar por Nombre"></ion-searchbar>
+  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar por Nombre"></ion-searchbar>
 
   <ion-row>
-    <ion-col class="col-6" *ngFor="let amenitie of getAmenities()">
+    <ion-col class="col-6" *ngFor="let amenitie of getAmenities() | filter: searchKey ; let i = index">
       <!-- routerLink="/admin/country-dashboard" -->
       <ion-card 
       button >
-        <img alt="Silhouette of mountains" [src]="amenitie.image" />
+        <img alt="Imagen de Lugar de Reserva" [src]="amenitie.image" />
               
         <ion-card-content>
           <h3>

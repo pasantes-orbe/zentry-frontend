@@ -16,4 +16,5 @@ export class AllGuardsPage implements OnInit {
     this._guardsService.getAll().subscribe(guards => this.guards = guards)
   }
 
+
 }

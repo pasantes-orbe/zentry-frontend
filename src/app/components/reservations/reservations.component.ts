@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NavigationService } from 'src/app/helpers/navigation.service';
 
 @Component({
@@ -10,6 +10,7 @@ export class ReservationsComponent implements OnInit {
 
   private loading: boolean;
   private data: any;
+  @Input() reservations = []
 
   constructor(private Navigation: NavigationService) {
     this.setLoading(true);

@@ -13,6 +13,9 @@ export class CountryRecurrentsPage implements OnInit {
   constructor(private _recurrentsService: RecurrentsService) { }
 
   ngOnInit() {
+  }
+
+  ionViewWillEnter(){
     this._recurrentsService.getRecurrentsByCountry().then(data => data.subscribe((recurrents) => this.recurrents = recurrents))
   }
   

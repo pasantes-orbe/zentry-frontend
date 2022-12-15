@@ -24,8 +24,7 @@ export class AlertService {
   }
 
   public removeLoading() {
-
-    this.loading.dismiss();
+   this.loading.dismiss();
   }
 
   public async showAlert(header: string = "", message: string = "", buttons: [] = []){
