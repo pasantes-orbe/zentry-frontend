@@ -17,7 +17,7 @@
         <th *ngIf="reservation.status === 'pendiente' " scope="row"><ion-badge color="warning">{{reservation.status}}</ion-badge></th>
         <th *ngIf="reservation.status === 'rechazado' " scope="row"><ion-badge color="danger">{{reservation.status}}</ion-badge></th>
         <th *ngIf="reservation.status === 'aprobado' " scope="row"><ion-badge color="success">{{reservation.status}}</ion-badge></th>
-        <td>{{reservation.details}}</td>
+        <td>{{reservation.amenity.name}}</td>
         <td>{{reservation.date | date: 'dd/MM/yyyy hh:mm'}} </td>
       
       </tr>

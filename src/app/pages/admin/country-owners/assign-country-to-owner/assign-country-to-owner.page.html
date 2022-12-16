@@ -10,8 +10,8 @@
   <ion-list >
     <ion-radio-group formControlName="user_id" >
       <ion-item *ngFor="let owner of owners | filter: searchKey ; let i = index ">
-        <ion-label>{{owner.name}} {{owner.lastname}}             -       {{owner.dni}}</ion-label>
-        <ion-radio  slot="end" [value]="owner.id"></ion-radio>
+        <ion-label>{{owner.user.name}} {{owner.user.lastname}}             -       {{owner.user.dni}}</ion-label>
+        <ion-radio  slot="end" [value]="owner.user.id"></ion-radio>
       </ion-item>
     </ion-radio-group>
   </ion-list>

@@ -13,10 +13,11 @@ export class CountryRecurrentsPage implements OnInit {
   constructor(private _recurrentsService: RecurrentsService) { }
 
   ngOnInit() {
+    this._recurrentsService.getRecurrentsByCountry().then(data => data.subscribe((recurrents) => this.recurrents = recurrents))
   }
 
   ionViewWillEnter(){
-    this._recurrentsService.getRecurrentsByCountry().then(data => data.subscribe((recurrents) => this.recurrents = recurrents))
+    this.ngOnInit()
   }
   
   public cambiarStatus(recurrent, i){

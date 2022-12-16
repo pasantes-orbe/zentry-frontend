@@ -17,27 +17,15 @@ export class ViewPage implements OnInit {
   constructor(private _propertiesService: PropertiesService) { }
 
   ngOnInit() {
-    this._propertiesService.getAll().then(data => data.subscribe((property) => {
+    this._propertiesService.getAllById().then(data => data.subscribe((property) => {
       this.properties = property;
+      console.log(property)
     }))
   }
 
-//  ionViewWillEnter() {
-  //  this.getPropertiesFromDB();
- // }
+  ionViewWillEnter(){
+    this.ngOnInit()
+  }
 
- // private getPropertiesFromDB() {
-
- // this._propertiesService.getAll().console.log(data))
-
-  //}
-
- // public getProperties(): PropertyInterface {
-   // return this.properties;
- // }
-
- // public setProperties(properties: undefined): void {
-  //  this.properties = properties;
- // }
 
 }

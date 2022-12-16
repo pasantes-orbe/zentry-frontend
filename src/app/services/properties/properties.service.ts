@@ -48,6 +48,17 @@ export class PropertiesService {
 
 public async getAll(): Promise<Observable<PropertyInterface[]>> {
   const token = await this._authStorageService.getJWT();
+  const httpOptions = {
+    headers: new HttpHeaders({
+      'Authorization': token,
+    }),
+  };
+  return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties`, httpOptions);
+
+}
+
+public async getAllById(): Promise<Observable<PropertyInterface[]>> {
+  const token = await this._authStorageService.getJWT();
   const country = await this._countryStorageService.getCountry()
   const countryID = country.id
   const httpOptions = {
@@ -55,7 +66,7 @@ public async getAll(): Promise<Observable<PropertyInterface[]>> {
       'Authorization': token,
     }),
   };
-  return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties`, httpOptions);
+  return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties/country/get_by_id/${countryID}`, httpOptions);
 
 }
 

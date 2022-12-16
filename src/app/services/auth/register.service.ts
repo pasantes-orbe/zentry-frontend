@@ -6,6 +6,9 @@ import { AlertService } from '../helpers/alert.service';
 import { RolsService } from './rols.service';
 import { Rols } from 'src/app/interfaces/rols-interface';
 import { environment } from 'src/environments/environment';
+import { CountryStorageService } from '../storage/country-storage.service';
+import { UserInterface } from '../../interfaces/user-interface';
+import { GuardResponseInterface } from '../../interfaces/guard-response-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +16,10 @@ import { environment } from 'src/environments/environment';
 export class RegisterService {
   private _authStorageService: any;
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _rols: RolsService, ) { }
+  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _rols: RolsService, private _countryStorageService: CountryStorageService ) { }
 
     private id;
-  
+    private guard: GuardResponseInterface
   public register(name: string,
                         lastName: string,
                         dni: any,
@@ -56,30 +59,34 @@ export class RegisterService {
     
     this._http.post(`${environment.URL}/api/users`, formData)
       .subscribe(res => {
-        console.log(res)
-        this._alertService.removeLoading();
+        console.log(res) 
         this._alertService.showAlert("¡Listo!", `El usuario ${rol} fue creado con éxito`);
         if (rol === 'propietario'){
+          this.asignarCountry(res['user']['id'],'owners')
           this._router.navigate(['/admin/asignar-propiedad'])
           console.log(res);
         } else if(rol == 'vigilador'){
+          this.asignarCountry(res['user']['id'],'guards')
           this._router.navigate(['/admin/todos-los-guardias']);
         } else {
           this._router.navigate(['/admin/country-dashboard']);
         }
+        this._alertService.removeLoading();
       });
+  })
+
+
   }
-  )
 
- // const token = await this._authStorageService.getJWT();
+  public async asignarCountry(idUser, rol){
+    const country = await this._countryStorageService.getCountry()
+    const countryID = country.id;
+    const formData = new FormData();
+    formData.append('id_user', idUser);
+    formData.append('id_country', countryID.toString());  
 
-    
-
-    //const httpOptions = {
-     // headers: new HttpHeaders({
-      //  'Authorization': 'Token' + token, No funciona con Token, por error
-     // }),
-    //};
+    this._http.post(`${environment.URL}/api/${rol}/assign`, formData).subscribe(res => console.log(res))
   }
+
 
 }

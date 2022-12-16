@@ -13,7 +13,10 @@ export class ViewPage implements OnInit {
   constructor(private _ownersService: OwnersService) { }
 
   ngOnInit() {
-    this._ownersService.getAll().subscribe(owners => this.owners = owners)
+    this._ownersService.getAllByCountryID().then(data => data.subscribe( owners => this.owners = owners))
   }
-
+  
+  ionViewWillEnter(){
+    this.ngOnInit()
+  }
 }

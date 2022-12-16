@@ -8,6 +8,8 @@ import { Property } from '../../../../interfaces/recurrents-interface';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { Router } from '@angular/router';
+import { OwnerResponse } from '../../../../interfaces/ownerResponse-interface';
+import { Owner_CountryInterface } from '../../../../interfaces/owner_country-interface';
 
 @Component({
   selector: 'app-assign-country-to-owner',
@@ -19,7 +21,7 @@ export class AssignCountryToOwnerPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
   private userID; 
-  protected owners:  OwnerInterface[];
+  protected owners:  Owner_CountryInterface[];
   protected properties: PropertyInterface[];
 
 
@@ -29,8 +31,8 @@ export class AssignCountryToOwnerPage implements OnInit {
    }
 
   ngOnInit() {
-    this._ownersService.getAllByRole().subscribe(owners => this.owners = owners)
-    this._propertiesService.getAll().then(data => data.subscribe(properties => this.properties = properties))
+    this._ownersService.getAllByCountry().then(data => data.subscribe(owners => this.owners = owners))
+    this._propertiesService.getAllById().then(data => data.subscribe(properties => this.properties = properties))
   }
 
 
@@ -48,8 +50,6 @@ export class AssignCountryToOwnerPage implements OnInit {
 
  public asignarPropiedadAlUsuario(){
     this._ownersService.relationWithProperty(this.getForm().get('user_id').value, this.getForm().get('property_id').value)
-    console.log(this.getForm().get('user_id').value);
-    console.log(this.getForm().get('property_id').value);
  }
 
 

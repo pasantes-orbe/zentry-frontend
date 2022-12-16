@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NavigationService } from 'src/app/helpers/navigation.service';
+import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
+import { ReservationsService } from 'src/app/services/amenities/reservations.service';
 
 @Component({
   selector: 'app-reservations',
@@ -10,15 +12,23 @@ export class ReservationsComponent implements OnInit {
 
   private loading: boolean;
   private data: any;
-  @Input() reservations = []
+  protected reservations: ReservationsInterface[]
 
-  constructor(private Navigation: NavigationService) {
+  constructor(private Navigation: NavigationService, private _reservationsService: ReservationsService) {
     this.setLoading(true);
     this.loadData();
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => this.reservations = reservations ))
+   }
 
+   holamundo(){
+    console.log("ola")
+   }
+
+  ionViewWillEnter(){
+  }
   private loadData(): void{
     setTimeout(() => {
       this.setLoading(false);

@@ -6,6 +6,8 @@ import { OwnerResponse } from '../../interfaces/ownerResponse-interface';
 import { Observable } from 'rxjs';
 import { OwnerInterface } from '../../interfaces/owner-interface';
 import { AlertService } from '../helpers/alert.service';
+import { CountryStorageService } from '../storage/country-storage.service';
+import { Owner_CountryInterface } from 'src/app/interfaces/owner_country-interface';
 
 
 
@@ -14,10 +16,22 @@ import { AlertService } from '../helpers/alert.service';
 })
 export class OwnersService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router,) { }
+  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) { }
 
   public getAll(): Observable<OwnerResponse[]>{
     return this._http.get<OwnerResponse[]>(`${environment.URL}/api/owners`)
+  }
+
+  public async getAllByCountryID(): Promise<Observable<OwnerResponse[]>>{
+    const country = await this._countryStorageService.getCountry()
+    const countryID = country.id
+    return this._http.get<OwnerResponse[]>(`${environment.URL}/api/owners/country/get_by_id/${countryID}`)
+  }
+
+  public async getAllByCountry(): Promise<Observable<Owner_CountryInterface[]>>{
+    const country = await this._countryStorageService.getCountry()
+    const countryID = country.id
+    return this._http.get<Owner_CountryInterface[]>(`${environment.URL}/api/users/owners/get_by_country/${countryID}`)
   }
 
   public getAllByRole(): Observable<OwnerInterface[]>{
@@ -40,16 +54,11 @@ export class OwnersService {
 
     this._http.post(`${environment.URL}/api/owners`, formData).subscribe(
       res => {
+        console.log(res)
         this._alertService.removeLoading()
         this._alertService.showAlert("¡Listo!", "La propiedad se asignó con éxito al usuario");
         this._router.navigate(['/admin/ver-propietarios']); 
       },
-      (err) => {
-        console.log(err)
-        this._alertService.removeLoading();
-        this._alertService.showAlert("¡Ooops!", "Ocurrió un error Inesperado");
-        this._router.navigate(['/admin/ver-propietarios']);
-      }
     )
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController, MenuController } from '@ionic/angular';
 import { UserStorageService } from '../services/storage/user-storage.service';
 import { AuthStorageService } from '../services/storage/auth-storage.service';
@@ -6,12 +6,13 @@ import { UserInterface } from '../interfaces/user-interface';
 import { OwnersService } from '../services/owners/owners.service';
 import { OwnerInterface } from '../interfaces/owner-interface';
 import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
-import swal from'sweetalert2';
+
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
 import { AmenitieInterface } from '../interfaces/amenitie-interface';
 import { AmenitieService } from '../services/amenities/amenitie.service';
 import { ReservationsInterface } from '../interfaces/reservations-interface';
 import { ReservationsService } from '../services/amenities/reservations.service';
+import { ReservationsComponent } from '../components/reservations/reservations.component';
 
 @Component({
   selector: 'app-tab1',
@@ -23,8 +24,7 @@ export class Tab1Page implements OnInit{
   private user: UserInterface;
   private userID;
   protected owner: OwnerResponse
-  protected reservations: ReservationsInterface[]
-
+  @ViewChild(ReservationsComponent) reservationsComponent: ReservationsComponent;
 
   constructor(
     private menu: MenuController,
@@ -43,7 +43,6 @@ export class Tab1Page implements OnInit{
   }
 
   async ngOnInit() {
-    console.log("ONINIT")
     const user = await this._userStorageService.getUser()
     this.userID = user.id;
     this._ownersService.getByID(this.userID).subscribe((owner) => {
@@ -51,15 +50,19 @@ export class Tab1Page implements OnInit{
       this._ownerStorageService.saveOwner(owner)
     })
 
-    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => this.reservations = reservations ))
+    
   }
     
-  public async ionViewWillEnter(){
-
-    console.log("IONWENTER")
-
-    await this.ngOnInit() 
+  ionViewWillEnter(){
+    console.log("bbbbbb")
   }
+
+  ionViewDidEnter() {
+    console.log("CCCCCC")
+  }
+
+  
+
   async presentAlert(){
     const alert = await this.alertController.create({
       header: 'Solicitud de Ingreso',

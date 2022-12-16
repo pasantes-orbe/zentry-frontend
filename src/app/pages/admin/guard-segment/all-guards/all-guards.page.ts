@@ -13,7 +13,11 @@ export class AllGuardsPage implements OnInit {
   constructor(private _guardsService: GuardsService ) { }
 
   ngOnInit() {
-    this._guardsService.getAll().subscribe(guards => this.guards = guards)
+    this._guardsService.getAllByCountryID().then(data => data.subscribe(guards => this.guards = guards))
+  }
+
+  ionViewWillEnter(){
+    this.ngOnInit()
   }
 
 

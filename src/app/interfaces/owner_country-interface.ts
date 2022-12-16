@@ -1,7 +1,9 @@
-export interface GuardInterface {
-    id:      number;
-    user:    User;
-    country: Country;
+export interface Owner_CountryInterface {
+    id:         number;
+    id_user:    number;
+    id_country: number;
+    user:       User;
+    country:    Country;
 }
 
 export interface Country {
@@ -23,11 +25,4 @@ export interface User {
     dni:      number;
     avatar:   null;
     role_id:  number;
-    role:     Role;
-}
-
-export interface Role {
-    id:     number;
-    name:   string;
-    avatar: null;
 }

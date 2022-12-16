@@ -13,11 +13,11 @@ export class ViewAllPage implements OnInit {
   constructor(private _amenitiesService: AmenitieService) { }
 
   ngOnInit() {
-   this.ionViewWillEnter();
+    this.getCountriesFromDB();
   }
 
   ionViewWillEnter() {
-    this.getCountriesFromDB();
+    this.ngOnInit()
   }
 
   private getCountriesFromDB() {

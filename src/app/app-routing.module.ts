@@ -142,6 +142,11 @@ const routes: Routes = [
     path: 'admin/solicitudes-de-contrasena',
     loadChildren: () => import('./pages/admin/password-requests/password-requests/password-requests.module').then( m => m.PasswordRequestsPageModule)
   },
+  {
+    path: 'admin/agregar-horario-laboral',
+    loadChildren: () => import('./pages/admin/guard-segment/add-laboral-schedule/add-laboral-schedule.module').then( m => m.AddLaboralSchedulePageModule)
+  },
+
 
   
  

@@ -15,7 +15,7 @@ import { OwnerStorageService } from '../storage/owner-interface-storage.service'
 })
 export class ReservationsService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _ownerStorageService: OwnerStorageService) {
+  constructor(private _countryStorageService: CountryStorageService, private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _ownerStorageService: OwnerStorageService) {
 
    }
 
@@ -30,11 +30,17 @@ export class ReservationsService {
 
     this._alertService.setLoading();
 
-    this._http.post(`${environment.URL}/api/reservations`, formData).subscribe(res => {
+    this._http.post(`${environment.URL}/api/reservations`, formData).subscribe((res) => {
       console.log(res);
       this._alertService.removeLoading();
       this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
-      this._router.navigate([`/admin/ver-propiedades`]);
+      this._router.navigate([`/home/tabs/tab1`]);
+},
+  (err) => {
+    console.log(err);
+    this._alertService.removeLoading();
+    this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+    this._router.navigate([`/home/tabs/tab1`]);
 })
 
    }
@@ -46,8 +52,10 @@ export class ReservationsService {
     return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/${userID}`);
  }
 
-  public getAll():Observable<ReservationsInterface[]>{
-    return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/`)
+  public async getAllByCountry():Promise<Observable<ReservationsInterface[]>>{
+    const country = await this._countryStorageService.getCountry()
+    const countryID = country.id
+    return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/country/get_by_id/${countryID}`)
   }
 
   public updateStatus(status:boolean, reservationID: number){
