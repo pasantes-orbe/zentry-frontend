@@ -20,11 +20,11 @@ export class AlertService {
       spinner: "crescent"
     });
 
-    this.loading.present();
+    await this.loading.present();
   }
 
-  public removeLoading() {
-   this.loading.dismiss();
+  public async removeLoading() {
+    await this.loading.dismiss();
   }
 
   public async showAlert(header: string = "", message: string = "", buttons: [] = []){
