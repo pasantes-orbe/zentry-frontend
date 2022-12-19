@@ -24,18 +24,18 @@ export class AmenitieService {
     formData.append('address', address);
     formData.append('avatar', avatar);
 
-    this._alertService.setLoading();
+    await this._alertService.setLoading();
 
     this._http.post(`${environment.URL}/api/amenities/${countryID}`, formData)
-      .subscribe(res => {
+      .subscribe(async (res) => {
         console.log(res);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Lugar de Reserva se agregó con éxito");
         this._router.navigate([`/admin/ver-amenities`]);
       },
-      (err) => {
+      async (err) => {
         console.log(err);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Ooops!", `${err['error']}`);
         this._router.navigate([`/admin/ver-amenities`]);
     }

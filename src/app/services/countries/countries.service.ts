@@ -21,7 +21,7 @@ export class CountriesService {
 
   }
 
-  public addCountry(avatar: File, name: string, latitude: string, longitude: string){
+  public async addCountry(avatar: File, name: string, latitude: string, longitude: string){
 
     const formData = new FormData();
     formData.append('avatar', avatar);
@@ -29,18 +29,18 @@ export class CountriesService {
     formData.append('latitude', latitude);
     formData.append('longitude', longitude);
 
-    this._alertService.setLoading();
+    await this._alertService.setLoading();
 
     this._http.post(`${environment.URL}/api/countries`, formData)
-      .subscribe(res => {
+      .subscribe(async (res) => {
         console.log(res);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El country se agregó con éxito");
         this._router.navigate(['/admin/home']);
       },
-      (err) => {
+      async (err) => {
         console.log(err);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Ooops!", `${err['error']}`);
         this._router.navigate([`/admin/home`]);
     });
@@ -48,7 +48,7 @@ export class CountriesService {
 
   }
 
-  public getByID(id:number): Observable<CountryInteface>{
+  public getByID(id:number): Observable<CountryInteface> {
     return this._http.get<CountryInteface>(`${environment.URL}/api/countries/${ id }`);
   }
 }

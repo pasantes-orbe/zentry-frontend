@@ -26,7 +26,8 @@ constructor(
   protected _loading: LoadingService,
   private _alertService: AlertService,
   private _amenitie: AmenitieService
-){
+)
+{
   this.formBuilder = _formBuilder;
   this.form = this.createForm();
 }

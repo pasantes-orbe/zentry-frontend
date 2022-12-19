@@ -28,17 +28,17 @@ export class ReservationsService {
     formData.append('date', date);
     formData.append('details', details);
 
-    this._alertService.setLoading();
+    await this._alertService.setLoading();
 
-    this._http.post(`${environment.URL}/api/reservations`, formData).subscribe((res) => {
+    this._http.post(`${environment.URL}/api/reservations`, formData).subscribe(async (res) => {
       console.log(res);
-      this._alertService.removeLoading();
+     await this._alertService.removeLoading();
       this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
       this._router.navigate([`/home/tabs/tab1`]);
 },
-  (err) => {
+    async (err) => {
     console.log(err);
-    this._alertService.removeLoading();
+    await this._alertService.removeLoading();
     this._alertService.showAlert("¡Ooops!", `${err['error']}`);
     this._router.navigate([`/home/tabs/tab1`]);
 })

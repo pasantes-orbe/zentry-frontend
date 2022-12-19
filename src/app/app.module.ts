@@ -13,7 +13,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { SortPipe } from './pipes/sort.pipe';
 
 @NgModule({
-  declarations: [AppComponent, SortPipe],
+  declarations: [AppComponent],
   imports: [
     FormsModule,
     HttpClientModule,

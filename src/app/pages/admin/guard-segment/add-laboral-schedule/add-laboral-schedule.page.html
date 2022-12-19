@@ -7,12 +7,12 @@
         <h5>Dia laboral </h5>
       </ion-col>
     </ion-row>
-
+    <form form  [formGroup]="getForm()"(keyup.enter)="guardarDia()" (ngSubmit)="guardarDia()">
     <ion-row class="ion-padding ">
       <ion-col>
         <ion-list>
           <ion-item>
-            <ion-select placeholder="Seleccione un Dia">
+            <ion-select formControlName="day" placeholder="Seleccione un Dia">
               <ion-select-option value="Lunes">Lunes</ion-select-option>
               <ion-select-option value="Martes">Martes</ion-select-option>
               <ion-select-option value="Miercoles">Miércoles</ion-select-option>
@@ -28,14 +28,14 @@
     <ion-row class="ion-padding ion-text-center">
       <ion-col>
         <p>Seleccione horario de inicio </p>
-        <ion-datetime presentation="time"></ion-datetime>
+        <ion-datetime presentation="time" formControlName="start" ></ion-datetime>
       </ion-col>
     </ion-row>
 
     <ion-row class="ion-padding ion-text-center">
       <ion-col>
         <p>Seleccione horario de fin </p>
-        <ion-datetime presentation="time"></ion-datetime>
+        <ion-datetime presentation="time" formControlName="exit" ></ion-datetime>
       </ion-col>
     </ion-row>
 
@@ -49,11 +49,13 @@
       </thead>
       
       <tbody>
-        <tr>
+        <tr *ngFor="let hour of schedule" >
           
-          <td>LUNES </td>
-          <td>13:15 Hs</td>
-          <td>14:45 hs</td>
+          <td>{{hour.getDay() }} </td>
+          <td>{{hour.getStart() | date : 'EEEE, h:mm' }}</td>
+          <td>{{hour.getExit() | date : 'EEEE, h:mm' }}</td>
+          
+          
         </tr>
         <tr>
         
@@ -62,12 +64,14 @@
 
     <ion-row>
       <ion-col>
-        <ion-button size="4"> Agregar Horario</ion-button>
+        <ion-button size="4" (click)="addHourToSchedule()"> Agregar Horario</ion-button>
       </ion-col>
       <ion-col size="6">
-        <ion-button> Agregar a Calendario</ion-button>
+        <ion-button type="sumbit"> Agregar a Calendario</ion-button>
       </ion-col>
     </ion-row>
+  </form>
+
   </ion-grid>
 
 

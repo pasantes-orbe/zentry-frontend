@@ -14,7 +14,7 @@ export class RecurrentsService {
 
   constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) { }
 
-  public addRecurrent(id_property, name, lastname, dni){
+  public async addRecurrent(id_property, name, lastname, dni){
 
 
     const formData = new FormData();
@@ -22,19 +22,19 @@ export class RecurrentsService {
     formData.append('guest_name', name);
     formData.append('guest_lastname', lastname);
     formData.append('dni', dni);
-    this._alertService.setLoading();
+    await this._alertService.setLoading();
 
     this._http.post(`${environment.URL}/api/recurrents`, formData)
       .subscribe(
-        (res) => {
+        async (res) => {
         console.log(res);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
         this._router.navigate(['/admin/invitados-recurrentes']);
       },
-      (err) => {
+      async (err) => {
         console.log(err);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Ooops!", `${err['error']}`);
         this._router.navigate([`/home/tabs/tab1`]);
     });

@@ -44,24 +44,24 @@ export class OwnersService {
 
   }
 
-  public relationWithProperty(user_id, property_id){
+  public async relationWithProperty(user_id, property_id){
     const formData = new FormData();
     formData.append('id_user', user_id);
     formData.append('id_property', property_id);
-    this._alertService.setLoading();
+     await this._alertService.setLoading();
 
     
 
     this._http.post(`${environment.URL}/api/owners`, formData).subscribe(
-      (res) => {
+      async (res) => {
         console.log(res)
-        this._alertService.removeLoading()
+        await this._alertService.removeLoading()
         this._alertService.showAlert("¡Listo!", "La propiedad se asignó con éxito al usuario");
         this._router.navigate(['/admin/ver-propietarios']); 
       },
-      (err) => {
+      async (err) => {
         console.log(err);
-        this._alertService.removeLoading();
+        await this._alertService.removeLoading();
         this._alertService.showAlert("¡Ooops!", `${err['error']}`);
         this._router.navigate([`/admin/ver-propietarios`]);
     }
