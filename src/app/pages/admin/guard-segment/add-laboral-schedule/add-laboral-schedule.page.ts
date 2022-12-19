@@ -37,10 +37,10 @@ export class AddLaboralSchedulePage implements OnInit {
     return this.form;
   }
 
-  public guardarDia(){
-    console.log(this.getForm().get('day').value)
-    console.log(this.getForm().get('start').value)
-    console.log(this.getForm().get('exit').value)
+  public guardarCalendario(){
+    for (const horario of this.schedule) {
+      console.log(horario)
+    }
   }
 
 

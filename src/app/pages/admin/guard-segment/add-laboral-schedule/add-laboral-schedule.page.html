@@ -7,7 +7,7 @@
         <h5>Dia laboral </h5>
       </ion-col>
     </ion-row>
-    <form form  [formGroup]="getForm()"(keyup.enter)="guardarDia()" (ngSubmit)="guardarDia()">
+    <form form  [formGroup]="getForm()"(keyup.enter)="guardarCalendario()" (ngSubmit)="guardarCalendario()">
     <ion-row class="ion-padding ">
       <ion-col>
         <ion-list>
@@ -52,8 +52,8 @@
         <tr *ngFor="let hour of schedule" >
           
           <td>{{hour.getDay() }} </td>
-          <td>{{hour.getStart() | date : 'EEEE, h:mm' }}</td>
-          <td>{{hour.getExit() | date : 'EEEE, h:mm' }}</td>
+          <td>{{hour.getStart() | date : 'h:mm' }}</td>
+          <td>{{hour.getExit() | date : 'h:mm' }}</td>
           
           
         </tr>
