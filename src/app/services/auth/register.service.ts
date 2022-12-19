@@ -64,7 +64,6 @@ export class RegisterService {
         if (rol === 'propietario'){
           this.asignarCountry(res['user']['id'],'owners')
           this._router.navigate(['/admin/asignar-propiedad'])
-          console.log(res);
         } else if(rol == 'vigilador'){
           this.asignarCountry(res['user']['id'],'guards')
           this._router.navigate(['/admin/todos-los-guardias']);
@@ -72,7 +71,15 @@ export class RegisterService {
           this._router.navigate(['/admin/country-dashboard']);
         }
         this._alertService.removeLoading();
-      });
+      },
+      (err) => {
+        console.log(err);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._router.navigate([`/admin/country-dashboard`]);
+    }
+      
+      );
   })
 
 

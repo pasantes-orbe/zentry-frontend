@@ -21,7 +21,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let owner of owners| filter: searchKey ; let i = index">
+      <tr *ngFor="let owner of owners| filter: searchKey | sort:['user','lastname','2']; let i = index">
         <td>{{owner.user.lastname}}</td>
         <td>{{owner.user.name}}</td>
         <td>{{owner.user.dni}}</td>

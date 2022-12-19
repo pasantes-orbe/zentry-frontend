@@ -20,14 +20,12 @@ export class ReservationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => this.reservations = reservations ))
+    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => {this.reservations = reservations, this.reservations.sort()} ))
    }
 
-   holamundo(){
-    console.log("ola")
-   }
 
   ionViewWillEnter(){
+    this.ngOnInit()
   }
   private loadData(): void{
     setTimeout(() => {

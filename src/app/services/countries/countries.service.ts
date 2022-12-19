@@ -37,7 +37,13 @@ export class CountriesService {
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El country se agregó con éxito");
         this._router.navigate(['/admin/home']);
-      });
+      },
+      (err) => {
+        console.log(err);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._router.navigate([`/admin/home`]);
+    });
 
 
   }

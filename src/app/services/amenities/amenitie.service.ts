@@ -32,7 +32,14 @@ export class AmenitieService {
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Lugar de Reserva se agregó con éxito");
         this._router.navigate([`/admin/ver-amenities`]);
-      });
+      },
+      (err) => {
+        console.log(err);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._router.navigate([`/admin/ver-amenities`]);
+    }
+      );
    }
 
 

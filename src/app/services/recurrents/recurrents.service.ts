@@ -25,12 +25,19 @@ export class RecurrentsService {
     this._alertService.setLoading();
 
     this._http.post(`${environment.URL}/api/recurrents`, formData)
-      .subscribe(res => {
+      .subscribe(
+        (res) => {
         console.log(res);
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
         this._router.navigate(['/admin/invitados-recurrentes']);
-      });
+      },
+      (err) => {
+        console.log(err);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._router.navigate([`/home/tabs/tab1`]);
+    });
   }
 
   public async getRecurrentsByCountry(): Promise<Observable<RecurrentsInterface[]>> {

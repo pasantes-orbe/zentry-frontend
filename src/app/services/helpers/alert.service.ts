@@ -31,7 +31,7 @@ export class AlertService {
 
     const alert = await this.alertController.create({
       header,
-      message,
+      message, 
       backdropDismiss: true
     });
 

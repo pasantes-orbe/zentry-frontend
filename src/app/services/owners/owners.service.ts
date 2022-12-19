@@ -53,12 +53,18 @@ export class OwnersService {
     
 
     this._http.post(`${environment.URL}/api/owners`, formData).subscribe(
-      res => {
+      (res) => {
         console.log(res)
         this._alertService.removeLoading()
         this._alertService.showAlert("¡Listo!", "La propiedad se asignó con éxito al usuario");
         this._router.navigate(['/admin/ver-propietarios']); 
       },
+      (err) => {
+        console.log(err);
+        this._alertService.removeLoading();
+        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._router.navigate([`/admin/ver-propietarios`]);
+    }
     )
   }
 }

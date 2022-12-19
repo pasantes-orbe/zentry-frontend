@@ -23,7 +23,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let recurrent of recurrents | filter: searchKey ; let i = index">
+      <tr *ngFor="let recurrent of recurrents | filter: searchKey | sort:['guest_lastname','','1']; let i = index">
         <td class="text-center">{{recurrent.guest_lastname}}</td>
         <td>{{recurrent.guest_name}}</td>
         <td>

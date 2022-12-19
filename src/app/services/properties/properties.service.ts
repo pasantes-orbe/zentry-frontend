@@ -35,12 +35,19 @@ export class PropertiesService {
 
     this._alertService.setLoading();
     this._http.post(`${environment.URL}/api/properties`, formData, httpOptions)
-      .subscribe(res => {
+      .subscribe((res) => {
         console.log(res);
         this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "La propiedad se agregó con éxito");
         this._router.navigate([`/admin/ver-propiedades`]);
   },
+  (err) => {
+    console.log(err);
+    this._alertService.removeLoading();
+    this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+    this._router.navigate([`/admin/ver-propiedades`]);
+}
+  
 
   );
 

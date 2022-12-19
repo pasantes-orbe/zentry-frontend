@@ -9,6 +9,7 @@ import { CountryRecurrentsPageRoutingModule } from './country-recurrents-routing
 import { CountryRecurrentsPage } from './country-recurrents.page';
 import { ComponentsModule } from 'src/app/components/components.module';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { SortPipe } from 'src/app/pipes/sort.pipe';
 
 @NgModule({
   imports: [
@@ -17,8 +18,8 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     IonicModule,
     CountryRecurrentsPageRoutingModule,
     ComponentsModule,
-    Ng2SearchPipeModule
+    Ng2SearchPipeModule,
   ],
-  declarations: [CountryRecurrentsPage]
+  declarations: [CountryRecurrentsPage, SortPipe]
 })
 export class CountryRecurrentsPageModule {}

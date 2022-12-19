@@ -10,9 +10,10 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { SortPipe } from './pipes/sort.pipe';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SortPipe],
   imports: [
     FormsModule,
     HttpClientModule,
@@ -20,6 +21,7 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    
     ServiceWorkerModule.register('ngsw-worker.js', {
   enabled: environment.production,
   // Register the ServiceWorker as soon as the application is stable

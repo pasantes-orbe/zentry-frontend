@@ -9,6 +9,7 @@ import { ViewPageRoutingModule } from './view-routing.module';
 import { ViewPage } from './view.page';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { ComponentsModule } from 'src/app/components/components.module';
+import { SortPipe } from 'src/app/pipes/sort.pipe';
 
 @NgModule({
   imports: [
@@ -19,6 +20,6 @@ import { ComponentsModule } from 'src/app/components/components.module';
     Ng2SearchPipeModule,
     ComponentsModule
   ],
-  declarations: [ViewPage]
+  declarations: [ViewPage, SortPipe]
 })
 export class ViewPageModule {}
