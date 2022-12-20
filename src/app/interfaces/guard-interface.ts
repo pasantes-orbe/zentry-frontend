@@ -1,7 +1,15 @@
 export interface GuardInterface {
-    id:      number;
-    user:    User;
-    country: Country;
+    guard:   Guard;
+    working: boolean;
+}
+
+export interface Guard {
+    id:       number;
+    week_day: string;
+    start:    Date;
+    exit:     Date;
+    user:     User;
+    country:  Country;
 }
 
 export interface Country {

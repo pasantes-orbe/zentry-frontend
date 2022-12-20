@@ -2,6 +2,10 @@
 
 <ion-content class="ion-padding">
 
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
   <div class="text-center">
     <ion-button class="top-button" routerLink="/admin/nuevo-vigilador" expand="block">
       <ion-icon slot="start" name="add"></ion-icon>
@@ -21,13 +25,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let guard of guards | filter: searchKey | sort:['user','lastname','2']; let i = index">
-        <td class="text-center">{{guard.user.name}}</td>
-        <td>{{guard.user.lastname}}</td>
-        <td *ngIf="i % 2 == 0">
+      <tr *ngFor="let guard of guards | filter: searchKey; let i = index">
+        <td class="text-center">{{guard.guard.user.name}} </td>
+        <td>{{guard.guard.user.lastname}}</td>
+        <td *ngIf="guard.working == true">
           <ion-icon color="success" slot="icon-only" name="checkmark-outline"></ion-icon>
         </td>
-        <td *ngIf="i % 2 != 0">
+        <td *ngIf="guard.working == false">
           <ion-icon color="danger" slot="icon-only" name="close-outline"></ion-icon>
         </td>
       </tr>

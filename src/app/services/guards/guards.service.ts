@@ -21,6 +21,6 @@ export class GuardsService {
   public async getAllByCountryID(): Promise<Observable<GuardInterface[]>>{
     const country = await this._countryStorageService.getCountry()
     const countryID = country.id 
-    return this._http.get<GuardInterface[]>(`${environment.URL}/api/guards/get_by_country/${countryID}`);
+    return this._http.get<GuardInterface[]>(`${environment.URL}/api/guards/schedule/all/${countryID}`);
   }
 }

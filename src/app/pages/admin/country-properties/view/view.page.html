@@ -10,7 +10,7 @@
   </div>
 
   <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar por Dirección"></ion-searchbar>
-
+  <div class="table-responsive container">
   <table class="table text-center">
     <thead>
       <tr>
@@ -26,7 +26,7 @@
         <td>
           <ion-list lines="none">
             <ion-item *ngFor="let owner of propertie.owners" >
-              <ion-label>{{owner.user.name}}</ion-label>
+              <ion-label>{{owner.user.name}} {{owner.user.lastname}}, </ion-label>
             </ion-item>
           </ion-list>
         </td>
@@ -35,5 +35,5 @@
 
     </tbody>
   </table>
-
+</div>
 </ion-content>
