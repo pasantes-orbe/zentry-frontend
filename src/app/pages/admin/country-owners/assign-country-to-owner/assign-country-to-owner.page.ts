@@ -10,6 +10,7 @@ import { AlertService } from 'src/app/services/helpers/alert.service';
 import { Router } from '@angular/router';
 import { OwnerResponse } from '../../../../interfaces/ownerResponse-interface';
 import { Owner_CountryInterface } from '../../../../interfaces/owner_country-interface';
+import { Property_OwnerInterface } from '../../../../interfaces/property_owner-interface';
 
 @Component({
   selector: 'app-assign-country-to-owner',
@@ -22,7 +23,7 @@ export class AssignCountryToOwnerPage implements OnInit {
   private form: FormGroup;
   private userID; 
   protected owners:  Owner_CountryInterface[];
-  protected properties: PropertyInterface[];
+  protected properties: Property_OwnerInterface[];
 
 
   constructor(private _alertService: AlertService, private _router: Router, protected _formBuilder: FormBuilder, private _ownersService: OwnersService, private _propertiesService: PropertiesService) {
@@ -32,7 +33,7 @@ export class AssignCountryToOwnerPage implements OnInit {
 
   ngOnInit() {
     this._ownersService.getAllByCountry().then(data => data.subscribe(owners => this.owners = owners))
-    this._propertiesService.getAllById().then(data => data.subscribe(properties => this.properties = properties))
+    this._propertiesService.getAllProperty_OwnerByCountryID().then(data => data.subscribe(properties => this.properties = properties))
   }
 
 

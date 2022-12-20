@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PropertiesService } from '../../../../services/properties/properties.service';
 import { PropertyInterface } from '../../../../interfaces/property-interface';
+import { Property_OwnerInterface } from 'src/app/interfaces/property_owner-interface';
 
 @Component({
   selector: 'app-view',
@@ -9,7 +10,7 @@ import { PropertyInterface } from '../../../../interfaces/property-interface';
 })
 export class ViewPage implements OnInit {
 
-  protected properties: PropertyInterface[]
+  protected properties: Property_OwnerInterface[]
   protected propertyName: string;
   protected propertyObservable: any
   searchKey: string;
@@ -17,7 +18,7 @@ export class ViewPage implements OnInit {
   constructor(private _propertiesService: PropertiesService) { }
 
   ngOnInit() {
-    this._propertiesService.getAllById().then(data => data.subscribe((property) => {
+    this._propertiesService.getAllProperty_OwnerByCountryID().then(data => data.subscribe((property) => {
       this.properties = property;
       console.log(property)
     }))

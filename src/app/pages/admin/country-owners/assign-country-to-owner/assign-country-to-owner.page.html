@@ -34,10 +34,10 @@
     <ion-radio-group formControlName="property_id">
       <ion-item *ngFor="let property of properties | filter: searchKey1 ; let i = index "> 
         <ion-avatar>
-          <img alt="Avatar" [src]="property.avatar" />
+          <img alt="Avatar" [src]="property.property.avatar" />
         </ion-avatar>
-        <ion-label>{{property.name}} - <b>Nº </b>  {{property.number}}</ion-label>
-        <ion-radio slot="end" [value]="property.id"></ion-radio>
+        <ion-label>{{property.property.name}} - <b>Nº </b>  {{property.property.number}}</ion-label>
+        <ion-radio slot="end" [value]="property.property.id"></ion-radio>
       </ion-item>
     </ion-radio-group>
   </ion-list>

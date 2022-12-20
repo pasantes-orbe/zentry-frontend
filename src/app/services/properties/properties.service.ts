@@ -7,6 +7,7 @@ import { AuthStorageService } from '../storage/auth-storage.service';
 import { CountryStorageService } from '../storage/country-storage.service';
 import { PropertyInterface } from '../../interfaces/property-interface';
 import { Observable } from 'rxjs';
+import { Property_OwnerInterface } from '../../interfaces/property_owner-interface';
 
 
 @Injectable({
@@ -64,18 +65,6 @@ public async getAll(): Promise<Observable<PropertyInterface[]>> {
 
 }
 
-public async getAllById(): Promise<Observable<PropertyInterface[]>> {
-  const token = await this._authStorageService.getJWT();
-  const country = await this._countryStorageService.getCountry()
-  const countryID = country.id
-  const httpOptions = {
-    headers: new HttpHeaders({
-      'Authorization': token,
-    }),
-  };
-  return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties/country/get_by_id/${countryID}`, httpOptions);
-
-}
 
 public async getBySearchTerm(searchTerm) : Promise<Observable<PropertyInterface[]>> {
   const token = await this._authStorageService.getJWT();
@@ -88,6 +77,19 @@ public async getBySearchTerm(searchTerm) : Promise<Observable<PropertyInterface[
     }),
   };
   return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties/${countryID}/${searchTerm}`, httpOptions);
+}
+
+
+public async getAllProperty_OwnerByCountryID():Promise<Observable<Property_OwnerInterface[]>> {
+  const token = await this._authStorageService.getJWT();
+  const country = await this._countryStorageService.getCountry()
+  const countryID = country.id
+  const httpOptions = {
+    headers: new HttpHeaders({
+      'Authorization': token,
+    }),
+  };
+  return this._http.get<Property_OwnerInterface[]>(`${environment.URL}/api/properties/country/get_by_id/${countryID}`, httpOptions);
 }
 
 }

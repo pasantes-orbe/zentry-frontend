@@ -4,11 +4,12 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertService } from '../helpers/alert.service';
 import { RolsService } from './rols.service';
-import { Rols } from 'src/app/interfaces/rols-interface';
+
 import { environment } from 'src/environments/environment';
 import { CountryStorageService } from '../storage/country-storage.service';
 import { UserInterface } from '../../interfaces/user-interface';
 import { GuardResponseInterface } from '../../interfaces/guard-response-interface';
+import { GuardStorageService } from '../storage/guard-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class RegisterService {
   private id;
   private guard: GuardResponseInterface
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _rols: RolsService, private _countryStorageService: CountryStorageService) { }
+  constructor(private _guardStorageService: GuardStorageService, private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _rols: RolsService, private _countryStorageService: CountryStorageService) { }
 
   public register(
     name: string,
@@ -60,14 +61,14 @@ export class RegisterService {
       this._http.post(`${environment.URL}/api/users`, formData)
         .subscribe( async (res) => {
           await this._alertService.removeLoading();
-          console.log(res)
             this._alertService.showAlert("¡Listo!", `El usuario ${rol} fue creado con éxito`);
           if (rol === 'propietario') {
             this.asignarCountry(res['user']['id'], 'owners')
             this._router.navigate(['/admin/asignar-propiedad'])
           } else if (rol == 'vigilador') {
+            this._guardStorageService.saveGuard(res['user']['id'])
             this.asignarCountry(res['user']['id'], 'guards')
-            this._router.navigate(['/admin/todos-los-guardias']);
+            this._router.navigate(['/admin/agregar-horario-laboral']);
           } else {
             this._router.navigate(['/admin/country-dashboard']);
           }

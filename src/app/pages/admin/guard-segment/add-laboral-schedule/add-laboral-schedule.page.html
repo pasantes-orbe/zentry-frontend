@@ -64,10 +64,10 @@
 
     <ion-row>
       <ion-col>
-        <ion-button size="4" (click)="addHourToSchedule()"> Agregar Horario</ion-button>
+        <ion-button size="4" [disabled]="getForm().invalid" (click)="addHourToSchedule() "> Agregar Horario</ion-button>
       </ion-col>
       <ion-col size="6">
-        <ion-button type="sumbit"> Agregar a Calendario</ion-button>
+        <ion-button type="sumbit" > Agregar a Calendario</ion-button>
       </ion-col>
     </ion-row>
   </form>
