@@ -8,7 +8,7 @@
       </ion-col>
     </ion-row>
     <form form  [formGroup]="getForm()"(keyup.enter)="guardarCalendario()" (ngSubmit)="guardarCalendario()">
-    <ion-row class="ion-padding ">
+    <ion-row class="ion-padding ion-justify-content-center">
       <ion-col>
         <ion-list>
           <ion-item>
@@ -25,17 +25,21 @@
     </ion-row>
 
 
-    <ion-row class="ion-padding ion-text-center">
+    <ion-row class="ion-padding ion-text-center ion-justify-content-center">
       <ion-col>
         <p>Seleccione horario de inicio </p>
-        <ion-datetime presentation="time" formControlName="start" ></ion-datetime>
+        <ion-item>
+        <ion-datetime size="cover" presentation="time" formControlName="start" ></ion-datetime>
+      </ion-item>
       </ion-col>
     </ion-row>
 
-    <ion-row class="ion-padding ion-text-center">
+    <ion-row class="ion-padding ion-text-center ion-justify-content-center">
       <ion-col>
         <p>Seleccione horario de fin </p>
-        <ion-datetime presentation="time" formControlName="exit" ></ion-datetime>
+        <ion-item >
+        <ion-datetime size="cover" presentation="time" formControlName="exit" ></ion-datetime>
+      </ion-item>
       </ion-col>
     </ion-row>
 
@@ -49,13 +53,10 @@
       </thead>
       
       <tbody>
-        <tr *ngFor="let hour of schedule" >
-          
+        <tr *ngFor="let hour of schedule; let i = index" >
           <td>{{hour.getDay() }} </td>
           <td>{{hour.getStart() | date : 'h:mm' }}</td>
           <td>{{hour.getExit() | date : 'h:mm' }}</td>
-          
-          
         </tr>
         <tr>
         
@@ -64,10 +65,10 @@
 
     <ion-row>
       <ion-col>
-        <ion-button size="4" [disabled]="getForm().invalid" (click)="addHourToSchedule() "> Agregar Horario</ion-button>
+        <ion-button expand="block" [disabled]="getForm().invalid" (click)="addHourToSchedule() "> Agregar Horario</ion-button>
       </ion-col>
-      <ion-col size="6">
-        <ion-button type="sumbit" > Agregar a Calendario</ion-button>
+      <ion-col >
+        <ion-button expand="block" [disabled]="getForm().invalid" type="sumbit" [disabled]="" > Agregar a Calendario</ion-button>
       </ion-col>
     </ion-row>
   </form>

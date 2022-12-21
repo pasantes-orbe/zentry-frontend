@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class AddLaboralSchedulePage implements OnInit {
 
-  protected schedule: Schedule[] = [];
+  public schedule: Schedule[] = [];
   private formBuilder: FormBuilder;
   private form: FormGroup;
 
@@ -60,9 +60,9 @@ export class AddLaboralSchedulePage implements OnInit {
       this.getForm().get('start').value,
       this.getForm().get('exit').value
     )
-
     this.schedule.push(horario)
     console.log(this.schedule)
+    console.log(this.schedule.length > 1);
   }
 
 }
