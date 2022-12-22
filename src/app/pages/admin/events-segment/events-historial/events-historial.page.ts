@@ -30,7 +30,7 @@ export class EventsHistorialPage implements OnInit {
       duration: 3000
     })
     loading.present();
-    this._reservationsService.updateStatus(status, reservationID,).subscribe((res) => {console.log(res)
+      this._reservationsService.updateStatus(status, reservationID,).subscribe((res) => {console.log(res)
       this._reservationsService.getAllByCountry().then(data => data.subscribe(reservations => this.reservations = reservations))
     })
     
