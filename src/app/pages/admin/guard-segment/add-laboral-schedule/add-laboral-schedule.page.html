@@ -55,8 +55,8 @@
       <tbody>
         <tr *ngFor="let hour of schedule; let i = index" >
           <td>{{hour.getDay() }} </td>
-          <td>{{hour.getStart() | date : 'h:mm' }}</td>
-          <td>{{hour.getExit() | date : 'h:mm' }}</td>
+          <td>{{hour.getStart() | date : 'shortTime' }}</td>
+          <td>{{hour.getExit() | date : 'shortTime' }}</td>
         </tr>
         <tr>
         
@@ -68,7 +68,7 @@
         <ion-button expand="block" [disabled]="getForm().invalid" (click)="addHourToSchedule() "> Agregar Horario</ion-button>
       </ion-col>
       <ion-col >
-        <ion-button expand="block" [disabled]="getForm().invalid" type="sumbit" [disabled]="" > Agregar a Calendario</ion-button>
+        <ion-button expand="block" [disabled]="this.schedule.length == 0" type="sumbit" [disabled]="" > Agregar a Calendario</ion-button>
       </ion-col>
     </ion-row>
   </form>

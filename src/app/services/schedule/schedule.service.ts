@@ -1,17 +1,18 @@
-import { AlertService } from 'src/app/services/helpers/alert.service';
-import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
-import { Injectable } from '@angular/core';
-import { GuardStorageService } from '../storage/guard-storage.service';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { AlertService } from '../helpers/alert.service';
+import { Router } from '@angular/router';
+import { CountryStorageService } from '../storage/country-storage.service';
 import { environment } from 'src/environments/environment';
+import { GuardStorageService } from '../storage/guard-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScheduleService {
+  
 
-  constructor(private _guardStorageService: GuardStorageService, private _countryStorageService : CountryStorageService, private _alertService: AlertService, private _http: HttpClient ) { }
-
+  constructor(private _guardStorageService: GuardStorageService, private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) { }
 
   public async saveSchedule(day: any, start: any, exit: any){
     const country = await this._countryStorageService.getCountry()

@@ -28,6 +28,7 @@ export class AddLaboralSchedulePage implements OnInit {
      }
 
   ngOnInit() {
+    console.log(this.schedule.length);
   }
 
   public createForm(): FormGroup{
@@ -47,6 +48,7 @@ export class AddLaboralSchedulePage implements OnInit {
     await this._alertService.setLoading(); 
     for (const horario of this.schedule) {
       this._scheduleService.saveSchedule(horario.getDay(), horario.getStart(), horario.getExit())
+      this.schedule.pop()
     }
     await this._alertService.removeLoading()
     this._router.navigate([`/admin/todos-los-guardias`]);
@@ -61,8 +63,6 @@ export class AddLaboralSchedulePage implements OnInit {
       this.getForm().get('exit').value
     )
     this.schedule.push(horario)
-    console.log(this.schedule)
-    console.log(this.schedule.length > 1);
   }
 
 }
