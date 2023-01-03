@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 import { LoginService } from 'src/app/services/auth/login.service';
@@ -8,7 +8,7 @@ import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { RedirectService } from 'src/app/services/helpers/redirect.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
-
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -20,9 +20,7 @@ export class LoginPage implements OnInit {
 
   private formBuilder: FormBuilder;
   private form: FormGroup;
-
   private errorMessage: any;
-
 
 
   constructor(
@@ -33,16 +31,21 @@ export class LoginPage implements OnInit {
     private _authStorage: AuthStorageService,
     protected _loading: LoadingService,
     private _userStorage: UserStorageService,
-    private _redirectService: RedirectService
+    private _redirectService: RedirectService,
+    private _webSocketService: WebSocketService
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
 
-  ngOnInit() { }
+   ngOnInit() { 
+    this._webSocketService.conectar()
+  }
 
   private async ionViewWillEnter() {
 
+
+    
     this.setErrorMessage(false);
     // Redireccionar si ya esta almacenado el usuario en storage
     const user = await this._userStorage.getUser();
