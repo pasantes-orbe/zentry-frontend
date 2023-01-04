@@ -30,13 +30,11 @@ export class RecurrentsService {
         console.log(res);
         await this._alertService.removeLoading();
         this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
-        this._router.navigate(['/admin/invitados-recurrentes']);
       },
       async (err) => {
         console.log(err);
         await this._alertService.removeLoading();
         this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-        this._router.navigate([`/home/tabs/tab1`]);
     });
   }
 

@@ -1,8 +1,11 @@
+import { OwnerResponse } from "src/app/interfaces/ownerResponse-interface";
+
 export interface CheckinInterface {
     
-    fullname: string,
+    name: string,
+    lastname: string,
     DNI: string,
-    owner: string,
+    ownerID: string | number,
     date: string | Date | String,
     transport: string,
     patent: string,

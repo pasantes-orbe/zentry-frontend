@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
+import { CheckInService } from 'src/app/services/check-in/check-in.service';
+import { CheckInOrOut } from '../../interfaces/checkInOrOut-interface';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-incomes-guards',
@@ -7,8 +11,42 @@ import { Component, OnInit } from '@angular/core';
 })
 export class IncomesGuardsComponent implements OnInit {
 
-  constructor() { }
+  protected checkIn: CheckInOrOut[] 
 
-  ngOnInit() {}
+  constructor(private _checkInService: CheckInService, protected alertController: AlertController) { }
+
+  ngOnInit() {
+    this._checkInService.getAllCheckInConfirmedByOwner().subscribe(res =>{
+      console.log(res),
+      this.checkIn = res
+    } )
+  }
+
+  ionViewWillEnter(){
+    this.ngOnInit()
+  }
+
+  public async checkInSelected(e){
+
+
+    const alert = await this.alertController.create({
+      header: 'Confirmar Check In',
+      message: `Persona: ${e.guest_name}<br>DNI: ${e.DNI}`,
+      buttons: [
+        {
+          text:'Check In',
+          handler: () => {
+            this._checkInService.updateCheckInTrue(e.id)
+          }
+        }, 'Cancelar'],
+    });
+
+    
+
+    await alert.present();
+
+
+
+  }
 
 }

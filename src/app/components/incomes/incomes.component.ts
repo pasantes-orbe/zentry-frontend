@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/helpers/navigation.service';
+import { OwnerStorageService } from '../../services/storage/owner-interface-storage.service';
+import { CheckInService } from '../../services/check-in/check-in.service';
+import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
 
 @Component({
   selector: 'app-incomes',
@@ -14,13 +17,26 @@ export class IncomesComponent implements OnInit {
 
   private loading: boolean;
   private data: any;
+  protected checkIn : CheckInInterfaceResponse[];
 
-  constructor(private Navigation: NavigationService) {
+  constructor(private Navigation: NavigationService, private _ownerStorage: OwnerStorageService, private _checkInService: CheckInService) {
     this.setLoading(true);
     this.loadData();
   }
 
-  ngOnInit() { }
+  async ngOnInit() {
+    const owner = await this._ownerStorage.getOwner()
+    const ownerID = owner.user.id
+    this._checkInService.getCheckinsByOwnerID(ownerID).subscribe(res => {
+      console.log(res);
+      this.checkIn = res
+    })
+
+   }
+
+   ionViewWillEnter(){
+    this.ngOnInit()
+   }
 
   private loadData(): void {
     setTimeout(() => {

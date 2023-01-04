@@ -3,56 +3,56 @@
   <ion-title class="text-center mb-3">Nueva Autorización de Ingreso</ion-title>
   
 
-  <form (ngSubmit)="onSubmit($event)">
+  <form [formGroup]="getForm()" (ngSubmit)="onSubmit($event)">
     <ion-item>
-      <ion-label position="floating">Nombre Completo</ion-label>
-      <ion-input required type="text"></ion-input>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input formControlName="name" required type="text"></ion-input>
     </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Apellido</ion-label>
+      <ion-input formControlName="lastname" required type="text"></ion-input>
+    </ion-item>
+
     <ion-item>
       <ion-label position="floating">DNI</ion-label>
-      <ion-input required type="text"></ion-input>
+      <ion-input formControlName="DNI" required type="text"></ion-input>
     </ion-item>
+
     <ion-item>
       <ion-label>INGRESO RECURRENTE</ion-label>
-      <ion-toggle color="success"></ion-toggle>
+      <ion-toggle [checked]="this.getForm().get('isRecurrent').value" formControlName="isRecurrent" color="success"></ion-toggle>
     </ion-item>
-    <ion-item>
+
+    
+    <ion-item *ngIf="this.getForm().get('isRecurrent').value == false">
       <ion-label class="ion-text-wrap birthday" position="">Fecha y Hora de entrada</ion-label>
       <br>
-      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+      <ion-datetime-button  datetime="datetime"></ion-datetime-button>
     </ion-item>
-    <ion-item>
-      <ion-label class="ion-text-wrap birthday" position="">Fecha y Hora de salida</ion-label>
-      <br>
-      <ion-datetime-button datetime="datetime-out"></ion-datetime-button>
-    </ion-item>
+
 
     <div class="text-center mt-4">
       <ion-button routerLink="/home" fill="clear" shape="round">
         Cancelar
       </ion-button>
 
-      <ion-button block size="large" color="primary" shape="round" type="submit">
+      <ion-button [disabled]="getForm().invalid" block size="large" color="primary" shape="round" type="submit">
         Autorizar
       </ion-button>
     </div>
 
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime formControlName="date" (ionChange)="getDateIncome($event)" color="primary" [showDefaultTitle]="true" id="datetime">
+          <span slot="title">ENTRADA</span>
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+
   </form>
 
-  <ion-modal [keepContentsMounted]="true">
-    <ng-template>
-      <ion-datetime (ionChange)="getDateIncome($event)" color="primary" [showDefaultTitle]="true" id="datetime">
-        <span slot="title">ENTRADA</span>
-      </ion-datetime>
-    </ng-template>
-  </ion-modal>
+  
 
-  <ion-modal [keepContentsMounted]="true">
-    <ng-template>
-      <ion-datetime (ionChange)="getDateExit($event)" color="primary" [showDefaultTitle]="true" id="datetime-out">
-        <span slot="title">SALIDA</span>
-      </ion-datetime>
-    </ng-template>
-  </ion-modal>
 
 </ion-content>

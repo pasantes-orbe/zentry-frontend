@@ -14,15 +14,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of [1,1,1,1,1,1,1,1,1,1]; let i = index">
+      <tr *ngFor="let check of checkIn; let i = index">
 
-        <th *ngIf="!isReadOnly()" scope="row"><ion-toggle color="success"></ion-toggle></th>
-        <th *ngIf="isReadOnly() && i % 2 == 0" class="text-center" scope="row"><ion-badge color="success">SI</ion-badge></th>
-        <th *ngIf="isReadOnly() && i % 2 != 0" class="text-center" scope="row"><ion-badge color="danger">NO</ion-badge></th>
+        <th scope="row"><ion-toggle [checked]="check.confirmed_by_owner" color="success"></ion-toggle></th>
 
-        <td>Juan Perez Gomez</td>
-        <td>01/08/2022</td>
-        <td>08:00</td>
+        <td>{{check.guest_name}}</td>
+        <td>{{check.income_date | date : 'shortDate' }}</td>
+        <td>{{check.income_date | date : 'shortTime' }}</td>
         <td>Propietario</td>
       </tr>
       <tr>

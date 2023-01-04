@@ -3,6 +3,8 @@
     <ion-col size="4" style="margin-top: 19px">INGRESOS</ion-col>
     <ion-col size="8"><ion-searchbar animated="true" placeholder="Buscar ingresos..."></ion-searchbar></ion-col>
   </ion-row>
+  <div class="table-responsive container">
+
   <table class="table">
     <thead>
       <tr>
@@ -14,21 +16,22 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; let i = index">
+      <tr *ngFor="let check of checkIn; let i = index">
         <th scope="row">
-          <ion-button fill="clear" shape="round">
+          <ion-button (click)="checkInSelected(check)" fill="clear" shape="round">
             <ion-icon
               slot="icon-only"
               name="arrow-forward-circle-outline"
             ></ion-icon>
           </ion-button>
         </th>
-        <td class="text-center" scope="row">Alejandro Chicala</td>
-        <td class="text-center" scope="row">01/08/22</td>
-        <td>08:00</td>
-        <td>Nombre Propietario {{ i }}</td>
+        <td class="text-center" scope="row">{{check.guest_name}}</td>
+        <td class="text-center" scope="row">{{check.income_date | date : 'shortDate' }}</td>
+        <td>{{check.income_date | date : 'shortTime' }}</td>
+        <td>{{ check.user.name }}</td>
       </tr>
       <tr></tr>
     </tbody>
   </table>
+</div>
 </div>

@@ -10,17 +10,33 @@
 
   <form [formGroup]="getForm()" (ngSubmit)="submitIncome()" >
     <ion-item>
-      <ion-label position="floating">Nombre Completo <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="getIncomeData().fullname" required formControlName="fullname" type="text"></ion-input>
+      <ion-label position="floating">Nombre<ion-text color="danger">*</ion-text></ion-label>
+      <ion-input [(ngModel)]="getIncomeData().name" required formControlName="name" type="text"></ion-input>
     </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Apellido <ion-text color="danger">*</ion-text></ion-label>
+      <ion-input [(ngModel)]="getIncomeData().lastname" required formControlName="lastname" type="text"></ion-input>
+    </ion-item>
+
     <ion-item>
       <ion-label position="floating">DNI <small>(Sólo números)</small> <ion-text color="danger">*</ion-text></ion-label>
       <ion-input [(ngModel)]="getIncomeData().DNI" required formControlName="DNI" type="text"></ion-input>
     </ion-item>
-    <ion-item>
-      <ion-label position="floating">Propietario Autoriza <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="getIncomeData().owner" required formControlName="owner" type="text"></ion-input>
-    </ion-item>
+
+    <ion-searchbar #searchBar [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" animated   debounce="500" placeholder="Buscar Propietario" mode="ios"  [(ngModel)]="term" (ionChange)="filtrarOwners($event.detail.value)" ></ion-searchbar>
+    <ion-list *ngIf="searchKey?.length > 0">
+      <ion-radio-group (ionChange)="setOwner($event)" formControlName="ownerID">
+
+
+        <ion-item *ngFor="let owner of owners | filter: searchKey ; let i = index" >
+          <ion-label >{{owner.user.name}} {{owner.user.lastname}} - {{owner.user.dni}}</ion-label>
+          <ion-radio  [value]="owner.user.id"></ion-radio>
+        </ion-item>
+
+      </ion-radio-group>
+    </ion-list>
+
 
     <ion-item>
       <ion-label class="ion-text-wrap mb-3" position="stacked">Fecha y hora de ingreso</ion-label>
@@ -37,7 +53,7 @@
 
     <ion-item>
       <ion-label position="floating">Transporte</ion-label>
-      <ion-select (ionChange)="select($event)" placeholder="Seleccionar">
+      <ion-select #ionSelect (ionChange)="select($event)" placeholder="Seleccionar">
         <ion-select-option value="Vehículo">Vehículo</ion-select-option>
         <ion-select-option value="Motocicleta">Motocicleta</ion-select-option>
         <ion-select-option value="Camión">Camión</ion-select-option>
@@ -53,7 +69,7 @@
 
     <ion-item>
       <ion-label  position="floating">Observaciones</ion-label>
-      <ion-textarea (ionChange)="setObservations($event)" rows="5"></ion-textarea>
+      <ion-textarea #textArea (ionChange)="setObservations($event)" rows="5"></ion-textarea>
     </ion-item>
     
       <ion-button size="large" block color="primary" type="submit" [disabled]="getForm().invalid">

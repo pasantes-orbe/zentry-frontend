@@ -5,6 +5,7 @@ import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { PropertiesService } from '../../../../services/properties/properties.service';
 import { PropertyInterface } from '../../../../interfaces/property-interface';
 import { RecurrentsService } from '../../../../services/recurrents/recurrents.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-recurrent',
@@ -22,7 +23,8 @@ export class AddRecurrentPage implements OnInit {
     protected _formBuilder: FormBuilder,
     protected _loading: LoadingService,
     private _propertiesService: PropertiesService,
-    private _recurrentsService: RecurrentsService
+    private _recurrentsService: RecurrentsService,
+    private _router: Router
   ) { 
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -53,8 +55,7 @@ export class AddRecurrentPage implements OnInit {
                                            this.getForm().get('name').value,
                                            this.getForm().get('lastname').value,
                                            this.getForm().get('dni').value)
-    
-
-  }
+                                           this._router.navigate([`/admin/invitados-recurrentes`]);
+            }
 
 }

@@ -1,6 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CheckinInterface } from './checkin.interface';
+import { UserStorageService } from '../../../services/storage/user-storage.service';
+import { GuardsService } from '../../../services/guards/guards.service';
+import { GuardStorageService } from '../../../services/storage/guard-storage.service';
+import { OwnersService } from '../../../services/owners/owners.service';
+import { CountryStorageService } from '../../../services/storage/country-storage.service';
+import { OwnerResponse } from '../../../interfaces/ownerResponse-interface';
+import { CheckInService } from '../../../services/check-in/check-in.service';
+import { IonSearchbar, IonSelect, IonTextarea } from '@ionic/angular';
 
 @Component({
   selector: 'app-checkin',
@@ -16,16 +24,33 @@ export class CheckinPage implements OnInit {
 
   protected dateNow: String = new Date().toISOString();
 
+  protected userID: any
+
+  protected owners: OwnerResponse[]
+
+  @ViewChild("textArea") protected textArea: IonTextarea;
+
+  @ViewChild("searchBar") protected searchBar: IonSearchbar;
+
+  @ViewChild("ionSelect") protected ionSelect: IonSelect;
+
 
   constructor(
-    protected _formBuilder: FormBuilder
+    protected _formBuilder: FormBuilder,
+    private _userStorageService: UserStorageService,
+    private _guardsService: GuardsService,
+    private _countryStorageService: CountryStorageService,
+    private _ownersService: OwnersService,
+    private _checkInService: CheckInService
+
     ) {
       this.formBuilder = _formBuilder;
       this.form = this.createForm();
       this.incomeData = {    
-        fullname: '',
+        name: '',
+        lastname: '',
         DNI: '',
-        owner: '',
+        ownerID: '',
         date: '',
         transport: '',
         patent: '',
@@ -35,32 +60,80 @@ export class CheckinPage implements OnInit {
     this.getIncomeData().date = this.dateNow;
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+
+    const user = await this._userStorageService.getUser()
+    this.userID = user.id;
+    console.log(this.userID)
+    this._guardsService.getGuardByCountryId(this.userID).subscribe(data => {
+    this._countryStorageService.saveCountry(data['country'])
+
+    console.log(this.textArea)      
+
+
+    })
+
   }
 
   select(e){
     this.getIncomeData().transport = e.detail.value;
   }
 
+
   setObservations(e){
     this.getIncomeData().observations = e.detail.value;
+  }
+
+  public setOwner(e){
+    console.log(e.detail.value)
+    this.getIncomeData().ownerID = e.detail.value
   }
 
   public getIncomeData(): CheckinInterface{
     return this.incomeData;
   }
 
+  filtrarOwners(termino:string){
+
+    if (termino.length > 3) {
+      
+      this._ownersService.getAllByCountryID().then(data => data.subscribe(owners =>{
+        this.owners = owners;
+      } ))
+
+    }
+  }
+
   submitIncome(){
-    console.log(this.getIncomeData());
+
+    this._checkInService.createCheckin(
+      this.getForm().get('name').value,
+      this.getForm().get('lastname').value,
+      this.getForm().get('DNI').value,
+      this.getForm().get('ownerID').value,
+      this.userID,
+      this.getForm().get('date').value,
+      this.getIncomeData().observations,
+      this.getIncomeData().transport,
+      this.getForm().get('patent').value
+    )
+      
+  
+    this.form.reset();
+    this.getIncomeData().observations = "";
+    this.textArea.value = ""
+    this.searchBar.value = ""
+    this.ionSelect.value = ""
+    this.getIncomeData().patent = ""
   }
 
   private createForm(): FormGroup {
     return this.formBuilder.group({
-      fullname: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      lastname: ['', [Validators.required, Validators.minLength(3)]],
       DNI: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(9), Validators.pattern("^[0-9]*$")]],
-      owner: ['', [Validators.required]],
+      ownerID: ['', [Validators.required]],
       date: ['', [Validators.required]],
-      patent: ''
     });
   }
 
@@ -83,5 +156,7 @@ export class CheckinPage implements OnInit {
 
     console.log(value);
   }
+
+  
 
 }

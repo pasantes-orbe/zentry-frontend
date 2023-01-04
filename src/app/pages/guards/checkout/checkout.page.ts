@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
+import { CheckInOrOut } from '../../../interfaces/checkInOrOut-interface';
+import { CheckInService } from '../../../services/check-in/check-in.service';
+import { CheckoutService } from '../../../services/checkout/checkout.service';
 
 @Component({
   selector: 'app-checkout',
@@ -8,54 +11,35 @@ import { AlertController } from '@ionic/angular';
 })
 export class CheckoutPage implements OnInit {
 
-  public checkOutList = [
-    {
-      id: 1,
-      name: "Alejandro Chicala",
-      dni: 43112125,
-      date: "25/10/2022",
-      time: "12:22",
-      authorizedBy: {
-        id: 2,
-        name: "Nombre Propietario",
-        lastname: "Apellido Propietario",
-        phone: "3624627173"
-      }
-    },
-    {
-      id: 2,
-      name: "Javier Bernal",
-      dni: 43112126,
-      date: "25/10/2022",
-      time: "12:22",
-      authorizedBy: {
-        id: 2,
-        name: "Nombre Propietario 2",
-        lastname: "Apellido Propietario 2",
-        phone: "3624627173"
-      }
-    }
-  ]
+  protected checkOutList : CheckInOrOut[]
 
   constructor(
-    private alertController: AlertController
+    private alertController: AlertController,
+    private _checkInService: CheckInService,
+    private _checkOutService:CheckoutService
   ) { }
 
   ngOnInit() {
+    this._checkInService.getAllCheckInApproved().subscribe(res => this.checkOutList = res)
+  }
+
+  ionViewWillEnter(){
+    this.ngOnInit()
   }
 
   public async checkOut(e){
-    console.log(e);
 
 
     const alert = await this.alertController.create({
       header: 'Confirmar Check Out',
-      message: `Persona: ${e.name}<br>DNI: ${e.dni}`,
+      message: `Persona: ${e.guest_name}<br>DNI: ${e.DNI}`,
       buttons: [
         {
           text:'Check Out',
           handler: (data) => {
             console.log("CHECKOUT CONFIRMADO..", data)
+            this._checkOutService.createCheckout(e.id, data)
+            
           }
         }, 'Cancelar'],
       inputs: [
@@ -70,6 +54,8 @@ export class CheckoutPage implements OnInit {
     
 
     await alert.present();
+
+
 
   }
 

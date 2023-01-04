@@ -32,11 +32,11 @@
               <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
             </ion-button>
           </td>
-          <td>{{guest.name}}</td>
-          <td>{{guest.dni}}</td>
-          <td>{{guest.date}}</td>
-          <td>{{guest.time}}</td>
-          <td> {{guest.authorizedBy.name}} </td>
+          <td>{{guest.guest_name}}</td>
+          <td>{{guest.DNI}}</td>
+          <td>{{guest.income_date | date : 'shortDate'}}</td>
+          <td>{{guest.income_date | date : 'shortTime'}}</td>
+          <td> {{guest.user.name}} </td>
         </tr>
         <tr>
         

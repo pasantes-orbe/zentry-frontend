@@ -23,4 +23,10 @@ export class GuardsService {
     const countryID = country.id 
     return this._http.get<GuardInterface[]>(`${environment.URL}/api/guards/schedule/all/${countryID}`);
   }
+
+  public getGuardByCountryId(id:any){
+    const userID = id;
+    return this._http.get(`${environment.URL}/api/guards/get_country/${userID}`);
+  }
+
 }
