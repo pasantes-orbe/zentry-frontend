@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { CheckInInterfaceResponse } from '../../interfaces/checkIn-interface';
 import { CheckInOrOut } from '../../interfaces/checkInOrOut-interface';
 import { Observable } from 'rxjs';
+import { WebSocketService } from '../websocket/web-socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class CheckInService {
   constructor(
     private _http: HttpClient,
     private _alertService: AlertService,
-    private _router: Router
+    private _router: Router,
+    private _socketService: WebSocketService,
   ) { }
 
 
@@ -41,7 +43,7 @@ export class CheckInService {
 
     this._http.post(`${environment.URL}/api/checkin`, formData).subscribe(async res => {
       console.log(res)
-
+      this._socketService.notificarCheckIn(res['checkIn']) 
       await this._alertService.removeLoading();
       this._alertService.showAlert("¡Listo!", "El Check-in fue enviado con exito al propietario");
       this._router.navigate(['/vigiladores/home']);
@@ -70,9 +72,20 @@ export class CheckInService {
 
   }
 
+  changeCheckInConfirmedByOwner(id:any, status: any){
+    const newStatus = !status
+    
+    return this._http.patch(`${environment.URL}/api/checkin/changeStatus/${id}`, {
+      new_status: newStatus
+      })
+
+  }
+
   getCheckinsByOwnerID(id){
     return this._http.get<CheckInInterfaceResponse[]>(`${environment.URL}/api/checkin/get_by_owner/${id}`)
   }
+
+  // filtrar por country, no se verifica campo del country en checkin Model
 
 getAllCheckInConfirmedByOwner(){
   return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/confirmed`)
@@ -84,8 +97,18 @@ getAllCheckInApproved(): Observable<CheckInOrOut[]>{
 
 }
 
+getAllCheckoutFalse(){
+  return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/checkout`)
+
+}
+
 updateCheckInTrue(id:any){
   this._http.patch(`${environment.URL}/api/checkin/${id}`, {}).subscribe(res => console.log(res))
 }
+
+updateCheckOutTrue(id:any){
+  this._http.patch(`${environment.URL}/api/checkin/checkout/${id}`, {}).subscribe(res => console.log(res))
+}
+
 
 }

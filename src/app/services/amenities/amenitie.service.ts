@@ -6,13 +6,14 @@ import { AlertService } from '../helpers/alert.service';
 import { CountryStorageService } from '../storage/country-storage.service';
 import { AmenitieInterface } from '../../interfaces/amenitie-interface';
 import { Observable } from 'rxjs';
+import { OwnerStorageService } from '../storage/owner-interface-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AmenitieService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) {
+  constructor(private _http: HttpClient, private _ownerStorageService: OwnerStorageService,private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) {
    }
 
    async addAmenitiy(name: string, address: string, avatar: File){
@@ -45,9 +46,14 @@ export class AmenitieService {
 
    public async getAll(): Promise<Observable<AmenitieInterface[]>> {
       const country = await this._countryStorageService.getCountry()
-      const countryID = country.id;
-
+      const countryID = country.id
       return this._http.get<AmenitieInterface[]>(`${environment.URL}/api/amenities/${countryID}`);
    }
 
+
+   public async getAllByOwner(): Promise<Observable<AmenitieInterface[]>> {
+    const owner = await this._ownerStorageService.getOwner()
+    const countryID = owner.property.id_country
+    return this._http.get<AmenitieInterface[]>(`${environment.URL}/api/amenities/${countryID}`);
+ }
 }

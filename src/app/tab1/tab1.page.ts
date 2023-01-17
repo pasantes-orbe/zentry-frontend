@@ -13,6 +13,10 @@ import { AmenitieService } from '../services/amenities/amenitie.service';
 import { ReservationsInterface } from '../interfaces/reservations-interface';
 import { ReservationsService } from '../services/amenities/reservations.service';
 import { ReservationsComponent } from '../components/reservations/reservations.component';
+import { WebSocketService } from '../services/websocket/web-socket.service';
+import { io, Socket } from 'socket.io-client'; 
+import { AlertService } from '../services/helpers/alert.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tab1',
@@ -23,8 +27,12 @@ export class Tab1Page implements OnInit{
   private loading: boolean;
   private user: UserInterface;
   private userID;
-  protected owner: OwnerResponse
-  @ViewChild(ReservationsComponent) reservationsComponent: ReservationsComponent;
+  protected owner: OwnerResponse;
+  private socket: Socket;
+
+
+  @ViewChild('incomesComponent') incomesComponent;
+  @ViewChild('reservationsComponent') reservationsComponent;
 
   constructor(
     private menu: MenuController,
@@ -32,12 +40,15 @@ export class Tab1Page implements OnInit{
     private _userStorageService: UserStorageService,
     private _ownerStorageService: OwnerStorageService,
     private _ownersService: OwnersService,
-    private _reservationsService: ReservationsService
+    private _reservationsService: ReservationsService,
+    private _socketService: WebSocketService,
+    private alerts: AlertService
     ) { 
     this.setLoading(true);
     this.getData();
 
-    
+    this.socket = io(environment.URL)
+
     this.presentAlert();  
 
   }
@@ -50,15 +61,16 @@ export class Tab1Page implements OnInit{
       this._ownerStorageService.saveOwner(owner)
     })
 
-    
+    this.escucharNotificacionesCheckin()
   }
     
   ionViewWillEnter(){
-    console.log("bbbbbb")
+    console.log("ivwilenterdesdeTabs")
+    this.incomesComponent.ngOnInit()
+    this.reservationsComponent.ngOnInit()
   }
 
   ionViewDidEnter() {
-    console.log("CCCCCC")
   }
 
   
@@ -106,6 +118,14 @@ export class Tab1Page implements OnInit{
     });
 
     await alert.present();
+  }
+
+  async escucharNotificacionesCheckin(){
+    this.socket.on('notificacion-check-in', async (payload) =>{
+      console.log(payload)
+      await this.alerts.presentAlert(payload)
+      this.incomesComponent.ngOnInit()
+    })
   }
 
   protected doRefresh(event){

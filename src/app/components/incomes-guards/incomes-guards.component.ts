@@ -3,6 +3,8 @@ import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
 import { CheckInService } from 'src/app/services/check-in/check-in.service';
 import { CheckInOrOut } from '../../interfaces/checkInOrOut-interface';
 import { AlertController } from '@ionic/angular';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+
 
 @Component({
   selector: 'app-incomes-guards',
@@ -13,22 +15,25 @@ export class IncomesGuardsComponent implements OnInit {
 
   protected checkIn: CheckInOrOut[] 
 
-  constructor(private _checkInService: CheckInService, protected alertController: AlertController) { }
+  constructor(private _checkInService: CheckInService, protected alertController: AlertController, protected _socketService: WebSocketService) { 
+  }
 
   ngOnInit() {
     this._checkInService.getAllCheckInConfirmedByOwner().subscribe(res =>{
       console.log(res),
       this.checkIn = res
-    } )
+    }
+    )  
+    
   }
 
   ionViewWillEnter(){
-    this.ngOnInit()
+   this.ngOnInit()
   }
 
-  public async checkInSelected(e){
+  public async checkInSelected(e, index){
 
-
+    console.log(index)
     const alert = await this.alertController.create({
       header: 'Confirmar Check In',
       message: `Persona: ${e.guest_name}<br>DNI: ${e.DNI}`,
@@ -37,6 +42,7 @@ export class IncomesGuardsComponent implements OnInit {
           text:'Check In',
           handler: () => {
             this._checkInService.updateCheckInTrue(e.id)
+            this.checkIn.splice(index,1)
           }
         }, 'Cancelar'],
     });
@@ -48,5 +54,20 @@ export class IncomesGuardsComponent implements OnInit {
 
 
   }
+
+  actualizarListaCheckIn(){
+    setTimeout(() => {
+      this._checkInService.getAllCheckInConfirmedByOwner().subscribe(
+        res =>{
+          console.log(res),
+          this.checkIn = res
+        }
+      )
+    }
+    , 1000);
+
+
+    
+}
 
 }

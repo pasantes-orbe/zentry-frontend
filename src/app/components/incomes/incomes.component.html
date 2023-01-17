@@ -16,7 +16,7 @@
     <tbody>
       <tr *ngFor="let check of checkIn; let i = index">
 
-        <th scope="row"><ion-toggle [checked]="check.confirmed_by_owner" color="success"></ion-toggle></th>
+        <th scope="row"><ion-toggle (click)="changeAuthorization(check, i)" [checked]="check.confirmed_by_owner" color="success"></ion-toggle></th>
 
         <td>{{check.guest_name}}</td>
         <td>{{check.income_date | date : 'shortDate' }}</td>

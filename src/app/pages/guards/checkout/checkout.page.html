@@ -28,7 +28,7 @@
         <tr *ngFor="let guest of checkOutList; let i = index">
           
           <td>
-            <ion-button (click)="checkOut(guest)" color="danger" expand="block" fill="clear" shape="round">
+            <ion-button (click)="checkOut(guest, i)" color="danger" expand="block" fill="clear" shape="round">
               <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
             </ion-button>
           </td>

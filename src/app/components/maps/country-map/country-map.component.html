@@ -10,7 +10,11 @@
 
 <div id="map"></div>
 
-<ion-button (click)="antipanic()" expand="block" size="large" color="danger" shape="round">
+<ion-button *ngIf="!antipanicState" (click)="activateAntipanic()" expand="block" size="large" color="danger" shape="round">
     BOTON ANTIPANICO
+</ion-button>
+
+<ion-button *ngIf="antipanicState" (click)="desactivateAntipanic()" expand="block" size="large" color="danger" shape="round">
+    Cancelar Antipánico
 </ion-button>
 

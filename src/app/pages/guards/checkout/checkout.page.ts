@@ -11,7 +11,7 @@ import { CheckoutService } from '../../../services/checkout/checkout.service';
 })
 export class CheckoutPage implements OnInit {
 
-  protected checkOutList : CheckInOrOut[]
+  protected checkOutList : CheckInOrOut[] = []
 
   constructor(
     private alertController: AlertController,
@@ -20,14 +20,14 @@ export class CheckoutPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this._checkInService.getAllCheckInApproved().subscribe(res => this.checkOutList = res)
+    this._checkInService.getAllCheckoutFalse().subscribe(res => this.checkOutList = res)
   }
 
   ionViewWillEnter(){
     this.ngOnInit()
   }
 
-  public async checkOut(e){
+  public async checkOut(e, index){
 
 
     const alert = await this.alertController.create({
@@ -39,7 +39,8 @@ export class CheckoutPage implements OnInit {
           handler: (data) => {
             console.log("CHECKOUT CONFIRMADO..", data)
             this._checkOutService.createCheckout(e.id, data)
-            
+            this._checkInService.updateCheckOutTrue(e.id)
+            this.checkOutList.splice(index,1)
           }
         }, 'Cancelar'],
       inputs: [

@@ -1,5 +1,9 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AlertController } from '@ionic/angular';
 import * as L from 'leaflet';
+import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
+import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 @Component({
   selector: 'app-country-map',
@@ -10,8 +14,17 @@ export class CountryMapComponent implements AfterViewInit {
 
   private map: any;
   private tileLayer: any;
+  protected antipanicState: boolean = false; 
+  protected antipanicID: any;
 
-  constructor() { }
+  constructor(
+    private _antipanicService: AntipanicService,
+    private alertController: AlertController,
+    private _ownerStorage : OwnerStorageService,
+    private _socketService: WebSocketService
+  ) { 
+
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -80,9 +93,71 @@ export class CountryMapComponent implements AfterViewInit {
     this.map = map;
   }
 
-  antipanic(){
+  async activateAntipanic(){
     const box = document.querySelector('.box');
     (document.querySelector('.box') as HTMLElement).style.display = 'block';
+
+    this.antipanicState = true;
+
+    const owner = await this._ownerStorage.getOwner()
+    const ownerID = owner.user.id;
+    const ownerAddress = owner.property.address;
+    const ownerName = owner.user.name;
+    const ownerLastName = owner.user.lastname;
+    const countryID =  owner.property.id_country;
+
+    this._antipanicService.activateAntipanic(ownerID, ownerAddress, ownerName, ownerLastName, countryID).subscribe(
+      res => {
+        this.antipanicID = res['antipanic']['id']
+        this._socketService.notificarAntipanico({
+          res,
+          ownerName,
+          ownerLastName
+        })
+      }
+    )
+
   }
 
+  async desactivateAntipanic(){
+
+    this._antipanicService.desactivateAntipanic(this.antipanicID)
+
+     this.presentAlert()
+  }
+
+
+
+  public async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Cancelar Antipanico',
+      message: '¿Está seguro de cancelar la situación antipánico?',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Autorizar',
+          role: 'confirm',
+          handler: () => {
+            this.antipanicState = false
+                const box = document.querySelector('.box');
+                (document.querySelector('.box') as HTMLElement).style.display = '';
+          },
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            this.antipanicState = true
+          },
+        }
+      ],
+    });
+
+    await alert.present();
+  }
+
+  
 }
+
+
+

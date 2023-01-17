@@ -9,6 +9,7 @@ import { CountryStorageService } from '../../../services/storage/country-storage
 import { OwnerResponse } from '../../../interfaces/ownerResponse-interface';
 import { CheckInService } from '../../../services/check-in/check-in.service';
 import { IonSearchbar, IonSelect, IonTextarea } from '@ionic/angular';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 @Component({
   selector: 'app-checkin',
@@ -41,7 +42,8 @@ export class CheckinPage implements OnInit {
     private _guardsService: GuardsService,
     private _countryStorageService: CountryStorageService,
     private _ownersService: OwnersService,
-    private _checkInService: CheckInService
+    private _checkInService: CheckInService,
+    private _socketService: WebSocketService
 
     ) {
       this.formBuilder = _formBuilder;
@@ -67,12 +69,12 @@ export class CheckinPage implements OnInit {
     console.log(this.userID)
     this._guardsService.getGuardByCountryId(this.userID).subscribe(data => {
     this._countryStorageService.saveCountry(data['country'])
-
-    console.log(this.textArea)      
-
-
     })
 
+  }
+
+  ionViewWillEnter(){
+    this.ngOnInit()
   }
 
   select(e){
@@ -105,6 +107,16 @@ export class CheckinPage implements OnInit {
   }
 
   submitIncome(){
+    console.log(this.getForm().get('name').value,
+      this.getForm().get('lastname').value,
+      this.getForm().get('DNI').value,
+      this.getForm().get('ownerID').value,
+      this.userID,
+      this.getForm().get('date').value,
+      this.getIncomeData().observations,
+      this.getIncomeData().transport,
+      this.getIncomeData().patent,
+      )
 
     this._checkInService.createCheckin(
       this.getForm().get('name').value,
@@ -115,7 +127,7 @@ export class CheckinPage implements OnInit {
       this.getForm().get('date').value,
       this.getIncomeData().observations,
       this.getIncomeData().transport,
-      this.getForm().get('patent').value
+      this.getIncomeData().patent,
     )
       
   
@@ -125,6 +137,8 @@ export class CheckinPage implements OnInit {
     this.searchBar.value = ""
     this.ionSelect.value = ""
     this.getIncomeData().patent = ""
+
+
   }
 
   private createForm(): FormGroup {

@@ -21,9 +21,11 @@ export class CountryRecurrentsPage implements OnInit {
   }
   
   public cambiarStatus(recurrent, i){
-    this._recurrentsService.patchStatus(recurrent.id, recurrent.status).subscribe(data => {console.log(data)
+    this._recurrentsService.patchStatus(recurrent.id, recurrent.status).subscribe(data => {
+      console.log(data)
       this.recurrents[i].status = !recurrent.status;
-                                                                                  })
+                                                                            
+    })
     //recurrent.status = !recurrent.status
     }
 }

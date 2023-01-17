@@ -20,8 +20,12 @@ export class EventReservationPage implements OnInit {
    }
 
   ngOnInit() {
-    this._amenitiesService.getAll().then(data => data.subscribe( amenities => {this.amenities = amenities
+    this._amenitiesService.getAllByOwner().then(data => data.subscribe( amenities => {this.amenities = amenities
       console.log(amenities)}))
+  }
+
+  ionViewWillEnter(){
+    this.ngOnInit()
   }
 
   async reservation(){

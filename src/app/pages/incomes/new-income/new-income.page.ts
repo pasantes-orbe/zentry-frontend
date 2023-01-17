@@ -55,7 +55,7 @@ export class NewIncomePage implements OnInit {
         this.getForm().get('lastname').value,
         this.getForm().get('DNI').value,
       )
-      this._router.navigate([`/home/tabs/tab1`]);
+      this._router.navigate([`/login`]);
 
 
 

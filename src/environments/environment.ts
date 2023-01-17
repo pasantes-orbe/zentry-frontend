@@ -4,9 +4,11 @@
 
 export const environment = {
   production: false,
-  URL: "http://localhost:3000"
+  URL: "https://shock-app-backend-production.up.railway.app",
   // URL: "https://countriesapp-8shm.onrender.com"
 };
+
+
 
 /*
  * For easier debugging in development mode, you can import the following file
