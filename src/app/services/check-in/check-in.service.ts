@@ -97,6 +97,11 @@ getAllCheckInApproved(): Observable<CheckInOrOut[]>{
 
 }
 
+getAllCheckInTodayByOwnerID(id): Observable<CheckInOrOut[]>{
+  return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/getAllToday/${id}`)
+
+}
+
 getAllCheckoutFalse(){
   return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/checkout`)
 

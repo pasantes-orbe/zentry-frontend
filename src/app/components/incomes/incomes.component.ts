@@ -5,6 +5,7 @@ import { OwnerStorageService } from '../../services/storage/owner-interface-stor
 import { CheckInService } from '../../services/check-in/check-in.service';
 import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { io, Socket } from 'socket.io-client'; 
 
 @Component({
   selector: 'app-incomes',
@@ -31,7 +32,7 @@ export class IncomesComponent implements OnInit {
   async ngOnInit() {
     const owner = await this._ownerStorage.getOwner()
      this.ownerID = owner.user.id
-    this._checkInService.getCheckinsByOwnerID(this.ownerID).subscribe(
+    this._checkInService.getAllCheckInTodayByOwnerID(this.ownerID).subscribe(
       res => {
       console.log(res);
       this.checkIn = res

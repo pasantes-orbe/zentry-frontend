@@ -4,6 +4,9 @@ import * as L from 'leaflet';
 import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { io, Socket } from 'socket.io-client'; 
+import { environment } from 'src/environments/environment';
+import { AlertService } from 'src/app/services/helpers/alert.service';
 
 @Component({
   selector: 'app-country-map',
@@ -11,7 +14,7 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
   styleUrls: ['./country-map.component.scss'],
 })
 export class CountryMapComponent implements AfterViewInit {
-
+  private socket: Socket;
   private map: any;
   private tileLayer: any;
   protected antipanicState: boolean = false; 
@@ -21,13 +24,22 @@ export class CountryMapComponent implements AfterViewInit {
     private _antipanicService: AntipanicService,
     private alertController: AlertController,
     private _ownerStorage : OwnerStorageService,
-    private _socketService: WebSocketService
+    private _socketService: WebSocketService,
+    private _alerts: AlertService
   ) { 
-
+    this.socket = io(environment.URL)
   }
 
   ngAfterViewInit(): void {
     this.initMap();
+
+    this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
+      console.log(payload);
+      this.antipanicState = false
+      const box = document.querySelector('.box');
+      (document.querySelector('.box') as HTMLElement).style.display = '';
+      this._alerts.presentAlertFinishAntipanicDetails(payload['antipanic']['details'])
+    })  
   }
 
   public getTileLayer(): any {
@@ -106,8 +118,9 @@ export class CountryMapComponent implements AfterViewInit {
     const ownerLastName = owner.user.lastname;
     const countryID =  owner.property.id_country;
 
-    this._antipanicService.activateAntipanic(ownerID, ownerAddress, ownerName, ownerLastName, countryID).subscribe(
+    this._antipanicService.activateAntipanic(ownerID, ownerAddress, countryID).subscribe(
       res => {
+        console.log(res)
         this.antipanicID = res['antipanic']['id']
         this._socketService.notificarAntipanico({
           res,
@@ -120,9 +133,6 @@ export class CountryMapComponent implements AfterViewInit {
   }
 
   async desactivateAntipanic(){
-
-    this._antipanicService.desactivateAntipanic(this.antipanicID)
-
      this.presentAlert()
   }
 
@@ -139,8 +149,9 @@ export class CountryMapComponent implements AfterViewInit {
           role: 'confirm',
           handler: () => {
             this.antipanicState = false
-                const box = document.querySelector('.box');
-                (document.querySelector('.box') as HTMLElement).style.display = '';
+            const box = document.querySelector('.box');
+            (document.querySelector('.box') as HTMLElement).style.display = '';
+                
           },
         },
         {

@@ -2,19 +2,30 @@ import { Injectable } from '@angular/core';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { formatDate } from '@angular/common';
 import { CheckInService } from '../check-in/check-in.service';
+import { AntipanicService } from '../antipanic/antipanic.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+import { WebSocketService } from '../websocket/web-socket.service';
+import { io, Socket } from 'socket.io-client'; 
+import * as moment from 'moment';
+import { UserStorageService } from '../storage/user-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertService {
-
+  private socket: Socket;
   private loading;
   private datePipeString: string;
 
   constructor(
     private alertController: AlertController,
     private _loadingCtrl: LoadingController,
-      ) { }
+    private _http: HttpClient,
+    private _userStorage: UserStorageService,
+    ) { 
+      this.socket = io(environment.URL)
+    }
 
 
   public async setLoading(msg: string = "Aguarde un momento...") {
@@ -52,21 +63,8 @@ export class AlertService {
       backdropDismiss: false,
       buttons: [        
         {
-          text: 'Autorizar',
-          role: 'confirm',
-          handler: () => {
-            console.log("Autorizado");
-            
-            // actualizar check-in - TIENE CIRCULAR DEPENDENCY
-          },
+          text: 'Ok'
         },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log("Cancelled");
-          },
-        }
       ],
     });
 
@@ -87,7 +85,7 @@ export class AlertService {
           text: 'Alerta Notificada',
           role: 'confirm',
           handler: () => {
-            this.presentAlertFinishAntipanic()
+            this.presentAlertFinishAntipanic(e)
           },
         },
       ],
@@ -98,9 +96,10 @@ export class AlertService {
   }
 
 
-  async presentAlertFinishAntipanic(){
+  async presentAlertFinishAntipanic(e){
     const alert = await this.alertController.create({
       header: 'Antipánico detalles',
+      backdropDismiss: false,
       inputs: [
         {
           name: 'details',
@@ -110,27 +109,55 @@ export class AlertService {
       ],
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: data => {
-            console.log('Cancel clicked');
-          }
-        },
-        {
           text: 'Detalles de la situación',
-          handler: data => {
-            
+          handler: async data => {
+           console.log(data)
+           console.log(e.id)
+           const {details} = data;
+           const now = new Date();
+           const finishAt = moment(now).format("YYYY-MM-DDThh:mm:ss-03:00");
+           const guard = await this._userStorage.getUser()
+           const guardId = guard.id
+          //  2022-12-16T12:00:00-03:00
+
+            console.log(finishAt)
+
+           this._http.put(`${environment.URL}/api/antipanic/${e.id}`, {
+            details,
+            finishAt,
+            guardId
+           }).subscribe(
+            res =>  {
+              console.log(res)
+              this.socket.emit('notificar-antipanico-finalizado', res)
+            } 
+           )
           }
         }
       ]
     });
+    
 
     await alert.present();
 
   }
 
 
-    
+  async presentAlertFinishAntipanicDetails(details){
+    const alert = await this.alertController.create({
+      header: 'Antipánico finalizado',
+      message: `Los detalles por los que fue finalizada la alarma: <b>${details}</b> `,
+      buttons: [
+        {
+          text: 'Ok',
+        }
+      ]
+    });
+
+  await alert.present();
+
+}
+
 }
 
 

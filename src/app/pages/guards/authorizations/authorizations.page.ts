@@ -1,8 +1,11 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, Platform } from '@ionic/angular';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { io, Socket } from 'socket.io-client'; 
 import { environment } from 'src/environments/environment';
+import { Geolocation } from '@capacitor/geolocation';
+import { GeolocationPlugin } from '@capacitor/geolocation/dist/esm/definitions';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-authorizations',
@@ -14,15 +17,21 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   @ViewChild('incomes') incomes;
   private socket: Socket;
 
+  public lat;
+  public lng;
+
   constructor(
     private alertController: AlertController,
-    private _socketService: WebSocketService
+    private _socketService: WebSocketService,
     ) {
       this.socket = io(environment.URL)
 
+
+        
+
     }
 
-  ngOnInit() {
+  async ngOnInit() {
     this._socketService.escucharNotificacionesAntipanico()
 
     this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
@@ -30,6 +39,33 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
         this.incomes.actualizarListaCheckIn()
       
     })
+    navigator.geolocation.getCurrentPosition(resp => {
+
+      const { latitude, longitude } = resp.coords;
+      console.log(latitude, longitude);
+
+      this.lat = latitude;
+      this.lng = longitude;
+      
+      },
+      err => {
+      });
+      
+    setInterval( (asd) => {
+      navigator.geolocation.getCurrentPosition(resp => {
+
+        const { latitude, longitude } = resp.coords;
+        console.log(latitude, longitude);
+
+        this.lat = latitude;
+        this.lng = longitude;
+        
+        },
+        err => {
+        });
+    }, 1000 )
+
+    
 
   }
 
@@ -37,11 +73,29 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   }
 
   ionViewWillEnter(){
-    console.log("holamundo")
-    this.incomes.ngOnInit();
+    
+
   }
 
 
+
+
+
+
+getPosition(): Promise<any>
+  {
+    return new Promise((resolve, reject) => {
+
+      navigator.geolocation.getCurrentPosition(resp => {
+        console.log("asjkldjklasjd");
+          resolve({lng: resp.coords.longitude, lat: resp.coords.latitude});
+        },
+        err => {
+          reject(err);
+        });
+    });
+
+  }
   
   //async presentAlert(){
 

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   URL: "https://shock-app-backend-production.up.railway.app",
-  // URL: "https://countriesapp-8shm.onrender.com"
+  // URL: "https://shock-app-backend-production.up.railway.app"
 };
 
 

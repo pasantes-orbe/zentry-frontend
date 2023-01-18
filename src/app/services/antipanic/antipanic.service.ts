@@ -18,14 +18,15 @@ export class AntipanicService {
   ) { }
 
 
-  activateAntipanic(ownerID, ownerAddress, ownerName, ownerLastName, countryID){
+  activateAntipanic(ownerID, ownerAddress, countryID){
 
     
     const formData = new FormData();
 
-    formData.append('id_owner', ownerID.toString());
+    console.log(ownerID, ownerAddress, countryID)
+    formData.append('id_owner', ownerID);
     formData.append('address', ownerAddress);
-    formData.append('id_country', countryID.toString());
+    formData.append('id_country', countryID);
 
 
 
