@@ -6,6 +6,10 @@ import { environment } from 'src/environments/environment';
 import { Geolocation } from '@capacitor/geolocation';
 import { GeolocationPlugin } from '@capacitor/geolocation/dist/esm/definitions';
 import { Observable } from 'rxjs/internal/Observable';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+import { GuardsService } from 'src/app/services/guards/guards.service';
+import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
 
 @Component({
   selector: 'app-authorizations',
@@ -15,23 +19,50 @@ import { Observable } from 'rxjs/internal/Observable';
 export class AuthorizationsPage implements OnInit, AfterViewInit {
 
   @ViewChild('incomes') incomes;
+  @ViewChild('navBarGuards') navBarGuards;
   private socket: Socket;
 
   public lat;
   public lng;
+  private userID;
+  private user_name;
+  private user_lastname;
+  private countryID;
+  public myTimer;
 
   constructor(
     private alertController: AlertController,
     private _socketService: WebSocketService,
+    private _userStorage: UserStorageService,
+    private _countryStorageService: CountryStorageService,
+    private _intervalStorageService: IntervalStorageService,
+    private _guardsService: GuardsService
+
     ) {
       this.socket = io(environment.URL)
-
-
-        
-
     }
 
   async ngOnInit() {
+
+    const user = await this._userStorage.getUser()
+    const id_user = user.id;
+    const user_name = user.name;
+    const user_lastname = user.lastname;
+
+    this.userID = id_user;
+    this.user_name = user_name;
+    this.user_lastname = user_lastname;
+          
+    this._guardsService.getGuardByCountryId(this.userID).subscribe(data => {
+      this._countryStorageService.saveCountry(data['country'])
+      })
+
+      const country = await this._countryStorageService.getCountry()
+      const id_country = country.id
+      this.countryID = id_country
+
+   
+
     this._socketService.escucharNotificacionesAntipanico()
 
     this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
@@ -39,6 +70,7 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
         this.incomes.actualizarListaCheckIn()
       
     })
+   
     navigator.geolocation.getCurrentPosition(resp => {
 
       const { latitude, longitude } = resp.coords;
@@ -46,24 +78,46 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
 
       this.lat = latitude;
       this.lng = longitude;
-      
+
+      const payload ={
+        lat: this.lat,
+        lng: this.lng,
+        id_user: this.userID,
+        id_country: this.countryID,
+        user_name: this.user_name,
+        user_lastname: this.user_lastname
+
+      }
+
+      this.socket.emit('nueva-posicion-guardia', payload);
+
       },
       err => {
+        console.log(err)
       });
       
-    setInterval( (asd) => {
+      this.myTimer = window.setInterval( () => {
       navigator.geolocation.getCurrentPosition(resp => {
-
         const { latitude, longitude } = resp.coords;
         console.log(latitude, longitude);
 
         this.lat = latitude;
         this.lng = longitude;
-        
+        const payload ={
+          lat: this.lat,
+          lng: this.lng,
+          id_user: this.userID,
+          id_country: this.countryID,
+          user_name: this.user_name,
+          user_lastname: this.user_lastname
+        }
+        this.socket.emit('nueva-posicion-guardia', payload);
+
         },
         err => {
         });
-    }, 1000 )
+    }, 8000 )
+
 
     
 
@@ -73,9 +127,13 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   }
 
   ionViewWillEnter(){
-    
-
+    this._intervalStorageService.saveInterval_id(this.myTimer)
   }
+
+  ionViewWillLeave() {
+  }
+
+  
 
 
 

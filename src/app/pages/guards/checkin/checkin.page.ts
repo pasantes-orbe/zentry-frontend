@@ -66,10 +66,6 @@ export class CheckinPage implements OnInit {
 
     const user = await this._userStorageService.getUser()
     this.userID = user.id;
-    console.log(this.userID)
-    this._guardsService.getGuardByCountryId(this.userID).subscribe(data => {
-    this._countryStorageService.saveCountry(data['country'])
-    })
 
   }
 

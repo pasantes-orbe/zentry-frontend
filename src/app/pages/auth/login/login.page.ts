@@ -7,6 +7,7 @@ import { LoginService } from 'src/app/services/auth/login.service';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { RedirectService } from 'src/app/services/helpers/redirect.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
+import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 @Component({
@@ -31,6 +32,7 @@ export class LoginPage implements OnInit {
     private _authStorage: AuthStorageService,
     protected _loading: LoadingService,
     private _userStorage: UserStorageService,
+    private _intervalStorageService: IntervalStorageService,
     private _redirectService: RedirectService,
     private _webSocketService: WebSocketService
   ) {
@@ -38,8 +40,10 @@ export class LoginPage implements OnInit {
     this.form = this.createForm();
   }
 
-   ngOnInit() { 
+   async ngOnInit() { 
     this._webSocketService.conectar()
+    const timerID = await this._intervalStorageService.getInterval_id()
+    window.clearInterval(timerID)
   }
 
   private async ionViewWillEnter() {

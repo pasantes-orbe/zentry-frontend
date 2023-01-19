@@ -7,6 +7,7 @@ import { CheckInInterfaceResponse } from '../../interfaces/checkIn-interface';
 import { CheckInOrOut } from '../../interfaces/checkInOrOut-interface';
 import { Observable } from 'rxjs';
 import { WebSocketService } from '../websocket/web-socket.service';
+import { CountryStorageService } from '../storage/country-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class CheckInService {
     private _alertService: AlertService,
     private _router: Router,
     private _socketService: WebSocketService,
+    private _countryStorageService: CountryStorageService
   ) { }
 
 
@@ -27,6 +29,9 @@ export class CheckInService {
 
 
     console.log(guest_name, guest_lastname, dni, id_owner, id_guard, income_date, details, transport)
+  
+    const country = await this._countryStorageService.getCountry()
+    const id_country = country.id.toString()
 
     const formData = new FormData();
     formData.append('guest_name', guest_name);
@@ -34,6 +39,7 @@ export class CheckInService {
     formData.append('DNI', dni);
     formData.append('id_owner', id_owner);
     formData.append('id_guard', id_guard);
+    formData.append('id_country', id_country);
     formData.append('income_date', income_date);
     formData.append('details', details);
     formData.append('transport', transport);

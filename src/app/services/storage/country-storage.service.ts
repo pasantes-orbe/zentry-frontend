@@ -29,5 +29,11 @@ export class CountryStorageService {
   private setCountry(country: CountryInteface): void {
     this.country = country;
   }
+
+  public async signOut(): Promise<void>{
+
+    await Preferences.remove({key: 'COUNTRY'});
+  }
+
 }
 
