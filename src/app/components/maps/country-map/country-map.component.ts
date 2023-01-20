@@ -7,6 +7,9 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
 import { io, Socket } from 'socket.io-client'; 
 import { environment } from 'src/environments/environment';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
+import { CountriesService } from 'src/app/services/countries/countries.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
 @Component({
   selector: 'app-country-map',
@@ -19,22 +22,56 @@ export class CountryMapComponent implements AfterViewInit {
   private tileLayer: any;
   protected antipanicState: boolean = false; 
   protected antipanicID: any;
+  protected activeGuards: GuardPointInterface[]
+  public countryLat;
+  public countryLng;
+  public markers = [];
 
   constructor(
     private _antipanicService: AntipanicService,
     private alertController: AlertController,
     private _ownerStorage : OwnerStorageService,
     private _socketService: WebSocketService,
-    private _alerts: AlertService
+    private _countryService: CountriesService,
+    private _ownerStorageService: OwnerStorageService,
+    private _alerts: AlertService,
   ) { 
     this.socket = io(environment.URL)
   }
+   ngOnInit(){  
+    this.socket.on('get-actives-guards', (payload) =>{
+      this.removeMarkers()
+      this.activeGuards = payload
+      console.log(this.activeGuards)
+      this.activeGuards.forEach((data) => {
+        console.log(data)
+        this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`)
+      })
+    })
 
-  ngAfterViewInit(): void {
-    this.initMap();
+    this.socket.on('guardDisconnected', (payload) =>{
+      this.removeMarkers()
+    })
 
+
+  }
+
+
+  async ngAfterViewInit() {
+
+    const owner = await this._ownerStorageService.getOwner()
+    const countryID = owner.property.id_country;
+     
+    this._countryService.getByID(countryID).subscribe(res =>{
+      console.log(res)
+      this.countryLat = res['latitude']
+      this.countryLng = res['longitude']
+      this.initMap();
+
+    })
+
+    
     this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
-      console.log(payload);
       this.antipanicState = false
       const box = document.querySelector('.box');
       (document.querySelector('.box') as HTMLElement).style.display = '';
@@ -46,6 +83,9 @@ export class CountryMapComponent implements AfterViewInit {
     return this.tileLayer;
   }
 
+  ionViewWillEnter() {
+    this.removeMarkers()
+  }
   public setTileLayer(url: any): void {
     this.tileLayer = L.tileLayer(url,
       {
@@ -66,14 +106,10 @@ export class CountryMapComponent implements AfterViewInit {
 
     this.map = L.map('map',
       {
-        zoomControl: false,
+        zoomControl: true,
         layers: [this.getTileLayer()],
-        maxZoom: 15,
-        minZoom: 15
       }
-    ).setView([-27.568994, -58.755599], 15);
-
-    this.getMap().dragging.disable();
+    ).setView([this.countryLat, this.countryLng], 15);
 
     this.addPoint(-27.5622, -58.7488, "Vigilador: <b>Juan Pérez</b> <br> Horario: 22:00hs - 06:00hs");
     this.addPoint(-27.5594, -58.7516, "Vigilador: <b>Carlos Gómez</b> <br> Horario: 06:00hs - 12:00hs");
@@ -87,7 +123,7 @@ export class CountryMapComponent implements AfterViewInit {
   }
 
   public addPoint(lat: number, lng: number, html: string = null): void {
-    L.circle([lat, lng], {
+    const marker = L.circle([lat, lng], {
       color: 'red',
       fillColor: '#f03',
       fillOpacity: 0.5,
@@ -95,6 +131,25 @@ export class CountryMapComponent implements AfterViewInit {
     })
       .bindPopup(html, {closeButton: false})
       .addTo(this.getMap());
+
+
+      this.markers.push(marker);
+
+  }
+
+  public removeMarker(marker){
+    this.map.removeLayer(marker);
+  }
+
+  public removeMarkers(){
+    this.getMarkers().forEach( marker => {
+      this.removeMarker(marker);
+    })
+  }
+
+  public getMarkers(){
+    console.log(this.markers);
+    return this.markers;
   }
 
   public getMap() {

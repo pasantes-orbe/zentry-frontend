@@ -4,9 +4,11 @@ import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 import { LoginService } from 'src/app/services/auth/login.service';
+import { GuardsService } from 'src/app/services/guards/guards.service';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { RedirectService } from 'src/app/services/helpers/redirect.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
@@ -29,10 +31,12 @@ export class LoginPage implements OnInit {
     private _modalCtrl: ModalController,
     protected _formBuilder: FormBuilder,
     private _loginService: LoginService,
+    private _guardsService: GuardsService,
     private _authStorage: AuthStorageService,
     protected _loading: LoadingService,
     private _userStorage: UserStorageService,
     private _intervalStorageService: IntervalStorageService,
+    private _countryStorageService: CountryStorageService,
     private _redirectService: RedirectService,
     private _webSocketService: WebSocketService
   ) {
@@ -42,12 +46,9 @@ export class LoginPage implements OnInit {
 
    async ngOnInit() { 
     this._webSocketService.conectar()
-    const timerID = await this._intervalStorageService.getInterval_id()
-    window.clearInterval(timerID)
   }
 
   private async ionViewWillEnter() {
-
 
     
     this.setErrorMessage(false);
@@ -55,6 +56,8 @@ export class LoginPage implements OnInit {
     const user = await this._userStorage.getUser();
 
     if (user) this._redirectService.redirectByRole(user['role'].name);
+
+
   }
 
   login() {
@@ -76,11 +79,19 @@ export class LoginPage implements OnInit {
         data => {
 
           this._authStorage.saveJWT(data['token']);
+          console.log(data['user'])
           this._userStorage.saveUser(data['user']);
 
           
 
           const { name } = data['user'].role;
+
+          if(name === 'vigilador'){
+            this._guardsService.getGuardByCountryId(data['user']['id']).subscribe(data => {
+              console.log(data)
+              this._countryStorageService.saveCountry(data['country'])
+            })
+          }
           this._redirectService.redirectByRole(name);
           this.setErrorMessage("Iniciando sesion...");
           this._loading.stopLoading();
@@ -105,6 +116,7 @@ export class LoginPage implements OnInit {
 
   }
 
+ 
   private createForm(): FormGroup {
     return this.formBuilder.group({
       user: ['', [Validators.required]],

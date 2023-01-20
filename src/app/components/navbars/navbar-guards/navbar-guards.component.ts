@@ -4,7 +4,9 @@ import { MenuController } from '@ionic/angular';
 import { NavigationService } from 'src/app/helpers/navigation.service';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 @Component({
   selector: 'app-navbar-guards',
@@ -14,19 +16,21 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 export class NavbarGuardsComponent implements OnInit {
 
   protected user: UserInterface;
-  protected countryName: string = "";
+  public countryName: string = "";
   
   constructor(
     private router: Router,
     protected _userStorage: UserStorageService,
     private menu: MenuController,
-    private Navigation: NavigationService,
-    protected _countryStorage: CountryStorageService
+    private _socketService: WebSocketService,
+    protected _countryStorage: CountryStorageService,
+    protected _intervalStorageService: IntervalStorageService
     ) { }
 
   async ngOnInit() {
     const country = await this._countryStorage.getCountry()
     this.countryName = country.name
+    console.log(country.name)
     this.setUser(await this._userStorage.getUser());
   }
 
@@ -35,8 +39,14 @@ export class NavbarGuardsComponent implements OnInit {
   }
 
   async signOut(){
+    const user = this.getUser()
+    const timerID = await this._intervalStorageService.getInterval_id()
+    console.log(timerID)
+    window.clearInterval(timerID)
+    this._socketService.disconnectGuardUbication(user.id)
     this._userStorage.signOut()
-    this._countryStorage.signOut()
+    this._countryStorage.signOut() 
+    this._intervalStorageService.remove()
   }
 
   protected navigate(url: string): void {

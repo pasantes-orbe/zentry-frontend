@@ -63,6 +63,11 @@ conectar(){
     console.log(data)
   }
 
+  disconnectGuardUbication(data){
+    this.socket.emit('disconnectGuardUbication', data)
+  }
+
+
    escucharNotificacionesCheckin(){
     this.socket.on('notificacion-check-in', async (payload) =>{
       console.log(payload)

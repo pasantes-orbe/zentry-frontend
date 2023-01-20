@@ -45,21 +45,14 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   async ngOnInit() {
 
     const user = await this._userStorage.getUser()
-    const id_user = user.id;
-    const user_name = user.name;
-    const user_lastname = user.lastname;
+    const country = await this._countryStorageService.getCountry()
+    this.countryID = country.id;
+    this.userID = user.id;
+    this.user_name = user.name;
+    this.user_lastname = user.lastname;
+    
 
-    this.userID = id_user;
-    this.user_name = user_name;
-    this.user_lastname = user_lastname;
-          
-    this._guardsService.getGuardByCountryId(this.userID).subscribe(data => {
-      this._countryStorageService.saveCountry(data['country'])
-      })
-
-      const country = await this._countryStorageService.getCountry()
-      const id_country = country.id
-      this.countryID = id_country
+    this.navBarGuards.ngOnInit()  
 
    
 
@@ -98,6 +91,8 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
       
       this.myTimer = window.setInterval( () => {
       navigator.geolocation.getCurrentPosition(resp => {
+        this._intervalStorageService.saveInterval_id(this.myTimer)
+        console.log("Este es el id del Interval: ",this.myTimer)
         const { latitude, longitude } = resp.coords;
         console.log(latitude, longitude);
 
@@ -117,9 +112,10 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
         err => {
         });
     }, 8000 )
-
-
     
+  }
+
+  ionViewDidLeave(){
 
   }
 
@@ -127,7 +123,6 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   }
 
   ionViewWillEnter(){
-    this._intervalStorageService.saveInterval_id(this.myTimer)
   }
 
   ionViewWillLeave() {
