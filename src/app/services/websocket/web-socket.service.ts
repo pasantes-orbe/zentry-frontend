@@ -47,7 +47,16 @@ conectar(){
 
 }
 
+  propietarioConectado(){
+    this.socket.emit('propietario-conectado', {msg: "asdfasdf"})
+  }
 
+
+  newOwnerConnected(data){
+
+    this.socket.emit('owner-connected', data)
+
+  }
 
   notificarCheckIn(data){
     this.socket.emit('notificar-check-in', data)

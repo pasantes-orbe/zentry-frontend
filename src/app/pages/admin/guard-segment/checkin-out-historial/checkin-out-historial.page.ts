@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { CheckInOrOut } from 'src/app/interfaces/checkInOrOut-interface';
+import { CheckInService } from 'src/app/services/check-in/check-in.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
 @Component({
   selector: 'app-checkin-out-historial',
@@ -7,62 +10,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CheckinOutHistorialPage implements OnInit {
 
-  public registers: Register[] = [
-    {
-      checkIn: {
-        id: 1,
-        name: "Juan",
-        lastname: "Perez",
-        fullname : "Juan Perez",
-        dni: 49788569,
-        date: "27/10/2022",
-        time: "07:25"
-      },
-      checkOut: {
-        id: 1,
-        name: "Juan",
-        lastname: "Perez",
-        fullname : "Juan Perez",
-        dni: 49788569,
-        date: "27/10/2022",
-        time: "18:15"
-      }
-    },
-    {
-      checkIn: {
-        id: 1,
-        name: "Ludmila",
-        lastname: "Gomez",
-        fullname : "Ludmila Gomez",
-        dni: 40999887,
-        date: "24/10/2022",
-        time: "12:45"
-      },
-      checkOut: {}
-    },
-    {
-      checkIn: {
-        id: 1,
-        name: "Javier",
-        lastname: "Bernal",
-        fullname : "Javier Bernal",
-        dni: 40999888,
-        date: "24/10/2022",
-        time: "12:45"
-      },
-      checkOut: {
-        id: 1,
-        name: "Javier",
-        lastname: "Bernal",
-        fullname : "Javier Bernal",
-        dni: 40999888,
-        date: "24/10/2022",
-        time: "20:30"
-      }
-    }
-    
-  ];
-
+  public registers: Register[] = [];
+  public checkIns: CheckInOrOut[] = []
   public icons = {
     checkIn: 'caret-forward-outline',
     checkOut: 'caret-back-outline',
@@ -71,9 +20,14 @@ export class CheckinOutHistorialPage implements OnInit {
 
   searchKey: string;
 
-  constructor() { }
+  constructor(private _checkInService: CheckInService,
+              private _countryStorage: CountryStorageService
+  ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    const country = await this._countryStorage.getCountry()
+    const id_country = country.id
+    
   }
 
   isEmptyObject(obj){
@@ -82,16 +36,25 @@ export class CheckinOutHistorialPage implements OnInit {
 
 }
 
+
+
 interface Register{
 
   checkIn: {
-    id: number,
-    name: string,
-    lastname: string,
-    fullname: string,
-    dni: number,
-    date: string,
-    time: string
+    DNI: any,
+    guest_name: string,
+    guest_lastname: string,
+    details: string,
+    check_in: boolean,
+    check_out: boolean,
+    confirmed_by_owner: boolean,
+    id: any,
+    id_country: any,
+    id_guard: any,
+    id_owner: any,
+    income_date: Date,
+    patent: string,
+    transport: string
   },
   checkOut: {
     id?: number,

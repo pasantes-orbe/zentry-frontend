@@ -56,12 +56,11 @@ export class Tab1Page implements OnInit{
       this.owner = owner
       this._ownerStorageService.saveOwner(owner)
     })
-
   }
     
   ionViewWillEnter(){
-    console.log("ivwilenterdesdeTabs")
     this.reservationsComponent.ngOnInit()
+
   }
 
   ionViewDidEnter() {

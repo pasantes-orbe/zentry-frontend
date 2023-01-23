@@ -3,6 +3,8 @@ import { AlertController } from '@ionic/angular';
 import { CheckInOrOut } from '../../../interfaces/checkInOrOut-interface';
 import { CheckInService } from '../../../services/check-in/check-in.service';
 import { CheckoutService } from '../../../services/checkout/checkout.service';
+import { io, Socket } from 'socket.io-client'; 
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-checkout',
@@ -12,15 +14,24 @@ import { CheckoutService } from '../../../services/checkout/checkout.service';
 export class CheckoutPage implements OnInit {
 
   protected checkOutList : CheckInOrOut[] = []
+  private socket: Socket;
 
   constructor(
+    
     private alertController: AlertController,
     private _checkInService: CheckInService,
     private _checkOutService:CheckoutService
-  ) { }
+  ) {
+    this.socket = io(environment.URL)
+   }
 
+  
   ngOnInit() {
     this._checkInService.getAllCheckoutFalse().subscribe(res => this.checkOutList = res)
+    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
+      console.log(payload);
+      this._checkInService.getAllCheckoutFalse().subscribe(res => this.checkOutList = res)
+  })
   }
 
   ionViewWillEnter(){
@@ -40,6 +51,7 @@ export class CheckoutPage implements OnInit {
             console.log("CHECKOUT CONFIRMADO..", data)
             this._checkOutService.createCheckout(e.id, data)
             this._checkInService.updateCheckOutTrue(e.id)
+            this.socket.emit("notificar-nuevo-confirmedByOwner", "Actualizar Lista")
             this.checkOutList.splice(index,1)
           }
         }, 'Cancelar'],

@@ -26,12 +26,11 @@ export class IncomesComponent implements OnInit {
   constructor(private Navigation: NavigationService, private _socketService: WebSocketService ,private _ownerStorage: OwnerStorageService, private _checkInService: CheckInService) {
     this.setLoading(true);
     this.loadData();
-
   }
 
   async ngOnInit() {
     const owner = await this._ownerStorage.getOwner()
-     this.ownerID = owner.user.id
+    this.ownerID = owner.user.id
     this._checkInService.getAllCheckInTodayByOwnerID(this.ownerID).subscribe(
       res => {
       console.log(res);

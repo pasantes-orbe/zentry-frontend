@@ -66,7 +66,7 @@ export class CountryMapComponent implements AfterViewInit {
       console.log(res)
       this.countryLat = res['latitude']
       this.countryLng = res['longitude']
-      this.initMap();
+      this.initMap(res['latitude'], res['longitude']);
 
     })
 
@@ -94,7 +94,7 @@ export class CountryMapComponent implements AfterViewInit {
   }
 
 
-  private initMap(): void {
+  private initMap(mapLat, mapLng): void {
 
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     if(prefersDark.matches){
@@ -109,7 +109,7 @@ export class CountryMapComponent implements AfterViewInit {
         zoomControl: true,
         layers: [this.getTileLayer()],
       }
-    ).setView([this.countryLat, this.countryLng], 15);
+    ).setView([mapLat, mapLng], 15);
 
     this.addPoint(-27.5622, -58.7488, "Vigilador: <b>Juan Pérez</b> <br> Horario: 22:00hs - 06:00hs");
     this.addPoint(-27.5594, -58.7516, "Vigilador: <b>Carlos Gómez</b> <br> Horario: 06:00hs - 12:00hs");

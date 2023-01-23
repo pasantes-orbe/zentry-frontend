@@ -42,6 +42,7 @@ export class IncomesGuardsComponent implements OnInit {
           text:'Check In',
           handler: () => {
             this._checkInService.updateCheckInTrue(e.id)
+            this._socketService.notificarNuevoConfirmedByOwner("Actualizar Lista")
             this.checkIn.splice(index,1)
           }
         }, 'Cancelar'],

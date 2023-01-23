@@ -98,8 +98,8 @@ getAllCheckInConfirmedByOwner(){
 
 }
 
-getAllCheckInApproved(): Observable<CheckInOrOut[]>{
-  return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/approved`)
+getAllCheckInApprovedByCountryId(id_country): Observable<CheckInOrOut[]>{
+  return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/approved/${id_country}`)
 
 }
 
