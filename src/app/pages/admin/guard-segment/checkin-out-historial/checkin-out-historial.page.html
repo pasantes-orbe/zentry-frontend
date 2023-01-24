@@ -2,37 +2,38 @@
 
 <ion-content class="ion-padding">
 
-  <!--<ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey" [debounce]="250"></ion-searchbar>
+  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey" [debounce]="250"></ion-searchbar>
   <ion-list>
     <div class="register" *ngFor="let register of registers | filter: searchKey">
-      <ion-item lines="none">-->
-        <!-- CHECKIN 
+      <ion-item lines="none">
+        <!-- CHECKIN   -->
+
         <ion-icon  color="success" slot="start" [name]="icons.checkIn"></ion-icon>
         <ion-text>
-           <p>{{register.checkIn.name}} {{register.checkIn.lastname}}</p>
-          <small>{{register.checkIn.dni}}</small>
+           <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
+          <small>{{register.checkin.DNI}}</small>
         </ion-text>
         <ion-text slot="end">
-          <p>{{register.checkIn.time}} hs</p>
-          <small>{{register.checkIn.date}}</small>
+          <p>{{register.checkin.income_date | date:'shortTime'}} hs</p>
+          <small>{{register.checkin.income_date | date :'shortDate'}}</small>
         </ion-text> 
       </ion-item>
-  -->
-     <!--  <ion-item lines="none" *ngIf="!isEmptyObject(register.checkOut)">
-        CHECKOUT 
+
+     <ion-item lines="none" *ngIf="register.checkout != null">
+      <!--  CHECKOUT  -->
         <ion-icon color="danger" slot="start" [name]="icons.checkOut"></ion-icon>
         <ion-text>
-          <p>{{register.checkOut.name}} {{register.checkOut.lastname}}</p>
-          <small>{{register.checkOut.dni}}</small>
+          <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
+          <small>{{register.checkin.DNI}}</small>
         </ion-text>
         <ion-text slot="end">
-          <p>{{register.checkOut.time}} hs</p>
-          <small>{{register.checkOut.date}}</small>
+          <p>{{register.checkout.out_date | date:'shortTime'}} hs</p>
+          <small>{{register.checkout.out_date | date :'shortDate'}}</small>
         </ion-text>
       </ion-item>
--->
-     <!-- <ion-item lines="none" *ngIf="isEmptyObject(register.checkOut)">
-         CHECKOUT EMPTY 
+
+      <ion-item lines="none" *ngIf="register.checkout == null">
+       <!--    CHECKOUT EMPTY  -->
         <ion-icon color="danger" slot="start" [name]="icons.noCheckOut"></ion-icon>
         <ion-text>
           <small>No se registró CheckOut</small>
@@ -41,6 +42,5 @@
     </div>
 
   </ion-list>
--->
 </ion-content>
 

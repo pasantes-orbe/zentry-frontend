@@ -10,7 +10,7 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 })
 export class CheckinOutHistorialPage implements OnInit {
 
-  public registers: Register[] = [];
+  public registers: any[]
   public checkIns: CheckInOrOut[] = []
   public icons = {
     checkIn: 'caret-forward-outline',
@@ -27,7 +27,13 @@ export class CheckinOutHistorialPage implements OnInit {
   async ngOnInit() {
     const country = await this._countryStorage.getCountry()
     const id_country = country.id
-    
+    this._checkInService.getAllRegisters(id_country).subscribe(
+      data =>{
+        console.log(data)
+        this.registers = data
+      } 
+      
+    )
   }
 
   isEmptyObject(obj){
