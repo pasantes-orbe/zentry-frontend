@@ -12,22 +12,22 @@
                     <ion-icon slot="icon-only" class="shadow" name="create-outline"></ion-icon>
                 </ion-button>
 
-                <form>
+                <form [formGroup]="getForm()" (ngSubmit)="updateUser()">
                     <ion-item>
-                        <ion-label position="floating">Nombre Completo</ion-label>
-                        <ion-input required value="Jhon Doe" type="text"></ion-input>
+                        <ion-label position="floating"> Nombre </ion-label>
+                        <ion-input required formControlName="name" [value]="user?.name" type="text"></ion-input>
                     </ion-item>
                     <ion-item>
-                        <ion-label position="floating">Dirección</ion-label>
-                        <ion-input required value="Entre Rios 142 P.9 Of. A" type="text"></ion-input>
+                        <ion-label position="floating"> Apellido </ion-label>
+                        <ion-input required formControlName="lastname" [value]="user?.lastname" type="text"></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-label position="floating">Telefono</ion-label>
-                        <ion-input required value="3624000000" type="text"></ion-input>
+                        <ion-input required formControlName="phone" [value]="user?.phone" type="text"></ion-input>
                     </ion-item>                    
                     <ion-item>
                         <ion-label position="floating">Email</ion-label>
-                        <ion-input required value="alejandro@orbesoftware.com.ar" type="text"></ion-input>
+                        <ion-input required formControlName="email" [value]="user?.email" type="text"></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-label class="ion-text-wrap birthday" position="stacked">Cumpleaños</ion-label>
@@ -36,7 +36,7 @@
 
                     <ion-modal [keepContentsMounted]="true">
                         <ng-template>
-                            <ion-datetime value="2003-10-13T11:51:00-03:00" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
+                            <ion-datetime formControlName="birthday" [value]="user?.birthday" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
                             <span slot="title">ELIGE LA FECHA DE TU CUMPLEAÑOS</span>
                             </ion-datetime>
                         </ng-template>

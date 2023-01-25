@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-edit',
@@ -7,9 +10,59 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EditPage implements OnInit {
 
-  constructor() { }
+  private formBuilder: FormBuilder;
+  private form: FormGroup;
+  public user;
+  public name;
+  public lastname;
+  public phone;
+  public email;
+  public birthday;
+  
+  constructor(protected _formBuilder: FormBuilder, protected _userService: UserService, protected _userStorage: UserStorageService) { 
+    this.formBuilder = _formBuilder;
+    this.form = this.createForm();
 
-  ngOnInit() {
+  }
+
+  async ngOnInit() {
+
+    const user = await  this._userStorage.getUser()
+
+    this.user = user
+    this._userService.getUserByID(user.id).subscribe( user =>
+      this.user = user
+    )
+    this.form.controls['name'].setValue(user.name);
+    this.form.controls['lastname'].setValue(user.lastname);
+    this.form.controls['phone'].setValue(user.phone);
+    this.form.controls['birthday'].setValue(user.birthday);
+    this.form.controls['email'].setValue(user.email);
+
+  }
+  ionViewWillEnter() {
+    this.ngOnInit()
+  }
+
+ 
+
+  private createForm(): FormGroup{
+    return this.formBuilder.group({
+      name: [''],
+      lastname :[''],
+      phone: [''],
+      birthday: [''],
+      email: ['']
+    });
+}
+
+  updateUser(){
+    this._userService.updateUser(this.user.id, 
+                                  this.form.get('name').value,
+                                  this.form.get('lastname').value,
+                                  this.form.get('birthday').value,
+                                  this.form.get('email').value,
+                                  this.form.get('phone').value)
   }
 
   getDate(event){
@@ -18,6 +71,10 @@ export class EditPage implements OnInit {
 
     console.log(value);
     
+  }
+
+  public getForm(): FormGroup {
+    return this.form;
   }
 
 }

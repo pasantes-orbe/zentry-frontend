@@ -10,16 +10,25 @@
         <th scope="col">Fecha</th>
         <th scope="col">Prop N°</th>
         <th scope="col">Propietario</th>
-        <th scope="col">¿Fue Cancelado?</th>
+        <th scope="col">Guardia</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of [1,1,1] | filter: searchKey ; let i = index">
-        <td>17/11/2022</td>
-        <td class="text-center">{{i + 1}}</td>
-        <td>Chicala, Alejandro</td>
-        <td *ngIf="i % 2 != 0"><ion-badge color="success">SI</ion-badge></td>
+      <tr *ngFor="let antipanic of antipanics| filter: searchKey ; let i = index">
+        <td> {{antipanic.createdAt | date}} </td>
+        <td class="text-center">{{antipanic.propertyNumber}}</td>
+        <td>{{antipanic.owner.name}} </td>
+          <div *ngIf ="antipanic.guard" >
+            <td class="text-center"> {{antipanic.guard.name}} </td>
+          </div>
+          <div *ngIf ="!antipanic.guard" >
+            <td class="text-center"> nada </td>
+          </div>
+
+     <!-- ESTO TRATABA DE SI FUE CANCELADO O NO
+         <td *ngIf="i % 2 != 0"><ion-badge color="success">SI</ion-badge></td>
         <td *ngIf="i % 2 == 0"><ion-badge color="danger">NO</ion-badge></td>
+       --> 
       </tr>
       
     </tbody>

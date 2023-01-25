@@ -18,7 +18,7 @@ export class AntipanicService {
   ) { }
 
 
-  activateAntipanic(ownerID, ownerAddress, countryID){
+  activateAntipanic(ownerID, ownerAddress, countryID, propertyNumber){
 
     
     const formData = new FormData();
@@ -27,6 +27,7 @@ export class AntipanicService {
     formData.append('id_owner', ownerID);
     formData.append('address', ownerAddress);
     formData.append('id_country', countryID);
+    formData.append('propertyNumber', propertyNumber);
 
 
 
@@ -53,5 +54,8 @@ export class AntipanicService {
   }
 
 
+  getAllAntipanicByCountry(id_country){
+    return this._http.get<any[]>(`${environment.URL}/api/antipanic/${id_country}`)
+  }
 
   }

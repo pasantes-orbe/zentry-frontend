@@ -172,8 +172,8 @@ export class CountryMapComponent implements AfterViewInit {
     const ownerName = owner.user.name;
     const ownerLastName = owner.user.lastname;
     const countryID =  owner.property.id_country;
-
-    this._antipanicService.activateAntipanic(ownerID, ownerAddress, countryID).subscribe(
+    const propertyNumber = owner.property.number
+    this._antipanicService.activateAntipanic(ownerID, ownerAddress, countryID, propertyNumber).subscribe(
       res => {
         console.log(res)
         this.antipanicID = res['antipanic']['id']

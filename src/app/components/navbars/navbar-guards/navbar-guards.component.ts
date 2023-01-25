@@ -43,10 +43,10 @@ export class NavbarGuardsComponent implements OnInit {
     const timerID = await this._intervalStorageService.getInterval_id()
     console.log(timerID)
     window.clearInterval(timerID)
+    await this._intervalStorageService.remove()
     this._socketService.disconnectGuardUbication(user.id)
     this._userStorage.signOut()
     this._countryStorage.signOut() 
-    this._intervalStorageService.remove()
   }
 
   protected navigate(url: string): void {
