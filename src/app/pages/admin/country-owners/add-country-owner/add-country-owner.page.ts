@@ -62,7 +62,7 @@ register(){
     return this.formBuilder.group({
       ownerName: ['', [Validators.required, Validators.minLength(3)]],
       ownerLastname:['', [Validators.required, Validators.minLength(5)]],
-      ownerDNI:['', [Validators.required, Validators.max(99999999)]],
+      ownerDNI:['', [Validators.required, Validators.min(1000000),Validators.max(100000000)]],
       ownerEmail: ['', [Validators.required, Validators.pattern(this._emailHelperService.getEmailPattern())]],
       ownerPassword: ['', [Validators.required, Validators.minLength(4)]],
       ownerPhone: ['', [Validators.required, Validators.max(10000000000)]],

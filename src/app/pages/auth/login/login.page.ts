@@ -12,6 +12,7 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { Storage } from '@ionic/storage';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -25,9 +26,9 @@ export class LoginPage implements OnInit {
   private form: FormGroup;
   private errorMessage: any;
 
-
   constructor(
     private _router: Router,
+    private storage: Storage,
     private _modalCtrl: ModalController,
     protected _formBuilder: FormBuilder,
     private _loginService: LoginService,

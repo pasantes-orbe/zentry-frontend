@@ -2,7 +2,7 @@
 
 <ion-content>
 
-<form form [formGroup]="getForm()" >
+<form form [formGroup]="getForm()" (ngSubmit)="asignarPropiedadAlUsuario()" >
   <ion-grid>
     <ion-row class="ion-justify-content-center">
       <ion-col>
@@ -46,7 +46,7 @@
 
 <ion-row class="ion-justify-content-center">
   <ion-col>
-  <ion-button  (click)="asignarPropiedadAlUsuario()" expand="block" shape="round">
+  <ion-button [disabled]="getForm().invalid" type="submit" expand="block" shape="round">
     <ion-icon slot="start" name="add"></ion-icon>
     Asignar Country al Propietario
   </ion-button>

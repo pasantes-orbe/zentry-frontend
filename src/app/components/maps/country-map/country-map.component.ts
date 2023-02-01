@@ -26,24 +26,33 @@ export class CountryMapComponent implements AfterViewInit {
   public countryLat;
   public countryLng;
   public markers = [];
-
+  public id_country;
+  public id_user;
   constructor(
     private _antipanicService: AntipanicService,
     private alertController: AlertController,
     private _ownerStorage : OwnerStorageService,
     private _socketService: WebSocketService,
     private _countryService: CountriesService,
-    private _ownerStorageService: OwnerStorageService,
+  
     private _alerts: AlertService,
   ) { 
     this.socket = io(environment.URL)
   }
-   ngOnInit(){  
+   async ngOnInit(){  
+
+
+    const owner = await this._ownerStorage.getOwner()
+    this.id_user = owner.user.id
+
+    this.id_country = owner.property.id_country.toString()
+    
     this.socket.on('get-actives-guards', (payload) =>{
       this.removeMarkers()
       this.activeGuards = payload
       console.log(this.activeGuards)
       this.activeGuards.forEach((data) => {
+        if (data.id_country == this.id_country)
         console.log(data)
         this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`)
       })
@@ -57,9 +66,10 @@ export class CountryMapComponent implements AfterViewInit {
   }
 
 
+
   async ngAfterViewInit() {
 
-    const owner = await this._ownerStorageService.getOwner()
+    const owner = await this._ownerStorage.getOwner()
     const countryID = owner.property.id_country;
      
     this._countryService.getByID(countryID).subscribe(res =>{
@@ -72,6 +82,7 @@ export class CountryMapComponent implements AfterViewInit {
 
     
     this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
+      console.log(payload)
       this.antipanicState = false
       const box = document.querySelector('.box');
       (document.querySelector('.box') as HTMLElement).style.display = '';
@@ -84,7 +95,7 @@ export class CountryMapComponent implements AfterViewInit {
   }
 
   ionViewWillEnter() {
-    this.removeMarkers()
+    this.socket.emit('owner-connected', (this.id_user))
   }
   public setTileLayer(url: any): void {
     this.tileLayer = L.tileLayer(url,
@@ -163,6 +174,7 @@ export class CountryMapComponent implements AfterViewInit {
   async activateAntipanic(){
     const box = document.querySelector('.box');
     (document.querySelector('.box') as HTMLElement).style.display = 'block';
+    this.ionViewWillEnter()
 
     this.antipanicState = true;
 

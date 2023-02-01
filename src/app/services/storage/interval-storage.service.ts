@@ -27,6 +27,7 @@ export class IntervalStorageService {
   public async remove(): Promise<void>{
 
     await Preferences.remove({key: 'INTERVAL_ID'});
+    
   }
 
   

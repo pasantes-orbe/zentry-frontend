@@ -10,15 +10,27 @@ import { LoaderComponent } from './loader/loader.component';
 import { NavbarGuardsComponent } from './navbars/navbar-guards/navbar-guards.component';
 import { IncomesGuardsComponent } from './incomes-guards/incomes-guards.component';
 import { NavbarAdminComponent } from './navbars/navbar-admin/navbar-admin.component';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { RecurrentsViewAllComponent } from './recurrentsViewAll/recurrents-view-all/recurrents-view-all.component';
+import { SortPipe } from '../pipes/sort.pipe';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 
 
 @NgModule({
-  declarations: [NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent],
+  declarations: [
+    SortPipe,
+    NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent],
   imports: [
     CommonModule,
-    IonicModule
+    FormsModule,
+    ReactiveFormsModule,
+    IonicModule,
+    RouterModule,
+    Ng2SearchPipeModule,
   ],
-  exports: [NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent]
+  providers: [SortPipe],
+  exports: [NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent]
 })
 export class ComponentsModule { }

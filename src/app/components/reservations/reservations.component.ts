@@ -19,22 +19,15 @@ export class ReservationsComponent implements OnInit {
     this.loadData();
   }
 
-  ngOnInit() {
-    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => {
-      this.reservations = reservations 
-      this.reservations.sort()
-      console.log(reservations)
-    } ))
+  async ngOnInit() {
+
+   (await this._reservationsService.getAllByUser()).subscribe(reservations =>{
+    this.reservations = reservations
+    console.log(reservations);
+   })
+
    }
 
-
-  ionViewWillEnter(){
-    this._reservationsService.getAllByUser().then(data => data.subscribe(reservations => {
-      this.reservations = reservations
-      this.reservations.sort()
-      console.log(reservations)
-    } ))
-  }
   private loadData(): void{
     setTimeout(() => {
       this.setLoading(false);

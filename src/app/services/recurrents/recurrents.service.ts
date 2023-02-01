@@ -14,7 +14,7 @@ export class RecurrentsService {
 
   constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) { }
 
-  public async addRecurrent(id_property, name, lastname, dni){
+  public async addRecurrent(id_property, name, lastname, dni, role){
 
 
     const formData = new FormData();
@@ -23,19 +23,26 @@ export class RecurrentsService {
     formData.append('guest_lastname', lastname);
     formData.append('dni', dni);
     await this._alertService.setLoading();
+    
 
     this._http.post(`${environment.URL}/api/recurrents`, formData)
       .subscribe(
         async (res) => {
         console.log(res);
         await this._alertService.removeLoading();
+        if(role == "admin"){
+          this._router.navigate([`/admin/invitados-recurrentes`])
+        } else {
+          this._router.navigate([`/home/tabs/tab1`])
+        }
         this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
       },
       async (err) => {
         console.log(err);
         await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._alertService.showAlert("¡Ooops!", `${err['error']['msg']}`);
     });
+
   }
 
   public async getRecurrentsByCountry(): Promise<Observable<RecurrentsInterface[]>> {
@@ -50,6 +57,11 @@ export class RecurrentsService {
 
     return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents`);
   
+    }
+
+    public getByPropertyID(id){
+
+      return this._http.get<any[]>(`${environment.URL}/api/recurrents/get-by-property/${id}`)
     }
 
   public patchStatus(id_property, recurrentStatus){

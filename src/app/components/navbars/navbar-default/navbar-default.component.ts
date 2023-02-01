@@ -22,9 +22,11 @@ export class NavbarDefaultComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+
     this.setUser(await this._userStorage.getUser());
-    //TODO:
+
   }
+ 
 
   protected navigate(url: string): void {
     this.router.navigate([url]);

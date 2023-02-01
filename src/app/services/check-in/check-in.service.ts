@@ -57,7 +57,7 @@ export class CheckInService {
     })
   }
 
-  async createCheckInFromOwner(name: string, lastname: string, dni: any, income_date: any, id_owner: any){
+  async createCheckInFromOwner(name: string, lastname: string, dni: any, income_date: any, id_owner: any, id_country: any){
     const formData = new FormData();
     formData.append('guest_name', name);
     formData.append('guest_lastname', lastname);
@@ -65,6 +65,7 @@ export class CheckInService {
     formData.append('income_date', income_date);
     formData.append('id_owner', id_owner);
     formData.append('confirmed_by_owner', 'true');
+    formData.append('id_country', id_country);
 
     await this._alertService.setLoading();
 
@@ -72,8 +73,11 @@ export class CheckInService {
       console.log(res)
 
       await this._alertService.removeLoading();
+      var getUrl = window.location;
+      var baseUrl = getUrl.protocol + "//" + getUrl.host;
+      window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab1`
       this._alertService.showAlert("¡Listo!", "El Check-in fue realizado con exito");
-      this._router.navigate(['/home/tabs/tab1']);
+      this._socketService.notificarNuevoConfirmedByOwner(res)
     })
 
   }
@@ -93,9 +97,8 @@ export class CheckInService {
 
   // filtrar por country, no se verifica campo del country en checkin Model
 
-getAllCheckInConfirmedByOwner(){
-  return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/confirmed`)
-
+getAllCheckInConfirmedByOwner(id_country){
+  return this._http.get<CheckInOrOut[]>(`${environment.URL}/api/checkin/confirmed/${id_country}`)
 }
 
 getAllRegisters(id){

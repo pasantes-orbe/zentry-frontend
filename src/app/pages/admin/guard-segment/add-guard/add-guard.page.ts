@@ -65,7 +65,7 @@ export class AddGuardPage implements OnInit {
     return this.formBuilder.group({
       vigilatorName: ['', [Validators.required, Validators.minLength(3)]],
       vigilatorLastname:['', [Validators.required, Validators.minLength(5)]],
-      vigilatorDNI:['',[Validators.required, Validators.max(99999999)]],
+      vigilatorDNI:['',[Validators.required, Validators.min(1000000),Validators.max(100000000)]],
       vigilatorEmail: ['', [Validators.required, Validators.pattern(this._emailHelperService.getEmailPattern())]],
       vigilatorPassword: ['', [Validators.required, Validators.minLength(4)]],
       vigilatorPhone: ['', [Validators.required, Validators.max(10000000000)]],

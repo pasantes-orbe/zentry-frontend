@@ -29,6 +29,7 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   private user_lastname;
   private countryID;
   public myTimer;
+  public recurrentsState : boolean = false;
 
   constructor(
     private alertController: AlertController,
@@ -90,9 +91,9 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
       });
       
       this.myTimer = window.setInterval( () => {
-      navigator.geolocation.getCurrentPosition(resp => {
-        this._intervalStorageService.saveInterval_id(this.myTimer)
+      navigator.geolocation.getCurrentPosition(async resp => {
         console.log("Este es el id del Interval: ",this.myTimer)
+        console.log(await this._intervalStorageService.getInterval_id());
         const { latitude, longitude } = resp.coords;
         console.log(latitude, longitude);
 
@@ -111,8 +112,12 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
         },
         err => {
         });
-    }, 8000 )
-    
+    }, 500 )
+
+    console.log("DESPUES DE INTERVALo");
+
+    console.log(this._intervalStorageService.saveInterval_id(this.myTimer)); 
+    console.log(this.myTimer);
   }
 
   ionViewDidLeave(){
@@ -128,13 +133,11 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
   ionViewWillLeave() {
   }
 
-  
 
 
-
-
-
-
+  viewRecurrents(){
+    this.recurrentsState = !this.recurrentsState
+  }
 getPosition(): Promise<any>
   {
     return new Promise((resolve, reject) => {

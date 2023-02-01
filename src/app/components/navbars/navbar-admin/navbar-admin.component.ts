@@ -24,6 +24,7 @@ export class NavbarAdminComponent implements OnInit {
 
   async ngOnInit() {
     this.countryName =  await (await this._countryStorage.getCountry()).name;
+
     this.setUser(await this._userStorage.getUser());
     console.log("A", await this._userStorage.getUser());
 

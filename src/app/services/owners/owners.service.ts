@@ -62,7 +62,7 @@ export class OwnersService {
       async (err) => {
         console.log(err);
         await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+        this._alertService.showAlert("¡Ooops!", `${err['error']['msg']}`);
         this._router.navigate([`/admin/ver-propietarios`]);
     }
     )

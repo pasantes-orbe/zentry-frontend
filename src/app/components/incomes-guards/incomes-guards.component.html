@@ -1,7 +1,7 @@
 <div>
   <ion-row>
     <ion-col size="4" style="margin-top: 19px">INGRESOS</ion-col>
-    <ion-col size="8"><ion-searchbar animated="true" placeholder="Buscar ingresos..."></ion-searchbar></ion-col>
+    <ion-col size="8"><ion-searchbar  animated="true" placeholder="Buscar ingresos..."></ion-searchbar></ion-col>
   </ion-row>
   <div class="table-responsive container">
 
@@ -16,7 +16,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let check of checkIn; let i = index">
+      <tr *ngFor="let check of checkIn ; let i = index">
         <th scope="row">
           <ion-button (click)="checkInSelected(check, i)" fill="clear" shape="round">
             <ion-icon

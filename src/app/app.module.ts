@@ -7,16 +7,18 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import {OneSignal} from '@ionic-native/onesignal/ngx' ;
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SortPipe } from './pipes/sort.pipe';
-
 import localeEsAr from '@angular/common/locales/es-AR';
-
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { Ng2SearchPipe } from 'ng2-search-filter';
 
 registerLocaleData(localeEsAr, 'es-Ar');
+
 
 
 @NgModule({
@@ -27,6 +29,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
     ReactiveFormsModule,
     BrowserModule,
     IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
     AppRoutingModule,
     
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -35,7 +38,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
   // or after 30 seconds (whichever comes first).
   registrationStrategy: 'registerWhenStable:30000'
 })],
-  providers: [{ provide: LOCALE_ID, useValue: 'es-Ar' }, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [OneSignal, { provide: LOCALE_ID, useValue: 'es-Ar' }, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

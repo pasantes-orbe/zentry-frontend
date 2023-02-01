@@ -4,6 +4,15 @@
 
   <app-incomes-guards #incomes></app-incomes-guards>
 
-  {{lat}} {{lng}}
+  <ion-button class="ion-margin-top" (click)="viewRecurrents()" expand="block" fill="clear" shape="round">
+    Ver Recurrentes 
+    <ion-icon *ngIf="recurrentsState" name="chevron-down-outline"></ion-icon> 
+    <ion-icon *ngIf="!recurrentsState" name="chevron-forward-outline"></ion-icon>
+  </ion-button>
+
+  <div *ngIf="recurrentsState" >
+    <app-recurrents-view-all [readOnly]="true" role="guard" #recurrents ></app-recurrents-view-all>
+  </div>
+
 
 </ion-content>

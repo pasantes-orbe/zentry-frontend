@@ -30,14 +30,12 @@ export class EditPage implements OnInit {
     const user = await  this._userStorage.getUser()
 
     this.user = user
-    this._userService.getUserByID(user.id).subscribe( user =>
-      this.user = user
-    )
     this.form.controls['name'].setValue(user.name);
     this.form.controls['lastname'].setValue(user.lastname);
     this.form.controls['phone'].setValue(user.phone);
     this.form.controls['birthday'].setValue(user.birthday);
     this.form.controls['email'].setValue(user.email);
+
 
   }
   ionViewWillEnter() {
@@ -63,7 +61,9 @@ export class EditPage implements OnInit {
                                   this.form.get('birthday').value,
                                   this.form.get('email').value,
                                   this.form.get('phone').value)
-  }
+
+
+                                }
 
   getDate(event){
     

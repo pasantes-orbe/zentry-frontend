@@ -81,6 +81,9 @@ export class CheckinPage implements OnInit {
   setObservations(e){
     this.getIncomeData().observations = e.detail.value;
   }
+  changePatent(e){
+    this.getIncomeData().patent = e.detail.value
+  }
 
   public setOwner(e){
     console.log(e.detail.value)

@@ -28,7 +28,7 @@
         <td *ngIf="reservation.status === 'pendiente'"><ion-badge color="warning">Pendiente</ion-badge></td>
         <td>{{reservation.date | date: 'dd/MM/yyyy hh:mm'}}</td>
         <td class="text-center">{{reservation.amenity.name}}</td>
-        <td> {{reservation.user.name}} </td>
+        <td> {{reservation.user.name}} - {{reservation.user.lastname}}  </td>
         
       </tr>
       

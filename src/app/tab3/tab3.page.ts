@@ -20,7 +20,7 @@ export class Tab3Page implements OnInit{
   private userID;
   protected owner: OwnerResponse;
   private socket: Socket;
-
+  private recurrentsState: boolean = false;
 
   @ViewChild('incomesComponent') incomesComponent;
   
@@ -62,5 +62,7 @@ export class Tab3Page implements OnInit{
     this.socket.emit('owner-connected', (this.userID))
   }
 
-
+  viewRecurrents(){
+    this.recurrentsState = !this.recurrentsState
+  }
 }

@@ -37,7 +37,7 @@ export class AddRecurrentPage implements OnInit {
     return this.formBuilder.group({
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
-      dni: ['', [Validators.required,Validators.max(99999999)]],
+      dni: ['', [Validators.required, Validators.min(1000000),Validators.max(100000000)]],
       property: ['', [Validators.required]],
     })
   }
@@ -54,8 +54,9 @@ export class AddRecurrentPage implements OnInit {
      this._recurrentsService.addRecurrent( this.getForm().get('property').value,
                                            this.getForm().get('name').value,
                                            this.getForm().get('lastname').value,
-                                           this.getForm().get('dni').value)
-                                           this._router.navigate([`/admin/invitados-recurrentes`]);
+                                           this.getForm().get('dni').value,
+                                           "admin");
+                                           
             }
 
 }

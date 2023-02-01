@@ -1,0 +1,42 @@
+
+  <div class="text-center" *ngIf="readOnly == false && role == 'admin' ">
+    <ion-button class="top-button" routerLink="/admin/invitados-recurrentes/add-recurrent" expand="block">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Nuevo Invitado Recurrente
+    </ion-button>
+  </div>
+
+  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre o N° de propiedad"></ion-searchbar>
+  <div class="table-responsive container">
+  <table class="table text-center">
+    <thead>
+      <tr>
+        <th scope="col">DNI</th>
+        <th scope="col">Apellido</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Autorizado</th>
+        <th *ngIf="role != 'owner' " scope="col">Prop N°</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let recurrent of recurrents | filter: searchKey | sort:['guest_lastname','','1']; let i = index">
+        <td> {{recurrent.dni}} </td>
+        <td class="text-center">{{recurrent.guest_lastname}}</td>
+        <td>{{recurrent.guest_name}}</td>
+        <td *ngIf="readOnly == false">
+          <ion-toggle  slot="end" [checked]="recurrent.status" (click)="cambiarStatus(recurrent, i)"></ion-toggle>
+        </td>
+        <td *ngIf="readOnly == true">
+          <ion-badge *ngIf="recurrent.status === true" color="success" mode="ios">SI</ion-badge>
+          <ion-badge *ngIf="recurrent.status === false" color="danger" mode="ios">NO</ion-badge>
+        </td>
+        <td *ngIf="role != 'owner' ">
+          {{recurrent.property.number}}
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+

@@ -18,8 +18,7 @@ import { SortPipe } from 'src/app/pipes/sort.pipe';
     IonicModule,
     CountryRecurrentsPageRoutingModule,
     ComponentsModule,
-    Ng2SearchPipeModule,
   ],
-  declarations: [CountryRecurrentsPage, SortPipe]
+  declarations: [CountryRecurrentsPage]
 })
 export class CountryRecurrentsPageModule {}

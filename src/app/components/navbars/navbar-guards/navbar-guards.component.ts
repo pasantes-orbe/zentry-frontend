@@ -35,15 +35,17 @@ export class NavbarGuardsComponent implements OnInit {
   }
 
   ionViewWillEnter(){
-    this.ngOnInit()
+
   }
 
   async signOut(){
     const user = this.getUser()
     const timerID = await this._intervalStorageService.getInterval_id()
-    console.log(timerID)
-    window.clearInterval(timerID)
     await this._intervalStorageService.remove()
+    console.log(timerID)
+    console.log(window);
+    console.log(window.clearInterval);
+    window.clearInterval(timerID);
     this._socketService.disconnectGuardUbication(user.id)
     this._userStorage.signOut()
     this._countryStorage.signOut() 

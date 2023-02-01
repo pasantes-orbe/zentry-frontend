@@ -32,15 +32,16 @@ export class ReservationsService {
 
     this._http.post(`${environment.URL}/api/reservations`, formData).subscribe(async (res) => {
       console.log(res);
-     await this._alertService.removeLoading();
+      await this._alertService.removeLoading();
       this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
-      this._router.navigate([`/home/tabs/tab1`]);
+      var getUrl = window.location;
+      var baseUrl = getUrl.protocol + "//" + getUrl.host;
+      window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab3`
 },
     async (err) => {
     console.log(err);
     await this._alertService.removeLoading();
-    this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-    this._router.navigate([`/home/tabs/tab1`]);
+    this._alertService.showAlert("¡Ooops!", `${err['error']['msg']}`);
 })
 
    }

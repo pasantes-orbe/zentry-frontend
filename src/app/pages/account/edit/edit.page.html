@@ -42,7 +42,7 @@
                         </ng-template>
                     </ion-modal>
 
-                    <ion-button class="mt-4 mb-4" expand="block" size="large" color="primary" shape="round" type="submit">
+                    <ion-button [disabled]="this.getForm().pristine" class="mt-4 mb-4" expand="block" size="large" color="primary" shape="round" type="submit">
                         <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
                         Guardar
                     </ion-button>

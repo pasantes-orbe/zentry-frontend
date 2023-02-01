@@ -46,7 +46,11 @@ export class NewIncomePage implements OnInit {
     console.log(
       this.getForm().get('isRecurrent').value
     )
+
     const owner = await this._ownerStorage.getOwner()
+    const ownerID = owner.user.id;
+    const id_country = owner.property.id_country
+
     if(this.getForm().get('isRecurrent').value == true){
       const propertyID = owner.property.id
       this._recurrentsService.addRecurrent(
@@ -54,19 +58,21 @@ export class NewIncomePage implements OnInit {
         this.getForm().get('name').value,
         this.getForm().get('lastname').value,
         this.getForm().get('DNI').value,
+        "owner"
       )
-      this._router.navigate([`/login`]);
+      ;
 
 
 
     } else {
-      const ownerID = owner.user.id;
+      
       this._checkInService.createCheckInFromOwner(
         this.getForm().get('name').value,
         this.getForm().get('lastname').value,
         this.getForm().get('DNI').value,
         this.getForm().get('date').value,
-        ownerID
+        ownerID,
+        id_country
       )
     }
 

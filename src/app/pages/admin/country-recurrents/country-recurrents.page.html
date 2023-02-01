@@ -1,40 +1,7 @@
 <app-navbar-back title="Panel de Administración"></app-navbar-back>
 
-
-
 <ion-content>
 
-  <div class="text-center">
-    <ion-button class="top-button" routerLink="/admin/invitados-recurrentes/add-recurrent" expand="block">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Nuevo Invitado Recurrente
-    </ion-button>
-  </div>
-
-  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre o N° de propiedad"></ion-searchbar>
-
-  <table class="table text-center">
-    <thead>
-      <tr>
-        <th scope="col">Apellido</th>
-        <th scope="col">Nombre</th>
-        <th scope="col">Propiedad N°</th>
-        <th scope="col">Autorizado</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let recurrent of recurrents | filter: searchKey | sort:['guest_lastname','','1']; let i = index">
-        <td class="text-center">{{recurrent.guest_lastname}}</td>
-        <td>{{recurrent.guest_name}}</td>
-        <td>
-          {{recurrent.property.id}}
-        </td>
-        <td>
-          <ion-toggle slot="end" [checked]="recurrent.status" (click)="cambiarStatus(recurrent, i)"></ion-toggle>
-        </td>
-      </tr>
-      
-    </tbody>
-  </table>
+  <app-recurrents-view-all [readOnly]="false" role="admin" #recurrents ></app-recurrents-view-all>
 
 </ion-content>

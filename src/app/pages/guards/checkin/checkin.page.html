@@ -64,7 +64,7 @@
 
     <ion-item *ngIf="getIncomeData().transport != '' && (getIncomeData().transport != 'Bicicleta' && getIncomeData().transport != 'A pie')">
       <ion-label position="floating">Patente</ion-label>
-      <ion-input [(ngModel)]="getIncomeData().patent" formControlName="patent" required type="text"></ion-input>
+      <ion-input (ionChange)="changePatent($event)" required type="text"></ion-input>
     </ion-item>
 
     <ion-item>

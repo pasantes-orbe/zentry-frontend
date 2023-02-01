@@ -29,7 +29,7 @@ export class Tab1Page implements OnInit{
   protected owner: OwnerResponse;
 
 
-  @ViewChild('reservationsComponent') reservationsComponent;
+  @ViewChild('reservationsComponent') reservationsComponent: ReservationsComponent;
 
   constructor(
     private menu: MenuController,
@@ -44,23 +44,23 @@ export class Tab1Page implements OnInit{
     this.setLoading(true);
     this.getData();
 
-
-    this.presentAlert();  
-
   }
 
   async ngOnInit() {
+
     const user = await this._userStorageService.getUser()
+
     this.userID = user.id;
+    
     this._ownersService.getByID(this.userID).subscribe((owner) => {
       this.owner = owner
       this._ownerStorageService.saveOwner(owner)
     })
   }
     
-  ionViewWillEnter(){
-    this.reservationsComponent.ngOnInit()
-
+  async ionViewWillEnter(){
+    console.log("IVIWILL DESDE PADRE");
+    await this.reservationsComponent.ngOnInit()
   }
 
   ionViewDidEnter() {
@@ -68,52 +68,6 @@ export class Tab1Page implements OnInit{
 
   
 
-  async presentAlert(){
-    const alert = await this.alertController.create({
-      header: 'Solicitud de Ingreso',
-      message: 'Chicala, Alejandro <br> Ingreso 22/08/2019 Hora 10:23 <br> Salida 22/08/2019 Hora 18:00',
-      backdropDismiss: false,
-      buttons: [        
-        {
-          text: 'Autorizar',
-          role: 'confirm',
-          handler: () => {
-            console.log("Autorizado");
-            this.presentAlert2();
-          },
-        },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log("Cancelled");
-            this.presentAlert2();
-          },
-        }
-      ],
-    });
-
-    await alert.present();
-    
-  }
-
-  async presentAlert2(){
-    const alert = await this.alertController.create({
-      header: 'Reservas',
-      message: 'Estado: Confirmado <br> Evento: "Casamiento Juan" <br> Fecha 22/08/2019 Hora 18:00',
-      backdropDismiss: false,
-      buttons: [        
-        {
-          text: 'Ok',
-          role: 'confirm',
-        }
-      ],
-    });
-
-    await alert.present();
-  }
-
- 
 
   protected doRefresh(event){
     console.log(event);

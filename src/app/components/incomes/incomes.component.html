@@ -21,7 +21,8 @@
         <td>{{check.guest_name}}</td>
         <td>{{check.income_date | date : 'shortDate' }}</td>
         <td>{{check.income_date | date : 'shortTime' }}</td>
-        <td>Propietario</td>
+        <td *ngIf="check.id_guard"> {{check.guard.name}} {{check.guard.lastname}} <ion-icon color="tertiary" name="lock-closed-outline"></ion-icon> </td>
+        <td *ngIf="!check.id_guard"> {{check.owner.name}} {{check.owner.lastname}} <ion-icon color="primary" name="person-circle-outline"></ion-icon></td>
       </tr>
       <tr>
       

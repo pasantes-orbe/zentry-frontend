@@ -4,6 +4,7 @@ import { CheckInService } from 'src/app/services/check-in/check-in.service';
 import { CheckInOrOut } from '../../interfaces/checkInOrOut-interface';
 import { AlertController } from '@ionic/angular';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
 
 @Component({
@@ -14,15 +15,17 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
 export class IncomesGuardsComponent implements OnInit {
 
   protected checkIn: CheckInOrOut[] 
-
-  constructor(private _checkInService: CheckInService, protected alertController: AlertController, protected _socketService: WebSocketService) { 
+  protected id_country
+  constructor(private _checkInService: CheckInService, private _countryStorage:CountryStorageService, protected alertController: AlertController, protected _socketService: WebSocketService) { 
   }
 
-  ngOnInit() {
-    this._checkInService.getAllCheckInConfirmedByOwner().subscribe(res =>{
+  async ngOnInit() {
+    const country = await this._countryStorage.getCountry()
+    this.id_country = country.id
+    this._checkInService.getAllCheckInConfirmedByOwner(this.id_country).subscribe(res =>{
       console.log(res),
       this.checkIn = res
-    }
+      }
     )  
     
   }
@@ -58,7 +61,7 @@ export class IncomesGuardsComponent implements OnInit {
 
   actualizarListaCheckIn(){
     setTimeout(() => {
-      this._checkInService.getAllCheckInConfirmedByOwner().subscribe(
+      this._checkInService.getAllCheckInConfirmedByOwner(this.id_country).subscribe(
         res =>{
           console.log(res),
           this.checkIn = res
