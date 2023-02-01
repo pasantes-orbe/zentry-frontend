@@ -13,6 +13,7 @@ import { IntervalStorageService } from 'src/app/services/storage/interval-storag
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { Storage } from '@ionic/storage';
+import { PushService } from 'src/app/services/pushNotifications/push.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -39,7 +40,8 @@ export class LoginPage implements OnInit {
     private _intervalStorageService: IntervalStorageService,
     private _countryStorageService: CountryStorageService,
     private _redirectService: RedirectService,
-    private _webSocketService: WebSocketService
+    private _webSocketService: WebSocketService,
+    private _pushService: PushService
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -83,9 +85,10 @@ export class LoginPage implements OnInit {
           console.log(data['user'])
           this._userStorage.saveUser(data['user']);
 
-          
+          this._pushService.setOneSignalID(data['user']['id'])
 
           const { name } = data['user'].role;
+          this._pushService.setTagToExternalId(data['user']['id'], name)
 
           if(name === 'vigilador'){
             this._guardsService.getGuardByCountryId(data['user']['id']).subscribe(data => {
