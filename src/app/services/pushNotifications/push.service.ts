@@ -55,12 +55,22 @@ export class PushService {
 
   setOneSignalID(id){
 
-      OneSignal.setExternalUserId("10", (results) => {
+      OneSignal.setExternalUserId(id, (results) => {
       // The results will contain push and email success statuses
       console.log('Results of setting external user id');
       console.log(results);
 
   })
+
+    }
+
+    removeOneSignalID(){
+      OneSignal.removeExternalUserId((results) => {
+        // The results will contain push and email success statuses
+        console.log('Results of removing external user id');
+        console.log(results); 
+
+      })
 
 
     }
@@ -70,19 +80,10 @@ export class PushService {
     setTagToExternalId(id, role){
 
 
-      const external_id = String(id)
-      console.log("ESTOS SON LOS DATOS QUE SE ENVIAN AL ENDPOINT",external_id, role);
 
       this._http.put(`${environment.URL}/api/notifications/send_to_segment/${role}`, {
-        external_user_id: "10"
-      }).subscribe(
-        res => {
-          console.log(res);
-        },
-        fail => {
-          console.log(fail);
-        }
-        )
+        external_user_id: id
+      })
 
     }
 

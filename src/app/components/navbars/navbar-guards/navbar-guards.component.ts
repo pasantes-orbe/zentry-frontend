@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core/types/global';
 import { MenuController } from '@ionic/angular';
 import { NavigationService } from 'src/app/helpers/navigation.service';
 import { UserInterface } from 'src/app/interfaces/user-interface';
+import { PushService } from 'src/app/services/pushNotifications/push.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
@@ -24,7 +26,8 @@ export class NavbarGuardsComponent implements OnInit {
     private menu: MenuController,
     private _socketService: WebSocketService,
     protected _countryStorage: CountryStorageService,
-    protected _intervalStorageService: IntervalStorageService
+    protected _intervalStorageService: IntervalStorageService,
+    private _pushService: PushService
     ) { }
 
   async ngOnInit() {
@@ -52,7 +55,10 @@ export class NavbarGuardsComponent implements OnInit {
     window.clearInterval(timerID);
     this._socketService.disconnectGuardUbication(user.id)
     this._userStorage.signOut()
-    this._countryStorage.signOut()  
+    this._countryStorage.signOut()
+    if (Capacitor.getPlatform() == 'android') {
+      this._pushService.removeOneSignalID()  
+    }
   }
 
   protected navigate(url: string): void {
