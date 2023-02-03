@@ -11,8 +11,16 @@ export class RedirectService {
   ) { }
 
   public redirectByRole(role: string){
-    if(role == "propietario") this._router.navigate(['/home']);
-    if(role == "vigilador") this._router.navigate(['/vigiladores/home']);
-    if(role == "administrador") this._router.navigate(['/admin/home']);
+
+    var getUrl = window.location;
+    var baseUrl = getUrl .protocol + "//" + getUrl.host;
+    
+    //TODO: VER SI FUNCIONA BIEN EN EL APK
+    window.location.href = `${getUrl .protocol + "//" + getUrl.host}/menu/home`;
+
+
+    if(role == "propietario") window.location.href = `${getUrl .protocol + "//" + getUrl.host}/home`;
+    if(role == "vigilador") window.location.href = `${getUrl .protocol + "//" + getUrl.host}/vigiladores/home`; 
+    if(role == "administrador") window.location.href = `${getUrl .protocol + "//" + getUrl.host}/admin/home`;
   }
 }

@@ -124,6 +124,9 @@ export class AuthorizationsPage implements OnInit{
     console.log(this.myTimer);
   }
 
+  // async ionViewWillEnter() {
+  //   await this.ngOnInit();
+  // }
 
 
   viewRecurrents(){

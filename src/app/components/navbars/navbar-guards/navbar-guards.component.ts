@@ -32,6 +32,10 @@ export class NavbarGuardsComponent implements OnInit {
     this.countryName = country.name
     console.log(country.name)
     this.setUser(await this._userStorage.getUser());
+
+    const timerID = await this._intervalStorageService.getInterval_id()
+    console.log(timerID);
+
   }
 
   ionViewWillEnter(){
@@ -45,10 +49,10 @@ export class NavbarGuardsComponent implements OnInit {
     console.log("ID DE INTERVAAAALO", timerID); 
 
     await this._intervalStorageService.remove()
-    window.clearInterval(+timerID);
+    window.clearInterval(timerID);
     this._socketService.disconnectGuardUbication(user.id)
     this._userStorage.signOut()
-    this._countryStorage.signOut() 
+    this._countryStorage.signOut()  
   }
 
   protected navigate(url: string): void {
