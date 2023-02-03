@@ -55,7 +55,7 @@ export class PushService {
 
   setOneSignalID(id){
 
-    OneSignal.setExternalUserId(id, (results) => {
+      OneSignal.setExternalUserId(id, (results) => {
       // The results will contain push and email success statuses
       console.log('Results of setting external user id');
       console.log(results);

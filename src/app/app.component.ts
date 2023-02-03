@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
 import { PushService } from './services/pushNotifications/push.service';
 
@@ -7,6 +8,7 @@ import { PushService } from './services/pushNotifications/push.service';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
+
 export class AppComponent {
   constructor(
     private platform: Platform,
@@ -17,7 +19,9 @@ export class AppComponent {
 
   initializeApp(){
     this.platform.ready().then(() =>{
-      this.pushService.initialConfiguration()
+      if (Capacitor.getPlatform() == 'android') {
+        this.pushService.initialConfiguration()
+      }
     })
 
   }

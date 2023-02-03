@@ -100,7 +100,7 @@ export class CountryMapComponent implements AfterViewInit {
   public setTileLayer(url: any): void {
     this.tileLayer = L.tileLayer(url,
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: ''
       });
   }
 
@@ -109,9 +109,11 @@ export class CountryMapComponent implements AfterViewInit {
 
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     if(prefersDark.matches){
-      this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
+      // this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
+      this.setTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
     } else {
-      this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png');
+      // this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png');
+      this.setTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
     }
 
 

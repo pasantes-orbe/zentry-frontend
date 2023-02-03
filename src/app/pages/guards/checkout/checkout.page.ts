@@ -51,7 +51,6 @@ export class CheckoutPage implements OnInit {
             console.log("CHECKOUT CONFIRMADO..", data)
             this._checkOutService.createCheckout(e.id, data)
             this._checkInService.updateCheckOutTrue(e.id)
-            this.socket.emit("notificar-nuevo-confirmedByOwner", "Actualizar Lista")
             this.checkOutList.splice(index,1)
           }
         }, 'Cancelar'],

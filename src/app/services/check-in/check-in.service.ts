@@ -121,11 +121,15 @@ getAllCheckoutFalse(){
 }
 
 updateCheckInTrue(id:any){
-  this._http.patch(`${environment.URL}/api/checkin/${id}`, {}).subscribe(res => console.log(res))
+  this._http.patch(`${environment.URL}/api/checkin/${id}`, {}).subscribe(res => {
+    this._socketService.notificarNuevoConfirmedByOwner(res)
+  })
 }
 
 updateCheckOutTrue(id:any){
-  this._http.patch(`${environment.URL}/api/checkin/checkout/${id}`, {}).subscribe(res => console.log(res))
+  this._http.patch(`${environment.URL}/api/checkin/checkout/${id}`, {}).subscribe(res => {
+    this._socketService.notificarNuevoConfirmedByOwner(res['update'])
+  })
 }
 
 

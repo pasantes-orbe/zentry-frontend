@@ -14,6 +14,7 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { Storage } from '@ionic/storage';
 import { PushService } from 'src/app/services/pushNotifications/push.service';
+import { Capacitor } from '@capacitor/core';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -85,10 +86,15 @@ export class LoginPage implements OnInit {
           console.log(data['user'])
           this._userStorage.saveUser(data['user']);
 
-          this._pushService.setOneSignalID(data['user']['id'])
 
           const { name } = data['user'].role;
-          this._pushService.setTagToExternalId(data['user']['id'], name)
+
+          console.log("Esta es la plataforma", Capacitor.getPlatform());
+
+          if (Capacitor.getPlatform() === 'android') {
+            this._pushService.setOneSignalID(data['user']['id']) // Si estoy en un android seteeo el id y le asigno el rol
+            this._pushService.setTagToExternalId(data['user']['id'], name)
+          }
 
           if(name === 'vigilador'){
             this._guardsService.getGuardByCountryId(data['user']['id']).subscribe(data => {
