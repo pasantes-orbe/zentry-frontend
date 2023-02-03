@@ -92,7 +92,9 @@ export class LoginPage implements OnInit {
           console.log("Esta es la plataforma", Capacitor.getPlatform());
 
           if (Capacitor.getPlatform() === 'android') {
-            this._pushService.setOneSignalID(data['user']['id']) // Si estoy en un android seteeo el id y le asigno el rol
+            
+            this._pushService.setOneSignalID(data['user']['id'])  
+                    // Si estoy en un android seteeo el id y le asigno el rol
             this._pushService.setTagToExternalId(data['user']['id'], name)
           }
 

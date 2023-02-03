@@ -16,7 +16,7 @@ import { IntervalStorageService } from 'src/app/services/storage/interval-storag
   templateUrl: './authorizations.page.html',
   styleUrls: ['./authorizations.page.scss'],
 })
-export class AuthorizationsPage implements OnInit, AfterViewInit {
+export class AuthorizationsPage implements OnInit{
 
   @ViewChild('incomes') incomes;
   @ViewChild('navBarGuards') navBarGuards;
@@ -53,9 +53,7 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
     this.user_lastname = user.lastname;
     
 
-    this.navBarGuards.ngOnInit()  
-
-   
+    this.navBarGuards.ngOnInit();
 
     this._socketService.escucharNotificacionesAntipanico()
 
@@ -111,26 +109,19 @@ export class AuthorizationsPage implements OnInit, AfterViewInit {
 
         },
         err => {
+          console.log(err);
         });
     }, 500 )
 
+    // setTimeout(() => {
+    //   clearInterval(this.myTimer);
+    // }, 8000);
+
+
     console.log("DESPUES DE INTERVALo");
 
-    console.log(this._intervalStorageService.saveInterval_id(this.myTimer)); 
+    console.log(this._intervalStorageService.saveInterval_id( String(this.myTimer) )); 
     console.log(this.myTimer);
-  }
-
-  ionViewDidLeave(){
-
-  }
-
-  ngAfterViewInit(): void {    
-  }
-
-  ionViewWillEnter(){
-  }
-
-  ionViewWillLeave() {
   }
 
 

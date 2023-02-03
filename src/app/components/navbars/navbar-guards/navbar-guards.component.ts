@@ -41,11 +41,11 @@ export class NavbarGuardsComponent implements OnInit {
   async signOut(){
     const user = this.getUser()
     const timerID = await this._intervalStorageService.getInterval_id()
+
+    console.log("ID DE INTERVAAAALO", timerID); 
+
     await this._intervalStorageService.remove()
-    console.log(timerID)
-    console.log(window);
-    console.log(window.clearInterval);
-    window.clearInterval(timerID);
+    window.clearInterval(+timerID);
     this._socketService.disconnectGuardUbication(user.id)
     this._userStorage.signOut()
     this._countryStorage.signOut() 
