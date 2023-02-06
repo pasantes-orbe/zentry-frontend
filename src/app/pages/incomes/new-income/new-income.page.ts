@@ -4,6 +4,7 @@ import { CheckInService } from '../../../services/check-in/check-in.service';
 import { RecurrentsService } from '../../../services/recurrents/recurrents.service';
 import { OwnerStorageService } from '../../../services/storage/owner-interface-storage.service';
 import { Router } from '@angular/router';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-new-income',
@@ -24,6 +25,10 @@ export class NewIncomePage implements OnInit {
   }
 
   async ngOnInit() {
+    const now = new Date();
+    const nowFormatted = moment(now).format("YYYY-MM-DDThh:mm:ss-03:00");
+    this.form.controls['date'].setValue(nowFormatted);
+
   }
 
 
@@ -33,7 +38,7 @@ export class NewIncomePage implements OnInit {
       lastname: ['', [Validators.required]],
       DNI: ['', [Validators.required]],
       isRecurrent: [true, [Validators.required]],
-      date: [''],
+      date: ['', ]
     })
   }
   

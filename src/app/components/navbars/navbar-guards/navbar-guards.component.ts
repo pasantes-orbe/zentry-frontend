@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Capacitor } from '@capacitor/core/types/global';
+import { Capacitor } from '@capacitor/core';
 import { MenuController } from '@ionic/angular';
 import { NavigationService } from 'src/app/helpers/navigation.service';
 import { UserInterface } from 'src/app/interfaces/user-interface';
