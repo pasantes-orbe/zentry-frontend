@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { MenuController } from '@ionic/angular';
 import { NavigationService } from 'src/app/helpers/navigation.service';
 import { UserInterface } from 'src/app/interfaces/user-interface';
+import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { PushService } from 'src/app/services/pushNotifications/push.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
@@ -18,8 +19,11 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
 export class NavbarGuardsComponent implements OnInit {
 
   protected user: UserInterface;
+  protected notifications : any[];
+  protected id_user;
   public countryName: string = "";
-  
+  public dropdownState: boolean = false
+
   constructor(
     private router: Router,
     protected _userStorage: UserStorageService,
@@ -27,14 +31,28 @@ export class NavbarGuardsComponent implements OnInit {
     private _socketService: WebSocketService,
     protected _countryStorage: CountryStorageService,
     protected _intervalStorageService: IntervalStorageService,
-    private _pushService: PushService
+    private _pushService: PushService,
+    private _notificationService: NotificationsService
     ) { }
 
   async ngOnInit() {
     const country = await this._countryStorage.getCountry()
     this.countryName = country.name
     console.log(country.name)
+  
     this.setUser(await this._userStorage.getUser());
+
+    this.id_user = await (await this._userStorage.getUser()).id;
+
+    this._notificationService.getAllByUser(this.id_user).subscribe(
+      res => {
+        console.log(res);
+        console.log(res.slice((res.length - 5), (res.length)));
+
+        // this.notifications = res
+          this.notifications = res.slice((res.length - 5), (res.length))
+       }
+      )
 
     const timerID = await this._intervalStorageService.getInterval_id()
     console.log(timerID);
@@ -42,7 +60,7 @@ export class NavbarGuardsComponent implements OnInit {
   }
 
   ionViewWillEnter(){
-
+    console.log("ASDFASDF");
   }
 
   async signOut(){
@@ -88,5 +106,24 @@ export class NavbarGuardsComponent implements OnInit {
     this.user = user;
   }
 
+  public dropdown(){
+    console.log("DropdownActivado");
+    this.dropdownState = !this.dropdownState
+  }
+  
+  public deleteNotification(noti, i){
+    console.log("Eliminado", noti, i);
+    this.notifications.splice(i,1)
+  }
+
+  public updateNotifications(){
+
+    this._notificationService.getAllByUser(this.id_user).subscribe(
+      res => {
+        console.log(res);
+        this.notifications = res
+      }
+      )
+  }
 
 }

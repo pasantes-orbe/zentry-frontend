@@ -10,6 +10,7 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { GuardsService } from 'src/app/services/guards/guards.service';
 import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
+import { NavbarGuardsComponent } from 'src/app/components/navbars/navbar-guards/navbar-guards.component';
 
 @Component({
   selector: 'app-authorizations',
@@ -19,7 +20,6 @@ import { IntervalStorageService } from 'src/app/services/storage/interval-storag
 export class AuthorizationsPage implements OnInit{
 
   @ViewChild('incomes') incomes;
-  @ViewChild('navBarGuards') navBarGuards;
   private socket: Socket;
 
   public lat;
@@ -45,6 +45,7 @@ export class AuthorizationsPage implements OnInit{
 
   async ngOnInit() {
 
+    
     const user = await this._userStorage.getUser()
     const country = await this._countryStorageService.getCountry()
     this.countryID = country.id;
@@ -53,14 +54,12 @@ export class AuthorizationsPage implements OnInit{
     this.user_lastname = user.lastname;
     
 
-    this.navBarGuards.ngOnInit();
 
     this._socketService.escucharNotificacionesAntipanico()
 
-    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
-        console.log(payload);
+    this.socket.on('notificacion-nuevo-confirmedByOwner', async(payload) =>{
+        console.log("SDFASDF",payload);
         this.incomes.actualizarListaCheckIn()
-      
     })
    
     navigator.geolocation.getCurrentPosition(resp => {
@@ -90,11 +89,8 @@ export class AuthorizationsPage implements OnInit{
       
       this.myTimer = window.setInterval( () => {
       navigator.geolocation.getCurrentPosition(async resp => {
-        console.log("Este es el id del Interval: ",this.myTimer)
-        console.log(await this._intervalStorageService.getInterval_id());
         const { latitude, longitude } = resp.coords;
-        console.log(latitude, longitude);
-
+        
         this.lat = latitude;
         this.lng = longitude;
         const payload ={

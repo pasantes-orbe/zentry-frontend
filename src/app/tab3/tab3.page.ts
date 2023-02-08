@@ -8,6 +8,7 @@ import { OwnersService } from '../services/owners/owners.service';
 import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
 import { AlertService } from '../services/helpers/alert.service';
 import { WebSocketService } from '../services/websocket/web-socket.service';
+import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
 
 @Component({
   selector: 'app-tab3',
@@ -21,6 +22,7 @@ export class Tab3Page implements OnInit{
   protected owner: OwnerResponse;
   private socket: Socket;
   private recurrentsState: boolean = false;
+
 
   @ViewChild('incomesComponent') incomesComponent;
   

@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { io, Socket } from 'socket.io-client'; 
+import { environment } from 'src/environments/environment';
+import { NavbarGuardsComponent } from 'src/app/components/navbars/navbar-guards/navbar-guards.component';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +11,25 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomePage implements OnInit {
 
-  constructor() { }
+  private socket: Socket;
+  @ViewChild('navbar') navbar : NavbarGuardsComponent
+
+  constructor() {
+    this.socket = io(environment.URL)
+   }
 
   ngOnInit() {
+
+    this.socket.on('notificacion-nuevo-confirmedByOwner', async (payload) =>{
+        await this.navbar.ngOnInit()
+     
+  })
+
+  this.socket.on('notificacion-antipanico', async (payload) =>{
+      await this.navbar.ngOnInit()
+  })
+
+
   }
 
 }
