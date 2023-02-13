@@ -39,7 +39,6 @@ export class NavbarGuardsComponent implements OnInit {
     const country = await this._countryStorage.getCountry()
     this.countryName = country.name
     console.log(country.name)
-  
     this.setUser(await this._userStorage.getUser());
 
     this.id_user = await (await this._userStorage.getUser()).id;

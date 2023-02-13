@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title> Ver Eventos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="table-responsive container padding-top">
+  
+    <h5>Reserva de Eventos</h5>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Estado</th>
+          <th scope="col">Reserva</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Invitados</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <tr >
+          <th *ngIf=" 0 === 0 " scope="row"><ion-badge color="success">aprobado</ion-badge></th>
+          <td>sss</td>
+          <td>dddd</td>
+          <td>
+            <ion-button size="small" (click)="openModal()" shape="round">
+              Ver Invitados
+            </ion-button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+    
+    
+    </div>
+
+
+
+</ion-content>

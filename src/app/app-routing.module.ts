@@ -146,6 +146,11 @@ const routes: Routes = [
     path: 'admin/agregar-horario-laboral',
     loadChildren: () => import('./pages/admin/guard-segment/add-laboral-schedule/add-laboral-schedule.module').then( m => m.AddLaboralSchedulePageModule)
   },
+  {
+    path: 'ver-eventos',
+    loadChildren: () => import('./pages/guards/events/view-events/view-events.module').then( m => m.ViewEventsPageModule)
+  },
+
 
 
   

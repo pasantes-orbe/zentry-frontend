@@ -6,6 +6,14 @@
     </ion-header>
     <ion-content>
       <ion-accordion-group>
+
+        <ion-accordion value="navegar-eventos" toggleIcon="none">
+          <ion-item (click)=" router.navigate(['ver-eventos']) "  slot="header">
+            <ion-icon slot="start" name="today-outline"></ion-icon>
+            <ion-label>Eventos</ion-label>
+          </ion-item>
+        </ion-accordion>
+
         <ion-accordion value="cerrar-sesion" toggleIcon="none">
           <ion-item (click)="signOut()" slot="header">
             <ion-icon slot="start" name="log-out-outline"></ion-icon>

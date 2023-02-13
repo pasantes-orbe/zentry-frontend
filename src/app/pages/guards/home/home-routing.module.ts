@@ -33,6 +33,8 @@ const routes: Routes = [
         redirectTo: 'autorizaciones',
         pathMatch: 'full'
       }
+      
+
     ]
   },
   {
