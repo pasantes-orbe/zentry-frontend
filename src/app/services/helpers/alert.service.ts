@@ -92,6 +92,8 @@ export class AlertService {
     });
 
     await alert.present();
+
+    return alert;
     
   }
 
@@ -111,8 +113,6 @@ export class AlertService {
         {
           text: 'Detalles de la situación',
           handler: async data => {
-           console.log(data)
-           console.log(e.id)
            const {details} = data;
            const now = new Date();
            const finishAt = moment(now).format("YYYY-MM-DDThh:mm:ss-03:00");
@@ -120,7 +120,6 @@ export class AlertService {
            const guardId = guard.id
           //  2022-12-16T12:00:00-03:00
 
-            console.log(finishAt)
 
            this._http.put(`${environment.URL}/api/antipanic/${e.id}`, {
             details,
@@ -128,7 +127,6 @@ export class AlertService {
             guardId
            }).subscribe(
             res =>  {
-              console.log(res)
               this.socket.emit('notificar-antipanico-finalizado', res)
             } 
            )

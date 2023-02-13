@@ -95,9 +95,18 @@ conectar(){
   escucharNotificacionesAntipanico(){
     this.socket.on('notificacion-antipanico', async (payload) =>{
       console.log(payload)
-      await this.alerts.presentAlertPanic(payload)
+      const alert = await this.alerts.presentAlertPanic(payload)
+
+
+      this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
+        console.log("ANTIPANICO ATENDIDO");
+        alert.dismiss()
+      })  
+
     })
   }
+
+  
 
 
 }
