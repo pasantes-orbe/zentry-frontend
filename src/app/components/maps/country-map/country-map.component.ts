@@ -50,10 +50,8 @@ export class CountryMapComponent implements AfterViewInit {
     this.socket.on('get-actives-guards', (payload) =>{
       this.removeMarkers()
       this.activeGuards = payload
-      console.log(this.activeGuards)
       this.activeGuards.forEach((data) => {
         if (data.id_country == this.id_country)
-        console.log(data)
         this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`)
       })
     })
@@ -73,7 +71,6 @@ export class CountryMapComponent implements AfterViewInit {
     const countryID = owner.property.id_country;
      
     this._countryService.getByID(countryID).subscribe(res =>{
-      console.log(res)
       this.countryLat = res['latitude']
       this.countryLng = res['longitude']
       this.initMap(res['latitude'], res['longitude']);
@@ -161,7 +158,6 @@ export class CountryMapComponent implements AfterViewInit {
   }
 
   public getMarkers(){
-    console.log(this.markers);
     return this.markers;
   }
 

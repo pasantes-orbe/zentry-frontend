@@ -38,15 +38,13 @@ export class NavbarGuardsComponent implements OnInit {
   async ngOnInit() {
     const country = await this._countryStorage.getCountry()
     this.countryName = country.name
-    console.log(country.name)
+  
     this.setUser(await this._userStorage.getUser());
 
     this.id_user = await (await this._userStorage.getUser()).id;
 
     this._notificationService.getAllByUser(this.id_user).subscribe(
       res => {
-        console.log(res);
-        console.log(res.slice((res.length - 5), (res.length)));
 
         // this.notifications = res
           this.notifications = res.slice((res.length - 5), (res.length))
@@ -56,19 +54,16 @@ export class NavbarGuardsComponent implements OnInit {
       )
 
     const timerID = await this._intervalStorageService.getInterval_id()
-    console.log(timerID);
 
   }
 
   ionViewWillEnter(){
-    console.log("ASDFASDF");
   }
 
   async signOut(){
     const user = this.getUser()
     const timerID = await this._intervalStorageService.getInterval_id()
 
-    console.log("ID DE INTERVAAAALO", timerID); 
 
     await this._intervalStorageService.remove()
     window.clearInterval(timerID);
@@ -108,7 +103,6 @@ export class NavbarGuardsComponent implements OnInit {
   }
 
   public dropdown(){
-    console.log("DropdownActivado");
     this.dropdownState = !this.dropdownState
   }
   
