@@ -32,6 +32,11 @@ export class NavbarAdminComponent implements OnInit {
     
   }
 
+  protected signOut(){
+    this._userStorage.signOut()
+    this._countryStorage.signOut()
+  }
+
   protected navigate(url: string): void {
     this.router.navigate([url]);
   }

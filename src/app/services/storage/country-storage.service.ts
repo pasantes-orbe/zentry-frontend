@@ -12,8 +12,7 @@ export class CountryStorageService {
   public country: CountryInteface;
 
   public async saveCountry (country: CountryInteface): Promise<void>{
-    this.setCountry(country);
-
+    
     await Preferences.set({
       key: 'COUNTRY',
       value: JSON.stringify(country)
@@ -21,13 +20,10 @@ export class CountryStorageService {
   }
 
   public async getCountry(): Promise<CountryInteface>{
+
     const { value } = await Preferences.get({ key: 'COUNTRY' });
     return JSON.parse(value);
     
-  }
-
-  private setCountry(country: CountryInteface): void {
-    this.country = country;
   }
 
   public async signOut(): Promise<void>{

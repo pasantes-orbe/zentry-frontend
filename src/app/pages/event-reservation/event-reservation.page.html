@@ -16,6 +16,40 @@
       <ion-datetime-button datetime="datetime"></ion-datetime-button>
     </ion-item>
 
+    <ion-button class="paddingbutton" (click)="addGuest()" size="small" shape="round">
+      <ion-icon name="add-circle-outline"></ion-icon>
+        Añadir Invitado
+      </ion-button>
+
+    <ion-list>
+
+
+        <ion-row *ngFor="let guest of guests; let i = index">
+          <ion-col size="6">
+
+            <ion-item>
+                <ion-input  [(ngModel)]="guests[i].fullname" [ngModelOptions]="{standalone: true}" type="text" placeholder="Nombre Completo"></ion-input>                
+            </ion-item>
+        
+          </ion-col>
+    
+    
+          <ion-col size="6">
+    
+            <ion-item>
+                <ion-input [(ngModel)]="guests[i].dni" [ngModelOptions]="{standalone: true}" type="number" placeholder="DNI"></ion-input>                
+            </ion-item>
+        
+          </ion-col>
+          
+        </ion-row>
+  
+
+
+
+    </ion-list>
+
+
     <ion-modal  [keepContentsMounted]="true">
       <ng-template>
           <ion-datetime formControlName="fecha" presentation="date-time" color="primary" [showDefaultTitle]="true"  id="datetime">
@@ -25,10 +59,13 @@
     </ion-modal>
     <!--  -->
 
+    
+
     <ion-item>
       <ion-label position="stacked">Aclaraciones / Detalles</ion-label>
       <ion-textarea formControlName="detalles" rows="4" placeholder="Aclara al administrador el motivo de la reserva"></ion-textarea>
     </ion-item>
+   
 
     <div class="text-center">
       <ion-button  shape="round" block color="primary" type="submit" [disabled]="getForm().invalid">

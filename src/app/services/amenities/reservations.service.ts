@@ -19,7 +19,8 @@ export class ReservationsService {
 
    }
 
-   public async createReservation(id_amenity, date, details){
+   public async createReservation(id_amenity, date, details, guests){
+
     const owner = await this._ownerStorageService.getOwner()
     const ownerID = owner.user.id
     const formData = new FormData();
@@ -32,11 +33,23 @@ export class ReservationsService {
 
     this._http.post(`${environment.URL}/api/reservations`, formData).subscribe(async (res) => {
       console.log(res);
-      await this._alertService.removeLoading();
-      this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
-      var getUrl = window.location;
-      var baseUrl = getUrl.protocol + "//" + getUrl.host;
-      window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab3`
+      console.log(res['id']);
+      console.log("ESTO ES LO QUE SE ENVIA", guests);
+      const id_reservation = res['id']
+
+      this._http.post(`${environment.URL}/api/invitation/${id_reservation}`,{
+        guests: guests
+      }).subscribe(async res =>{
+
+        console.log(res);
+
+        await this._alertService.removeLoading();
+        this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
+        var getUrl = window.location;
+        var baseUrl = getUrl.protocol + "//" + getUrl.host;
+        window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab3`
+      })
+
 },
     async (err) => {
     console.log(err);

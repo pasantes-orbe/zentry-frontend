@@ -51,7 +51,9 @@ export class NavbarGuardsComponent implements OnInit {
 
         // this.notifications = res
           this.notifications = res.slice((res.length - 5), (res.length))
-       }
+        
+          this.notifications = this.notifications.reverse()
+        }
       )
 
     const timerID = await this._intervalStorageService.getInterval_id()

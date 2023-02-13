@@ -14,6 +14,9 @@ export class EventReservationPage implements OnInit {
   protected amenities: AmenitieInterface[]
   private formBuilder: FormBuilder;
   private form: FormGroup;
+
+  public guests: any[] = []
+
   constructor(private alertController: AlertController, private _amenitiesService: AmenitieService, protected _formBuilder: FormBuilder, private _reservationsService: ReservationsService) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -54,13 +57,22 @@ export class EventReservationPage implements OnInit {
   }
 
   public saveAmenitie(){
+    console.log(this.guests);
     console.log(this.getForm().get('amenitieID').value)
     console.log(this.getForm().get('fecha').value)
     console.log(this.getForm().get('detalles').value)
 
     this._reservationsService.createReservation(this.getForm().get('amenitieID').value,
                                                 this.getForm().get('fecha').value,
-                                                this.getForm().get('detalles').value)
+                                                this.getForm().get('detalles').value,
+                                                this.guests)
+  }
+
+  addGuest(){
+    this.guests.push({
+      fullname: "",
+      dni: 0    
+    })
   }
 
 }

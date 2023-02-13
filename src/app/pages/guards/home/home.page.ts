@@ -20,13 +20,15 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
 
-    this.socket.on('notificacion-nuevo-confirmedByOwner', async (payload) =>{
-        await this.navbar.ngOnInit()
+    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
+      
+      setTimeout(async cb =>  await this.navbar.ngOnInit(), 1000)
+        
      
   })
 
-  this.socket.on('notificacion-antipanico', async (payload) =>{
-      await this.navbar.ngOnInit()
+  this.socket.on('notificacion-antipanico', (payload) =>{
+    setTimeout(async cb =>  await this.navbar.ngOnInit(), 1000)
   })
 
 

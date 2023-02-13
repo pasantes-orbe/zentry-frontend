@@ -19,13 +19,13 @@ export class TabsPage implements OnInit {
 
   ngOnInit(): void {
 
-    this.socket.on('notificacion-check-in', async (payload) =>{
-      await this.navbar.ngOnInit()
+    this.socket.on('notificacion-check-in',  (payload) =>{
+      setTimeout(async cb =>  await this.navbar.ngOnInit(), 1000)
   })
 
-  this.socket.on('notificacion-nuevo-confirmedByOwner', async (payload) =>{
-    await this.navbar.ngOnInit()
-})
+  this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
+    setTimeout(async cb =>  await this.navbar.ngOnInit(), 1000)
+  })
 
   }
   

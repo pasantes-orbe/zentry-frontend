@@ -84,29 +84,47 @@ export class LoginPage implements OnInit {
 
           this._authStorage.saveJWT(data['token']);
           console.log(data['user'])
+          console.log("AAAAAAA");
           this._userStorage.saveUser(data['user']);
-
+          console.log("ESTO SE EJECUTA");
 
           const { name } = data['user'].role;
 
-          console.log("Esta es la plataforma", Capacitor.getPlatform());
+          console.log(name);
 
           if (Capacitor.getPlatform() === 'android') {
-            
             this._pushService.setOneSignalID(data['user']['id'])  
-                    // Si estoy en un android seteeo el id y le asigno el rol
-            this._pushService.setTagToExternalId(data['user']['id'], name)
+          } 
+
+          if(name == "vigilador"){
+
+            console.log("SE ENTRE AL IF");
+
+            this._guardsService.getGuardByCountryId(data['user']['id']).subscribe(async data => {
+              console.log(data)
+
+              await this._countryStorageService.saveCountry(data['country'])
+
+              console.log("Se guarda un ", data['country']);
+              console.log("No llega a este paso");
+              console.log("Esta es la plataforma", Capacitor.getPlatform());
+
+              
+
+            
+
+              console.log("Fuera del if");
+              this._redirectService.redirectByRole(name);
+              this.setErrorMessage("Iniciando sesion...");
+              this._loading.stopLoading();
+
+            })
+          } else {
+            this._redirectService.redirectByRole(name);
           }
 
-          if(name === 'vigilador'){
-            this._guardsService.getGuardByCountryId(data['user']['id']).subscribe(data => {
-              console.log(data)
-              this._countryStorageService.saveCountry(data['country'])
-            })
-          }
-          this._redirectService.redirectByRole(name);
-          this.setErrorMessage("Iniciando sesion...");
-          this._loading.stopLoading();
+
+          
 
         },
         fail => {
