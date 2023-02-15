@@ -24,11 +24,11 @@
     <ion-list>
 
 
-        <ion-row *ngFor="let guest of guests; let i = index">
+        <ion-row class="borderBottom" *ngFor="let guest of guests; let i = index">
           <ion-col size="6">
 
             <ion-item>
-                <ion-input  [(ngModel)]="guests[i].fullname" [ngModelOptions]="{standalone: true}" type="text" placeholder="Nombre Completo"></ion-input>                
+                <ion-input  [(ngModel)]="guests[i].name" [ngModelOptions]="{standalone: true}" type="text" placeholder="Nombre"></ion-input>                
             </ion-item>
         
           </ion-col>
@@ -37,12 +37,23 @@
           <ion-col size="6">
     
             <ion-item>
-                <ion-input [(ngModel)]="guests[i].dni" [ngModelOptions]="{standalone: true}" type="number" placeholder="DNI"></ion-input>                
+                <ion-input [(ngModel)]="guests[i].lastname" [ngModelOptions]="{standalone: true}" type="text" placeholder="Apellido"></ion-input>                
             </ion-item>
         
           </ion-col>
           
+
+          <ion-col size="12">
+
+            <ion-item>
+              <ion-input [(ngModel)]="guests[i].dni" [ngModelOptions]="{standalone: true}" type="number" placeholder="DNI"></ion-input>
+            </ion-item>
+
+          </ion-col>
+
+
         </ion-row>
+
   
 
 

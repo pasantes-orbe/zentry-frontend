@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, ToastController } from '@ionic/angular';
+import { LoadingController, ModalController, ToastController } from '@ionic/angular';
+import { InvitationsComponent } from 'src/app/components/invitations/invitations/invitations.component';
 import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
 import { ReservationsService } from 'src/app/services/amenities/reservations.service';
 
@@ -12,7 +13,7 @@ export class EventsHistorialPage implements OnInit {
 
   reservations: ReservationsInterface[]
   protected loading: boolean
-  constructor(private _reservationsService: ReservationsService, private loadingCtrl: LoadingController, private toastController: ToastController ) { }
+  constructor(private modalCtrl: ModalController,private reservationService: ReservationsService ,private _reservationsService: ReservationsService, private loadingCtrl: LoadingController, private toastController: ToastController ) { }
 
   ngOnInit() {
     this._reservationsService.getAllByCountry().then(data => data.subscribe(reservations => this.reservations = reservations))
@@ -45,4 +46,29 @@ export class EventsHistorialPage implements OnInit {
   public stopLoading(){
     return false
   }
+
+  async openModal(reservation, index) {
+    console.log(reservation, index);
+    const id_reservation = reservation.id
+
+    this.reservationService.reservationGuests(id_reservation).subscribe(
+      async guests => {
+
+        console.log(guests);
+
+        const modal = await this.modalCtrl.create({
+          component: InvitationsComponent,
+          mode: 'ios',
+          componentProps: {
+            guests: guests,
+          }
+        });
+        modal.present();
+    
+        const { data, role } = await modal.onWillDismiss();
+
+      } 
+    )
+  }
+
 }

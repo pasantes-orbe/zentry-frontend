@@ -71,13 +71,12 @@ export class CheckInService {
 
     this._http.post(`${environment.URL}/api/checkin`, formData).subscribe(async res => {
       console.log(res)
-
+      this._socketService.notificarNuevoConfirmedByOwner(res)
       await this._alertService.removeLoading();
       var getUrl = window.location;
       var baseUrl = getUrl.protocol + "//" + getUrl.host;
       window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab1`
       this._alertService.showAlert("¡Listo!", "El Check-in fue realizado con exito");
-      this._socketService.notificarNuevoConfirmedByOwner(res)
     })
 
   }

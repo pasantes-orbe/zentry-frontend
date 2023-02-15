@@ -1,8 +1,4 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title> Ver Eventos</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-navbar-back title="Ver Eventos"></app-navbar-back>
 
 <ion-content>
 
@@ -21,12 +17,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr >
+        <tr *ngFor="let reservation of reservations; let i = index" >
           <th *ngIf=" 0 === 0 " scope="row"><ion-badge color="success">aprobado</ion-badge></th>
-          <td>sss</td>
-          <td>dddd</td>
+          <td>{{reservation.amenity.name}}</td>
+          <td>{{reservation.date | date: 'short'}}</td>
           <td>
-            <ion-button size="small" (click)="openModal()" shape="round">
+            <ion-button size="small" (click)="openModal(reservation, i)" shape="round">
               Ver Invitados
             </ion-button>
           </td>

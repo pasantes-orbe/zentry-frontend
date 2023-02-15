@@ -15,13 +15,14 @@ import { RecurrentsViewAllComponent } from './recurrentsViewAll/recurrents-view-
 import { SortPipe } from '../pipes/sort.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { InvitationsComponent } from './invitations/invitations/invitations.component';
 
 
 
 @NgModule({
   declarations: [
     SortPipe,
-    NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent],
+    NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -31,6 +32,6 @@ import { RouterModule } from '@angular/router';
     Ng2SearchPipeModule,
   ],
   providers: [SortPipe],
-  exports: [NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent]
+  exports: [NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent]
 })
 export class ComponentsModule { }

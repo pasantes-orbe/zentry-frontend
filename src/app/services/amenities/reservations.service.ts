@@ -9,22 +9,23 @@ import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { CountryStorageService } from '../storage/country-storage.service';
 import { OwnerStorageService } from '../storage/owner-interface-storage.service';
+import { UserStorageService } from '../storage/user-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservationsService {
 
-  constructor(private _countryStorageService: CountryStorageService, private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _ownerStorageService: OwnerStorageService) {
+  constructor(private _userStorageService: UserStorageService, private _countryStorageService: CountryStorageService, private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _ownerStorageService: OwnerStorageService) {
 
    }
 
    public async createReservation(id_amenity, date, details, guests){
 
-    const owner = await this._ownerStorageService.getOwner()
-    const ownerID = owner.user.id
+    const user = await this._userStorageService.getUser()
+    const userID = user.id
     const formData = new FormData();
-    formData.append('id_user', ownerID.toString());
+    formData.append('id_user', userID.toString());
     formData.append('id_amenity', id_amenity);
     formData.append('date', date);
     formData.append('details', details);
@@ -37,7 +38,12 @@ export class ReservationsService {
       console.log("ESTO ES LO QUE SE ENVIA", guests);
       const id_reservation = res['id']
 
+
+      console.log(guests);
+
+      
       this._http.post(`${environment.URL}/api/invitation/${id_reservation}`,{
+
         guests: guests
       }).subscribe(async res =>{
 
@@ -63,7 +69,7 @@ export class ReservationsService {
     const owner = await this._ownerStorageService.getOwner()
     const userID = owner.user.id
 
-    return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/${userID}`);
+    return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/get_by_user/${userID}`);
  }
 
   public async getAllByCountry():Promise<Observable<ReservationsInterface[]>>{
@@ -72,8 +78,18 @@ export class ReservationsService {
     return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/country/get_by_id/${countryID}`)
   }
 
+  public getAllByCountryAndStatus(id_country, status){
+
+    return this._http.get<any[]>(`${environment.URL}/api/reservations/${id_country}?status=${status} `)
+  }
+
   public updateStatus(status:boolean, reservationID: number){
     return this._http.patch(`${environment.URL}/api/reservations/${reservationID}/${status}`,{
     })
   }
+
+  public reservationGuests(id_reservation){
+    return this._http.get<any[]>(`${environment.URL}/api/invitation/${id_reservation}`)
+  }
+
 }

@@ -22,8 +22,11 @@ export class ReservationsComponent implements OnInit {
   async ngOnInit() {
 
    (await this._reservationsService.getAllByUser()).subscribe(reservations =>{
+    
     this.reservations = reservations
-    console.log(reservations);
+   
+    console.log("ESTAS SON LAS RESERVACIONES CREADAS POR EL USUARIO", reservations);
+
    })
 
    }

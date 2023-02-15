@@ -58,7 +58,7 @@ export class AuthorizationsPage implements OnInit{
     this._socketService.escucharNotificacionesAntipanico()
 
     this.socket.on('notificacion-nuevo-confirmedByOwner', async(payload) =>{
-        console.log("SDFASDF",payload);
+        console.log("ESTE ES EL PAYLOAD",payload);
         this.incomes.actualizarListaCheckIn()
     })
    
@@ -128,6 +128,7 @@ export class AuthorizationsPage implements OnInit{
   viewRecurrents(){
     this.recurrentsState = !this.recurrentsState
   }
+
 getPosition(): Promise<any>
   {
     return new Promise((resolve, reject) => {

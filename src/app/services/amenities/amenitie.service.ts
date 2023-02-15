@@ -53,7 +53,13 @@ export class AmenitieService {
 
    public async getAllByOwner(): Promise<Observable<AmenitieInterface[]>> {
     const owner = await this._ownerStorageService.getOwner()
-    const countryID = owner.property.id_country
+
+    if (owner) {
+      var countryID = owner.property.id_country
+    } else {
+      var countryID = (await this._countryStorageService.getCountry()).id
+    }
+
     return this._http.get<AmenitieInterface[]>(`${environment.URL}/api/amenities/${countryID}`);
  }
 }

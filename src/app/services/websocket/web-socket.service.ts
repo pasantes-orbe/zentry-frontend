@@ -69,7 +69,7 @@ conectar(){
 
   notificarNuevoConfirmedByOwner(data){
     this.socket.emit('notificar-nuevo-confirmedByOwner', data)
-    console.log(data)
+    console.log("SE ENVIIO", data);
   }
 
   disconnectGuardUbication(data){

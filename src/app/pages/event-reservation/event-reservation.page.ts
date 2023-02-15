@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
+import { InvitationsComponent } from 'src/app/components/invitations/invitations/invitations.component';
 import { AmenitieInterface } from 'src/app/interfaces/amenitie-interface';
 import { AmenitieService } from 'src/app/services/amenities/amenitie.service';
 import { ReservationsService } from 'src/app/services/amenities/reservations.service';
@@ -17,13 +18,14 @@ export class EventReservationPage implements OnInit {
 
   public guests: any[] = []
 
-  constructor(private alertController: AlertController, private _amenitiesService: AmenitieService, protected _formBuilder: FormBuilder, private _reservationsService: ReservationsService) {
+  constructor(private modalCtrl: ModalController ,private reservationService: ReservationsService ,private alertController: AlertController, private _amenitiesService: AmenitieService, protected _formBuilder: FormBuilder, private _reservationsService: ReservationsService) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
    }
 
   ngOnInit() {
-    this._amenitiesService.getAllByOwner().then(data => data.subscribe( amenities => {this.amenities = amenities
+    this._amenitiesService.getAllByOwner().then(data => data.subscribe( amenities => {
+      this.amenities = amenities
       console.log(amenities)}))
   }
 
@@ -70,9 +72,11 @@ export class EventReservationPage implements OnInit {
 
   addGuest(){
     this.guests.push({
-      fullname: "",
-      dni: 0    
+      name: "",
+      lastname: "", 
+      dni: null   
     })
   }
 
-}
+} 
+

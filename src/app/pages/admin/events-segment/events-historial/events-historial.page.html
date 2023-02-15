@@ -12,6 +12,8 @@
         <th scope="col">Fecha</th>
         <th scope="col">Lugar</th>
         <th scope="col">Reservado por</th>
+        <th scope="col">Invitados</th>
+
       </tr>
     </thead>
     <tbody>
@@ -29,11 +31,25 @@
         <td>{{reservation.date | date: 'dd/MM/yyyy hh:mm'}}</td>
         <td class="text-center">{{reservation.amenity.name}}</td>
         <td> {{reservation.user.name}} - {{reservation.user.lastname}}  </td>
-        
+        <td> 
+          <ion-button size="small" (click)="openModal(reservation, i)" shape="round">
+            Ver Invitados
+          </ion-button> 
+        </td>
+
       </tr>
       
       
     </tbody>
   </table>
 </div>
+
+<ion-toolbar>
+  <div class="text-center">
+    <ion-button  routerLink="/reservar" expand="block">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Agregar Evento
+    </ion-button>
+  </div>
+</ion-toolbar>
 </ion-content>

@@ -7,10 +7,12 @@ import { ModalController } from '@ionic/angular';
   styleUrls: ['./invitations.component.scss'],
 })
 export class InvitationsComponent implements OnInit {
-  titulo;
+  guests: any[] ;
 
   constructor(private modalCtrl: ModalController) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.guests);
+  }
 
 }
