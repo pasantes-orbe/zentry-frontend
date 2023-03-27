@@ -31,14 +31,13 @@ export class AddCountryPage implements AfterViewInit {
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [ -40.44, -63.59 ],
-      zoom: 3
+      center: [ -27.5615, -58.7521 ],
+      zoom: 8
     });
 
-    const tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 18,
-      minZoom: 3,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
 
     tiles.addTo(this.map);
@@ -83,7 +82,7 @@ export class AddCountryPage implements AfterViewInit {
       shadowSize: [41, 41]
     });
 
-    this.marker = new L.marker([ -40.44, -63.59 ], {
+    this.marker = new L.marker([ -27.5615, -58.7521 ], {
       draggable: 'true'
     });
 

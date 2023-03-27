@@ -54,14 +54,15 @@ export class ReservationsService {
         var getUrl = window.location;
         var baseUrl = getUrl.protocol + "//" + getUrl.host;
         window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab3`
-      })
+      }
+      )
 
 },
     async (err) => {
-    console.log(err);
+    console.log("asdfasdf", err['error']);
     await this._alertService.removeLoading();
-    this._alertService.showAlert("¡Ooops!", `${err['error']['msg']}`);
-})
+    this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+  })
 
    }
 

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CountryStorageService } from '../storage/country-storage.service';
 import { environment } from 'src/environments/environment';
 import { GuardStorageService } from '../storage/guard-storage.service';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,12 @@ export class ScheduleService {
       }
     )
 
+
+  }
+
+  public getScheduleById(id:any): Observable<any[]>{
+
+   return this._http.get<any[]>(`${environment.URL}/api/guards/schedule/${id}`)
 
   }
 }

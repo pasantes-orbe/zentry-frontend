@@ -149,7 +149,11 @@ const routes: Routes = [
   {
     path: 'ver-eventos',
     loadChildren: () => import('./pages/guards/events/view-events/view-events.module').then( m => m.ViewEventsPageModule)
+  },  {
+    path: 'edit-guard',
+    loadChildren: () => import('./modals/guards/edit-guard/edit-guard.module').then( m => m.EditGuardPageModule)
   },
+
 
 
 

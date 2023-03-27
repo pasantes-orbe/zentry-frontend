@@ -73,10 +73,10 @@ export class RegisterService {
             this._router.navigate(['/admin/country-dashboard']);
           }
         },
-          async (err) => {
-            console.log(err);
+          async (err:any) => {
+            const { msg } = err.error.errors[0];
             await  this._alertService.removeLoading();
-            this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+            this._alertService.showAlert("¡Ooops!", `${msg}`);
             this._router.navigate([`/admin/country-dashboard`]);
           }
 

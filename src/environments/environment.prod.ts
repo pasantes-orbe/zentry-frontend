@@ -1,4 +1,4 @@
 export const environment = {
   production: true,  
-  URL: "https://shock-app-backend-production.up.railway.app"
+  URL: "http://138.219.42.111:3000"
 };

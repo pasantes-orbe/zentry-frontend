@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>Welcome</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()">Confirm</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="ion-padding">
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Dia</th>
+        <th scope="col" class="name">Horario de Inicio</th>
+        <th scope="col" class="name">Horario de Fin</th>
+        <th scope="col" class="name">Guardar</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+      <tr *ngFor="let day of schedule; let i = index" >
+
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+              <ion-datetime  id='start{{i}}'  [(ngModel)]="day.start" presentation="time" color="primary" [showDefaultTitle]="true">
+              <span slot="title">SELECCIONA LA HORA DE INGRESO</span>
+              </ion-datetime>
+          </ng-template>
+        </ion-modal>
+
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+              <ion-datetime id='exit{{i}}' [(ngModel)]="day.exit" presentation="time" color="primary" [showDefaultTitle]="true">
+              <span slot="title">SELECCIONA LA HORA DE INGRESO</span>
+              </ion-datetime>
+          </ng-template>
+        </ion-modal>
+
+        
+
+        <td> {{day.week_day}} </td>
+        <td>             
+          <ion-datetime-button datetime='start{{i}}'></ion-datetime-button>
+        </td>
+        <td>             
+          <ion-datetime-button datetime='exit{{i}}'></ion-datetime-button>
+        </td>
+        <td> 
+          <ion-icon (click)="editSchedule(day.id,day.start, day.exit)"  name="save-outline"></ion-icon>
+        </td>
+
+      </tr>
+
+  
+      <tr>
+      
+    </tbody>
+  </table>
+  
+
+
+</ion-content>

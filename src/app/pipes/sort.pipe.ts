@@ -12,6 +12,7 @@ export class SortPipe implements PipeTransform {
     const sortField = args[0]
     const sortField2 = args[1]
     const quantityFields = args[2]
+    
 
     if (quantityFields === "2"){
 

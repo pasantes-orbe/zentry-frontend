@@ -13,6 +13,7 @@
     </ion-button>
   </div>
 
+  <h3 style="text-align: center;">Vigiladores Activos</h3>
   <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por Nombre o Apellido"></ion-searchbar>
 
 
@@ -22,10 +23,11 @@
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
         <th scope="col">Horario Laboral</th>
+        <th scope="col">Editar Horario</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let guard of guards | filter: searchKey; let i = index">
+      <tr *ngFor="let guard of guards | filter: searchKey ; let i = index">
         <td class="text-center">{{guard.guard.user.name}} </td>
         <td>{{guard.guard.user.lastname}}</td>
         <td *ngIf="guard.working == true">
@@ -34,10 +36,50 @@
         <td *ngIf="guard.working == false">
           <ion-icon color="danger" slot="icon-only" name="close-outline"></ion-icon>
         </td>
+        <td>
+            <ion-icon (click)="editGuard(guard.guard.user.id)" name="create-outline"></ion-icon>
+        </td>
       </tr>
       <tr>
 
     </tbody>
   </table>
+  <hr>
+
+
+
+  <ion-button class="ion-margin-top" (click)="dropdown()" expand="block" fill="clear" shape="round">
+    Ver Vigiladores Inactivos
+    <ion-icon *ngIf="dropdownState" name="chevron-down-outline"></ion-icon> 
+    <ion-icon *ngIf="!dropdownState" name="chevron-forward-outline"></ion-icon>
+  </ion-button>
+
+  
+<div *ngIf="dropdownState"> 
+  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey1" placeholder="Buscar por Nombre o Apellido"></ion-searchbar>
+
+
+  <table class="table text-center">
+    <thead>
+      <tr>
+        <th scope="col">Apellido</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">DNI</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let guard of guardsOut | filter: searchKey1; let i = index">
+        <td class="text-center">{{guard.guard.user.name}} </td>
+        <td>{{guard.guard.user.lastname}}</td>
+        <td>
+          {{guard.guard.user.dni}}
+        </td>
+        
+      </tr>
+      <tr>
+
+    </tbody>
+  </table>
+</div>
 
 </ion-content>

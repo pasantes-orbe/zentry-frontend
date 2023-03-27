@@ -20,6 +20,6 @@ import { SortPipe } from 'src/app/pipes/sort.pipe';
     ComponentsModule,
     Ng2SearchPipeModule
   ],
-  declarations: [AllGuardsPage, SortPipe]
+  declarations: [AllGuardsPage]
 })
 export class AllGuardsPageModule {}
