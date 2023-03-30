@@ -108,4 +108,31 @@ async getOneProperty(id: number){
   }
 
 
+   editProperty(token, id, name, number, address){
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Authorization': token,
+      }),
+    };
+
+   return this._http.patch(`${environment.URL}/api/properties/${id}`, {
+      name,
+      number,
+      address
+    }, httpOptions)
+
+  }
+
+  deleteProperty(id, token){
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Authorization': token,
+      }),
+    };
+   return this._http.delete(`${environment.URL}/api/properties/${id}`, httpOptions)
+
+  }
+
+
 }

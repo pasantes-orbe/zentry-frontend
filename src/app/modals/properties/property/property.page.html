@@ -1,11 +1,22 @@
-<app-navbar-back title="Editar Propiedad"></app-navbar-back>
+
 <ion-content>
+
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="end">
+        <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+      </ion-buttons>
+      <ion-title> Editar Propiedad </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
 <ion-grid>
+  <form [formGroup]="getForm()" (keyup.enter)="editProperty()" (ngSubmit)="editProperty()">
   <ion-row class="ion-justify-content-center ion-padding-bottom">
   <ion-col size="12">
     <ion-item counter="true">
       <ion-label position="floating">Nombre de la Propiedad</ion-label>
-      <ion-input  maxlength="50" type="text"></ion-input>
+      <ion-input formControlName="propertyName" maxlength="50" type="text"></ion-input>
     </ion-item>
   </ion-col>
   </ion-row>
@@ -14,7 +25,7 @@
     <ion-col size="12">
     <ion-item  counter="true">
       <ion-label position="floating">Dirección de la Propiedad</ion-label>
-      <ion-input maxlength="50" ></ion-input>
+      <ion-input formControlName="propertyAddress" maxlength="50" ></ion-input>
     </ion-item>
   </ion-col>
   </ion-row>
@@ -23,23 +34,17 @@
     <ion-col size="12">
     <ion-item>
       <ion-label>Numero de Propiedad</ion-label>
-      <ion-input type="number" ></ion-input>
+      <ion-input formControlName="propertyNumber" type="number" ></ion-input>
     </ion-item>
   </ion-col>
   </ion-row>
 
-  <ion-row class="ion-justify-content-center ">
-    <ion-card button>
-      <img [src]=" newImg " alt="">
-      <ion-input (change)="onFileChange($event)" name="propertyAvatar" type="file" placeholder="Awesome Input"></ion-input>
-    </ion-card>
-  </ion-row>
 
   <ion-button type="submit" expand="block" shape="round">
     <ion-icon slot="start" name="add"></ion-icon>
-    Añadir Propiedad
+    Editar Propiedad
   </ion-button>
-    
+</form>
 
 </ion-grid>
 </ion-content>

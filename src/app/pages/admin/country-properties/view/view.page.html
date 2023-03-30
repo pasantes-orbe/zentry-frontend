@@ -18,6 +18,7 @@
         <th scope="col">Dirección</th>
         <th scope="col">Propietario/s</th>
         <th scope="col">Editar</th>
+        <th scope="col">Eliminar</th>
 
       </tr>
     </thead>
@@ -34,8 +35,13 @@
         </td>
 
         <td>
-          <ion-icon size="large" (click)="editProperty(propertie.property.id)" name="create-outline"></ion-icon>
+          <ion-icon size="large" (click)="editProperty(propertie.property.id, i)" name="create-outline"></ion-icon>
         </td>
+
+        <td>
+          <ion-icon size="large" (click)="deleteProperty(propertie.property.id, i)" name="trash-outline"></ion-icon>
+        </td>
+
       </tr>
       <tr>
       

@@ -4,6 +4,7 @@ import { PropertyInterface } from '../../../../interfaces/property-interface';
 import { Property_OwnerInterface } from 'src/app/interfaces/property_owner-interface';
 import { PropertyPage } from 'src/app/modals/properties/property/property.page';
 import { ModalController } from '@ionic/angular';
+import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
 
 @Component({
   selector: 'app-view',
@@ -16,10 +17,13 @@ export class ViewPage implements OnInit {
   protected propertyName: string;
   protected propertyObservable: any
   searchKey: string;
+  message = 'This modal example uses the modalController to present and dismiss modals.';
 
-  constructor(private _propertiesService: PropertiesService, private modalCtrl: ModalController) { }
+  constructor(private _propertiesService: PropertiesService, private modalCtrl: ModalController, private _authStorageService: AuthStorageService) { }
 
   ngOnInit() {
+
+    
     this._propertiesService.getAllProperty_OwnerByCountryID().then(data => data.subscribe((property) => {
       this.properties = property;
       console.log(property)
@@ -41,7 +45,25 @@ export class ViewPage implements OnInit {
     modal.present();
   
     const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      this.message = `Hello, ${data}!`;
+    }
   
+  
+  }
+
+  async  deleteProperty(id, index){
+
+    const token = await this._authStorageService.getJWT()
+
+    this._propertiesService.deleteProperty(id, token).subscribe(
+      res => {
+        console.log(res)
+        this.properties.splice(index,1)
+      }
+    )
+
   }
 
 
