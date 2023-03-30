@@ -1,0 +1,45 @@
+<app-navbar-back title="Editar Propiedad"></app-navbar-back>
+<ion-content>
+<ion-grid>
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+  <ion-col size="12">
+    <ion-item counter="true">
+      <ion-label position="floating">Nombre de la Propiedad</ion-label>
+      <ion-input  maxlength="50" type="text"></ion-input>
+    </ion-item>
+  </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="12">
+    <ion-item  counter="true">
+      <ion-label position="floating">Dirección de la Propiedad</ion-label>
+      <ion-input maxlength="50" ></ion-input>
+    </ion-item>
+  </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="12">
+    <ion-item>
+      <ion-label>Numero de Propiedad</ion-label>
+      <ion-input type="number" ></ion-input>
+    </ion-item>
+  </ion-col>
+  </ion-row>
+
+  <ion-row class="ion-justify-content-center ">
+    <ion-card button>
+      <img [src]=" newImg " alt="">
+      <ion-input (change)="onFileChange($event)" name="propertyAvatar" type="file" placeholder="Awesome Input"></ion-input>
+    </ion-card>
+  </ion-row>
+
+  <ion-button type="submit" expand="block" shape="round">
+    <ion-icon slot="start" name="add"></ion-icon>
+    Añadir Propiedad
+  </ion-button>
+    
+
+</ion-grid>
+</ion-content>

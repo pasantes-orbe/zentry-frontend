@@ -43,4 +43,18 @@ export class ScheduleService {
    return this._http.get<any[]>(`${environment.URL}/api/guards/schedule/${id}`)
 
   }
+
+
+  public editSchedule(id, newStart, newExit){
+
+    
+    console.log("ENTRADA", newStart, " Salida", newExit);
+
+   return this._http.put(`${environment.URL}/api/guards/schedule/${id}`, 
+    {
+      newStart,
+      newExit
+    })
+    
+  }
 }

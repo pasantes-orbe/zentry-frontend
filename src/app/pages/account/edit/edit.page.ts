@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { UserService } from 'src/app/services/user/user.service';
 
@@ -61,9 +61,13 @@ export class EditPage implements OnInit {
                                   this.form.get('birthday').value,
                                   this.form.get('email').value,
                                   this.form.get('phone').value)
+                                
+                                this.form.markAsPristine()
+                              }
+
+  
 
 
-                                }
 
   getDate(event){
     
@@ -76,5 +80,8 @@ export class EditPage implements OnInit {
   public getForm(): FormGroup {
     return this.form;
   }
+
+
+  
 
 }

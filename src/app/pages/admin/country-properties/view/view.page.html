@@ -17,6 +17,8 @@
         <th scope="col">Propiedad N°</th>
         <th scope="col">Dirección</th>
         <th scope="col">Propietario/s</th>
+        <th scope="col">Editar</th>
+
       </tr>
     </thead>
     <tbody>
@@ -30,8 +32,13 @@
             </ion-item>
           </ion-list>
         </td>
+
+        <td>
+          <ion-icon size="large" (click)="editProperty(propertie.property.id)" name="create-outline"></ion-icon>
+        </td>
       </tr>
       <tr>
+      
 
     </tbody>
   </table>

@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { EditGuardPageRoutingModule } from './edit-guard-routing.module';
+import { PropertyPageRoutingModule } from './property-routing.module';
 
-import { EditGuardPage } from './edit-guard.page';
+import { PropertyPage } from './property.page';
 import { ComponentsModule } from 'src/app/components/components.module';
 
 @NgModule({
@@ -14,9 +14,9 @@ import { ComponentsModule } from 'src/app/components/components.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    EditGuardPageRoutingModule,
+    PropertyPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [EditGuardPage]
+  declarations: [PropertyPage]
 })
-export class EditGuardPageModule {}
+export class PropertyPageModule {}

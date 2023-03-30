@@ -1,12 +1,8 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
-    </ion-buttons>
-    <ion-title>Welcome</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="confirm()">Confirm</ion-button>
-    </ion-buttons>
+
+    <ion-title>Cambio de Horario</ion-title>
+
   </ion-toolbar>
 </ion-header>
 
@@ -52,7 +48,9 @@
           <ion-datetime-button datetime='exit{{i}}'></ion-datetime-button>
         </td>
         <td> 
-          <ion-icon (click)="editSchedule(day.id,day.start, day.exit)"  name="save-outline"></ion-icon>
+          <ion-icon style="margin-left: 14px;"  (click)="editSchedule(day.id, day.start, day.exit)"  size="large" name="save-outline">
+
+          </ion-icon>
         </td>
 
       </tr>

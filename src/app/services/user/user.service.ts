@@ -22,6 +22,8 @@ export class UserService {
 
     updateUser(id, name, lastname, birthday, email, phone){
       console.log(birthday, name, lastname, email, phone );
+
+
       return this._htpp.patch<UserInterface>(`${environment.URL}/api/users/update-user/${id}`, {
         name,
         birthday,
@@ -30,6 +32,7 @@ export class UserService {
         phone
       }).subscribe(res => 
         {
+          console.log(res);
           this._userStorage.saveUser(res['user'])
         } )
     }

@@ -92,4 +92,20 @@ public async getAllProperty_OwnerByCountryID():Promise<Observable<Property_Owner
   return this._http.get<Property_OwnerInterface[]>(`${environment.URL}/api/properties/country/get_by_id/${countryID}`, httpOptions);
 }
 
+
+async getOneProperty(id: number){
+
+  const token = await this._authStorageService.getJWT()
+
+  const httpOptions = {
+    headers: new HttpHeaders({
+      'Authorization': token,
+    }),
+  };
+
+  return this._http.get(`${environment.URL}/api/properties/${id}`, httpOptions)
+
+  }
+
+
 }

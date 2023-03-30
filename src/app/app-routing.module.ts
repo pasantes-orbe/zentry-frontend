@@ -153,6 +153,10 @@ const routes: Routes = [
     path: 'edit-guard',
     loadChildren: () => import('./modals/guards/edit-guard/edit-guard.module').then( m => m.EditGuardPageModule)
   },
+  {
+    path: 'property',
+    loadChildren: () => import('./modals/properties/property/property.module').then( m => m.PropertyPageModule)
+  },
 
 
 
