@@ -25,6 +25,8 @@ export class OwnersService {
   public async getAllByCountryID(): Promise<Observable<OwnerResponse[]>>{
     const country = await this._countryStorageService.getCountry()
     const countryID = country.id
+
+    console.log(country.id);
     return this._http.get<OwnerResponse[]>(`${environment.URL}/api/owners/country/get_by_id/${countryID}`)
   }
 

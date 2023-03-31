@@ -13,6 +13,7 @@ export class ViewPage implements OnInit {
   constructor(private _ownersService: OwnersService) { }
 
   ngOnInit() {
+    console.log("ESTO SE EJECUTA");
     this._ownersService.getAllByCountryID().then(data => data.subscribe( owners => this.owners = owners))
   }
   
