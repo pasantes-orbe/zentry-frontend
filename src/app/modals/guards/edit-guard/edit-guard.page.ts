@@ -22,7 +22,23 @@ export class EditGuardPage implements OnInit {
     console.log(this.guard_id);
   
     this.scheduleService.getScheduleById(this.guard_id).subscribe(
-      res => this.schedule = res
+      res => {
+
+        
+
+        const map = res.map( x => {
+          console.log("XSTART", x.start);
+          return {
+            exit: moment.utc(x.exit).local().format("YYYY-MM-DDTHH:mm:ssZ") ,
+            id: x.id,
+            start: moment.utc(x.start).local().format("YYYY-MM-DDTHH:mm:ssZ"),
+            week_day: x.week_day
+          }
+        })
+        
+        console.log(map);
+        this.schedule = map
+      } 
     )
 
   }
@@ -36,14 +52,14 @@ export class EditGuardPage implements OnInit {
     // console.log("SIN FORMATEAR START", momentStart, "SIN FORMATEAR EXIT", momentExit);
 
     
-    const startFormateado = moment(start).format('YYYY-MM-DDTHH:mm:ss.000-00:00')
-    const exitFormateado = moment(exit).format('YYYY-MM-DDTHH:mm:ss.000-00:00') 
+    // const startFormateado = moment(start).format('YYYY-MM-DDTHH:mm:ss.000-00:00')
+    // const exitFormateado = moment(exit).format('YYYY-MM-DDTHH:mm:ss.000-00:00') 
 
     // "2023-01-23T08:00:00.000-00:00"
 
-    console.log("START FORMATEADO", startFormateado, "EXIT FORMATEADO", exitFormateado);
+    // console.log("START FORMATEADO", startFormateado, "EXIT FORMATEADO", exitFormateado);
 
-    this.scheduleService.editSchedule(id, startFormateado, exitFormateado).subscribe(
+    this.scheduleService.editSchedule(id, start, exit).subscribe(
      async res => {
           console.log(res);
           await this.correctlyToast()
