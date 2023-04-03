@@ -45,7 +45,7 @@ export class ScheduleService {
   }
 
 
-  public editSchedule(id, newStart, newExit){
+  public editSchedule(id, newStart, newExit, week_day){
 
     
     console.log("ENTRADA", newStart, " Salida", newExit);
@@ -53,7 +53,8 @@ export class ScheduleService {
    return this._http.put(`${environment.URL}/api/guards/schedule/${id}`, 
     {
       newStart,
-      newExit
+      newExit,
+      week_day
     })
     
   }

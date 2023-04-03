@@ -1,8 +1,14 @@
 <ion-header>
   <ion-toolbar>
 
-    <ion-title>Cambio de Horario</ion-title>
-
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+        </ion-buttons>
+        <ion-title> Cambio de Horario </ion-title>
+      </ion-toolbar>
+    </ion-header>
   </ion-toolbar>
 </ion-header>
 
@@ -38,9 +44,19 @@
           </ng-template>
         </ion-modal>
 
-        
-
-        <td> {{day.week_day}} </td>
+        <td> 
+          <ion-item>
+            <ion-select [(ngModel)]="day.week_day" multiple="false">
+              <ion-select-option value="lunes">Lunes</ion-select-option>
+              <ion-select-option value="martes">Martes</ion-select-option>
+              <ion-select-option value="miercoles">Miercoles</ion-select-option>
+              <ion-select-option value="jueves">Jueves</ion-select-option>
+              <ion-select-option value="viernes">Viernes</ion-select-option>
+              <ion-select-option value="sabado">Sabado</ion-select-option>
+              <ion-select-option value="domingo">Domingo</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </td>
         <td>             
           <ion-datetime-button datetime='start{{i}}'></ion-datetime-button>
         </td>
@@ -48,7 +64,7 @@
           <ion-datetime-button datetime='exit{{i}}'></ion-datetime-button>
         </td>
         <td> 
-          <ion-icon style="margin-left: 14px;"  (click)="editSchedule(day.id, day.start, day.exit)"  size="large" name="save-outline">
+          <ion-icon style="margin-left: 14px;"  (click)="editSchedule(day.id, day.start, day.exit, day.week_day)"  size="large" name="save-outline">
 
           </ion-icon>
         </td>

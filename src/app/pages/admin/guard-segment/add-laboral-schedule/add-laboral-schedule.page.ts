@@ -45,11 +45,18 @@ export class AddLaboralSchedulePage implements OnInit {
   }
 
   public async guardarCalendario(){
+
     await this._alertService.setLoading(); 
-    for (const horario of this.schedule) {
-      this._scheduleService.saveSchedule(horario.getDay(), horario.getStart(), horario.getExit())
-      this.schedule.pop()
-    }
+
+    console.log("ESTO ES EL CALENDARIO QUE SE MANDA", this.schedule);
+
+    this.schedule.map( async horario => {
+      await this._scheduleService.saveSchedule(horario.getDay(), horario.getStart(), horario.getExit())
+    })
+      
+      // this.schedule.pop()
+    
+
     await this._alertService.removeLoading()
     this._router.navigate([`/admin/todos-los-guardias`]);
     await this._alertService.showAlert("Se agrego correctamente los horarios")
@@ -57,12 +64,18 @@ export class AddLaboralSchedulePage implements OnInit {
 
 
   public addHourToSchedule(){
+
     const horario = new Schedule(
       this.getForm().get('day').value,
       this.getForm().get('start').value,
       this.getForm().get('exit').value
     )
+
+    console.log("ESTO ES LO QUE ESTOY AGERGANDO", horario);
+
     this.schedule.push(horario)
+
+    console.log("asi esta", this.schedule);
   }
 
 }

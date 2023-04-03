@@ -65,6 +65,8 @@
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
         <th scope="col">DNI</th>
+        <th scope="col">Editar</th>
+
       </tr>
     </thead>
     <tbody>
@@ -74,6 +76,9 @@
         <td>
           {{guard.guard.user.dni}}
         </td>
+        <td>
+          <ion-icon (click)="editGuard(guard.guard.user.id)" name="create-outline"></ion-icon>
+      </td>
         
       </tr>
       <tr>

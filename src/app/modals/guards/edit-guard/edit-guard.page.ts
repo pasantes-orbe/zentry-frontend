@@ -43,10 +43,11 @@ export class EditGuardPage implements OnInit {
 
   }
 
-  async editSchedule(id, start: Date, exit: Date){
+  async editSchedule(id, start: Date, exit: Date, week_day){
 
     console.log("SIN FORMATEAR START", start, "SIN FORMATEAR EXIT", exit);
 
+    console.log("DIA DE LA SEMANA", week_day);
 
 
     // console.log("SIN FORMATEAR START", momentStart, "SIN FORMATEAR EXIT", momentExit);
@@ -59,7 +60,8 @@ export class EditGuardPage implements OnInit {
 
     // console.log("START FORMATEADO", startFormateado, "EXIT FORMATEADO", exitFormateado);
 
-    this.scheduleService.editSchedule(id, start, exit).subscribe(
+    this.scheduleService.editSchedule(id, start, exit, week_day).subscribe(
+
      async res => {
           console.log(res);
           await this.correctlyToast()
@@ -89,7 +91,7 @@ export class EditGuardPage implements OnInit {
     const toast = await this.toastController.create({
       message: 'Cambios guardados correctamente!',
       duration: 2000,
-      position: 'top'
+      position: 'bottom'
     });
 
     await toast.present();
@@ -100,7 +102,7 @@ export class EditGuardPage implements OnInit {
       header: 'Ha ocurrido un error al cambiar los horarios!',
       message: 'Por favor intente nuevamente',
       duration: 2000,
-      position: 'top'
+      position: 'bottom'
     });
 
     await toast.present();
