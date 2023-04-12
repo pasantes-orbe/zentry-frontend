@@ -14,7 +14,13 @@ export class ViewPage implements OnInit {
 
   ngOnInit() {
     console.log("ESTO SE EJECUTA");
-    this._ownersService.getAllByCountryID().then(data => data.subscribe( owners => this.owners = owners))
+    this._ownersService.getAllByCountryID().then(data => data.subscribe( owners => 
+    {
+      this.owners = owners
+      console.log(owners)
+    }
+      ))
+
   }
   
   ionViewWillEnter(){

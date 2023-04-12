@@ -99,6 +99,7 @@ export class CheckinPage implements OnInit {
     if (termino.length > 3) {
       
       this._ownersService.getAllByCountryID().then(data => data.subscribe(owners =>{
+        console.log(owners);
         this.owners = owners;
       } ))
 

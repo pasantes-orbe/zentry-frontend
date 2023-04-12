@@ -4,10 +4,10 @@
 
 export const environment = {
   production: false,
-  URL: "https://138.219.42.111:3000",
+  URL: "https://138.219.42.111",
   // URL: "https://shock-app-backend-production.up.railway.app"
   // URL: "http://localhost:3000",
-  // URL: "https://138.219.42.111:3000"
+  // URL: "https://138.219.42.111"
 };
 
 
