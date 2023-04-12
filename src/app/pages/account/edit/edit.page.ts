@@ -10,6 +10,8 @@ import { UserService } from 'src/app/services/user/user.service';
 })
 export class EditPage implements OnInit {
 
+
+  private readonly: boolean;
   private formBuilder: FormBuilder;
   private form: FormGroup;
   public user;
@@ -28,14 +30,23 @@ export class EditPage implements OnInit {
   async ngOnInit() {
 
     const user = await  this._userStorage.getUser()
+    
 
     this.user = user
+
     this.form.controls['name'].setValue(user.name);
     this.form.controls['lastname'].setValue(user.lastname);
     this.form.controls['phone'].setValue(user.phone);
     this.form.controls['birthday'].setValue(user.birthday);
     this.form.controls['email'].setValue(user.email);
 
+    if(this.user.role.name == 'administrador'){
+      this.readonly = false
+    } else {
+      this.readonly = true
+    }
+
+    console.log(this.readonly);
 
   }
   ionViewWillEnter() {

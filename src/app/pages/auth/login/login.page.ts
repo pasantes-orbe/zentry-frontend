@@ -86,6 +86,7 @@ export class LoginPage implements OnInit {
           console.log(data['user'])
           console.log("AAAAAAA");
           this._userStorage.saveUser(data['user']);
+          console.log(data['user']);
           console.log("ESTO SE EJECUTA");
 
           const { name } = data['user'].role;

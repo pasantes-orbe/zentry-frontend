@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OwnersService } from '../../../../services/owners/owners.service';
 import { OwnerResponse } from '../../../../interfaces/ownerResponse-interface';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-view',
@@ -10,7 +11,7 @@ import { OwnerResponse } from '../../../../interfaces/ownerResponse-interface';
 export class ViewPage implements OnInit {
   protected owners : OwnerResponse[];
 
-  constructor(private _ownersService: OwnersService) { }
+  constructor(private _ownersService: OwnersService, private modalCtrl: ModalController) { }
 
   ngOnInit() {
     console.log("ESTO SE EJECUTA");

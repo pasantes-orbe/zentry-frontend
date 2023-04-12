@@ -18,6 +18,8 @@
         <th scope="col">Nombre</th>
         <th scope="col">DNI</th>
         <th scope="col">Propiedad</th>
+        <th scope="col">Editar</th>
+
       </tr>
     </thead>
     <tbody>
@@ -26,6 +28,10 @@
         <td>{{owner.user.name}}</td>
         <td>{{owner.user.dni}}</td>
         <td>{{owner.property.name}}</td>
+        <td>
+          <ion-icon size="large"  name="create-outline" (click)="editUser(owner.user.id, i)" ></ion-icon>
+          <!-- (click)="editProperty(propertie.property.id, i)"  -->
+        </td>
       </tr>
       <tr>
       

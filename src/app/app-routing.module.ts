@@ -157,6 +157,10 @@ const routes: Routes = [
     path: 'property',
     loadChildren: () => import('./modals/properties/property/property.module').then( m => m.PropertyPageModule)
   },
+  {
+    path: 'edit',
+    loadChildren: () => import('./modals/owners/edit/edit.module').then( m => m.EditPageModule)
+  },
 
 
 
