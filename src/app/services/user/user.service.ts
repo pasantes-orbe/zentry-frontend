@@ -20,7 +20,7 @@ export class UserService {
 
     }
 
-    updateUser(id, name, lastname, birthday, email, phone){
+    updateMyUser(id, name, lastname, birthday, email, phone){
       console.log(birthday, name, lastname, email, phone );
 
 
@@ -36,5 +36,23 @@ export class UserService {
           this._userStorage.saveUser(res['user'])
         } )
     }
+
+    updateUser(id, name, lastname, birthday, email, phone){
+      console.log(birthday, name, lastname, email, phone );
+
+
+      return this._htpp.patch<UserInterface>(`${environment.URL}/api/users/update-user/${id}`, {
+        name,
+        birthday,
+        lastname, 
+        email, 
+        phone
+      }).subscribe(res => 
+        {
+          console.log(res);
+        } )
+    }
+
+
 
 }

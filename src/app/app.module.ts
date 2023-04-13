@@ -15,14 +15,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { SortPipe } from './pipes/sort.pipe';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { IonicStorageModule } from '@ionic/storage-angular';
-import { Ng2SearchPipe } from 'ng2-search-filter';
 
 registerLocaleData(localeEsAr, 'es-Ar');
 
 
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     FormsModule,
     HttpClientModule,

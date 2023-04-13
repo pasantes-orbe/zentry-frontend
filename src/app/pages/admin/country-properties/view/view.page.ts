@@ -67,6 +67,13 @@ export class ViewPage implements OnInit {
   }
 
 
+  editUser(id_owner, index){
+
+    
+
+  }
+
+
 
   ionViewWillEnter(){
     this.ngOnInit()
