@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { AmenitieService } from '../../../../services/amenities/amenitie.service';
+import { PhotoService } from 'src/app/services/photos/photo.service';
 
 
 
@@ -25,7 +26,8 @@ constructor(
   protected _formBuilder: FormBuilder,
   protected _loading: LoadingService,
   private _alertService: AlertService,
-  private _amenitie: AmenitieService
+  private _amenitie: AmenitieService,
+  private photoService: PhotoService,
 )
 {
   this.formBuilder = _formBuilder;
@@ -49,8 +51,10 @@ private createForm(): FormGroup {
   });
 }
 onFileChange(event) {
+  console.log("ESTO ES LO QUE SE ENCUENTRA AL CAMBUIAR", event.target.files[0]);
   const file = event.target.files[0];
   const reader = new FileReader();
+
   reader.onload = e => this.newImg = reader.result;
 
   reader.readAsDataURL(file);
@@ -67,6 +71,9 @@ onFileChange(event) {
 public getForm(): FormGroup {
   return this.form;
 }
+
+
+
 
 
 }

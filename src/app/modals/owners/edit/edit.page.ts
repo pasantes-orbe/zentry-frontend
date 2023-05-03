@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ModalController, ToastController } from '@ionic/angular';
 import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
@@ -22,7 +23,7 @@ export class EditPage implements OnInit {
   public email;
   public birthday;
   
-  constructor(protected _formBuilder: FormBuilder, private _userService: UserService) { 
+  constructor(protected _formBuilder: FormBuilder, private _userService: UserService, private modalCtrl: ModalController, private toastController: ToastController) { 
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
@@ -68,6 +69,10 @@ export class EditPage implements OnInit {
     });
 }
 
+cancel() {
+  return this.modalCtrl.dismiss(null, 'cancel');
+}
+
   updateOwner(){
     // this._userService.updateUser(this.user.id, 
     //                               this.form.get('name').value,
@@ -101,7 +106,6 @@ export class EditPage implements OnInit {
   }
 
   
-
 
 
   getDate(event){

@@ -1,3 +1,18 @@
+<ion-header>
+    <ion-toolbar>
+  
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="end">
+            <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+          </ion-buttons>
+          <ion-title> Editar Perfil </ion-title>
+        </ion-toolbar>
+      </ion-header>
+    </ion-toolbar>
+  </ion-header>
+
+
 <ion-content>
   <form [formGroup]="getForm()" (ngSubmit)="updateOwner()">
     <ion-item>
@@ -17,7 +32,7 @@
         <ion-input required formControlName="email" [value]="user?.email" type="text"></ion-input>
     </ion-item>
     <ion-item>
-        <ion-label class="ion-text-wrap birthday" position="stacked">Cumpleaños</ion-label>
+        <ion-label class="ion-text-wrap birthday" position="stacked" class="ion-padding-bottom"  >Cumpleaños</ion-label>
         <ion-datetime-button  datetime="datetime"></ion-datetime-button>
     </ion-item>
 
