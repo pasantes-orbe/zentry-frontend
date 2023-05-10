@@ -76,8 +76,15 @@ export class RegisterService {
           async (err:any) => {
             // const { msg } = err.error.errors[0];      //Por este mensaje se traba y no redirige cuando se crea un neuvo propíetario, tura error y nnca redirige
             await  this._alertService.removeLoading();
-            this._alertService.showAlert("¡Ooops!", ` Ha ocurrido un error `);
-            this._router.navigate([`/admin/country-dashboard`]);
+
+            if(err['status'] == 0){
+              await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
+            } else{
+              this._router.navigate([`/admin/country-dashboard`]);
+              this._alertService.showAlert("¡Ooops!", ` Ha ocurrido un error `);
+            }
+            
+           
           }
 
         );

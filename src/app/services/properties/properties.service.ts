@@ -45,9 +45,14 @@ export class PropertiesService {
   async (err) => {
     console.log(err);
     await this._alertService.removeLoading();
-    this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-    this._router.navigate([`/admin/ver-propiedades`]);
-}
+    if(err['status'] == 0){
+      await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
+    } else {
+      await this._router.navigate([`/admin/ver-propiedades`]);
+      await this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+  }
+    }
+  
   
 
   );

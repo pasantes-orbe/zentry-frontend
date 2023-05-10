@@ -36,9 +36,24 @@ export class AmenitieService {
       },
       async (err) => {
         console.log(err);
+        console.log("ACA ENCONTRE EL ERROR ", err['error']);
+        const keys = Object.keys(err)
+        const dictionary = Object.entries(err)
+        console.log("SUPUESTO MENSAJE DE ERROR",err );
+
+        console.log("Estas son las keys ",keys);
+        console.log("Estas son las llave valor", dictionary);
+
+        console.log("este es el status", err['status']);
         await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-        this._router.navigate([`/admin/ver-amenities`]);
+
+        if(err['status'] == 0){
+          await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
+        } else {
+          await this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+          this._router.navigate([`/admin/ver-amenities`]);
+        }
+        
     }
       );
    }
