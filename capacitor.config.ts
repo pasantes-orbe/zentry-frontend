@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'countriesApp',
+  appId: 'app.web.countries.shockm',
+  appName: 'M-Seguridad',
   webDir: 'www',
   bundledWebRuntime: false
 };

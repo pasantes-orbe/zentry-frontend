@@ -49,12 +49,12 @@ const routes: Routes = [
   {
     path: 'vigiladores/home',
     loadChildren: () => import('./pages/guards/home/home.module').then( m => m.HomePageModule),
-    canActivate: [SecurityGuard]
+    // canActivate: [SecurityGuard]
   },
   {
     path: 'admin/home',
     loadChildren: () => import('./pages/admin/home/home.module').then( m => m.HomePageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'reservar',
@@ -63,43 +63,43 @@ const routes: Routes = [
   {
     path: 'checkin-y-checkout',
     loadChildren: () => import('./pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.module').then( m => m.CheckInAndCheckOutPageModule),
-    canActivate: [SecurityGuard]
+    // canActivate: [SecurityGuard]
   },
   {
     path: 'admin/country-dashboard',
     loadChildren: () => import('./pages/admin/country-dashboard/country-dashboard.module').then( m => m.CountryDashboardPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/ver-propiedades',
     loadChildren: () => import('./pages/admin/country-properties/view/view.module').then( m => m.ViewPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
 
   {
     path: 'admin/ver-propietarios',
     loadChildren: () => import('./pages/admin/country-owners/view/view.module').then( m => m.ViewPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/ver-amenities',
     loadChildren: () => import('./pages/admin/country-amenities/view-all/view-all.module').then( m => m.ViewAllPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/registro-checkin-y-checkout',
     loadChildren: () => import('./pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.module').then( m => m.CheckinOutHistorialPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/todos-los-guardias',
     loadChildren: () => import('./pages/admin/guard-segment/all-guards/all-guards.module').then( m => m.AllGuardsPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/agregar-country',
     loadChildren: () => import('./pages/admin/add-country/add-country.module').then( m => m.AddCountryPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/invitados-recurrentes',
@@ -116,27 +116,27 @@ const routes: Routes = [
   {
     path: 'admin/nueva-propiedad',
     loadChildren: () => import('./pages/admin/country-properties/add-property/add-property.module').then( m => m.AddPropertyPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/nuevo-lugar-de-reserva',
     loadChildren: () => import('./pages/admin/country-amenities/add-amenity/add-amenity.module').then( m => m.AddAmenityPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/nuevo-propietario',
     loadChildren: () => import('./pages/admin/country-owners/add-country-owner/add-country-owner.module').then( m => m.AddCountryOwnerPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/nuevo-vigilador',
     loadChildren: () => import('./pages/admin/guard-segment/add-guard/add-guard.module').then( m => m.AddGuardPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/asignar-propiedad',
     loadChildren: () => import('./pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.module').then( m => m.AssignCountryToOwnerPageModule),
-    canActivate: [AdminGuard]
+    // canActivate: [AdminGuard]
   },
   {
     path: 'admin/solicitudes-de-contrasena',
@@ -149,7 +149,8 @@ const routes: Routes = [
   {
     path: 'ver-eventos',
     loadChildren: () => import('./pages/guards/events/view-events/view-events.module').then( m => m.ViewEventsPageModule)
-  },  {
+  },
+  {
     path: 'edit-guard',
     loadChildren: () => import('./modals/guards/edit-guard/edit-guard.module').then( m => m.EditGuardPageModule)
   },
@@ -160,6 +161,10 @@ const routes: Routes = [
   {
     path: 'edit',
     loadChildren: () => import('./modals/owners/edit/edit.module').then( m => m.EditPageModule)
+  },
+  {
+    path: 'descarga',
+    loadChildren: () => import('./pages/download/download.module').then( m => m.DownloadPageModule)
   },
 
 
