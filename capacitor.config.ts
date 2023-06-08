@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.web.countries.shockm',
-  appName: 'M-Seguridad',
+  appId: 'com.MFSeguridad',
+  appName: 'MF-Seguridad',
   webDir: 'www',
   bundledWebRuntime: false
 };

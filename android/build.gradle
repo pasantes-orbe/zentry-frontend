@@ -1,22 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-apply plugin: 'com.android.application'
-
-android {
-    compileSdkVersion 32
-    defaultConfig {
-        applicationId "app.web.countries.shockm"
-        minSdkVersion 22
-        targetSdkVersion 32
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        aaptOptions {
-            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!.scc:.:!CVS:!thumbs.db:!picasa.ini:!*~'
-        }
-    }
-}
-
 buildscript {
     
     repositories {
@@ -41,6 +24,6 @@ allprojects {
     }
 }
 
-// task clean(type: Delete) {
-//     delete rootProject.buildDir
-// }
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
