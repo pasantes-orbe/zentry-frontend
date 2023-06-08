@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-download',
@@ -12,9 +11,6 @@ export class DownloadPage implements OnInit {
   constructor() { }
 
   showInstallButton = false;
-  platform: Platform
-
-  mobileType = '';
 
   ngOnInit() {
     window.addEventListener('beforeinstallprompt', (event: any) => {
@@ -25,71 +21,59 @@ export class DownloadPage implements OnInit {
       // Update UI to notify the user they can add to home screen
       this.showInstallButton = true;
     });
-
   }
 
+  showIosInstallModal(localStorageKey: string) {
+    // detect if the device is on iOS
+    const isIos = () => {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      return /iphone|ipad|ipod/.test(userAgent);
+    };
+    const isInStandaloneMode = () => {
+      return (
+        "standalone" in (window as any).navigator &&
+        (window as any).navigator.standalone
+      );
+    };
 
-  public initPwaPrompt() {
-    if (this.platform.is('android')) {
-      window.addEventListener('beforeinstallprompt', (event: any) => {
-        event.preventDefault();
-        this.deferredPrompt = event;
-
-        if (this.deferredPrompt) {
-          // Show the prompt
-          this.deferredPrompt.prompt();
-          // Wait for the user to respond to the prompt
-          this.deferredPrompt.userChoice.then((choiceResult: any) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('User accepted the install prompt');
-            } else {
-              console.log('User dismissed the install prompt');
-            }
-          });
-        }
-        // this.openPromptComponent('android');
-      });
-    }
-    if (this.platform.is('ios')) {
-      const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator['standalone']);
-      if (!isInStandaloneMode) {
-        // this.showInstallButton = true;
-        // this.mobileType = 'ios'
-        // this.openPromptComponent('ios');
-      }
-    }
+    const localStorageKeyValue = localStorage.getItem(localStorageKey);
+  const iosInstallModalShown = localStorageKeyValue
+    ? JSON.parse(localStorageKeyValue)
+    : false;
+  const shouldShowModalResponse =
+    isIos() && !isInStandaloneMode() && !iosInstallModalShown;
+  if (shouldShowModalResponse) {
+    localStorage.setItem(localStorageKey, "true");
+    this.showInstallButton = true;
   }
-
-  // showIosInstallModal(localStorageKey: string) {
-  //   // detect if the device is on iOS
-  //   const isIos = () => {
-  //     const userAgent = window.navigator.userAgent.toLowerCase();
-  //     return /iphone|ipad|ipod/.test(userAgent);
-  //   };
-  //   const isInStandaloneMode = () => {
-  //     return (
-  //       "standalone" in (window as any).navigator &&
-  //       (window as any).navigator.standalone
-  //     );
-  //   };
-
-  //   const localStorageKeyValue = localStorage.getItem(localStorageKey);
-  // const iosInstallModalShown = localStorageKeyValue
-  //   ? JSON.parse(localStorageKeyValue)
-  //   : false;
-  // const shouldShowModalResponse =
-  //   isIos() && !isInStandaloneMode() && !iosInstallModalShown;
-  // if (shouldShowModalResponse) {
-  //   localStorage.setItem(localStorageKey, "true");
-  //   this.showInstallButton = true;
-  // }
-  // return shouldShowModalResponse;
+  return shouldShowModalResponse;
 
 
-  //  }
+   }
 
    
 
+
+  promptInstallPWA() {
+    if (this.deferredPrompt) {
+      // Show the prompt
+      this.deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      this.deferredPrompt.userChoice.then((choiceResult: any) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        // Reset the deferred prompt variable
+        this.deferredPrompt = null;
+        // Hide the install button
+        this.showInstallButton = false;
+      });
+    }
+  }
+
+  
 
   // showInstallBanner() {
   //   if (this.deferredPrompt !== undefined && this.deferredPrompt !== null) {
