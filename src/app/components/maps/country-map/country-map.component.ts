@@ -121,11 +121,7 @@ export class CountryMapComponent implements AfterViewInit {
       }
     ).setView([mapLat, mapLng], 15);
 
-    this.addPoint(-27.5622, -58.7488, "Vigilador: <b>Juan Pérez</b> <br> Horario: 22:00hs - 06:00hs");
-    this.addPoint(-27.5594, -58.7516, "Vigilador: <b>Carlos Gómez</b> <br> Horario: 06:00hs - 12:00hs");
-    this.addPoint(-27.5628, -58.7560, "Vigilador: <b>Alejandro Chicala</b> <br> Horario: 12:00hs - 17:00hs");
-    this.addPoint(-27.568994, -58.755599, "<img class='guard-avatar' src='img.png' /> <br> Vigilador: <b>Javier Bernal</b> <br> Horario: 17:00hs - 22:00hs");
-
+ 
     setTimeout(() => {
       this.getMap().invalidateSize(true);
     }, 100);
