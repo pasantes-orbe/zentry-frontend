@@ -165,9 +165,18 @@ const routes: Routes = [
   {
     path: 'descarga',
     loadChildren: () => import('./pages/download/download.module').then( m => m.DownloadPageModule)
-  },  {
+  },
+  {
     path: 'politica-de-privacidad',
     loadChildren: () => import('./pages/politica-de-privacidad/politica-de-privacidad.module').then( m => m.PoliticaDePrivacidadPageModule)
+  },
+  {
+    path: 'guards-schedule',
+    loadChildren: () => import('./pages/guardsSchedule/guards-schedule/guards-schedule.module').then( m => m.GuardsSchedulePageModule)
+  },
+  {
+    path: 'admin/map-guards',
+    loadChildren: () => import('./pages/admin/map-guards/map-guards.module').then( m => m.MapGuardsPageModule)
   },
 
 

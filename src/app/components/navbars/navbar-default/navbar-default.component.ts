@@ -49,9 +49,12 @@ export class NavbarDefaultComponent implements OnInit {
   }
  
 
-  protected navigate(url: string): void {
+  protected async navigate(url: string) {
+    await this.menu.close()
     this.router.navigate([url]);
   }
+
+
 
   protected openFirst(id: string): void {
     this.menu.enable(true, id);

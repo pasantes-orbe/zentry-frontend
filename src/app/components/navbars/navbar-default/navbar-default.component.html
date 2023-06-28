@@ -71,13 +71,13 @@
 
           <ion-list lines="none">
             <ion-item>
-              <ion-button fill="clear" shape="round">
+              <ion-button (click)="navigate('home/tabs/tab2')" fill="clear" shape="round">
                 Ubicacion de Vigiladores
               </ion-button>
             </ion-item>
 
             <ion-item>
-              <ion-button expand="block" fill="clear" shape="round">
+              <ion-button (click)="navigate('guards-schedule')" expand="block" fill="clear" shape="round">
                 Nomina y Horarios
               </ion-button>
             </ion-item>

@@ -1,0 +1,197 @@
+<app-navbar-back title="Nomina de Guradias" ></app-navbar-back>
+
+<ion-content>
+
+  <ion-accordion-group style="margin-top: 30px;">
+    <ion-accordion value="lunes">
+      <ion-item slot="header" color="light">
+        <ion-label>Lunes</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content" >
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'lunes'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+
+      </div>
+    </ion-accordion>
+
+    <ion-accordion value="martes">
+      <ion-item slot="header" color="light">
+        <ion-label>Martes</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'martes'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+    </ion-accordion>
+
+    <ion-accordion value="miercoles">
+      <ion-item slot="header" color="light">
+        <ion-label>Miercoles</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'miercoles'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+    </ion-accordion>
+
+    <ion-accordion value="jueves">
+      <ion-item slot="header" color="light">
+        <ion-label>Jueves</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'jueves'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+    </ion-accordion>
+
+    <ion-accordion value="viernes">
+      <ion-item slot="header" color="light">
+        <ion-label>Viernes</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'viernes'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+    </ion-accordion>
+
+    <ion-accordion value="sabado">
+      <ion-item slot="header" color="light">
+        <ion-label>Sabado</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'sabado'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+    </ion-accordion>
+
+    <ion-accordion value="domingo">
+      <ion-item slot="header" color="light">
+        <ion-label>Domingo</ion-label>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col">Apellido</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Salida</th>
+            </tr>
+          </thead>
+          <!-- *ngIf="guard.guard.week_day == 'lunes'" -->
+          <tbody *ngFor="let guard of guards">
+            <tr *ngIf="guard.guard.week_day == 'domingo'">
+              <td> {{guard.guard.user.name}} </td>
+              <td> {{guard.guard.user.lastname}} </td>
+              <td> {{guard.guard.start | date:'shortTime'}} </td>
+              <td> {{guard.guard.exit | date:'shortTime'}} </td>
+            </tr>
+          </tbody>
+      </table>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+
+</ion-content>
