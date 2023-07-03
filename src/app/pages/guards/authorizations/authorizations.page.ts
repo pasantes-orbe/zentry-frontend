@@ -107,7 +107,7 @@ export class AuthorizationsPage implements OnInit{
         err => {
           console.log(err);
         });
-    }, 500 )
+    }, 3000 )
 
     // setTimeout(() => {
     //   clearInterval(this.myTimer);
