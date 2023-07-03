@@ -20,7 +20,7 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule),
-    canActivate: [OwnerGuard]
+    // canActivate: [OwnerGuard]
   },
   {
     path: 'editar-perfil',
