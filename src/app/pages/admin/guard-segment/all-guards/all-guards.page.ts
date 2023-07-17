@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { GuardsService } from '../../../../services/guards/guards.service';
 import { GuardInterface } from '../../../../interfaces/guard-interface';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { EditGuardPage } from 'src/app/modals/guards/edit-guard/edit-guard.page';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-all-guards',
@@ -15,10 +16,11 @@ export class AllGuardsPage implements OnInit {
   public dropdownState: boolean = false;
   message = 'This modal example uses the modalController to present and dismiss modals.';
 
-  constructor(private _guardsService: GuardsService, private modalCtrl: ModalController ) { }
+  constructor(private _guardsService: GuardsService, private modalCtrl: ModalController, private _userService: UserService, private alertCtrl: AlertController) { }
 
   ngOnInit() {
     this._guardsService.getAllByCountryID().then(data => data.subscribe((guards) => {
+      console.log(guards);
       const actualDate = new Date();
       this.guards = this.filterByDay(guards, actualDate.getDay())
       this.guardsOut = this.fliterGuardsByAnotherDay(guards, actualDate.getDay())
@@ -38,14 +40,42 @@ export class AllGuardsPage implements OnInit {
     }, 2000);
   };
 
+  async deleteGuard(userId){
+    console.log(userId);
+    
+    const alerta = await this.alertCtrl.create({
+      header: '¿Estás seguro de borrar este guardia?',
+      message: 'El mismo no volverá a estar disponible.',
+      buttons:[        
+          {
+            text: 'Confirmar',
+            cssClass: 'red',
+            role: 'confirm',
+            handler: () => {
+              this._userService.deleteUserById(userId).subscribe(res => {
+                console.log(res);
+                var getUrl = window.location;
+                var baseUrl = getUrl .protocol + "//" + getUrl.host;
+                window.location.href = `${getUrl .protocol + "//" + getUrl.host}/admin/todos-los-guardias`;
+              })
+            },
+          }
+          ],
+    })
+
+    alerta.present()
+
+    
+  }
+
   filterByDay(guards: GuardInterface[], weekDayNumber: number){
     const weekDay = this.returnDay(weekDayNumber)
-    return guards.filter( guard => guard.guard.week_day == weekDay)
+    return guards.filter( guard => (guard.guard.week_day == weekDay && guard.guard.user.isActive !== false ))
   }
 
   fliterGuardsByAnotherDay(guards: GuardInterface[], weekDayNumber: number){
    const weekDay = this.returnDay(weekDayNumber)
-   return guards.filter( guard => guard.guard.week_day != weekDay)
+   return guards.filter( guard => (guard.guard.week_day != weekDay && guard.guard.user.isActive !== false ))
   }
 
   public dropdown(){

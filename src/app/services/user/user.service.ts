@@ -82,6 +82,8 @@ export class UserService {
       await toast.present();
     }
 
-
+    deleteUserById(id){
+      return this._htpp.patch(`${environment.URL}/api/users/delete-user/${id}`, {})
+    }
 
 }

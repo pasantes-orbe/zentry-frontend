@@ -32,6 +32,7 @@ export interface User {
     avatar:   null;
     role_id:  number;
     role:     Role;
+    isActive: boolean;
 }
 
 export interface Role {
