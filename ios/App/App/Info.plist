@@ -47,11 +47,11 @@
 	<true/>
 
 	<key>NSPhotoLibraryUsageDescription</key>         
-	<string>Need library access to upload images</string> 
+	<string>Need library access to upload images and bring more accesibility to the users</string> 
 	<key>NSCameraUsageDescription</key> 
-	<string>Need camera access to take pictures</string> 
+	<string>Need camera access to take pictures and bring a better experience to the users</string> 
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Need library access to upload images</string>
+	<string>Need library access to upload images and bring more flexibility for upload to users</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need location for localizate guards and show to the owners of a property</string>
 	<key>NSLocationAlwaysUsageDescription</key>
