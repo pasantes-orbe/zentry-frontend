@@ -22,7 +22,7 @@
       </ion-card>
     </ion-col>
 
-    <ion-col class="col-6" *ngFor="let country of getCountries()">
+    <ion-col class="col-6" *ngFor="let country of countries">
       <ion-card (click)="saveCountryLocalStorage(country)" [routerLink]="['/admin/country-dashboard/', country.id]" button >
         <!-- <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" /> -->
         <img alt="Country avatar" [src]="country.avatar" />
@@ -30,6 +30,9 @@
           {{country.name}}
         </ion-card-content>
       </ion-card>
+      <ion-button (click)="deleteCountry(country)" class="ion-justify-content-end" fill="clear">  
+        <ion-icon name="trash-outline"></ion-icon>        
+    </ion-button>
     </ion-col>
   </ion-row>
 

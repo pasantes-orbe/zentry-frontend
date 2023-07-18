@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   URL: "https://shock-app-backend-production-eeeb.up.railway.app",
-  // URL: "https://shock-app-backend-production.up.railway.app"
+  // URL: "https://shock-app-backend-production-eeeb.up.railway.app"
   // URL: "http://localhost:3000",
   // URL: "https://138.219.42.111"
 };

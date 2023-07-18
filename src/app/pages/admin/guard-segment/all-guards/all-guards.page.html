@@ -42,7 +42,7 @@
         </td>
         <td>
           <ion-icon (click)="deleteGuard(guard.guard.user.id)" name="trash-outline"></ion-icon>
-      </td>
+        </td>
       </tr>
       <tr>
 
@@ -70,6 +70,7 @@
         <th scope="col">Nombre</th>
         <th scope="col">DNI</th>
         <th scope="col">Editar</th>
+        <th scope="col">Eliminar</th>
 
       </tr>
     </thead>
@@ -83,7 +84,9 @@
         <td>
           <ion-icon (click)="editGuard(guard.guard.user.id)" name="create-outline"></ion-icon>
       </td>
-        
+      <td>
+        <ion-icon (click)="deleteGuard(guard.guard.user.id)" name="trash-outline"></ion-icon>
+      </td>
       </tr>
       <tr>
 

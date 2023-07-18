@@ -15,6 +15,8 @@
 
 <ion-content class="ion-padding">
 
+  <div class="table-responsive container padding-top">
+
   <table class="table">
     <thead>
       <tr>
@@ -22,6 +24,8 @@
         <th scope="col" class="name">Horario de Inicio</th>
         <th scope="col" class="name">Horario de Fin</th>
         <th scope="col" class="name">Guardar</th>
+        <th scope="col" class="name">Eliminar</th>
+
       </tr>
     </thead>
     
@@ -39,7 +43,7 @@
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
               <ion-datetime id='exit{{i}}' [(ngModel)]="day.exit" presentation="time" color="primary" [showDefaultTitle]="true">
-              <span slot="title">SELECCIONA LA HORA DE INGRESO</span>
+              <span slot="title">SELECCIONA LA HORA DE EGRESO</span>
               </ion-datetime>
           </ng-template>
         </ion-modal>
@@ -57,6 +61,7 @@
             </ion-select>
           </ion-item>
         </td>
+
         <td>             
           <ion-datetime-button datetime='start{{i}}'></ion-datetime-button>
         </td>
@@ -65,18 +70,76 @@
         </td>
         <td> 
           <ion-icon style="margin-left: 14px;"  (click)="editSchedule(day.id, day.start, day.exit, day.week_day)"  size="large" name="save-outline">
-
           </ion-icon>
+        </td>
+        <td>             
+            <ion-icon style="margin-left: 14px;" (click)="deleteSchedule(day.id)" size="large" name="trash-outline"></ion-icon>
         </td>
 
       </tr>
 
+
+      <tr *ngFor="let newDay of newScheduleHour; let iNuevo = index" >
+
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+              <ion-datetime  id='startNew{{iNuevo}}'  [(ngModel)]="newDay.start" presentation="time" color="primary" [showDefaultTitle]="true">
+              <span slot="title">SELECCIONA LA HORA DE INGRESO</span>
+              </ion-datetime>
+          </ng-template>
+        </ion-modal>
+  
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+              <ion-datetime id='exitNew{{iNuevo}}' [(ngModel)]="newDay.exit" presentation="time" color="primary" [showDefaultTitle]="true">
+              <span slot="title">SELECCIONA LA HORA DE EGRESO</span>
+              </ion-datetime>
+          </ng-template>
+        </ion-modal>
+  
+        <td> 
+          <ion-item>
+            <ion-select [(ngModel)]="newDay.week_day" multiple="false">
+              <ion-select-option value="lunes">Lunes</ion-select-option>
+              <ion-select-option value="martes">Martes</ion-select-option>
+              <ion-select-option value="miercoles">Miercoles</ion-select-option>
+              <ion-select-option value="jueves">Jueves</ion-select-option>
+              <ion-select-option value="viernes">Viernes</ion-select-option>
+              <ion-select-option value="sabado">Sabado</ion-select-option>
+              <ion-select-option value="domingo">Domingo</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </td>
+  
+        <td>             
+          <ion-datetime-button datetime='startNew{{iNuevo}}'></ion-datetime-button>
+        </td>
+        <td>             
+          <ion-datetime-button datetime='exitNew{{iNuevo}}'></ion-datetime-button>
+        </td>
+        <td> 
+          <ion-icon style="margin-left: 14px;"  (click)="newHourOnSchedule(newDay.start, newDay.exit, newDay.week_day)"  size="large" name="save-outline">
+          </ion-icon>
+        </td>
+        <td>             
+          <ion-icon style="margin-left: 14px; opacity: 0.4;" size="large" name="trash-outline"></ion-icon>
+      </td>
+        
+  
+      </tr>
   
       <tr>
       
     </tbody>
   </table>
-  
+</div>
+
+  <ion-button style="margin-top: 20px; margin-left: 6px;" (click)="newSchedule()"  shape="round">
+    <ion-icon slot="start" name="add"></ion-icon>
+      Añadir Horario
+    </ion-button>
+
+   
 
 
 </ion-content>
