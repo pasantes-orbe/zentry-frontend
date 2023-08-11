@@ -22,6 +22,7 @@
       <tr>
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
+        <th scope="col">Email</th>
         <th scope="col">Horario Laboral</th>
         <th scope="col">Editar Horario</th>
         <th scope="col">Eliminar</th>
@@ -29,19 +30,18 @@
     </thead>
     <tbody>
       <tr *ngFor="let guard of guards | filter: searchKey ; let i = index">
-        <td class="text-center">{{guard.guard.user.name}} </td>
-        <td>{{guard.guard.user.lastname}}</td>
-        <td *ngIf="guard.working == true">
+        <td class="text-center">{{guard.guards[0].guard.user.lastname}} </td>
+        <td>{{guard.guards[0].guard.user.name}}</td>
+        <td>{{guard.guards[0].guard.user.email}}</td>
+
+        <td>
           <ion-icon color="success" slot="icon-only" name="checkmark-outline"></ion-icon>
         </td>
-        <td *ngIf="guard.working == false">
-          <ion-icon color="danger" slot="icon-only" name="close-outline"></ion-icon>
+        <td>
+            <ion-icon (click)="editGuard(guard.guards[0].guard.user.id)" name="create-outline"></ion-icon>
         </td>
         <td>
-            <ion-icon (click)="editGuard(guard.guard.user.id)" name="create-outline"></ion-icon>
-        </td>
-        <td>
-          <ion-icon (click)="deleteGuard(guard.guard.user.id)" name="trash-outline"></ion-icon>
+          <ion-icon (click)="deleteGuard(guard.guards[0].guard.user.id)" name="trash-outline"></ion-icon>
         </td>
       </tr>
       <tr>
@@ -68,24 +68,26 @@
       <tr>
         <th scope="col">Apellido</th>
         <th scope="col">Nombre</th>
-        <th scope="col">DNI</th>
-        <th scope="col">Editar</th>
+        <th scope="col">Email</th>
+        <th scope="col">Horario Laboral</th>
+        <th scope="col">Editar Horario</th>
         <th scope="col">Eliminar</th>
 
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let guard of guardsOut | filter: searchKey1; let i = index">
-        <td class="text-center">{{guard.guard.user.name}} </td>
-        <td>{{guard.guard.user.lastname}}</td>
+        <td class="text-center">{{guard.guards[0].guard.user.lastname}} </td>
+        <td>{{guard.guards[0].guard.user.name}}</td>
+        <td>{{guard.guards[0].guard.user.email}}</td>
         <td>
-          {{guard.guard.user.dni}}
+          <ion-icon color="danger" slot="icon-only" name="close-outline"></ion-icon>
         </td>
         <td>
-          <ion-icon (click)="editGuard(guard.guard.user.id)" name="create-outline"></ion-icon>
+          <ion-icon (click)="editGuard(guard.guards[0].guard.user.id)" name="create-outline"></ion-icon>
       </td>
       <td>
-        <ion-icon (click)="deleteGuard(guard.guard.user.id)" name="trash-outline"></ion-icon>
+        <ion-icon (click)="deleteGuard(guard.guards[0].guard.user.id)" name="trash-outline"></ion-icon>
       </td>
       </tr>
       <tr>

@@ -16,13 +16,14 @@ import { SortPipe } from '../pipes/sort.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { InvitationsComponent } from './invitations/invitations/invitations.component';
+import { CountryPopoverComponent } from './country-popover/country-popover.component';
 
 
 
 @NgModule({
   declarations: [
     SortPipe,
-    NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent],
+    NavbarAdminComponent, CountryPopoverComponent ,IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -32,6 +33,6 @@ import { InvitationsComponent } from './invitations/invitations/invitations.comp
     Ng2SearchPipeModule,
   ],
   providers: [SortPipe],
-  exports: [NavbarAdminComponent, IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent]
+  exports: [NavbarAdminComponent, CountryPopoverComponent ,IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent]
 })
 export class ComponentsModule { }

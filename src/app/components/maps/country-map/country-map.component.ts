@@ -47,18 +47,18 @@ export class CountryMapComponent implements AfterViewInit {
 
     this.id_country = owner.property.id_country.toString()
     
-    this.socket.on('get-actives-guards', (payload) =>{
-      this.removeMarkers()
-      this.activeGuards = payload
-      this.activeGuards.forEach((data) => {
-        if (data.id_country == this.id_country)
-        this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`)
-      })
-    })
+    // this.socket.on('get-actives-guards', (payload) =>{
+    //   this.removeMarkers()
+    //   this.activeGuards = payload
+    //   this.activeGuards.forEach((data) => {
+    //     if (data.id_country == this.id_country)
+    //     this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`)
+    //   })
+    // })
 
-    this.socket.on('guardDisconnected', (payload) =>{
-      this.removeMarkers()
-    })
+    // this.socket.on('guardDisconnected', (payload) =>{
+    //   this.removeMarkers()
+    // })
 
 
   }
@@ -128,20 +128,20 @@ export class CountryMapComponent implements AfterViewInit {
 
   }
 
-  public addPoint(lat: number, lng: number, html: string = null): void {
-    const marker = L.circle([lat, lng], {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5,
-      radius: 15
-    })
-      .bindPopup(html, {closeButton: false})
-      .addTo(this.getMap());
+  // public addPoint(lat: number, lng: number, html: string = null): void {
+  //   const marker = L.circle([lat, lng], {
+  //     color: 'red',
+  //     fillColor: '#f03',
+  //     fillOpacity: 0.5,
+  //     radius: 15
+  //   })
+  //     .bindPopup(html, {closeButton: false})
+  //     .addTo(this.getMap());
 
 
-      this.markers.push(marker);
+  //     this.markers.push(marker);
 
-  }
+  // }
 
   public removeMarker(marker){
     this.map.removeLayer(marker);

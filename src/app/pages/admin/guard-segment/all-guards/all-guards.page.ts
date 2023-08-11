@@ -11,8 +11,9 @@ import { UserService } from 'src/app/services/user/user.service';
   styleUrls: ['./all-guards.page.scss'],
 })
 export class AllGuardsPage implements OnInit {
-  protected guards: GuardInterface[]
-  protected guardsOut: GuardInterface[]
+  protected guards: any[]
+  protected guardsOut: any[]
+  guardsTest: GuardInterface[]
   public dropdownState: boolean = false;
   message = 'This modal example uses the modalController to present and dismiss modals.';
 
@@ -20,10 +21,61 @@ export class AllGuardsPage implements OnInit {
 
   ngOnInit() {
     this._guardsService.getAllByCountryID().then(data => data.subscribe((guards) => {
-      console.log(guards);
       const actualDate = new Date();
-      this.guards = this.filterByDay(guards, actualDate.getDay())
-      this.guardsOut = this.fliterGuardsByAnotherDay(guards, actualDate.getDay())
+      
+      const userGuardMap = {};
+      
+      this.guards = guards.filter( guard => {
+        if(guard.guard.user.isActive !==false) {
+          return guard
+        }
+      })
+      console.log(this.guards);
+      
+      for (const guard of this.guards) {
+        const userId = guard.guard.user.id 
+        if (!userGuardMap[userId]) {
+          userGuardMap[userId] = {
+            userId: userId,
+            guards: [],
+          };
+        }
+        userGuardMap[userId].guards.push(guard);
+      }
+      
+
+      this.guards = Object.values(userGuardMap)
+      
+      const isWorking = [];
+      const isNoWorking = [];
+      
+      for (const userGroup of this.guards) {
+        let hasWorkingSchedule = false;
+
+        for (const guard of userGroup["guards"]) {
+          if (guard.working && guard.guard.user.isActive !== false) {
+            hasWorkingSchedule = true;
+            break;
+          }
+        }
+        
+        if (hasWorkingSchedule) {
+          isWorking.push(userGroup);
+        } else {
+          isNoWorking.push(userGroup);
+        }
+      }
+
+      this.guards = isWorking
+      this.guardsOut = isNoWorking
+      console.log('Usuarios con horario de trabajo:', isWorking);
+      console.log('Usuarios sin horario de trabajo:', isNoWorking);
+      
+      // console.log(this.guards);
+      // this.guards = this.filterByDay(guards, actualDate.getDay())
+      // this.guardsOut = this.fliterGuardsByAnotherDay(guards, actualDate.getDay())
+
+
     }
     ))
   }
@@ -31,6 +83,7 @@ export class AllGuardsPage implements OnInit {
   ionViewWillEnter(){
     this.ngOnInit()
   }
+
 
   handleRefresh(event) {
     setTimeout(() => {
@@ -66,6 +119,10 @@ export class AllGuardsPage implements OnInit {
     alerta.present()
 
     
+  }
+
+  filter(guards: GuardInterface[]){
+    return guards.filter( guard => (guard.guard.user.isActive !== false ))
   }
 
   filterByDay(guards: GuardInterface[], weekDayNumber: number){

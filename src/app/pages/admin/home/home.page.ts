@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { CountryInteface } from '../../../interfaces/country-interface';
-import { AlertController } from '@ionic/angular';
+import { AlertController, PopoverController } from '@ionic/angular';
+import { CountryPopoverComponent } from 'src/app/components/country-popover/country-popover.component';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,7 @@ export class HomePage implements OnInit {
 
 
 
-  constructor(private _CountriesService: CountriesService, private _countryStorage: CountryStorageService, private alertCtrl: AlertController) { }
+  constructor(private _CountriesService: CountriesService, private _countryStorage: CountryStorageService, private alertCtrl: AlertController, private popoverController: PopoverController) { }
 
   ngOnInit() {
 
@@ -68,6 +69,20 @@ export class HomePage implements OnInit {
     })
 
     alerta.present()
+  }
+
+  
+  async openPopover(id, ev: any) {
+    const popover = await this.popoverController.create({
+      component: CountryPopoverComponent, // Ajusta el componente del popover
+      event: ev,
+      translucent: true,
+      componentProps: {
+        country: id
+      }
+    });
+
+    return await popover.present();
   }
 
 }
