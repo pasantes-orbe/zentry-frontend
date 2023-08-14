@@ -44,45 +44,31 @@ export class HomePage implements OnInit {
     this._countryStorage.saveCountry(country);
   }
 
-  async deleteCountry(country){
-    console.log(country);
-
-    const alerta = await this.alertCtrl.create({
-      header: `¿Estás seguro de borrar ${country.name} ?`,
-      message: 'El mismo no volverá a estar disponible.',
-      buttons:[        
-          {
-            text: 'Confirmar',
-            cssClass: 'red',
-            role: 'confirm',
-            handler: () => {
-              this._CountriesService.deleteById(country.id).subscribe(res => {
-                console.log(res);
-                this.ionViewWillEnter()
-                // var getUrl = window.location;
-                // var baseUrl = getUrl .protocol + "//" + getUrl.host;
-                // window.location.href = `${getUrl .protocol + "//" + getUrl.host}/admin/home`;
-              })
-            },
-          }
-          ],
-    })
-
-    alerta.present()
+  handleCustomClick() {
+    this.ionViewWillEnter();
+    console.log("se actualiza");
   }
 
   
-  async openPopover(id, ev: any) {
+
+  
+  async openPopover(country, ev: any) {
     const popover = await this.popoverController.create({
       component: CountryPopoverComponent, // Ajusta el componente del popover
       event: ev,
       translucent: true,
       componentProps: {
-        country: id
+        country: country
       }
     });
 
+    popover.onDidDismiss().then(() => {
+      this.ionViewWillEnter();
+    });
+    
     return await popover.present();
   }
 
+
+  
 }
