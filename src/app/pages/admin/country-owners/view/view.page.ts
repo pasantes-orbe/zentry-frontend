@@ -10,41 +10,64 @@ import { EditPage } from 'src/app/modals/owners/edit/edit.page';
   styleUrls: ['./view.page.scss'],
 })
 export class ViewPage implements OnInit {
-  protected owners : OwnerResponse[];
 
-  constructor(private _ownersService: OwnersService, private modalCtrl: ModalController) { }
+  // CORRECCIÓN 1: Se cambia 'protected' a 'public' y se inicializa el array.
+  // La propiedad debe ser pública para que la plantilla HTML pueda acceder a ella.
+  public owners: OwnerResponse[] = [];
+
+  // CORRECCIÓN 2: Se declara la propiedad 'searchKey' que faltaba.
+  // Esta propiedad es necesaria para el [(ngModel)] de la barra de búsqueda en el HTML.
+  public searchKey: string = '';
+
+  // Se inyecta ModalController como público para que sea accesible si es necesario.
+  constructor(
+    private _ownersService: OwnersService,
+    public modalCtrl: ModalController
+  ) { }
 
   ngOnInit() {
-    console.log("ESTO SE EJECUTA");
-    this._ownersService.getAllByCountryID().then(data => data.subscribe( owners => 
-    {
-      this.owners = owners
-      console.log(owners)
+    // Se llama al método de carga de datos.
+    this.loadOwners();
+  }
+
+  ionViewWillEnter() {
+    // Se recargan los datos cada vez que se entra a la vista.
+    this.loadOwners();
+  }
+
+  // Se encapsula la lógica de carga en un método async/await para mayor claridad.
+  async loadOwners() {
+    try {
+      const ownersObservable = await this._ownersService.getAllByCountryID();
+      ownersObservable.subscribe(owners => {
+        this.owners = owners;
+        console.log(owners);
+      });
+    } catch (error) {
+      console.error("Error al cargar los propietarios:", error);
     }
-      ))
-
-  }
-  
-  ionViewWillEnter(){
-    this.ngOnInit()
   }
 
-  async editUser(id_owner, index){
-
+  async editUser(id_owner: number, index: number) {
     console.log(id_owner, index);
 
     const modal = await this.modalCtrl.create({
-      component:  EditPage,
+      component: EditPage,
       componentProps: {
         id_owner: id_owner
       }
     });
-  
-    modal.present();
-  
+
+    await modal.present();
+
+    // El manejo de los datos de retorno del modal se puede añadir aquí si es necesario.
     const { data, role } = await modal.onWillDismiss();
 
-
+    // Si el modal se cerró con un rol de 'confirm' (o cualquier otro que uses para confirmar cambios),
+    // se recargan los datos para reflejar las actualizaciones.
+    if (role === 'confirm') {
+      console.log('Modal cerrado con datos, recargando lista...');
+      this.loadOwners();
+    }
   }
-
 }

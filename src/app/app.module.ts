@@ -7,7 +7,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {OneSignal} from '@ionic-native/onesignal/ngx' ;
+//import {OneSignal} from '@ionic-native/onesignal/ngx' ;
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -37,7 +37,8 @@ registerLocaleData(localeEsAr, 'es-Ar');
   // or after 30 seconds (whichever comes first).
   registrationStrategy: 'registerWhenStable:30000'
 })],
-  providers: [OneSignal, { provide: LOCALE_ID, useValue: 'es-Ar' }, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+//Se elimino import IonicStorageModule porque no deja compilar el proyecto (onesignal no se puede importar)
+  providers: [{ provide: LOCALE_ID, useValue: 'es-Ar' }, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/services/helpers/alert.service';
-import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { PropertiesService } from '../../../../services/properties/properties.service';
 import { PropertyInterface } from '../../../../interfaces/property-interface';
 import { RecurrentsService } from '../../../../services/recurrents/recurrents.service';
 import { Router } from '@angular/router';
+import { SearchbarCustomEvent } from '@ionic/angular';
 
 @Component({
   selector: 'app-add-recurrent',
@@ -13,50 +13,79 @@ import { Router } from '@angular/router';
   styleUrls: ['./add-recurrent.page.scss'],
 })
 export class AddRecurrentPage implements OnInit {
-  private formBuilder: FormBuilder;
-  private form: FormGroup;
-  protected properties: PropertyInterface[]
-  protected termino: string;
-  protected selectedValue;
+
+  // CORRECCIÓN 1: Se cambian las propiedades a 'public' para que sean accesibles desde la plantilla HTML.
+  public form: FormGroup;
+  public properties: PropertyInterface[] = [];
+  public selectedValue: any; // Se mantiene por si se usa en el HTML
 
   constructor(
-    protected _formBuilder: FormBuilder,
-    protected _loading: LoadingService,
+    private _formBuilder: FormBuilder,
     private _propertiesService: PropertiesService,
     private _recurrentsService: RecurrentsService,
-    private _router: Router
-  ) { 
-    this.formBuilder = _formBuilder;
+    private _router: Router,
+    private _alertService: AlertService // Se inyecta AlertService para dar feedback
+  ) {
     this.form = this.createForm();
   }
 
   ngOnInit() {
   }
 
-  private createForm(): FormGroup{
-    return this.formBuilder.group({
-      name: ['', [Validators.required]],
-      lastname: ['', [Validators.required]],
-      dni: ['', [Validators.required, Validators.min(1000000),Validators.max(100000000)]],
+  private createForm(): FormGroup {
+    return this._formBuilder.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      lastname: ['', [Validators.required, Validators.minLength(3)]],
+      dni: ['', [Validators.required, Validators.min(1000000), Validators.max(100000000)]],
       property: ['', [Validators.required]],
-    })
+    });
   }
 
-  public getForm(): FormGroup {
-    return this.form;
+  // CORRECCIÓN 2: Se corrige la lógica para buscar propiedades.
+  public async getProperties(event: SearchbarCustomEvent) {
+    // Se añade el tipo correcto al evento para acceder a 'detail'.
+    const termino = event.detail.value;
+
+    if (termino && termino.length > 2) {
+      try {
+        const propertiesObservable = await this._propertiesService.getBySearchTerm(termino);
+        propertiesObservable.subscribe((properties) => {
+          this.properties = properties;
+        });
+      } catch (error) {
+        console.error("Error al buscar propiedades:", error);
+        this.properties = [];
+      }
+    } else {
+      this.properties = []; // Limpia la lista si el término es muy corto.
+    }
   }
 
-  public getProperties(termino){
-  this._propertiesService.getBySearchTerm(termino).then(data => data.subscribe((properties) => {this.properties = properties}))  
+  // CORRECCIÓN 3: Se añade el manejo de la respuesta del servicio al guardar.
+  public saveRecurrent() {
+    if (this.form.invalid) {
+      this._alertService.presentAlert('Formulario Inválido: Por favor, complete todos los campos requeridos.');
+      return;
+    }
+
+    const formValues = this.form.value;
+    
+    this._recurrentsService.addRecurrent(
+      formValues.property,
+      formValues.name,
+      formValues.lastname,
+      formValues.dni,
+      "admin" // Se asume que este valor es correcto
+    ).then((response) => {
+      console.log("Recurrente guardado:", response);
+      this._alertService.presentAlert('Éxito: El invitado/personal recurrente ha sido guardado correctamente.');
+      this.form.reset();
+      this.properties = []; // Limpia la lista de propiedades buscadas
+      // Opcional: Redirigir al usuario.
+      // this._router.navigate(['/ruta-deseada']);
+    }).catch((err) => {
+      console.error("Error al guardar recurrente:", err);
+      this._alertService.presentAlert('Error:No se pudo guardar el recurrente. Intente nuevamente.');
+    });
   }
-
-  public saveRecurrent(){
-     this._recurrentsService.addRecurrent( this.getForm().get('property').value,
-                                           this.getForm().get('name').value,
-                                           this.getForm().get('lastname').value,
-                                           this.getForm().get('dni').value,
-                                           "admin");
-                                           
-            }
-
 }

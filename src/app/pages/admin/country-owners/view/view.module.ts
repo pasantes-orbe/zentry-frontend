@@ -20,6 +20,7 @@ import { SortPipe } from 'src/app/pipes/sort.pipe';
     Ng2SearchPipeModule,
     ComponentsModule
   ],
-  declarations: [ViewPage, SortPipe]
+  //declarations: [ViewPage, SortPipe]
+  declarations: [ViewPage],
 })
 export class ViewPageModule {}

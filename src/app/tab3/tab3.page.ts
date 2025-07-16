@@ -21,7 +21,7 @@ export class Tab3Page implements OnInit{
   private userID;
   protected owner: OwnerResponse;
   private socket: Socket;
-  private recurrentsState: boolean = false;
+  public recurrentsState: boolean = false;
 
 
   @ViewChild('incomesComponent') incomesComponent;

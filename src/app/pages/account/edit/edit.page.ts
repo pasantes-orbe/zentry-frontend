@@ -11,7 +11,7 @@ import { UserService } from 'src/app/services/user/user.service';
 export class EditPage implements OnInit {
 
 
-  private readonly: boolean;
+  public readonly: boolean;
   private formBuilder: FormBuilder;
   private form: FormGroup;
   public user;

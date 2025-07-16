@@ -14,7 +14,7 @@ export class ReservationsComponent implements OnInit {
   private data: any;
   protected reservations: ReservationsInterface[]
 
-  constructor(private Navigation: NavigationService, private _reservationsService: ReservationsService) {
+  constructor(public Navigation: NavigationService, private _reservationsService: ReservationsService) {
     this.setLoading(true);
     this.loadData();
   }

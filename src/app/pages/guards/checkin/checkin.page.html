@@ -11,20 +11,20 @@
   <form [formGroup]="getForm()" (ngSubmit)="submitIncome()" >
     <ion-item>
       <ion-label position="floating">Nombre<ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="getIncomeData().name" required formControlName="name" type="text"></ion-input>
+      <ion-input [(ngModel)]="incomeData.name" required formControlName="name" type="text"></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating">Apellido <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="getIncomeData().lastname" required formControlName="lastname" type="text"></ion-input>
+      <ion-input [(ngModel)]="incomeData.lastname" required formControlName="lastname" type="text"></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label position="floating">DNI <small>(Sólo números)</small> <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="getIncomeData().DNI" required formControlName="DNI" type="text"></ion-input>
+      <ion-input [(ngModel)]="incomeData.DNI" required formControlName="DNI" type="text"></ion-input>
     </ion-item>
 
-    <ion-searchbar #searchBar [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" animated   debounce="500" placeholder="Buscar Propietario" mode="ios"  [(ngModel)]="term" (ionChange)="filtrarOwners($event.detail.value)" ></ion-searchbar>
+    <ion-searchbar #searchBar [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" animated   debounce="500" placeholder="Buscar Propietario" mode="ios"  [(ngModel)]="term" (ionChange)="filtrarOwners($any($event).detail.value)" ></ion-searchbar>
     <ion-list *ngIf="searchKey?.length > 3">
       <ion-radio-group (ionChange)="setOwner($event)" formControlName="ownerID">
 
@@ -45,7 +45,7 @@
 
     <ion-modal [keepContentsMounted]="true">
       <ng-template>
-          <ion-datetime [(ngModel)]="getIncomeData().date" presentation="date-time" formControlName="date" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime">
+          <ion-datetime [(ngModel)]="incomeData.date" presentation="date-time" formControlName="date" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime">
           <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
           </ion-datetime>
       </ng-template>
@@ -62,7 +62,7 @@
       </ion-select>
     </ion-item>
 
-    <ion-item *ngIf="getIncomeData().transport != '' && (getIncomeData().transport != 'Bicicleta' && getIncomeData().transport != 'A pie')">
+    <ion-item *ngIf="incomeData.transport != '' && (incomeData.transport != 'Bicicleta' && incomeData.transport != 'A pie')">
       <ion-label position="floating">Patente</ion-label>
       <ion-input (ionChange)="changePatent($event)" required type="text"></ion-input>
     </ion-item>

@@ -31,9 +31,12 @@
               },
               "src/manifest.webmanifest"
             ],
-            "styles": [
+            
+              "styles": [
+              {
+                "input": "node_modules/leaflet/dist/leaflet.css"
+              },
               "src/theme/variables.scss",
-              "node_modules/leaflet/dist/leaflet.css",
               "src/global.scss"
             ],
             "scripts": [],

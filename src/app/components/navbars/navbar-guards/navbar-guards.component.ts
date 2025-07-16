@@ -25,7 +25,7 @@ export class NavbarGuardsComponent implements OnInit {
   public dropdownState: boolean = false
 
   constructor(
-    private router: Router,
+    public router: Router,
     protected _userStorage: UserStorageService,
     private menu: MenuController,
     private _socketService: WebSocketService,

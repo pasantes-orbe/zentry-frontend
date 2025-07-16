@@ -11,174 +11,147 @@ import { UserService } from 'src/app/services/user/user.service';
   styleUrls: ['./all-guards.page.scss'],
 })
 export class AllGuardsPage implements OnInit {
-  protected guards: any[]
-  protected guardsOut: any[]
-  guardsTest: GuardInterface[]
-  public dropdownState: boolean = false;
-  message = 'This modal example uses the modalController to present and dismiss modals.';
 
-  constructor(private _guardsService: GuardsService, private modalCtrl: ModalController, private _userService: UserService, private alertCtrl: AlertController) { }
+  // CORRECCIÓN 1: Propiedades cambiadas a 'public' e inicializadas.
+  public guards: any[] = [];
+  public guardsOut: any[] = [];
+  public dropdownState: boolean = false;
+  public message = 'This modal example uses the modalController to present and dismiss modals.';
+
+  // CORRECCIÓN 2: Se declaran las propiedades que faltaban para las barras de búsqueda.
+  public searchKey: string = '';
+  public searchKey1: string = '';
+
+  constructor(
+    private _guardsService: GuardsService,
+    private modalCtrl: ModalController,
+    private _userService: UserService,
+    private alertCtrl: AlertController
+  ) { }
 
   ngOnInit() {
-    this._guardsService.getAllByCountryID().then(data => data.subscribe((guards) => {
-      const actualDate = new Date();
-      
-      const userGuardMap = {};
-      
-      this.guards = guards.filter( guard => {
-        if(guard.guard.user.isActive !==false) {
-          return guard
-        }
-      })
-      console.log(this.guards);
-      
-      for (const guard of this.guards) {
-        const userId = guard.guard.user.id 
-        if (!userGuardMap[userId]) {
-          userGuardMap[userId] = {
-            userId: userId,
-            guards: [],
-          };
-        }
-        userGuardMap[userId].guards.push(guard);
-      }
-      
+    this.loadGuards();
+  }
 
-      this.guards = Object.values(userGuardMap)
-      
-      const isWorking = [];
-      const isNoWorking = [];
-      
-      for (const userGroup of this.guards) {
-        let hasWorkingSchedule = false;
+  ionViewWillEnter() {
+    this.loadGuards();
+  }
 
-        for (const guard of userGroup["guards"]) {
-          if (guard.working && guard.guard.user.isActive !== false) {
-            hasWorkingSchedule = true;
-            break;
-          }
-        }
+  async loadGuards() {
+    try {
+      const guardsObservable = await this._guardsService.getAllByCountryID();
+      guardsObservable.subscribe(guards => {
+        // Filtramos primero los guardias activos
+        const activeGuards = guards.filter(guard => guard.guard.user.isActive !== false);
         
-        if (hasWorkingSchedule) {
-          isWorking.push(userGroup);
-        } else {
-          isNoWorking.push(userGroup);
-        }
-      }
+        // Agrupamos los horarios por cada guardia
+        const guardsGroupedByUser = this.groupGuardsByUser(activeGuards);
+        
+        // Separamos los que están trabajando de los que no
+        const { working, notWorking } = this.separateWorkingGuards(guardsGroupedByUser);
 
-      this.guards = isWorking
-      this.guardsOut = isNoWorking
-      console.log('Usuarios con horario de trabajo:', isWorking);
-      console.log('Usuarios sin horario de trabajo:', isNoWorking);
-      
-      // console.log(this.guards);
-      // this.guards = this.filterByDay(guards, actualDate.getDay())
-      // this.guardsOut = this.fliterGuardsByAnotherDay(guards, actualDate.getDay())
+        this.guards = working;
+        this.guardsOut = notWorking;
 
-
+        console.log('Guardias con horario de trabajo:', this.guards);
+        console.log('Guardias sin horario de trabajo:', this.guardsOut);
+      });
+    } catch (error) {
+      console.error("Error al cargar los guardias:", error);
     }
-    ))
   }
 
-  ionViewWillEnter(){
-    this.ngOnInit()
+  private groupGuardsByUser(guards: any[]): any[] {
+    const userGuardMap = {};
+    for (const guard of guards) {
+      const userId = guard.guard.user.id;
+      if (!userGuardMap[userId]) {
+        userGuardMap[userId] = {
+          // Se copia toda la información del primer schedule para tener datos del usuario
+          ...guard, 
+          schedules: [], // Se crea un array para guardar todos los horarios
+        };
+      }
+      userGuardMap[userId].schedules.push(guard);
+    }
+    return Object.values(userGuardMap);
   }
 
+  private separateWorkingGuards(groupedGuards: any[]) {
+    const working = [];
+    const notWorking = [];
+
+    for (const userGroup of groupedGuards) {
+      // Usamos .some() que es más eficiente para ver si al menos un horario está activo
+      const hasWorkingSchedule = userGroup.schedules.some(schedule => schedule.working);
+      
+      if (hasWorkingSchedule) {
+        working.push(userGroup);
+      } else {
+        notWorking.push(userGroup);
+      }
+    }
+    return { working, notWorking };
+  }
 
   handleRefresh(event) {
     setTimeout(() => {
-      // Any calls to load data go here
-      this.ngOnInit()
+      this.loadGuards();
       event.target.complete();
     }, 2000);
-  };
+  }
 
-  async deleteGuard(userId){
-    console.log(userId);
-    
-    const alerta = await this.alertCtrl.create({
-      header: '¿Estás seguro de borrar este guardia?',
-      message: 'El mismo no volverá a estar disponible.',
-      buttons:[        
-          {
-            text: 'Confirmar',
-            cssClass: 'red',
-            role: 'confirm',
-            handler: () => {
-              this._userService.deleteUserById(userId).subscribe(res => {
+  async deleteGuard(userId: number) {
+    const alert = await this.alertCtrl.create({
+      header: '¿Estás seguro?',
+      message: 'El guardia será eliminado permanentemente.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Confirmar',
+          cssClass: 'red',
+          handler: () => {
+            this._userService.deleteUserById(userId).subscribe({
+              next: res => {
                 console.log(res);
-                var getUrl = window.location;
-                var baseUrl = getUrl .protocol + "//" + getUrl.host;
-                window.location.href = `${getUrl .protocol + "//" + getUrl.host}/admin/todos-los-guardias`;
-              })
-            },
-          }
-          ],
-    })
-
-    alerta.present()
-
-    
+                // CORRECCIÓN 3: En lugar de recargar toda la página, solo recargamos los datos.
+                this.loadGuards(); 
+              },
+              error: err => console.error("Error al eliminar el guardia:", err)
+            });
+          },
+        }
+      ],
+    });
+    await alert.present();
   }
 
-  filter(guards: GuardInterface[]){
-    return guards.filter( guard => (guard.guard.user.isActive !== false ))
+  public dropdown() {
+    this.dropdownState = !this.dropdownState;
   }
 
-  filterByDay(guards: GuardInterface[], weekDayNumber: number){
-    const weekDay = this.returnDay(weekDayNumber)
-    return guards.filter( guard => (guard.guard.week_day == weekDay && guard.guard.user.isActive !== false ))
-  }
+  async editGuard(id: any) {
+    const modal = await this.modalCtrl.create({
+      component: EditGuardPage,
+      componentProps: {
+        guard_id: id
+      }
+    });
+    await modal.present();
 
-  fliterGuardsByAnotherDay(guards: GuardInterface[], weekDayNumber: number){
-   const weekDay = this.returnDay(weekDayNumber)
-   return guards.filter( guard => (guard.guard.week_day != weekDay && guard.guard.user.isActive !== false ))
-  }
-
-  public dropdown(){
-   this.dropdownState = !this.dropdownState
- }
- 
-
- async editGuard(id:any) {
-
-  console.log(id);
-
-  const modal = await this.modalCtrl.create({
-    component: EditGuardPage,
-    componentProps: {
-      guard_id : id
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'confirm') {
+      // Si el modal confirma una edición, recargamos la lista para ver los cambios.
+      this.loadGuards();
     }
-  });
-
-  modal.present();
-
-  const { data, role } = await modal.onWillDismiss();
-
-  if (role === 'confirm') {
-    this.message = `Hello, ${data}!`;
   }
-}
 
-
-  public returnDay(weekday) {
-    switch (weekday) {
-       case 1:
-          return "lunes";
-       case 2:
-          return "martes";
-       case 3:
-          return "miercoles";
-       case 4:
-          return "jueves";
-       case 5:
-          return "viernes";
-       case 6:
-          return "sabado";
-       case 7:
-          return "domingo";
-       default:
-          return "Fecha equivocada" ;
-    }
- }
+  // Este método no se usa en la lógica principal, pero se mantiene por si lo necesitas.
+  public returnDay(weekday: number): string {
+    const days = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
+    return days[weekday] || "Fecha equivocada";
+  }
 }

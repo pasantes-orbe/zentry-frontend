@@ -5,7 +5,6 @@ import { OwnerStorageService } from '../../services/storage/owner-interface-stor
 import { CheckInService } from '../../services/check-in/check-in.service';
 import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
-import { io, Socket } from 'socket.io-client'; 
 
 @Component({
   selector: 'app-incomes',
@@ -14,95 +13,76 @@ import { io, Socket } from 'socket.io-client';
 })
 export class IncomesComponent implements OnInit {
 
-  @Input('readonly') readonly: boolean;
-  @Input('nobuttons') nobuttons: boolean;
+  @Input('readonly') readonly: boolean = false;
+  @Input('nobuttons') nobuttons: boolean = false;
 
-  private loading: boolean;
-  private data: any;
-  protected checkIn : CheckInInterfaceResponse[];
-  protected ownerID;
+  public loading: boolean = true;
+  
+  // CORRECCIÓN 1: Se cambian las propiedades a 'public' y se inicializan.
+  public checkIn: CheckInInterfaceResponse[] = [];
+  public ownerID: number;
 
+  // CORRECCIÓN 2: Se cambia 'Navigation' a 'public'.
+  // Las propiedades usadas en el HTML deben ser públicas.
+  constructor(
+    public Navigation: NavigationService, 
+    public _socketService: WebSocketService,
+    public _ownerStorage: OwnerStorageService,
+    public _checkInService: CheckInService
+  ) {}
 
-  constructor(private Navigation: NavigationService, private _socketService: WebSocketService ,private _ownerStorage: OwnerStorageService, private _checkInService: CheckInService) {
-    this.setLoading(true);
+  ngOnInit() {
     this.loadData();
   }
 
-  async ngOnInit() {
-    const owner = await this._ownerStorage.getOwner()
-    this.ownerID = owner.user.id
-    this._checkInService.getAllCheckInTodayByOwnerID(this.ownerID).subscribe(
-      res => {
-      console.log(res);
-      this.checkIn = res
-    })
+  ionViewWillEnter() {
+    this.loadData();
+    console.log("ionViewWillEnter desde incomes.component");
+  }
 
-    
-   }
-
-   ionViewWillEnter(){
-    this.ngOnInit()
-    console.log("ivwilenterdesdecomponente")
-   }
-
-  private loadData(): void {
-    setTimeout(() => {
+  public async loadData(): Promise<void> {
+    this.setLoading(true);
+    try {
+      const owner = await this._ownerStorage.getOwner();
+      if (owner && owner.user) {
+        this.ownerID = owner.user.id;
+        this._checkInService.getAllCheckInTodayByOwnerID(this.ownerID).subscribe(
+          res => {
+            console.log(res);
+            this.checkIn = res;
+            this.setLoading(false);
+          },
+          err => {
+            console.error(err);
+            this.setLoading(false);
+          }
+        );
+      } else {
+        this.setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
       this.setLoading(false);
-    }, 3000);
+    }
   }
 
-  public changeAuthorization(checkIn, index){
-
-      console.log(checkIn,index)
-      this._checkInService.changeCheckInConfirmedByOwner(checkIn.id, checkIn.confirmed_by_owner).subscribe(
-        res =>{
-          this.checkIn[index].confirmed_by_owner = res['update']['confirmed_by_owner']
-          this._socketService.notificarNuevoConfirmedByOwner(res['update'])
-        } 
-      )
-
-   // this._checkInService.changeCheckInConfirmedByOwner(checkIn.id, checkIn.confirmed_by_owner).subscribe(
-     // res => {
-       // console.log(res);
-       // this.checkIn[index].confirmed_by_owner = !checkIn.confirmed_by_owner
-       // console.log("aca llamo al socket y le digo que hay un nuevo checkin autorizado")
-       // this._socketService.notificarNuevoConfirmedByOwner(checkIn)
-        
-     // }
-    //)
+  public changeAuthorization(checkIn: CheckInInterfaceResponse, index: number) {
+    console.log(checkIn, index);
+    this._checkInService.changeCheckInConfirmedByOwner(checkIn.id, !checkIn.confirmed_by_owner).subscribe(
+      res => {
+        if (res && res['update']) {
+          this.checkIn[index].confirmed_by_owner = res['update']['confirmed_by_owner'];
+          this._socketService.notificarNuevoConfirmedByOwner(res['update']);
+        }
+      }
+    );
   }
 
-  public getData(): any {
-    return this.data;
-  }
-
-  private setData(data: any): void {
-    this.data = data;
+  public setLoading(loading: boolean): void {
+    this.loading = loading;
   }
 
   public isLoading(): boolean {
     return this.loading;
   }
-
-  private setLoading(loading: boolean): void {
-    this.loading = loading;
-  }
-
-  public isReadOnly(): boolean {
-    return this.readonly;
-  }
-
-  private setReadOnly(readonly: boolean): void {
-    this.readonly = readonly;
-  }
-
-  public isNobuttons(): boolean {
-    return this.nobuttons;
-  }
-
-  public setNobuttons(nobuttons: boolean): void {
-    this.nobuttons = nobuttons;
-  }
-
-
 }
