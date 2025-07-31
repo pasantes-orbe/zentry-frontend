@@ -1,47 +1,38 @@
+```html
+<!-- --- Archivo: src/app/pages/incomes/new-income/new-income.page.html (Corregido) --- -->
+
 <ion-content class="ion-padding">
-
   <ion-title class="text-center mb-3">Nueva Autorización de Ingreso</ion-title>
-  
-
-  <form [formGroup]="getForm()" (ngSubmit)="onSubmit($event)">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <ion-item>
       <ion-label position="floating">Nombre</ion-label>
       <ion-input formControlName="name" required type="text"></ion-input>
     </ion-item>
-
     <ion-item>
       <ion-label position="floating">Apellido</ion-label>
       <ion-input formControlName="lastname" required type="text"></ion-input>
     </ion-item>
-
     <ion-item>
       <ion-label position="floating">DNI</ion-label>
       <ion-input formControlName="DNI" required type="number"></ion-input>
     </ion-item>
-
     <ion-item>
       <ion-label>INGRESO RECURRENTE</ion-label>
-      <ion-toggle [checked]="this.getForm().get('isRecurrent').value" formControlName="isRecurrent" color="success"></ion-toggle>
+      <ion-toggle [checked]="form.get('isRecurrent')?.value" formControlName="isRecurrent" color="success"></ion-toggle>
     </ion-item>
-
-    
-    <ion-item *ngIf="this.getForm().get('isRecurrent').value == false">
+    <ion-item *ngIf="form.get('isRecurrent')?.value === false">
       <ion-label class="ion-text-wrap birthday" position="">Fecha y Hora de entrada</ion-label>
       <br>
       <ion-datetime-button required datetime="datetime"></ion-datetime-button>
     </ion-item>
-
-
     <div class="text-center mt-4">
-      <ion-button routerLink="/home" fill="clear" shape="round">
+      <ion-button routerLink="/tabs/tab1" fill="clear" shape="round">
         Cancelar
       </ion-button>
-
-      <ion-button [disabled]="getForm().invalid" block size="large" color="primary" shape="round" type="submit">
+      <ion-button [disabled]="form.invalid" size="large" color="primary" shape="round" type="submit">
         Autorizar
       </ion-button>
     </div>
-
     <ion-modal [keepContentsMounted]="true">
       <ng-template>
         <ion-datetime formControlName="date" (ionChange)="getDateIncome($event)" color="primary" [showDefaultTitle]="true" id="datetime">
@@ -49,10 +40,5 @@
         </ion-datetime>
       </ng-template>
     </ion-modal>
-
   </form>
-
-  
-
-
 </ion-content>

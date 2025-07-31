@@ -1,115 +1,126 @@
-<ion-card *ngIf="!isLoading()">
+<!-- 
+  CORRECCIÓN: Se ha cambiado la llamada a la función isLoading() por la propiedad pública loading.
+  Esto es una práctica más directa y común en Angular.
+-->
+<ion-card *ngIf="!loading">
   <div class="table-responsive container padding-top">
-  
+
     <h5>Ingresos Autorizados</h5>
-  
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Autorizado</th>
-        <th scope="col" class="name">Nombre</th>
-        <th scope="col">Fecha</th>
-        <th scope="col">Hora</th>
-        <th scope="col">Solicitante</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let check of checkIn; let i = index">
 
-        <th scope="row"><ion-toggle (click)="changeAuthorization(check, i)" [checked]="check.confirmed_by_owner" color="success"></ion-toggle></th>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Autorizado</th>
+          <th scope="col" class="name">Nombre</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Hora</th>
+          <th scope="col">Solicitante</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- El bucle recorre la propiedad pública 'checkIn' -->
+        <tr *ngFor="let check of checkIn; let i = index">
 
-        <td>{{check.guest_name}}</td>
-        <td>{{check.income_date | date : 'shortDate' }}</td>
-        <td>{{check.income_date | date : 'shortTime' }}</td>
-        <td *ngIf="check.id_guard"> {{check.guard.name}} {{check.guard.lastname}} <ion-icon color="tertiary" name="lock-closed-outline"></ion-icon> </td>
-        <td *ngIf="!check.id_guard"> {{check.owner.name}} {{check.owner.lastname}} <ion-icon color="primary" name="person-circle-outline"></ion-icon></td>
-      </tr>
-      <tr>
-      
-    </tbody>
-  </table>
-  
-  
-  
+          <th scope="row">
+            <ion-toggle (ionChange)="changeAuthorization(check, i)" [checked]="check.confirmed_by_owner" color="success"></ion-toggle>
+          </th>
+
+          <td>{{check.guest_name}}</td>
+          <td>{{check.income_date | date : 'shortDate' }}</td>
+          <td>{{check.income_date | date : 'shortTime' }}</td>
+          <!-- Se comprueba si 'guard' o 'owner' existen antes de intentar mostrar sus nombres -->
+          <td *ngIf="check.id_guard && check.guard"> {{check.guard?.name}} {{check.guard?.lastname}}
+            <ion-icon color="tertiary" name="lock-closed-outline"></ion-icon>
+          </td>
+          <td *ngIf="!check.id_guard && check.owner"> {{check.owner?.name}} {{check.owner?.lastname}}
+            <ion-icon color="primary" name="person-circle-outline"></ion-icon>
+          </td>
+        </tr>
+        <tr>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  
+
+  <!-- 
+    CORRECCIÓN: Se ha cambiado la llamada a funciones como isReadOnly() por el acceso directo a las propiedades 'readonly' y 'nobuttons'.
+    Esto soluciona el error "This expression is not callable".
+  -->
   <div *ngIf="!readonly && !nobuttons" class="buttons text-center mt-2 mb-2">
-    <ion-button (click)="Navigation.navigate('ingresos-autorizados')" fill="clear" >
+    <ion-button (click)="Navigation.navigate('ingresos-autorizados')" fill="clear">
       <ion-icon slot="end" name="search-outline"></ion-icon>
       Ver Todos
     </ion-button>
-    
-    <ion-button (click)="Navigation.navigate('nueva-autorizacion')"shape="round">
+
+    <ion-button (click)="Navigation.navigate('nueva-autorizacion')" shape="round">
       <ion-icon slot="end" name="add"></ion-icon>
-      Agregar {{nobuttons}}
+      <!-- CORRECCIÓN: Se elimina {{nobuttons}} que solo imprimiría 'true' o 'false' en el botón. -->
+      Agregar
     </ion-button>
-    
   </div>
-  
-  </ion-card>
+</ion-card>
 
 <!-- 
   SKELETON TEXT WHEN LOADING DATA
- -->
-<ion-card *ngIf="isLoading()">
+  Se muestra una pantalla de carga mientras los datos se obtienen del servidor.
+-->
+<ion-card *ngIf="loading">
   <div class="table-responsive container">
-  
+
     <h5>
       <ion-skeleton-text animated style="width: 50%; height: 20px;"></ion-skeleton-text>
     </h5>
-  
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 50px; height: 20px; margin: 0 auto; "></ion-skeleton-text></th>
-        <th scope="col"><ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text></th>
-        <th scope="col"><ion-skeleton-text animated style="width: 150px; height: 10px;"></ion-skeleton-text></th>
-        <th scope="col"><ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text></th>
-        <th scope="col"><ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text></th>
-      </tr>
-    </thead>
-    <tbody class="text-center" >
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 50px; height: 20px; margin: 0 auto; "></ion-skeleton-text></th>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-        <td><ion-skeleton-text animated style="width: 150px; height: 10px;"></ion-skeleton-text></td>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-      </tr>
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 50px; height: 20px; margin: 0 auto; "></ion-skeleton-text></th>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-        <td><ion-skeleton-text animated style="width: 150px; height: 10px;"></ion-skeleton-text></td>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-      </tr>
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 50px; height: 20px; margin: 0 auto; "></ion-skeleton-text></th>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-        <td><ion-skeleton-text animated style="width: 150px; height: 10px;"></ion-skeleton-text></td>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text> </td>
-      </tr>
-      
-    </tbody>
-  </table>
-  
-  
-  
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="row">
+            <ion-skeleton-text animated style="width: 50px; height: 20px; margin: 0 auto; "></ion-skeleton-text>
+          </th>
+          <th scope="col">
+            <ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text>
+          </th>
+          <th scope="col">
+            <ion-skeleton-text animated style="width: 150px; height: 10px;"></ion-skeleton-text>
+          </th>
+          <th scope="col">
+            <ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text>
+          </th>
+          <th scope="col">
+            <ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="text-center">
+        <tr>
+          <th scope="row">
+            <ion-skeleton-text animated style="width: 50px; height: 20px; margin: 0 auto; "></ion-skeleton-text>
+          </th>
+          <td>
+            <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text>
+          </td>
+          <td>
+            <ion-skeleton-text animated style="width: 150px; height: 10px;"></ion-skeleton-text>
+          </td>
+          <td>
+            <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text>
+          </td>
+          <td>
+            <ion-skeleton-text animated style="width: 100px; height: 10px;"></ion-skeleton-text>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  
+
   <div class="buttons text-center">
     <ion-row>
-      <ion-col size="6"><ion-skeleton-text animated style="width: 100%; height: 30px;"></ion-skeleton-text></ion-col>
-      <ion-col size="6"><ion-skeleton-text animated style="width: 100%; height: 30px;"></ion-skeleton-text>  </ion-col>
+      <ion-col size="6">
+        <ion-skeleton-text animated style="width: 100%; height: 30px;"></ion-skeleton-text>
+      </ion-col>
+      <ion-col size="6">
+        <ion-skeleton-text animated style="width: 100%; height: 30px;"></ion-skeleton-text>
+      </ion-col>
     </ion-row>
-    
-      
   </div>
-  
 </ion-card>
-
-
-
-
-

@@ -1,59 +1,93 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { CheckInOrOut } from '../../../interfaces/checkInOrOut-interface';
 import { CheckInService } from '../../../services/check-in/check-in.service';
 import { CheckoutService } from '../../../services/checkout/checkout.service';
-import { io, Socket } from 'socket.io-client'; 
+import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.page.html',
   styleUrls: ['./checkout.page.scss'],
 })
-export class CheckoutPage implements OnInit {
+// Se implementa OnDestroy para limpiar la suscripción al socket cuando el componente se destruye.
+export class CheckoutPage implements OnInit, OnDestroy {
 
-  protected checkOutList : CheckInOrOut[] = []
+  // CORRECCIÓN 1: Se cambian las propiedades a 'public' para que sean accesibles desde la plantilla.
+  public checkOutList: CheckInOrOut[] = [];
+  
+  // CORRECCIÓN 2: Se declara la propiedad 'searchKey' que faltaba para el buscador.
+  public searchKey: string = '';
+  
   private socket: Socket;
+  private socketSubscription: Subscription;
 
   constructor(
-    
     private alertController: AlertController,
     private _checkInService: CheckInService,
-    private _checkOutService:CheckoutService
-  ) {
-    this.socket = io(environment.URL)
-   }
+    private _checkOutService: CheckoutService
+  ) { }
 
-  
   ngOnInit() {
-    this._checkInService.getAllCheckoutFalse().subscribe(res => this.checkOutList = res)
-    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
-      console.log(payload);
-      this._checkInService.getAllCheckoutFalse().subscribe(res => this.checkOutList = res)
-  })
+    // La conexión al socket se realiza aquí, una sola vez.
+    this.socket = io(environment.URL);
+    this.listenForUpdates();
   }
 
-  ionViewWillEnter(){
-    this.ngOnInit()
+  ionViewWillEnter() {
+    // Se cargan los datos cada vez que se entra a la vista.
+    this.loadCheckOutList();
   }
 
-  public async checkOut(e, index){
+  // Se encapsula la lógica de carga en un método para reutilizarla.
+  loadCheckOutList() {
+    this._checkInService.getAllCheckoutFalse().subscribe(res => {
+      this.checkOutList = res;
+    });
+  }
 
+  // Se crea un método específico para escuchar los eventos del socket.
+  listenForUpdates() {
+    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) => {
+      console.log('Notificación recibida:', payload);
+      // Cuando llega una notificación, se recarga la lista.
+      this.loadCheckOutList();
+    });
+  }
 
+  public async checkOut(checkInData: CheckInOrOut, index: number) {
     const alert = await this.alertController.create({
       header: 'Confirmar Check Out',
-      message: `Persona: ${e.guest_name}<br>DNI: ${e.DNI}`,
+      message: `Persona: ${checkInData.guest_name}<br>DNI: ${checkInData.DNI}`,
       buttons: [
         {
-          text:'Check Out',
-          handler: (data) => {
-            console.log("CHECKOUT CONFIRMADO..", data)
-            this._checkOutService.createCheckout(e.id, data)
-            this._checkInService.updateCheckOutTrue(e.id)
-            this.checkOutList.splice(index,1)
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Check Out',
+          // CORRECCIÓN 3: Se cambia el handler para usar async/await con try/catch.
+          // Esto es necesario si los métodos del servicio devuelven Promesas en lugar de Observables.
+          handler: async (data) => {
+            try {
+              // Se espera a que se cree el checkout.
+              await this._checkOutService.createCheckout(checkInData.id, data.observation);
+              
+              // Si lo anterior tuvo éxito, se espera a que se actualice el check-in.
+              await this._checkInService.updateCheckOutTrue(checkInData.id);
+              
+              // Si todo tuvo éxito, se elimina el elemento de la lista local.
+              this.checkOutList.splice(index, 1);
+
+            } catch (error) {
+              console.error("Error en el proceso de check-out:", error);
+              // Aquí podrías mostrar una alerta de error al usuario.
+            }
           }
-        }, 'Cancelar'],
+        }
+      ],
       inputs: [
         {
           type: 'textarea',
@@ -63,12 +97,13 @@ export class CheckoutPage implements OnInit {
       ],
     });
 
-    
-
     await alert.present();
-
-
-
   }
 
+  // Se desconecta del socket cuando el componente se destruye para evitar fugas de memoria.
+  ngOnDestroy() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
 }

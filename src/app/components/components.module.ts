@@ -18,12 +18,22 @@ import { RouterModule } from '@angular/router';
 import { InvitationsComponent } from './invitations/invitations/invitations.component';
 import { CountryPopoverComponent } from './country-popover/country-popover.component';
 
-
-
 @NgModule({
   declarations: [
     SortPipe,
-    NavbarAdminComponent, CountryPopoverComponent ,IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent],
+    NavbarAdminComponent,
+    CountryPopoverComponent,
+    IncomesGuardsComponent,
+    NavbarGuardsComponent,
+    LoaderComponent,
+    CountryMapComponent,
+    IncomesComponent,
+    ReservationsComponent,
+    NavbarDefaultComponent,
+    NavbarBackComponent,
+    RecurrentsViewAllComponent,
+    InvitationsComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -32,7 +42,24 @@ import { CountryPopoverComponent } from './country-popover/country-popover.compo
     RouterModule,
     Ng2SearchPipeModule,
   ],
-  providers: [SortPipe],
-  exports: [NavbarAdminComponent, CountryPopoverComponent ,IncomesGuardsComponent, NavbarGuardsComponent, LoaderComponent, CountryMapComponent, IncomesComponent, ReservationsComponent, NavbarDefaultComponent, NavbarBackComponent, RecurrentsViewAllComponent, InvitationsComponent]
+  // CORRECCIÓN 1: Se elimina 'SortPipe' de los providers. Los pipes no se proveen.
+  providers: [],
+  // CORRECCIÓN 2: Se añade 'SortPipe' a los exports.
+  // Ahora, cualquier módulo que importe 'ComponentsModule' podrá usar el 'SortPipe'.
+  exports: [
+    SortPipe,
+    NavbarAdminComponent,
+    CountryPopoverComponent,
+    IncomesGuardsComponent,
+    NavbarGuardsComponent,
+    LoaderComponent,
+    CountryMapComponent,
+    IncomesComponent,
+    ReservationsComponent,
+    NavbarDefaultComponent,
+    NavbarBackComponent,
+    RecurrentsViewAllComponent,
+    InvitationsComponent
+  ]
 })
 export class ComponentsModule { }

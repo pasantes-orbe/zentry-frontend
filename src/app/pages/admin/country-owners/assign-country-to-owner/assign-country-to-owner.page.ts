@@ -1,3 +1,5 @@
+// --- Archivo: assign-country-to-owner.page.ts (Corregido) ---
+
 import { Component, OnInit } from '@angular/core';
 import { OwnersService } from '../../../../services/owners/owners.service';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
@@ -14,7 +16,6 @@ import { Property_OwnerInterface } from '../../../../interfaces/property_owner-i
 })
 export class AssignCountryToOwnerPage implements OnInit {
 
-  // CORRECCIÓN 1: Se declaran todas las propiedades como públicas y se inicializan.
   public form: FormGroup;
   public owners: Owner_CountryInterface[] = [];
   public properties: Property_OwnerInterface[] = [];
@@ -54,10 +55,8 @@ export class AssignCountryToOwnerPage implements OnInit {
     });
   }
 
-  // CORRECCIÓN 2: Se reestructura el método para usar async/await y se corrigen las llamadas a las alertas.
   public async asignarPropiedadAlUsuario() {
     if (this.form.invalid) {
-      // El error indicaba que la función solo espera 1 argumento.
       this._alertService.presentAlert('Formulario Inválido: Por favor, seleccione un propietario y una propiedad.');
       return;
     }
@@ -66,17 +65,17 @@ export class AssignCountryToOwnerPage implements OnInit {
     const propertyId = this.form.get('property_id')?.value;
 
     try {
-      // El error indicaba que la función devuelve una Promise, por lo que se usa 'await'.
       await this._ownersService.relationWithProperty(userId, propertyId);
-      
       this._alertService.presentAlert('Éxito: La propiedad ha sido asignada correctamente.');
-      
-      // Se resetea el formulario tras el éxito.
-      this.form.reset(); 
-
+      this.form.reset();
     } catch (err) {
       console.error("Error al asignar propiedad:", err);
       this._alertService.presentAlert('Error: No se pudo asignar la propiedad. Intente nuevamente.');
     }
+  }
+
+  //  Función agregada para que funcione el HTML
+  public getForm(): FormGroup {
+    return this.form;
   }
 }

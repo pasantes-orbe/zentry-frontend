@@ -1,15 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
 import { ViewPageRoutingModule } from './view-routing.module';
-
 import { ViewPage } from './view.page';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { ComponentsModule } from 'src/app/components/components.module';
-import { SortPipe } from 'src/app/pipes/sort.pipe';
 
 @NgModule({
   imports: [
@@ -18,9 +14,10 @@ import { SortPipe } from 'src/app/pipes/sort.pipe';
     IonicModule,
     ViewPageRoutingModule,
     Ng2SearchPipeModule,
-    ComponentsModule
+    // Se confirma que ComponentsModule (que exporta los pipes) está importado.
+    ComponentsModule 
   ],
-  //declarations: [ViewPage, SortPipe]
+  // Se confirma que 'SortPipe' NO está en las declaraciones aquí.
   declarations: [ViewPage],
 })
 export class ViewPageModule {}

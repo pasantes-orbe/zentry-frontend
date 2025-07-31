@@ -1,3 +1,5 @@
+// --- Archivo: src/app/pages/incomes/new-income/new-income.page.ts (Corregido) ---
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CheckInService } from '../../../services/check-in/check-in.service';
@@ -5,6 +7,7 @@ import { RecurrentsService } from '../../../services/recurrents/recurrents.servi
 import { OwnerStorageService } from '../../../services/storage/owner-interface-storage.service';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
+import { AlertService } from 'src/app/services/helpers/alert.service';
 
 @Component({
   selector: 'app-new-income',
@@ -13,90 +16,83 @@ import * as moment from 'moment';
 })
 export class NewIncomePage implements OnInit {
 
-  protected incomeDate;
-  protected incomeExit;
-  private formBuilder: FormBuilder;
-  private form: FormGroup;
+  public form: FormGroup;
+  public incomeDate: any;
+  public incomeExit: any;
 
-
-  constructor(protected _formBuilder: FormBuilder, private _checkInService: CheckInService, private _recurrentsService: RecurrentsService, private _ownerStorage: OwnerStorageService, private _router: Router) { 
-    this.formBuilder = _formBuilder;
+  constructor(
+    private _formBuilder: FormBuilder,
+    private _checkInService: CheckInService,
+    private _recurrentsService: RecurrentsService,
+    private _ownerStorage: OwnerStorageService,
+    private _router: Router,
+    private _alertService: AlertService
+  ) {
     this.form = this.createForm();
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     const now = new Date();
-    const nowFormatted = moment(now).format("YYYY-MM-DDThh:mm:ss-03:00");
+    const nowFormatted = moment(now).format("YYYY-MM-DDTHH:mm:ss");
     this.form.controls['date'].setValue(nowFormatted);
-
   }
 
-
-  createForm(){
-    return this.formBuilder.group({
+  createForm(): FormGroup {
+    return this._formBuilder.group({
       name: ['', [Validators.required]],
       lastname: ['', [Validators.required]],
       DNI: ['', [Validators.required]],
       isRecurrent: [true, [Validators.required]],
-      date: ['', ]
-    })
-  }
-  
-  public getForm(): FormGroup {
-    return this.form;
+      date: ['',],
+    });
   }
 
-  async onSubmit(){
-
-    console.log(
-      this.getForm().get('isRecurrent').value
-    )
-
-    const owner = await this._ownerStorage.getOwner()
-    const ownerID = owner.user.id;
-    const id_country = owner.property.id_country
-
-    if(this.getForm().get('isRecurrent').value == true){
-      const propertyID = owner.property.id
-      this._recurrentsService.addRecurrent(
-        propertyID,
-        this.getForm().get('name').value,
-        this.getForm().get('lastname').value,
-        this.getForm().get('DNI').value,
-        "owner"
-      )
-      ;
-
-
-
-    } else {
-      
-      this._checkInService.createCheckInFromOwner(
-        this.getForm().get('name').value,
-        this.getForm().get('lastname').value,
-        this.getForm().get('DNI').value,
-        this.getForm().get('date').value,
-        ownerID,
-        id_country
-      )
+  async onSubmit() {
+    if (this.form.invalid) {
+      this._alertService.presentAlert('Formulario Inválido Por favor, complete todos los campos requeridos.');
+      return;
     }
 
-    this.form.reset()
+    try {
+      const owner = await this._ownerStorage.getOwner();
+      const ownerID = owner.user.id;
+      const id_country = owner.property.id_country;
+      const formValues = this.form.value;
+
+      if (formValues.isRecurrent) {
+        const propertyID = owner.property.id;
+        await this._recurrentsService.addRecurrent(
+          propertyID,
+          formValues.name,
+          formValues.lastname,
+          formValues.DNI,
+          "owner"
+        );
+        this._alertService.presentAlert('Éxito El invitado recurrente ha sido guardado.');
+
+      } else {
+        await this._checkInService.createCheckInFromOwner(
+          formValues.name,
+          formValues.lastname,
+          formValues.DNI,
+          formValues.date,
+          ownerID,
+          id_country
+        );
+        this._alertService.presentAlert('Éxito La autorización de ingreso ha sido creada.');
+      }
+
+      this.form.reset();
+      this._router.navigate(['/tabs/tab1']);
+
+    } catch (error) {
+      console.error("Error al procesar el formulario:", error);
+      this._alertService.presentAlert('Error No se pudo completar la operación. Intente nuevamente.');
+    }
   }
 
-  getDateIncome(event){
+  getDateIncome(event: any) {
     const { value } = event.detail;
-
-    console.log(value);
-
     this.incomeDate = value;
   }
-
-  getDateExit(event){
-    const { value } = event.detail;
-
-    console.log(value);
-    this.incomeExit = value;
-  }
-
 }

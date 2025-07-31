@@ -15,14 +15,12 @@ import { AlertService } from 'src/app/services/helpers/alert.service';
 })
 export class CheckinPage implements OnInit {
 
-  // CORRECCIÓN 1: Se cambian las propiedades a 'public' para que sean accesibles desde la plantilla HTML.
+  // CORRECCIÓN: Se cambian las propiedades a 'public' para que el HTML pueda acceder a ellas.
   public form: FormGroup;
   public incomeData: CheckinInterface;
   public dateNow: String = new Date().toISOString();
   public userID: any;
   public owners: OwnerResponse[] = [];
-
-  // CORRECCIÓN 2: Se declaran las propiedades que faltaban para el [(ngModel)] del HTML.
   public searchKey: string = '';
   public term: string = '';
 
@@ -35,7 +33,7 @@ export class CheckinPage implements OnInit {
     private _userStorageService: UserStorageService,
     private _ownersService: OwnersService,
     private _checkInService: CheckInService,
-    private _alertService: AlertService // Se asume que tienes un servicio de alertas para feedback.
+    private _alertService: AlertService
   ) {
     this.form = this.createForm();
     this.incomeData = {
@@ -58,7 +56,10 @@ export class CheckinPage implements OnInit {
     }
   }
 
-  // --- Métodos para actualizar el objeto incomeData desde el HTML ---
+  ionViewWillEnter() {
+    this.ngOnInit();
+  }
+
   select(e: any) {
     this.incomeData.transport = e.detail.value;
   }
@@ -66,7 +67,6 @@ export class CheckinPage implements OnInit {
   setObservations(e: any) {
     this.incomeData.observations = e.detail.value;
   }
-
   changePatent(e: any) {
     this.incomeData.patent = e.detail.value;
   }
@@ -75,27 +75,26 @@ export class CheckinPage implements OnInit {
     this.incomeData.ownerID = e.detail.value;
   }
 
-  // CORRECCIÓN 3: Se añade el tipo de evento correcto para evitar el error con 'event.detail'.
-  async filtrarOwners(event: SearchbarCustomEvent) {
-    const termino = event.detail.value;
+  public getIncomeData(): CheckinInterface {
+    return this.incomeData;
+  }
 
+  async filtrarOwners(event: any) { // CORRECCIÓN: Se cambia el tipo a 'any' para aceptar el evento del HTML.
+    const termino = event.detail.value;
     if (termino && termino.length > 3) {
-      try {
-        const ownersObservable = await this._ownersService.getAllByCountryID();
-        ownersObservable.subscribe(owners => {
-          this.owners = owners;
-        });
-      } catch (error) {
-        console.error("Error al filtrar propietarios:", error);
-      }
+      const ownersObservable = await this._ownersService.getAllByCountryID();
+      ownersObservable.subscribe(owners => {
+        this.owners = owners;
+      });
     } else {
-      this.owners = []; // Limpia la lista si el término de búsqueda es corto.
+      this.owners = [];
     }
   }
 
   submitIncome() {
     if (this.form.invalid) {
-      this._alertService.presentAlert("Formulario Incompleto", "Por favor, complete todos los campos requeridos.", "");
+      // CORRECCIÓN: Se une el mensaje en un solo argumento para la alerta.
+      this._alertService.presentAlert("Formulario Incompleto: Por favor, complete todos los campos requeridos.");
       return;
     }
 
@@ -111,25 +110,23 @@ export class CheckinPage implements OnInit {
       patent: this.incomeData.patent,
     };
 
-    // CORRECCIÓN 4: Se añade el .subscribe() para manejar la respuesta del servicio y dar feedback.
+    // CORRECCIÓN: Se reemplaza '.subscribe' por '.then()' y '.catch()' para manejar la Promise.
     this._checkInService.createCheckin(
       checkinData.name, checkinData.lastname, checkinData.DNI,
       checkinData.ownerID, checkinData.guardID, checkinData.date,
       checkinData.observations, checkinData.transport, checkinData.patent
-    ).subscribe({
-      next: (response) => {
-        console.log("Check-in creado:", response);
-        this._alertService.presentAlert("Éxito", "El check-in se ha registrado correctamente.", );
-        this.resetForm();
-      },
-      error: (err) => {
-        console.error("Error al crear check-in:", err);
-        this._alertService.presentAlert("Error", "No se pudo registrar el check-in.", "Intente nuevamente.");
-      }
+    ).then(response => {
+      console.log("Check-in creado:", response);
+      // CORRECCIÓN: Se une el mensaje en un solo argumento para la alerta.
+      this._alertService.presentAlert("Éxito: El check-in se ha registrado correctamente.");
+      this.resetForm();
+    }).catch(err => {
+      console.error("Error al crear check-in:", err);
+      // CORRECCIÓN: Se une el mensaje en un solo argumento para la alerta.
+      this._alertService.presentAlert("Error: No se pudo registrar el check-in. Intente nuevamente.");
     });
   }
 
-  // Se crea un método para centralizar la limpieza del formulario.
   resetForm() {
     this.form.reset();
     this.incomeData.observations = "";
@@ -156,5 +153,10 @@ export class CheckinPage implements OnInit {
   getDate(event: any) {
     const { value } = event.detail;
     this.incomeData.date = value;
+  }
+
+  getIncomeTime(event: any) {
+    const { value } = event.detail;
+    console.log(value);
   }
 }
