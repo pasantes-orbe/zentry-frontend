@@ -1,3 +1,5 @@
+// --- Archivo: src/app/pages/admin/add-country/add-country.page.ts (Corregido) ---
+
 import { AfterViewInit, Component } from '@angular/core';
 // import 'leaflet/dist/leaflet.css'; // PASO 1: Se comenta la importación de Leaflet.
 // import * as L from 'leaflet'; // PASO 2: Se comenta la importación de Leaflet.
@@ -121,12 +123,13 @@ export class AddCountryPage implements AfterViewInit {
 
   public addCountry(): void {
     if (this.form.invalid) {
-      this._alertService.presentAlert('Formulario Inválido Por favor, complete todos los campos.');
+      this._alertService.presentAlert('Formulario Inválido: Por favor, complete todos los campos.');
       return;
     }
 
     this.setCoords();
     
+    // Se asume que el servicio devuelve una Promise.
     this._countries.addCountry(
       this.form.value.fileSource,
       this.form.value.countryName,
@@ -134,12 +137,12 @@ export class AddCountryPage implements AfterViewInit {
       String(this.lng)
     )
       .then(() => {
-        this._alertService.presentAlert('Éxito El país ha sido agregado correctamente.');
+        this._alertService.presentAlert('Éxito: El país ha sido agregado correctamente.');
         this._router.navigate(['/admin/home']);
       })
       .catch(err => {
         console.error("Error al agregar el país:", err);
-        this._alertService.presentAlert('Error No se pudo agregar el país.');
+        this._alertService.presentAlert('Error: No se pudo agregar el país.');
       });
   }
 }

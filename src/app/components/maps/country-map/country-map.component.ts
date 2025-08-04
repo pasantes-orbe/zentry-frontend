@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import * as L from 'leaflet';
+//import * as L from 'leaflet';
 import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
@@ -70,12 +70,12 @@ export class CountryMapComponent implements AfterViewInit {
     const owner = await this._ownerStorage.getOwner()
     const countryID = owner.property.id_country;
      
-    this._countryService.getByID(countryID).subscribe(res =>{
+    /*this._countryService.getByID(countryID).subscribe(res =>{
       this.countryLat = res['latitude']
       this.countryLng = res['longitude']
       this.initMap(res['latitude'], res['longitude']);
 
-    })
+    })*/
 
     
     this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
@@ -94,15 +94,15 @@ export class CountryMapComponent implements AfterViewInit {
   ionViewWillEnter() {
     this.socket.emit('owner-connected', (this.id_user))
   }
-  public setTileLayer(url: any): void {
+  /*public setTileLayer(url: any): void {
     this.tileLayer = L.tileLayer(url,
       {
         attribution: ''
       });
-  }
+  }*/
 
 
-  private initMap(mapLat, mapLng): void {
+  /*private initMap(mapLat, mapLng): void {
 
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     if(prefersDark.matches){
@@ -126,7 +126,7 @@ export class CountryMapComponent implements AfterViewInit {
       this.getMap().invalidateSize(true);
     }, 100);
 
-  }
+  }*/
 
   // public addPoint(lat: number, lng: number, html: string = null): void {
   //   const marker = L.circle([lat, lng], {

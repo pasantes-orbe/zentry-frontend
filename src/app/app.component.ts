@@ -4,7 +4,7 @@ import { Platform } from '@ionic/angular';
 import { PushService } from './services/pushNotifications/push.service';
 
 // CORRECCIÓN: Se importa el CSS de Leaflet aquí para forzar su carga.
-import 'leaflet/dist/leaflet.css';
+//import 'leaflet/dist/leaflet.css';
 
 @Component({
   selector: 'app-root',
