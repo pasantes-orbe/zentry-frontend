@@ -4,7 +4,7 @@
 
   <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey" [debounce]="250"></ion-searchbar>
   <ion-list>
-    <div class="register" *ngFor="let register of registers | filter: searchKey">
+    <div class="register" *ngFor="let register of registers | filterBy: searchKey">
       <ion-item lines="none">
         <!-- CHECKIN   -->
 

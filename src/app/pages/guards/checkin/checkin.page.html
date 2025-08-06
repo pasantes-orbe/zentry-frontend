@@ -29,7 +29,7 @@
       <ion-radio-group (ionChange)="setOwner($event)" formControlName="ownerID">
 
 
-        <ion-item *ngFor="let owner of owners | filter: searchKey ; let i = index" >
+        <ion-item *ngFor="let owner of owners | filterBy: searchKey ; let i = index" >
           <ion-label >{{owner.user.name}} {{owner.user.lastname}} - {{owner.user.dni}}</ion-label>
           <ion-radio  [value]="owner.user.id"></ion-radio>
         </ion-item>

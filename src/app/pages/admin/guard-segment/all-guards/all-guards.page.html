@@ -29,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let guard of guards | filter: searchKey ; let i = index">
+      <tr *ngFor="let guard of guards | filterBy: searchKey ; let i = index">
         <td class="text-center">{{guard.guards[0].guard.user.lastname}} </td>
         <td>{{guard.guards[0].guard.user.name}}</td>
         <td>{{guard.guards[0].guard.user.email}}</td>
@@ -76,7 +76,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let guard of guardsOut | filter: searchKey1; let i = index">
+      <tr *ngFor="let guard of guardsOut | filterBy: searchKey1; let i = index">
         <td class="text-center">{{guard.guards[0].guard.user.lastname}} </td>
         <td>{{guard.guards[0].guard.user.name}}</td>
         <td>{{guard.guards[0].guard.user.email}}</td>

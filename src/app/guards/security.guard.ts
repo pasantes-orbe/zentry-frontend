@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { RoleGuard } from '../interfaces/roleguard-interface';
 import { LoginService } from '../services/auth/login.service';
@@ -8,7 +8,7 @@ import { AuthStorageService } from '../services/storage/auth-storage.service';
 @Injectable({
   providedIn: 'root'
 })
-export class SecurityGuard implements CanActivate, RoleGuard {
+export class SecurityGuard  implements RoleGuard {
 
   public roleType: string = "vigilador";
 

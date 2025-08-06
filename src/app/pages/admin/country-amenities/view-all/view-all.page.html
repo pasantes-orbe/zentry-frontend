@@ -2,29 +2,29 @@
 
 <ion-content class="ion-padding">
 
-  <div class="text-center">
-    <ion-button class="top-button" routerLink="/admin/nuevo-lugar-de-reserva" expand="block">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Nuevo Lugar de Reserva
-    </ion-button>
-  </div>
+  <div class="text-center">
+    <ion-button class="top-button" routerLink="/admin/nuevo-lugar-de-reserva" expand="block">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Nuevo Lugar de Reserva
+    </ion-button>
+  </div>
 
-  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar por Nombre"></ion-searchbar>
+  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar por Nombre"></ion-searchbar>
 
-  <ion-row>
-    <ion-col class="col-6" *ngFor="let amenitie of getAmenities() | filter: searchKey ; let i = index">
-      <!-- routerLink="/admin/country-dashboard" -->
-      <ion-card 
-      button >
-        <img alt="Imagen de Lugar de Reserva" [src]="amenitie.image" />
-              
-        <ion-card-content>
-          <h3>
-            {{amenitie.name}}
-          </h3>
-        </ion-card-content>
-      </ion-card>
-    </ion-col>
-  </ion-row>
+  <ion-row>
+    <!-- CAMBIO: Se reemplazó 'filter' por 'filterBy' para usar el nuevo pipe personalizado. -->
+    <ion-col class="col-6" *ngFor="let amenitie of getAmenities() | filterBy: searchKey ; let i = index">
+      <ion-card 
+      button >
+        <img alt="Imagen de Lugar de Reserva" [src]="amenitie.image" />
+              
+        <ion-card-content>
+          <h3>
+            {{amenitie.name}}
+          </h3>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
 
 </ion-content>

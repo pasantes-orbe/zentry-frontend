@@ -8,7 +8,6 @@ import { CheckinPageRoutingModule } from './checkin-routing.module';
 
 import { CheckinPage } from './checkin.page';
 import { ComponentsModule } from '../../../components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 
 @NgModule({
@@ -19,7 +18,6 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     CheckinPageRoutingModule,
     ComponentsModule,
     ReactiveFormsModule,
-    Ng2SearchPipeModule
   ],
   declarations: [CheckinPage]
 })

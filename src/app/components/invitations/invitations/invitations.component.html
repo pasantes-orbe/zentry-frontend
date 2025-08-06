@@ -12,7 +12,7 @@
     <ion-item>
       <ion-searchbar [(ngModel)]="searchKey" animated="true" placeholder="Buscar invitados..."></ion-searchbar>
     </ion-item>
-    <ion-item *ngFor="let guest of guests | filter: searchKey ;; let i = index" >
+    <ion-item *ngFor="let guest of guests | filterBy:searchKey; let i = index">
       <ion-label>
         <h2>{{guest.fullname}} </h2>
         <p>{{guest.dni}}</p>

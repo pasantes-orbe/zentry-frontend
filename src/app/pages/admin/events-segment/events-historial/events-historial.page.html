@@ -17,7 +17,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let reservation of reservations | filter: searchKey ; let i = index">
+      <tr *ngFor="let reservation of reservations | filterBy: searchKey ; let i = index">
         <td *ngIf="reservation.status === 'pendiente'" > 
           <ion-button (click)="resolverPeticion(true, reservation.id)" shape="round" color="success">Aceptar</ion-button> 
           <ion-button (click)="resolverPeticion(false, reservation.id)" shape="round" color="danger">Rechazar</ion-button>

@@ -8,7 +8,7 @@ import { ViewAllPageRoutingModule } from './view-all-routing.module';
 
 import { ViewAllPage } from './view-all.page';
 import { ComponentsModule } from 'src/app/components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 @NgModule({
   imports: [
@@ -17,7 +17,6 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     IonicModule,
     ViewAllPageRoutingModule,
     ComponentsModule,
-    Ng2SearchPipeModule
   ],
   declarations: [ViewAllPage]
 })

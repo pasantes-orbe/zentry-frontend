@@ -21,7 +21,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let propertie of properties | filter: searchKey ; let i = index">
+      <tr *ngFor="let propertie of properties | filterBy: searchKey ; let i = index">
         <td class="text-center">{{propertie.property.number}}</td>
         <td>{{propertie.property.address}}</td>
         <td>

@@ -9,7 +9,7 @@
   <ion-searchbar placeholder="Buscar por Nombre o Apellido"  [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" > </ion-searchbar>
   <ion-list >
     <ion-radio-group formControlName="user_id" >
-      <ion-item *ngFor="let owner of owners | filter: searchKey ; let i = index ">
+      <ion-item *ngFor="let owner of owners | filterBy: searchKey ; let i = index ">
         <ion-label>{{owner.user.name}} {{owner.user.lastname}}             -       {{owner.user.dni}}</ion-label>
         <ion-radio  slot="end" [value]="owner.user.id"></ion-radio>
       </ion-item>
@@ -32,7 +32,7 @@
   <ion-searchbar placeholder="Buscar por Nombre de Propiedad" [(ngModel)]="searchKey1" [ngModelOptions]="{standalone: true}" ></ion-searchbar>
   <ion-list >
     <ion-radio-group formControlName="property_id">
-      <ion-item *ngFor="let property of properties | filter: searchKey1 ; let i = index "> 
+      <ion-item *ngFor="let property of properties | filterBy: searchKey1 ; let i = index "> 
         <ion-avatar>
           <img alt="Avatar" [src]="property.property.avatar" />
         </ion-avatar>

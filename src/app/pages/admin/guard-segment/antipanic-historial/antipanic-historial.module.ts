@@ -8,7 +8,7 @@ import { AntipanicHistorialPageRoutingModule } from './antipanic-historial-routi
 
 import { AntipanicHistorialPage } from './antipanic-historial.page';
 import { ComponentsModule } from 'src/app/components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 @NgModule({
   imports: [
@@ -17,7 +17,6 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     IonicModule,
     AntipanicHistorialPageRoutingModule,
     ComponentsModule,
-    Ng2SearchPipeModule
   ],
   declarations: [AntipanicHistorialPage]
 })

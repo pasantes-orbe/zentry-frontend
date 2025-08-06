@@ -25,7 +25,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let guest of checkOutList | filter: searchKey ; let i = index">
+        <tr *ngFor="let guest of checkOutList | filterBy: searchKey ; let i = index">
           
           <td>
             <ion-button (click)="checkOut(guest, i)" color="danger" expand="block" fill="clear" shape="round">

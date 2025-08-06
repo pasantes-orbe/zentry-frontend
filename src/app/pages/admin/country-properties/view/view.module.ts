@@ -8,7 +8,6 @@ import { ViewPageRoutingModule } from './view-routing.module';
 
 import { ViewPage } from './view.page';
 import { ComponentsModule } from 'src/app/components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 @NgModule({
   imports: [
@@ -16,8 +15,7 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     FormsModule,
     IonicModule,
     ViewPageRoutingModule,
-    ComponentsModule,
-    Ng2SearchPipeModule
+    ComponentsModule
   ],
   declarations: [ViewPage]
 })

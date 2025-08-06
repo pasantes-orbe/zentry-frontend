@@ -8,7 +8,7 @@ import { AssignCountryToOwnerPageRoutingModule } from './assign-country-to-owner
 
 import { AssignCountryToOwnerPage } from './assign-country-to-owner.page';
 import { ComponentsModule } from '../../../../components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 @NgModule({
   imports: [
@@ -17,8 +17,7 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     IonicModule,
     AssignCountryToOwnerPageRoutingModule,
     ReactiveFormsModule,
-    ComponentsModule,
-    Ng2SearchPipeModule,
+    ComponentsModule
   ],
   declarations: [AssignCountryToOwnerPage]
 })

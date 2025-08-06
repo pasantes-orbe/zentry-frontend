@@ -16,7 +16,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let antipanic of antipanics| filter: searchKey ; let i = index">
+      <tr *ngFor="let antipanic of antipanics| filterBy: searchKey ; let i = index">
         <td> {{antipanic.createdAt | date}} </td>
         <td> {{antipanic.createdAt | date:'shortTime'}} </td>
         <td class="text-center">{{antipanic.propertyNumber}}</td>

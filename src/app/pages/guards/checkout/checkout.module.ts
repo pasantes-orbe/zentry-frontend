@@ -8,7 +8,7 @@ import { CheckoutPageRoutingModule } from './checkout-routing.module';
 
 import { CheckoutPage } from './checkout.page';
 import { ComponentsModule } from '../../../components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 @NgModule({
   imports: [
@@ -17,7 +17,6 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     IonicModule,
     CheckoutPageRoutingModule,
     ComponentsModule,
-    Ng2SearchPipeModule
   ],
   declarations: [CheckoutPage]
 })

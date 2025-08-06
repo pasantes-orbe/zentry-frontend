@@ -8,7 +8,7 @@ import { AuthorizationsPageRoutingModule } from './authorizations-routing.module
 
 import { AuthorizationsPage } from './authorizations.page';
 import { ComponentsModule } from '../../../components/components.module';
-import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 @NgModule({
   imports: [
@@ -17,7 +17,6 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     IonicModule,
     AuthorizationsPageRoutingModule,
     ComponentsModule,
-    Ng2SearchPipeModule
   ],
   declarations: [AuthorizationsPage]
 })

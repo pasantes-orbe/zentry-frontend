@@ -34,7 +34,7 @@
           SOLUCIÓN: Usar getter que combina filtrado y ordenamiento
           Esto elimina la dependencia de pipes externos y mejora el rendimiento
         -->
-        <tr *ngFor="let owner of owners | filter: searchKey; let i = index">
+        <tr *ngFor="let owner of owners | filterBy: searchKey; let i = index">
           <td>{{ owner.user.lastname }}</td>
           <td>{{ owner.user.name }}</td>
           <td>{{ owner.user.dni }}</td>
