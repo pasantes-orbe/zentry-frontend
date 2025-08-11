@@ -6,7 +6,7 @@ import { CheckInService } from '../../../services/check-in/check-in.service';
 import { RecurrentsService } from '../../../services/recurrents/recurrents.service';
 import { OwnerStorageService } from '../../../services/storage/owner-interface-storage.service';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import moment from 'moment';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 
 @Component({

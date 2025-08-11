@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { WebSocketService } from '../websocket/web-socket.service';
 import { io, Socket } from 'socket.io-client'; 
-import * as moment from 'moment';
+import moment from 'moment';
 import { UserStorageService } from '../storage/user-storage.service';
 
 @Injectable({
