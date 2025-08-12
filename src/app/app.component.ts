@@ -1,30 +1,20 @@
+// src/app/app.component.ts
 import { Component } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { Platform } from '@ionic/angular';
-import { PushService } from './services/pushNotifications/push.service';
-
-// CORRECCIÓN: Se importa el CSS de Leaflet aquí para forzar su carga.
-//import 'leaflet/dist/leaflet.css';
+import { CommonModule } from '@angular/common';
+// ¡CORRECCIÓN! Importa solo los componentes necesarios desde @ionic/angular/standalone
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonApp,          // Componente principal de la app Ionic
+    IonRouterOutlet, // El lugar donde se cargan las páginas
+  ],
 })
 export class AppComponent {
-  constructor(
-    private platform: Platform,
-    private pushService: PushService
-  ) {
-    this.initializeApp();
-  }
-
-  initializeApp() {
-    this.platform.ready().then(() => {
-      if (Capacitor.getPlatform() == 'android') {
-        this.pushService.initialConfiguration();
-      }
-    });
-  }
+  constructor() {}
 }
-

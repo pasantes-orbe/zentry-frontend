@@ -1,18 +1,13 @@
 // src/app/components/components.module.ts
 
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
-
-// CAMBIO CLAVE: Se importa nuestro propio pipe desde su archivo local.
-import { FilterByPipe } from '../pipes/filter-by.pipe';
+import { SharedModule } from '../shared/shared.module'; // <-- Importamos nuestra caja de herramientas
 
 // Pipes
+import { FilterByPipe } from '../pipes/filter-by.pipe';
 import { SortPipe } from '../pipes/sort.pipe';
 
-// Components
+// Todos tus componentes
 import { IncomesComponent } from './incomes/incomes.component';
 import { ReservationsComponent } from './reservations/reservations.component';
 import { NavbarDefaultComponent } from './navbars/navbar-default/navbar-default.component';
@@ -27,48 +22,41 @@ import { InvitationsComponent } from './invitations/invitations/invitations.comp
 import { CountryPopoverComponent } from './country-popover/country-popover.component';
 
 @NgModule({
-  declarations: [
-    SortPipe,
-    // Se declara nuestro propio FilterByPipe.
-    FilterByPipe,
-    NavbarAdminComponent,
-    CountryPopoverComponent,
-    IncomesGuardsComponent,
-    NavbarGuardsComponent,
-    LoaderComponent,
-    CountryMapComponent,
-    IncomesComponent,
-    ReservationsComponent,
-    NavbarDefaultComponent,
-    NavbarBackComponent,
-    RecurrentsViewAllComponent,
-    InvitationsComponent
-  ],
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    IonicModule,
-    RouterModule,
+    SharedModule, // <-- Nos da acceso a *ngIf, ngModel, ion-button, etc.
+    // CAMBIO CLAVE: Se elimina RouterModule de aquí para romper el círculo vicioso.
   ],
-  providers: [],
-  exports: [
-    SortPipe,
-    // Se exporta nuestro propio FilterByPipe para que otros módulos puedan usarlo.
+  declarations: [
     FilterByPipe,
-    NavbarAdminComponent,
-    CountryPopoverComponent,
-    IncomesGuardsComponent,
-    NavbarGuardsComponent,
-    LoaderComponent,
-    CountryMapComponent,
+    SortPipe,
     IncomesComponent,
     ReservationsComponent,
     NavbarDefaultComponent,
     NavbarBackComponent,
+    CountryMapComponent,
+    LoaderComponent,
+    NavbarGuardsComponent,
+    IncomesGuardsComponent,
+    NavbarAdminComponent,
     RecurrentsViewAllComponent,
     InvitationsComponent,
+    CountryPopoverComponent
+  ],
+  exports: [
+    FilterByPipe,
+    SortPipe,
+    IncomesComponent,
+    ReservationsComponent,
+    NavbarDefaultComponent,
+    NavbarBackComponent,
+    CountryMapComponent,
+    LoaderComponent,
+    NavbarGuardsComponent,
+    IncomesGuardsComponent,
+    NavbarAdminComponent,
+    RecurrentsViewAllComponent,
+    InvitationsComponent,
+    CountryPopoverComponent
   ]
 })
 export class ComponentsModule { }
-// CAMBIO CLAVE: Se importa nuestro propio pipe desde su archivo local.

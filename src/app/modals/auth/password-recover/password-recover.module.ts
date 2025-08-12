@@ -1,20 +1,13 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
-
+import { SharedModule } from 'src/app/shared/shared.module'; // <-- Importamos SharedModule
 import { PasswordRecoverPageRoutingModule } from './password-recover-routing.module';
-
 import { PasswordRecoverPage } from './password-recover.page';
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    PasswordRecoverPageRoutingModule,
-    ReactiveFormsModule
+    // SharedModule nos da acceso a todo lo que necesitamos (CommonModule, FormsModule, etc.)
+    SharedModule,
+    PasswordRecoverPageRoutingModule
   ],
   declarations: [PasswordRecoverPage]
 })
