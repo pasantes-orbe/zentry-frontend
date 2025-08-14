@@ -9,9 +9,8 @@ describe('PasswordRecoverPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PasswordRecoverPage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), PasswordRecoverPage]
+}).compileComponents();
 
     fixture = TestBed.createComponent(PasswordRecoverPage);
     component = fixture.componentInstance;

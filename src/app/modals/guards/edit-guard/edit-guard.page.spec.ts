@@ -9,9 +9,8 @@ describe('EditGuardPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditGuardPage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), EditGuardPage]
+}).compileComponents();
 
     fixture = TestBed.createComponent(EditGuardPage);
     component = fixture.componentInstance;

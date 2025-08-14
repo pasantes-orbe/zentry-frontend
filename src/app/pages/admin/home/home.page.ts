@@ -6,9 +6,10 @@ import { AlertController, PopoverController } from '@ionic/angular';
 import { CountryPopoverComponent } from 'src/app/components/country-popover/country-popover.component';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+    selector: 'app-home',
+    templateUrl: './home.page.html',
+    styleUrls: ['./home.page.scss'],
+    standalone: true,
 })
 export class HomePage implements OnInit {
 

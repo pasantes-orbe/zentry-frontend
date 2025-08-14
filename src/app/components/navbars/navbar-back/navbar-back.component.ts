@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-navbar-back',
-  templateUrl: './navbar-back.component.html',
-  styleUrls: ['./navbar-back.component.scss'],
+    selector: 'app-navbar-back',
+    templateUrl: './navbar-back.component.html',
+    styleUrls: ['./navbar-back.component.scss'],
+    standalone: true,
 })
 export class NavbarBackComponent implements OnInit {
 

@@ -22,41 +22,38 @@ import { InvitationsComponent } from './invitations/invitations/invitations.comp
 import { CountryPopoverComponent } from './country-popover/country-popover.component';
 
 @NgModule({
-  imports: [
-    SharedModule, // <-- Nos da acceso a *ngIf, ngModel, ion-button, etc.
-    // CAMBIO CLAVE: Se elimina RouterModule de aquí para romper el círculo vicioso.
-  ],
-  declarations: [
-    FilterByPipe,
-    SortPipe,
-    IncomesComponent,
-    ReservationsComponent,
-    NavbarDefaultComponent,
-    NavbarBackComponent,
-    CountryMapComponent,
-    LoaderComponent,
-    NavbarGuardsComponent,
-    IncomesGuardsComponent,
-    NavbarAdminComponent,
-    RecurrentsViewAllComponent,
-    InvitationsComponent,
-    CountryPopoverComponent
-  ],
-  exports: [
-    FilterByPipe,
-    SortPipe,
-    IncomesComponent,
-    ReservationsComponent,
-    NavbarDefaultComponent,
-    NavbarBackComponent,
-    CountryMapComponent,
-    LoaderComponent,
-    NavbarGuardsComponent,
-    IncomesGuardsComponent,
-    NavbarAdminComponent,
-    RecurrentsViewAllComponent,
-    InvitationsComponent,
-    CountryPopoverComponent
-  ]
+    imports: [
+        SharedModule,
+        FilterByPipe,
+        SortPipe,
+        IncomesComponent,
+        ReservationsComponent,
+        NavbarDefaultComponent,
+        NavbarBackComponent,
+        CountryMapComponent,
+        LoaderComponent,
+        NavbarGuardsComponent,
+        IncomesGuardsComponent,
+        NavbarAdminComponent,
+        RecurrentsViewAllComponent,
+        InvitationsComponent,
+        CountryPopoverComponent,
+    ],
+    exports: [
+        FilterByPipe,
+        SortPipe,
+        IncomesComponent,
+        ReservationsComponent,
+        NavbarDefaultComponent,
+        NavbarBackComponent,
+        CountryMapComponent,
+        LoaderComponent,
+        NavbarGuardsComponent,
+        IncomesGuardsComponent,
+        NavbarAdminComponent,
+        RecurrentsViewAllComponent,
+        InvitationsComponent,
+        CountryPopoverComponent
+    ]
 })
 export class ComponentsModule { }

@@ -6,9 +6,10 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 @Component({
-  selector: 'app-navbar-admin',
-  templateUrl: './navbar-admin.component.html',
-  styleUrls: ['./navbar-admin.component.scss'],
+    selector: 'app-navbar-admin',
+    templateUrl: './navbar-admin.component.html',
+    styleUrls: ['./navbar-admin.component.scss'],
+    standalone: true,
 })
 export class NavbarAdminComponent implements OnInit {
 

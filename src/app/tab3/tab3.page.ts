@@ -11,9 +11,10 @@ import { WebSocketService } from '../services/websocket/web-socket.service';
 import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
 
 @Component({
-  selector: 'app-tab3',
-  templateUrl: 'tab3.page.html',
-  styleUrls: ['tab3.page.scss']
+    selector: 'app-tab3',
+    templateUrl: 'tab3.page.html',
+    styleUrls: ['tab3.page.scss'],
+    standalone: true
 })
 export class Tab3Page implements OnInit{
   private loading: boolean;

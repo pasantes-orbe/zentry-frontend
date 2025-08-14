@@ -10,9 +10,9 @@ describe('Tab1Page', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [Tab1Page],
-      imports: [IonicModule.forRoot(), ExploreContainerComponentModule]
-    }).compileComponents();
+    declarations: [Tab1Page],
+    imports: [IonicModule.forRoot(), ExploreContainerComponentModule]
+}).compileComponents();
 
     fixture = TestBed.createComponent(Tab1Page);
     component = fixture.componentInstance;

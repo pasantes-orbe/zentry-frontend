@@ -12,9 +12,10 @@ import { CountriesService } from 'src/app/services/countries/countries.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
 @Component({
-  selector: 'app-country-map',
-  templateUrl: './country-map.component.html',
-  styleUrls: ['./country-map.component.scss'],
+    selector: 'app-country-map',
+    templateUrl: './country-map.component.html',
+    styleUrls: ['./country-map.component.scss'],
+    standalone: true,
 })
 export class CountryMapComponent implements AfterViewInit {
   private socket: Socket;

@@ -8,9 +8,10 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 
 
 @Component({
-  selector: 'app-incomes-guards',
-  templateUrl: './incomes-guards.component.html',
-  styleUrls: ['./incomes-guards.component.scss'],
+    selector: 'app-incomes-guards',
+    templateUrl: './incomes-guards.component.html',
+    styleUrls: ['./incomes-guards.component.scss'],
+    standalone: true,
 })
 export class IncomesGuardsComponent implements OnInit {
 

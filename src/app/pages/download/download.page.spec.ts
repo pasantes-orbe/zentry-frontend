@@ -9,9 +9,9 @@ describe('DownloadPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DownloadPage ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    declarations: [DownloadPage],
+    imports: [IonicModule.forRoot()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(DownloadPage);
     component = fixture.componentInstance;

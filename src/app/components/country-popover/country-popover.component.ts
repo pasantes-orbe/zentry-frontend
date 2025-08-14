@@ -3,9 +3,10 @@ import { AlertController, PopoverController } from '@ionic/angular';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 
 @Component({
-  selector: 'app-country-popover',
-  templateUrl: './country-popover.component.html',
-  styleUrls: ['./country-popover.component.scss'],
+    selector: 'app-country-popover',
+    templateUrl: './country-popover.component.html',
+    styleUrls: ['./country-popover.component.scss'],
+    standalone: true,
 })
 export class CountryPopoverComponent implements OnInit {
 

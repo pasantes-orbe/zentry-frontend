@@ -12,9 +12,10 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 @Component({
-  selector: 'app-navbar-guards',
-  templateUrl: './navbar-guards.component.html',
-  styleUrls: ['./navbar-guards.component.scss'],
+    selector: 'app-navbar-guards',
+    templateUrl: './navbar-guards.component.html',
+    styleUrls: ['./navbar-guards.component.scss'],
+    standalone: true,
 })
 export class NavbarGuardsComponent implements OnInit {
 

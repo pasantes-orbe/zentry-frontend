@@ -4,10 +4,10 @@ import { RecurrentsService } from 'src/app/services/recurrents/recurrents.servic
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 
 @Component({
-  selector: 'app-recurrents-view-all',
-  templateUrl: './recurrents-view-all.component.html',
-  styleUrls: ['./recurrents-view-all.component.scss'],
-  // providers: [SortPipe] // Se elimina 'providers'. Los Pipes deben declararse en un NgModule.
+    selector: 'app-recurrents-view-all',
+    templateUrl: './recurrents-view-all.component.html',
+    styleUrls: ['./recurrents-view-all.component.scss'],
+    standalone: true,
 })
 export class RecurrentsViewAllComponent implements OnInit {
 

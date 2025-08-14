@@ -7,9 +7,10 @@ import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 @Component({
-  selector: 'app-incomes',
-  templateUrl: './incomes.component.html',
-  styleUrls: ['./incomes.component.scss'],
+    selector: 'app-incomes',
+    templateUrl: './incomes.component.html',
+    styleUrls: ['./incomes.component.scss'],
+    standalone: true,
 })
 export class IncomesComponent implements OnInit {
 

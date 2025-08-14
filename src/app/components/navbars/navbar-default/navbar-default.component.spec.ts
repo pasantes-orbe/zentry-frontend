@@ -9,9 +9,8 @@ describe('NavbarDefaultComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NavbarDefaultComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), NavbarDefaultComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(NavbarDefaultComponent);
     component = fixture.componentInstance;
