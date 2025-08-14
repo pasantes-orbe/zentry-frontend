@@ -41,7 +41,8 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
 import { Storage } from '@ionic/storage-angular';
 import { PushService } from 'src/app/services/pushNotifications/push.service';
 import { Capacitor } from '@capacitor/core';
-import { ComponentsModule } from 'src/app/components/components.module';
+
+import { LoaderComponent } from '../../../components/loader/loader.component';
 
 
 @Component({
@@ -53,7 +54,7 @@ import { ComponentsModule } from 'src/app/components/components.module';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    ComponentsModule,
+    LoaderComponent,
     IonContent,
     IonHeader,
     IonToolbar,
@@ -68,7 +69,7 @@ import { ComponentsModule } from 'src/app/components/components.module';
     IonCardHeader,
     IonAvatar,
     IonCardContent
-  ]
+]
 })
 export class LoginPage implements OnInit {
 
