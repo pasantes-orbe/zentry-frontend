@@ -1,8 +1,10 @@
 // src/app/app.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// ¡CORRECCIÓN! Importa solo los componentes necesarios desde @ionic/angular/standalone
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+
+// 1. Importa el servicio de Storage
+import { Storage } from '@ionic/storage-angular';
 
 @Component({
   selector: 'app-root',
@@ -11,10 +13,22 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   standalone: true,
   imports: [
     CommonModule,
-    IonApp,          // Componente principal de la app Ionic
-    IonRouterOutlet, // El lugar donde se cargan las páginas
+    IonApp,
+    IonRouterOutlet,
   ],
 })
 export class AppComponent {
-  constructor() {}
+  constructor(
+    // 2. Inyecta el servicio en el constructor
+    private storage: Storage
+  ) {
+    // 3. Llama al método para inicializar la base de datos
+    this.initializeApp();
+  }
+
+  async initializeApp() {
+    // Esta línea crea la base de datos y la deja lista para ser usada.
+    // Es fundamental para que el servicio esté listo cuando las páginas lo pidan.
+    await this.storage.create();
+  }
 }

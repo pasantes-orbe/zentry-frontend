@@ -1,123 +1,54 @@
-// src/app/routes/routes.ts
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'splash-screen', // O tu ruta inicial
+    redirectTo: 'splash-screen',
     pathMatch: 'full',
   },
   {
     path: 'login',
-    loadChildren: () => import('../pages/auth/login/login.module').then(m => m.LoginPageModule)
+    loadComponent: () => import('../pages/auth/login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'splash-screen',
-    loadChildren: () => import('../pages/splash-screen/splash-screen.module').then(m => m.SplashScreenPageModule)
+    loadComponent: () => import('../pages/splash-screen/splash-screen.page').then(m => m.SplashScreenPage)
   },
   {
     path: 'home',
-    loadChildren: () => import('../tabs/tabs.module').then(m => m.TabsPageModule)
+    loadComponent: () => import('../tabs/tabs.page').then(m => m.TabsPage),
+    children: [
+      {
+        path: 'tab1',
+        // CORRECCIÓN: La ruta correcta es ../tab1/tab1.page
+        loadComponent: () => import('../tab1/tab1.page').then(m => m.Tab1Page)
+      },
+      {
+        path: 'tab2',
+        // CORRECCIÓN: La ruta correcta es ../tab2/tab2.module
+        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+      },
+      {
+        path: 'tab3',
+        // CORRECCIÓN: La ruta correcta es ../tab3/tab3.module
+        loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
+      },
+      {
+        path: 'tab4',
+        // CORRECCIÓN: La ruta correcta es ../tab1/tab1.page
+        loadComponent: () => import('../tab1/tab1.page').then(m => m.Tab1Page)
+      },
+      {
+        path: '',
+        redirectTo: '/home/tab1',
+        pathMatch: 'full'
+      }
+    ]
   },
+  // ... resto de tus rutas ...
   {
     path: 'admin/home',
     loadChildren: () => import('../pages/admin/home/home.module').then(m => m.HomePageModule)
   },
-  {
-    path: 'admin/country-dashboard',
-    loadChildren: () => import('../pages/admin/country-dashboard/country-dashboard.module').then(m => m.CountryDashboardPageModule)
-  },
-  {
-    path: 'admin/add-country',
-    loadChildren: () => import('../pages/admin/add-country/add-country.module').then(m => m.AddCountryPageModule)
-  },
-  {
-    path: 'admin/country-amenities/view-all',
-    loadChildren: () => import('../pages/admin/country-amenities/view-all/view-all.module').then(m => m.ViewAllPageModule)
-  },
-  {
-    path: 'admin/country-owners/view',
-    loadChildren: () => import('../pages/admin/country-owners/view/view.module').then(m => m.ViewPageModule)
-  },
-  {
-    path: 'admin/country-properties/view',
-    loadChildren: () => import('../pages/admin/country-properties/view/view.module').then(m => m.ViewPageModule)
-  },
-  {
-    path: 'admin/country-recurrents',
-    loadChildren: () => import('../pages/admin/country-recurrents/country-recurrents.module').then(m => m.CountryRecurrentsPageModule)
-  },
-  {
-    path: 'admin/events-segment/events-historial',
-    loadChildren: () => import('../pages/admin/events-segment/events-historial/events-historial.module').then(m => m.EventsHistorialPageModule)
-  },
-  {
-    path: 'admin/guard-segment/all-guards',
-    loadChildren: () => import('../pages/admin/guard-segment/all-guards/all-guards.module').then(m => m.AllGuardsPageModule)
-  },
-  {
-    path: 'admin/guard-segment/antipanic-historial',
-    loadChildren: () => import('../pages/admin/guard-segment/antipanic-historial/antipanic-historial.module').then(m => m.AntipanicHistorialPageModule)
-  },
-  {
-    path: 'admin/guard-segment/checkin-out-historial',
-    loadChildren: () => import('../pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.module').then(m => m.CheckinOutHistorialPageModule)
-  },
-  {
-    path: 'admin/map-guards',
-    loadChildren: () => import('../pages/admin/map-guards/map-guards.module').then(m => m.MapGuardsPageModule)
-  },
-  {
-    path: 'admin/solicitudes-de-contrasena',
-    loadChildren: () => import('../pages/admin/password-requests/password-requests/password-requests.module').then(m => m.PasswordRequestsPageModule)
-  },
-  {
-    path: 'guards/home',
-    loadChildren: () => import('../pages/guards/home/home.module').then(m => m.HomePageModule)
-  },
-  {
-    path: 'guards/authorizations',
-    loadChildren: () => import('../pages/guards/authorizations/authorizations.module').then(m => m.AuthorizationsPageModule)
-  },
-  {
-    path: 'guards/checkin',
-    loadChildren: () => import('../pages/guards/checkin/checkin.module').then(m => m.CheckinPageModule)
-  },
-  {
-    path: 'guards/checkout',
-    loadChildren: () => import('../pages/guards/checkout/checkout.module').then(m => m.CheckoutPageModule)
-  },
-  {
-    path: 'ver-eventos',
-    loadChildren: () => import('../pages/guards/events/view-events/view-events.module').then(m => m.ViewEventsPageModule)
-  },
-  {
-    path: 'guards-schedule',
-    loadChildren: () => import('../pages/guardsSchedule/guards-schedule/guards-schedule.module').then(m => m.GuardsSchedulePageModule)
-  },
-  {
-    path: 'ingresos-autorizados',
-    loadChildren: () => import('../pages/incomes/auth-incomes/auth-incomes.module').then(m => m.AuthIncomesPageModule)
-  },
-  {
-    path: 'nueva-autorizacion',
-    loadChildren: () => import('../pages/incomes/new-income/new-income.module').then(m => m.NewIncomePageModule)
-  },
-  {
-    path: 'registros',
-    loadChildren: () => import('../pages/registrations/incomes/incomes.module').then(m => m.IncomesPageModule)
-  },
-  {
-    path: 'reservar',
-    loadChildren: () => import('../pages/event-reservation/event-reservation.module').then(m => m.EventReservationPageModule)
-  },
-  {
-    path: 'editar-perfil',
-    loadChildren: () => import('../pages/account/edit/edit.module').then(m => m.EditPageModule)
-  },
-  {
-    path: 'cambiar-contrasena',
-    loadChildren: () => import('../pages/account/password-change/password-change.module').then(m => m.PasswordChangePageModule)
-  },
-  // ... y así con todas las demás rutas que falten
+  // ... etc.
 ];

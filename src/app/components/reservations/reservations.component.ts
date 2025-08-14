@@ -1,4 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+// Componentes Standalone de Ionic
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonList, IonItem, IonLabel, IonSpinner, IonButton } from '@ionic/angular/standalone';
+
+// Servicios y otros
 import { NavigationService } from 'src/app/helpers/navigation.service';
 import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
 import { ReservationsService } from 'src/app/services/amenities/reservations.service';
@@ -6,32 +13,46 @@ import { ReservationsService } from 'src/app/services/amenities/reservations.ser
 @Component({
   selector: 'app-reservations',
   templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+  styleUrls: ['./reservations.component.scss'],
+  standalone: true, // Se convierte a Standalone
+  imports: [
+    CommonModule,
+    RouterModule,
+    // Componentes de Ionic que probablemente usa el HTML
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonSpinner,
+    IonButton
+  ]
 })
 export class ReservationsComponent implements OnInit {
 
   private loading: boolean;
   private data: any;
-  protected reservations: ReservationsInterface[]
+  protected reservations: ReservationsInterface[];
 
-  constructor(public Navigation: NavigationService, private _reservationsService: ReservationsService) {
+  constructor(
+    public Navigation: NavigationService,
+    private _reservationsService: ReservationsService
+  ) {
     this.setLoading(true);
     this.loadData();
   }
 
   async ngOnInit() {
+    (await this._reservationsService.getAllByUser()).subscribe(reservations => {
+      this.reservations = reservations;
+      console.log("ESTAS SON LAS RESERVACIONES CREADAS POR EL USUARIO", reservations);
+    });
+  }
 
-   (await this._reservationsService.getAllByUser()).subscribe(reservations =>{
-    
-    this.reservations = reservations
-   
-    console.log("ESTAS SON LAS RESERVACIONES CREADAS POR EL USUARIO", reservations);
-
-   })
-
-   }
-
-  private loadData(): void{
+  private loadData(): void {
     setTimeout(() => {
       this.setLoading(false);
     }, 3000);
@@ -52,5 +73,4 @@ export class ReservationsComponent implements OnInit {
   public setLoading(loading: boolean): void {
     this.loading = loading;
   }
-
 }

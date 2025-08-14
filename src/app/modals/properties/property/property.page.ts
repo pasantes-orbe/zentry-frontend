@@ -1,136 +1,115 @@
+// src/app/modals/properties/property/property.page.ts
+
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+// Se importan las herramientas para formularios reactivos
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+// Servicios de Ionic
 import { ModalController, ToastController } from '@ionic/angular';
-import { PropertiesService } from 'src/app/services/properties/properties.service';
-import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
-import { UserService } from 'src/app/services/user/user.service';
+
+// Componentes Standalone de Ionic para el template
+import {
+  IonContent,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonIcon
+} from '@ionic/angular/standalone';
+
+// Íconos
+import { addIcons } from 'ionicons';
+import { add, close, save } from 'ionicons/icons';
 
 @Component({
   selector: 'app-property',
   templateUrl: './property.page.html',
   styleUrls: ['./property.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule, // <-- Soluciona el error de [formGroup]
+
+    // Componentes de Ionic que usa el HTML
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonIcon
+  ]
 })
 export class PropertyPage implements OnInit {
+  // Input para recibir los datos de la propiedad si se está editando
+  @Input() property: any;
 
-  @Input("property_id") property_id;
-  private formBuilder: FormBuilder;
-  private form: FormGroup;
-  public propertyName;
-  public addressProperty;
-  public numberProperty;
-  public avatarProperty;
-  public img;
-  newImg: string | ArrayBuffer;
-
+  propertyForm: FormGroup;
+  isEditMode = false;
 
   constructor(
-    protected _formBuilder: FormBuilder,
-    private propertiesService: PropertiesService,
     private modalCtrl: ModalController,
-    private toastController: ToastController,
-    private authStorageService: AuthStorageService
-    ) {
-    this.formBuilder = _formBuilder;
-    this.form = this.createForm();
-   }
+    private formBuilder: FormBuilder, // Se inyecta el FormBuilder para crear el formulario
+    private toastController: ToastController
+  ) {
+    // Registra los íconos que se usan en el HTML
+    addIcons({ add, close, save });
+  }
 
   ngOnInit() {
-
-    this.propertiesService.getOneProperty(this.property_id).then(
-      res => res.subscribe( 
-        res2 => {
-          console.log(res2);
-
-          this.form.controls['propertyName'].setValue(res2['name']);
-          this.form.controls['propertyAddress'].setValue(res2['address']);
-          this.form.controls['propertyNumber'].setValue(res2['number']);
-        }
-      )
-    )
-
+    // Comprueba si se pasaron datos para determinar si es modo edición o creación
+    this.isEditMode = !!this.property;
+    this.buildForm();
   }
 
-
-  onFileChange(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = e => this.newImg = reader.result;
-
-    reader.readAsDataURL(file);
-
-    if (event.target.files.length > 0) {
-
-
-      const file = event.target.files[0];
-      this.form.patchValue({
-        fileSource: file
-      });
-    }
+  // Construye el formulario reactivo
+  private buildForm(): void {
+    this.propertyForm = this.formBuilder.group({
+      propertyName: [this.property?.name || '', [Validators.required, Validators.maxLength(50)]],
+      propertyAddress: [this.property?.address || '', [Validators.required, Validators.maxLength(50)]],
+      propertyNumber: [this.property?.number || '', [Validators.required, Validators.pattern('^[0-9]+$')]]
+    });
   }
-  
 
+  // Devuelve la instancia del formulario para usar en el HTML
+  public getForm(): FormGroup {
+    return this.propertyForm;
+  }
+
+  // Cierra el modal sin guardar cambios
   cancel() {
     return this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  confirm() {
-    return this.modalCtrl.dismiss('asdfasdf', 'confirm');
+  // CORRECCIÓN: Se renombra la función para que coincida con el HTML
+  async editProperty() {
+    if (this.propertyForm.invalid) {
+      const toast = await this.toastController.create({
+        message: 'Por favor, completa todos los campos requeridos.',
+        duration: 2000,
+        color: 'danger'
+      });
+      toast.present();
+      return;
+    }
+
+    // Devuelve los datos del formulario al componente que abrió el modal
+    const formData = this.propertyForm.value;
+    this.modalCtrl.dismiss(formData, 'submit');
   }
-
-  private createForm(): FormGroup{
-    return this.formBuilder.group({
-      propertyName: ['', [Validators.required, Validators.minLength(5)]],
-      propertyAddress:['', [Validators.required, Validators.minLength(5)]],
-      propertyNumber:['', [Validators.required, Validators.max(10000)]],
-    });
-  }
-  
-  public getForm(): FormGroup {
-    return this.form;
-  }
-
-  async correctlyToast() {
-    const toast = await this.toastController.create({
-      message: 'Cambios guardados correctamente!',
-      duration: 3000,
-      position: 'bottom'
-    });
-
-    await toast.present();
-  }
-
-  async errorToast() {
-    const toast = await this.toastController.create({
-      header: 'Ha ocurrido un error al cambiar los horarios!',
-      message: 'Por favor intente nuevamente',
-      duration: 3000,
-      position: 'bottom'
-    });
-
-    await toast.present();
-  }
-
-  async editProperty(){
-    const token = await this.authStorageService.getJWT()
-
-    this.propertiesService.editProperty(
-      token,
-      this.property_id,
-      this.form.get('propertyName').value,
-      this.form.get('propertyNumber').value,
-      this.form.get('propertyAddress').value,)
-      .subscribe( 
-        async (res) => {
-          console.log(res)
-          await this.correctlyToast()
-
-        },
-        async(error) => {
-          console.log(error);
-          await this.errorToast()
-        }
-          )
-
-  }
-
 }

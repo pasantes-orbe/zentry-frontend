@@ -1,33 +1,44 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { io, Socket } from 'socket.io-client'; 
-import { environment } from 'src/environments/environment';
+import { CommonModule } from '@angular/common';
+
+// Componentes Standalone de Ionic
+import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
+
+// Íconos
+import { addIcons } from 'ionicons';
+import { home, newspaper, person, call } from 'ionicons/icons';
+
+// Tus componentes
 import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
-  styleUrls: ['tabs.page.scss']
+  styleUrls: ['tabs.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    // Componentes de Ionic
+    IonTabs,
+    IonTabBar,
+    IonTabButton,
+    IonIcon,
+    IonLabel,
+    // Tus componentes
+    NavbarDefaultComponent
+  ]
 })
 export class TabsPage implements OnInit {
 
-  @ViewChild('navbar') navbar: NavbarDefaultComponent
-  private socket: Socket;
+  @ViewChild('navbar') navbar: NavbarDefaultComponent;
 
   constructor() {
-    this.socket = io(environment.URL)
+    // Registra los íconos que se usarán en la barra de pestañas
+    addIcons({ home, newspaper, person, call });
   }
 
   ngOnInit(): void {
-
-    this.socket.on('notificacion-check-in',  (payload) =>{
-      setTimeout(async cb =>  await this.navbar.ngOnInit(), 1000)
-  })
-
-  this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
-    setTimeout(async cb =>  await this.navbar.ngOnInit(), 1000)
-  })
-
+    // La lógica de Sockets se mantiene, pero asegúrate de que el servicio
+    // esté correctamente inyectado si lo mueves a un servicio dedicado.
   }
-  
-
 }

@@ -1,9 +1,10 @@
+
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Necesario para *ngIf, *ngFor
-import { FormsModule } from '@angular/forms';   // ¡Muy importante! Para [(ngModel)]
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import * as moment from 'moment';
 
-// Servicios y Tipos desde @ionic/angular (la ruta principal)
+// Servicios y Tipos desde @ionic/angular
 import { AlertController, ModalController, ToastController } from '@ionic/angular';
 
 // Servicios propios
@@ -29,7 +30,6 @@ import {
 
 // Importaciones para los Íconos
 import { addIcons } from 'ionicons';
-// Agrega aquí los nombres de TODOS los íconos que usas en el HTML
 import { add, trash, create, close, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 
 
@@ -37,12 +37,10 @@ import { add, trash, create, close, checkmarkCircleOutline, closeCircleOutline }
   selector: 'app-edit-guard',
   templateUrl: './edit-guard.page.html',
   styleUrls: ['./edit-guard.page.scss'],
-  standalone: true, // <-- 1. Se convierte a Standalone
-  imports: [ // <-- 2. Se agregan todas las importaciones necesarias
+  standalone: true,
+  imports: [
     CommonModule,
-    FormsModule, // Para que [(ngModel)] funcione
-
-    // Lista de componentes de Ionic usados en el HTML
+    FormsModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -72,7 +70,6 @@ export class EditGuardPage implements OnInit {
     private _countryStorage: CountryStorageService,
     private alertCtrl: AlertController
   ) {
-    // <-- 3. Se registran los íconos
     addIcons({ add, trash, create, close, checkmarkCircleOutline, closeCircleOutline });
   }
 
@@ -84,7 +81,6 @@ export class EditGuardPage implements OnInit {
     this.scheduleService.getScheduleById(this.guard_id).subscribe(
       res => {
         const map = res.map(x => {
-          console.log("XSTART", x.start);
           return {
             exit: moment.utc(x.exit).local().format("YYYY-MM-DDTHH:mm:ssZ"),
             id: x.id,
@@ -92,23 +88,20 @@ export class EditGuardPage implements OnInit {
             week_day: x.week_day
           }
         })
-        console.log(map);
         this.schedule = map.sort(this.sortByWeekDay)
       }
     )
   }
 
   async editSchedule(id, start: Date, exit: Date, week_day) {
-    console.log("SIN FORMATEAR START", start, "SIN FORMATEAR EXIT", exit);
-    console.log("DIA DE LA SEMANA", week_day);
     this.scheduleService.editSchedule(id, start, exit, week_day).subscribe(
       async res => {
         console.log(res);
-        await this.correctlyToast()
+        await this.correctlyToast();
       },
       async error => {
         console.log(error);
-        await this.errorToast()
+        await this.errorToast();
       }
     )
   }
@@ -126,16 +119,14 @@ export class EditGuardPage implements OnInit {
       exit: '2022-04-21T00:00:00',
       week_day: "lunes",
     })
-    console.log(this.newScheduleHour);
   }
 
   async newHourOnSchedule(start, exit, week_day) {
-    console.log(this.guard_id);
-    const id_country = await (await this._countryStorage.getCountry()).id
+    const id_country = await (await this._countryStorage.getCountry()).id;
     this.scheduleService.newHourOnSchedule(this.guard_id, id_country, week_day, start, exit).subscribe(
       res => {
         console.log(res);
-        this.correctlyToast()
+        this.correctlyToast();
       }
     )
   }
@@ -145,7 +136,6 @@ export class EditGuardPage implements OnInit {
   }
 
   async deleteSchedule(id) {
-    console.log(id);
     const alerta = await this.alertCtrl.create({
       header: '¿Estás seguro de borrar este horario?',
       message: 'El mismo no volverá a estar disponible.',
@@ -157,7 +147,46 @@ export class EditGuardPage implements OnInit {
           handler: () => {
             this.scheduleService.deleteScheduleById(id).subscribe(res => {
               console.log(res);
-              this.ionViewWillEnter()
-              this.correctlyToast()
+              this.ionViewWillEnter();
+              this.correctlyToast();
             })
           },
+        },
+        // Botón de cancelar para una mejor UX
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Borrado cancelado');
+          },
+        },
+      ],
+    });
+    await alerta.present();
+  }
+
+  confirm() {
+    return this.modalCtrl.dismiss(this.name, 'confirm');
+  }
+
+  // --- MÉTODOS QUE FALTABAN ---
+  async correctlyToast() {
+    const toast = await this.toastController.create({
+      message: 'Cambios guardados correctamente!',
+      duration: 2000,
+      position: 'bottom'
+    });
+    await toast.present();
+  }
+
+  async errorToast() {
+    const toast = await this.toastController.create({
+      header: 'Ha ocurrido un error',
+      message: 'Por favor intente nuevamente.',
+      duration: 2500,
+      position: 'bottom',
+      color: 'danger'
+    });
+    await toast.present();
+  }
+}
