@@ -1,7 +1,7 @@
-// src/app/app.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { RouterModule } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 
 // 1. Importa el servicio de Storage
 import { Storage } from '@ionic/storage-angular';
@@ -13,22 +13,19 @@ import { Storage } from '@ionic/storage-angular';
   standalone: true,
   imports: [
     CommonModule,
-    IonApp,
-    IonRouterOutlet,
+    RouterModule,
+    IonicModule
   ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(
     // 2. Inyecta el servicio en el constructor
     private storage: Storage
-  ) {
-    // 3. Llama al método para inicializar la base de datos
-    this.initializeApp();
-  }
+  ) {}
 
-  async initializeApp() {
-    // Esta línea crea la base de datos y la deja lista para ser usada.
-    // Es fundamental para que el servicio esté listo cuando las páginas lo pidan.
+  // Implementa OnInit para manejar la inicialización
+  async ngOnInit() {
+    // 3. Inicializa el storage
     await this.storage.create();
   }
 }

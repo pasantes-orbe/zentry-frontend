@@ -1,27 +1,46 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
+import { AlertController, PopoverController } from '@ionic/angular';
+
+// Servicios
 import { CountriesService } from 'src/app/services/countries/countries.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+
+// Interfaces
 import { CountryInteface } from '../../../interfaces/country-interface';
-import { AlertController, PopoverController } from '@ionic/angular';
+
+// Componentes
+import { NavbarDefaultComponent } from 'src/app/components/navbars/navbar-default/navbar-default.component';
 import { CountryPopoverComponent } from 'src/app/components/country-popover/country-popover.component';
 
 @Component({
-    selector: 'app-home',
-    templateUrl: './home.page.html',
-    styleUrls: ['./home.page.scss'],
-    standalone: true,
+  selector: 'app-home',
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    IonicModule,
+    // Componentes
+    NavbarDefaultComponent,
+    CountryPopoverComponent
+  ]
 })
 export class HomePage implements OnInit {
+  protected countries: CountryInteface[] = [];
 
-  protected countries;
-
-
-
-  constructor(private _CountriesService: CountriesService, private _countryStorage: CountryStorageService, private alertCtrl: AlertController, private popoverController: PopoverController) { }
+  constructor(
+    private countriesService: CountriesService,
+    private countryStorage: CountryStorageService,
+    private alertCtrl: AlertController,
+    private popoverController: PopoverController
+  ) {}
 
   ngOnInit() {
-
-
+    this.getCountriesFromDB();
   }
 
   ionViewWillEnter() {
@@ -29,33 +48,23 @@ export class HomePage implements OnInit {
   }
 
   private getCountriesFromDB() {
-
-    this._CountriesService.getAll().subscribe(
-      data => {
-        this.countries = data
-        const countriesPrueba = this.countries.filter(country => country.isActive !== false)
-        console.log(countriesPrueba);
-        this.countries = countriesPrueba
+    this.countriesService.getAll().subscribe({
+      next: (data) => {
+        this.countries = (data as CountryInteface[]).filter(country => country.isActive !== false);
+      },
+      error: (error) => {
+        this.handleError(error);
       }
-    )
-
+    });
   }
 
-  saveCountryLocalStorage(country: CountryInteface){
-    this._countryStorage.saveCountry(country);
+  saveCountryLocalStorage(country: CountryInteface) {
+    this.countryStorage.saveCountry(country);
   }
 
-  handleCustomClick() {
-    this.ionViewWillEnter();
-    console.log("se actualiza");
-  }
-
-  
-
-  
-  async openPopover(country, ev: any) {
+  async openPopover(country: CountryInteface, ev: any) {
     const popover = await this.popoverController.create({
-      component: CountryPopoverComponent, // Ajusta el componente del popover
+      component: CountryPopoverComponent,
       event: ev,
       translucent: true,
       componentProps: {
@@ -63,13 +72,25 @@ export class HomePage implements OnInit {
       }
     });
 
-    popover.onDidDismiss().then(() => {
-      this.ionViewWillEnter();
+    popover.onDidDismiss().then((data) => {
+      // Si el popover devolvió que se borró algo, actualizamos la lista
+      if (data?.data?.deleted) {
+        this.getCountriesFromDB();
+      }
     });
-    
+
     return await popover.present();
   }
 
+  // Método para manejar errores de manera centralizada
+  private async handleError(error: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message: 'No se pudieron cargar los países. Por favor, intente nuevamente.',
+      buttons: ['OK']
+    });
 
-  
+    await alert.present();
+    console.error('Error al cargar países:', error);
+  }
 }

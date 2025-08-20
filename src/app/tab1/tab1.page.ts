@@ -7,12 +7,13 @@ import { MenuController } from '@ionic/angular';
 import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 
 // CORRECCIÓN: Rutas de importación ajustadas a la estructura de tu proyecto
-import { UserStorageService } from '../../../services/storage/user-storage.service';
-import { OwnerStorageService } from '../../../services/storage/owner-interface-storage.service';
-import { OwnersService } from '../../../services/owners/owners.service';
-import { OwnerResponse } from '../../../interfaces/ownerResponse-interface';
-import { HeaderComponent } from '../../../components/header/header.component';
-import { ReservationsComponent } from '../../../components/reservations/reservations.component';
+import { UserStorageService } from '../services/storage/user-storage.service';
+import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
+import { OwnersService } from '../services/owners/owners.service';
+import { OwnerResponse } from '../interfaces/ownerResponse-interface';
+// CORRECCIÓN: Se importa el componente correcto que usa el HTML
+import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
+import { ReservationsComponent } from '../components/reservations/reservations.component';
 
 @Component({
   selector: 'app-tab1',
@@ -23,8 +24,8 @@ import { ReservationsComponent } from '../../../components/reservations/reservat
     CommonModule,
     FormsModule,
     IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    HeaderComponent,
-    // NOTA: Para que esto funcione, 'ReservationsComponent' también debe ser convertido a standalone.
+    // CORRECCIÓN: Se importa el componente correcto
+    NavbarDefaultComponent,
     ReservationsComponent
   ]
 })
@@ -55,7 +56,6 @@ export class Tab1Page implements OnInit {
   }
 
   async ionViewWillEnter() {
-    // Necesitamos convertir ReservationsComponent a standalone también
     if (this.reservationsComponent) {
       // await this.reservationsComponent.ngOnInit();
     }
