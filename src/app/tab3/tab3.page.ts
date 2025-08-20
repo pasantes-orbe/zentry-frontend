@@ -18,8 +18,8 @@ import { OwnerStorageService } from '../services/storage/owner-interface-storage
 import { AlertService } from '../services/helpers/alert.service';
 
 // Componentes
-import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
 import { IncomesComponent } from '../components/incomes/incomes.component';
+import { RecurrentsViewAllComponent } from '../components/recurrentsViewAll/recurrents-view-all/recurrents-view-all.component';
 
 @Component({
     selector: 'app-tab3',
@@ -30,8 +30,8 @@ import { IncomesComponent } from '../components/incomes/incomes.component';
         CommonModule,
         IonicModule,
         RouterModule,
-        NavbarDefaultComponent,
-        IncomesComponent
+        IncomesComponent,
+        RecurrentsViewAllComponent
     ]
 })
 export class Tab3Page implements OnInit {

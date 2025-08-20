@@ -2,17 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 
-// Componentes Standalone de Ionic
-import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
-
-// CORRECCIÓN: Rutas de importación ajustadas a la estructura de tu proyecto
+// Servicios
 import { UserStorageService } from '../services/storage/user-storage.service';
 import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
 import { OwnersService } from '../services/owners/owners.service';
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
-// CORRECCIÓN: Se importa el componente correcto que usa el HTML
-import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
+
+// Componentes
 import { ReservationsComponent } from '../components/reservations/reservations.component';
 
 @Component({
@@ -23,18 +21,16 @@ import { ReservationsComponent } from '../components/reservations/reservations.c
   imports: [
     CommonModule,
     FormsModule,
-    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    // CORRECCIÓN: Se importa el componente correcto
-    NavbarDefaultComponent,
+    IonicModule,
     ReservationsComponent
   ]
 })
 export class Tab1Page implements OnInit {
-  private loading: boolean;
-  private userID;
-  protected owner: OwnerResponse;
+  private loading: boolean = true;
+  private userID: any;
+  protected owner: OwnerResponse | null = null;
 
-  @ViewChild('reservationsComponent') reservationsComponent: ReservationsComponent;
+  @ViewChild('reservationsComponent') reservationsComponent!: ReservationsComponent;
 
   constructor(
     private menu: MenuController,
@@ -47,12 +43,25 @@ export class Tab1Page implements OnInit {
   }
 
   async ngOnInit() {
-    const user = await this._userStorageService.getUser();
-    this.userID = user.id;
-    this._ownersService.getByID(this.userID).subscribe((owner) => {
-      this.owner = owner;
-      this._ownerStorageService.saveOwner(owner);
-    });
+    try {
+      const user = await this._userStorageService.getUser();
+      if (user) {
+        this.userID = user.id;
+        this._ownersService.getByID(this.userID).subscribe({
+          next: (owner) => {
+            this.owner = owner;
+            this._ownerStorageService.saveOwner(owner);
+          },
+          error: (error) => {
+            console.error('Error loading owner:', error);
+            this.owner = null;
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error in ngOnInit:', error);
+      this.owner = null;
+    }
   }
 
   async ionViewWillEnter() {
@@ -61,7 +70,7 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  protected doRefresh(event) {
+  protected doRefresh(event: any) {
     console.log(event);
     setTimeout(() => {
       event.target.complete();

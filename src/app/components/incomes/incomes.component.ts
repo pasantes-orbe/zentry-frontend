@@ -1,9 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-// Componentes Standalone de Ionic
-import { IonList, IonItem, IonLabel, IonSpinner, IonToggle, IonNote } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
 
 // Servicios y otros
 import { NavigationService } from 'src/app/helpers/navigation.service';
@@ -17,16 +15,10 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
     templateUrl: './incomes.component.html',
     styleUrls: ['./incomes.component.scss'],
     standalone: true,
-    // Se agregan las importaciones necesarias para el template
     imports: [
         CommonModule,
         RouterModule,
-        IonList,
-        IonItem,
-        IonLabel,
-        IonSpinner,
-        IonToggle,
-        IonNote
+        IonicModule
     ]
 })
 export class IncomesComponent implements OnInit {

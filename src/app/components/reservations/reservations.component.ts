@@ -1,9 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-// Componentes Standalone de Ionic
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonList, IonItem, IonLabel, IonSpinner, IonButton } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
 
 // Servicios y otros
 import { NavigationService } from 'src/app/helpers/navigation.service';
@@ -14,28 +12,18 @@ import { ReservationsService } from 'src/app/services/amenities/reservations.ser
   selector: 'app-reservations',
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
-  standalone: true, // Se convierte a Standalone
+  standalone: true,
   imports: [
     CommonModule,
     RouterModule,
-    // Componentes de Ionic que probablemente usa el HTML
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonSpinner,
-    IonButton
+    IonicModule
   ]
 })
 export class ReservationsComponent implements OnInit {
 
-  private loading: boolean;
+  private loading: boolean = true;
   private data: any;
-  protected reservations: ReservationsInterface[];
+  protected reservations: ReservationsInterface[] = [];
 
   constructor(
     public Navigation: NavigationService,
@@ -46,10 +34,15 @@ export class ReservationsComponent implements OnInit {
   }
 
   async ngOnInit() {
-    (await this._reservationsService.getAllByUser()).subscribe(reservations => {
-      this.reservations = reservations;
-      console.log("ESTAS SON LAS RESERVACIONES CREADAS POR EL USUARIO", reservations);
-    });
+    try {
+      const reservationsObservable = await this._reservationsService.getAllByUser();
+      reservationsObservable.subscribe(reservations => {
+        this.reservations = reservations;
+        console.log("ESTAS SON LAS RESERVACIONES CREADAS POR EL USUARIO", reservations);
+      });
+    } catch (error) {
+      console.error('Error loading reservations:', error);
+    }
   }
 
   private loadData(): void {

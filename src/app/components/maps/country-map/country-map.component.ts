@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertController } from '@ionic/angular';
-import * as L from 'leaflet'; // Se restaura la importación de Leaflet
+import * as L from 'leaflet';
 
 // Componentes de Ionic que usa el HTML
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
 
 // Servicios y otros
 import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
@@ -23,8 +23,7 @@ import { CountriesService } from 'src/app/services/countries/countries.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonButton,
-    IonIcon
+    IonicModule
   ]
 })
 export class CountryMapComponent implements AfterViewInit {
@@ -33,17 +32,17 @@ export class CountryMapComponent implements AfterViewInit {
   private tileLayer: any;
   protected antipanicState: boolean = false; 
   protected antipanicID: any;
-  protected activeGuards: GuardPointInterface[];
-  public countryLat;
-  public countryLng;
-  public markers = [];
-  public id_country;
-  public id_user;
+  protected activeGuards: GuardPointInterface[] = [];
+  public countryLat: any;
+  public countryLng: any;
+  public markers: any[] = [];
+  public id_country: any;
+  public id_user: any;
 
   constructor(
     private _antipanicService: AntipanicService,
     private alertController: AlertController,
-    private _ownerStorage : OwnerStorageService,
+    private _ownerStorage: OwnerStorageService,
     private _socketService: WebSocketService,
     private _countryService: CountriesService,
     private _alerts: AlertService,
@@ -57,18 +56,18 @@ export class CountryMapComponent implements AfterViewInit {
     this.id_country = owner.property.id_country.toString();
     
     // Lógica de Sockets restaurada
-    this.socket.on('get-actives-guards', (payload) =>{
-      this.removeMarkers()
-      this.activeGuards = payload
+    this.socket.on('get-actives-guards', (payload) => {
+      this.removeMarkers();
+      this.activeGuards = payload;
       this.activeGuards.forEach((data) => {
         if (data.id_country == this.id_country)
-        this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`)
-      })
-    })
+        this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`);
+      });
+    });
 
-    this.socket.on('guardDisconnected', (payload) =>{
-      this.removeMarkers()
-    })
+    this.socket.on('guardDisconnected', (payload) => {
+      this.removeMarkers();
+    });
   }
 
   async ngAfterViewInit() {
@@ -76,13 +75,13 @@ export class CountryMapComponent implements AfterViewInit {
     const countryID = owner.property.id_country;
       
     // Lógica de Country Service restaurada
-    this._countryService.getByID(countryID).subscribe(res =>{
-      this.countryLat = res['latitude']
-      this.countryLng = res['longitude']
+    this._countryService.getByID(countryID).subscribe(res => {
+      this.countryLat = res['latitude'];
+      this.countryLng = res['longitude'];
       this.initMap(res['latitude'], res['longitude']);
-    })
+    });
     
-    this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
+    this.socket.on('notificacion-antipanico-finalizado', (payload) => {
       console.log(payload);
       this.antipanicState = false;
       const box = document.querySelector('.box');
@@ -101,13 +100,12 @@ export class CountryMapComponent implements AfterViewInit {
   
   // Lógica de Leaflet restaurada
   public setTileLayer(url: any): void {
-    this.tileLayer = L.tileLayer(url,
-      {
-        attribution: ''
-      });
+    this.tileLayer = L.tileLayer(url, {
+      attribution: ''
+    });
   }
 
-  private initMap(mapLat, mapLng): void {
+  private initMap(mapLat: any, mapLng: any): void {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     if(prefersDark.matches){
       this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
@@ -115,19 +113,17 @@ export class CountryMapComponent implements AfterViewInit {
       this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png');
     }
 
-    this.map = L.map('map',
-      {
-        zoomControl: true,
-        layers: [this.getTileLayer()],
-      }
-    ).setView([mapLat, mapLng], 15);
+    this.map = L.map('map', {
+      zoomControl: true,
+      layers: [this.getTileLayer()],
+    }).setView([mapLat, mapLng], 15);
 
     setTimeout(() => {
       this.getMap().invalidateSize(true);
     }, 100);
   }
 
-  public addPoint(lat: number, lng: number, html: string = null): void {
+  public addPoint(lat: number, lng: number, html: string = ''): void {
     const marker = L.circle([lat, lng], {
       color: 'red',
       fillColor: '#f03',
@@ -140,17 +136,17 @@ export class CountryMapComponent implements AfterViewInit {
       this.markers.push(marker);
   }
 
-  public removeMarker(marker){
+  public removeMarker(marker: any) {
     this.map.removeLayer(marker);
   }
 
-  public removeMarkers(){
-    this.getMarkers().forEach( marker => {
+  public removeMarkers() {
+    this.getMarkers().forEach(marker => {
       this.removeMarker(marker);
     });
   }
 
-  public getMarkers(){
+  public getMarkers() {
     return this.markers;
   }
 
@@ -158,11 +154,11 @@ export class CountryMapComponent implements AfterViewInit {
     return this.map;
   }
 
-  private setMap(map): void {
+  private setMap(map: any): void {
     this.map = map;
   }
 
-  async activateAntipanic(){
+  async activateAntipanic() {
     const box = document.querySelector('.box');
     (document.querySelector('.box') as HTMLElement).style.display = 'block';
     this.ionViewWillEnter();
@@ -174,8 +170,9 @@ export class CountryMapComponent implements AfterViewInit {
     const ownerAddress = owner.property.address;
     const ownerName = owner.user.name;
     const ownerLastName = owner.user.lastname;
-    const countryID =  owner.property.id_country;
+    const countryID = owner.property.id_country;
     const propertyNumber = owner.property.number;
+    
     this._antipanicService.activateAntipanic(ownerID, ownerAddress, countryID, propertyNumber).subscribe(
       res => {
         console.log(res);
@@ -189,7 +186,7 @@ export class CountryMapComponent implements AfterViewInit {
     );
   }
 
-  async desactivateAntipanic(){
+  async desactivateAntipanic() {
     this.presentAlert();
   }
 

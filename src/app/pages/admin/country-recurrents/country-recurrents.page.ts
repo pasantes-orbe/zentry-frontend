@@ -12,7 +12,7 @@ import { OwnerStorageService } from 'src/app/services/storage/owner-interface-st
 
 @Component({
   selector: 'app-recurrents-view-all',
-  templateUrl: './recurrents-view-all.component.html',
+  templateUrl: './add-recurrentrecurrents-view-all/recurrents-view-all.component.html',
   styleUrls: ['./recurrents-view-all.component.scss'],
   standalone: true,
   // Se agregan las importaciones que faltaban

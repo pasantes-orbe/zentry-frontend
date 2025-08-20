@@ -1,12 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 
-// Componentes de Ionic que usa el HTML
-import { IonList, IonItem, IonLabel, IonToggle, IonSearchbar } from '@ionic/angular/standalone';
+// Importar el pipe personalizado
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
-// Servicios y otros
+// Interfaces
 import { RecurrentsInterface } from 'src/app/interfaces/recurrents-interface';
+
+// Servicios
 import { RecurrentsService } from 'src/app/services/recurrents/recurrents.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 
@@ -15,15 +19,12 @@ import { OwnerStorageService } from 'src/app/services/storage/owner-interface-st
     templateUrl: './recurrents-view-all.component.html',
     styleUrls: ['./recurrents-view-all.component.scss'],
     standalone: true,
-    // Se agregan las importaciones que faltaban
     imports: [
-        CommonModule, // Para *ngIf y *ngFor
-        FormsModule,  // Para [(ngModel)] en la barra de búsqueda
-        IonList,
-        IonItem,
-        IonLabel,
-        IonToggle,
-        IonSearchbar
+        CommonModule,
+        FormsModule,
+        RouterModule,
+        IonicModule,
+        FilterByPipe
     ]
 })
 export class RecurrentsViewAllComponent implements OnInit {
@@ -32,7 +33,7 @@ export class RecurrentsViewAllComponent implements OnInit {
     @Input('readOnly') readOnly: boolean = false;
 
     public searchKey: string = '';
-    recurrents: RecurrentsInterface[] = [];
+    public recurrents: RecurrentsInterface[] = [];
 
     constructor(
         private _recurrentsService: RecurrentsService,

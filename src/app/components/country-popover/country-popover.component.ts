@@ -17,7 +17,6 @@ import { CountriesService } from 'src/app/services/countries/countries.service';
     templateUrl: './country-popover.component.html',
     styleUrls: ['./country-popover.component.scss'],
     standalone: true,
-    // Se agregan las importaciones que faltaban
     imports: [
         CommonModule,
         IonList,
@@ -36,16 +35,20 @@ export class CountryPopoverComponent implements OnInit {
         private _countriesService: CountriesService,
         private alertCtrl: AlertController
     ) {
-        addIcons({ trashOutline }); // Se registra el ícono
+        addIcons({ trashOutline });
     }
 
     ngOnInit() { }
 
     async deleteCountry() {
         const alerta = await this.alertCtrl.create({
-            header: `¿Estás seguro de borrar ${this.country.name} ?`,
+            header: `¿Estás seguro de borrar ${this.country.name}?`,
             message: 'El mismo no volverá a estar disponible.',
             buttons: [
+                {
+                    text: 'Cancelar',
+                    role: 'cancel'
+                },
                 {
                     text: 'Confirmar',
                     cssClass: 'red',
@@ -53,14 +56,13 @@ export class CountryPopoverComponent implements OnInit {
                     handler: () => {
                         this._countriesService.deleteById(this.country.id).subscribe(res => {
                             console.log(res);
-                            this.popoverController.dismiss({ deleted: true }); // Se envía un dato al cerrar
+                            this.popoverController.dismiss({ deleted: true });
                         });
                     },
                 }
             ],
         });
 
-        alerta.present();
+        await alerta.present();
     }
 }
-// Este componente CountryPopoverComponent se utiliza para mostrar un menú emergente con opciones relacionadas con un barrio privado , como eliminarlo.

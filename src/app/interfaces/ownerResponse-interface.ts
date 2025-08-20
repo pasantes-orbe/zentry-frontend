@@ -1,19 +1,18 @@
 export interface OwnerResponse {
-    id:       number;
-    user:     User;
+    id: number;
+    user: UserInterface; // Usar UserInterface consistentemente
     property: Property;
 }
 
 export interface Property {
-    id:         number;
-    name:       string;
-    number:     number;
-    address:    string;
-    avatar:     string;
+    id: number;
+    name: string;
+    number: number;
+    address: string;
+    avatar: string;
     id_country: number;
 }
-
-export interface User {
+export interface UserInterface {
     id:       number;
     email:    string;
     name:     string;

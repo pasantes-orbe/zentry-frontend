@@ -12,7 +12,7 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 import { CountryInteface } from '../../../interfaces/country-interface';
 
 // Componentes
-import { NavbarDefaultComponent } from 'src/app/components/navbars/navbar-default/navbar-default.component';
+import { NavbarAdminComponent } from 'src/app/components/navbars/navbar-admin/navbar-admin.component';
 import { CountryPopoverComponent } from 'src/app/components/country-popover/country-popover.component';
 
 @Component({
@@ -25,7 +25,7 @@ import { CountryPopoverComponent } from 'src/app/components/country-popover/coun
     RouterModule,
     IonicModule,
     // Componentes
-    NavbarDefaultComponent,
+    NavbarAdminComponent,
     CountryPopoverComponent
   ]
 })
@@ -50,7 +50,11 @@ export class HomePage implements OnInit {
   private getCountriesFromDB() {
     this.countriesService.getAll().subscribe({
       next: (data) => {
-        this.countries = (data as CountryInteface[]).filter(country => country.isActive !== false);
+        // Corregir el filtro - usar la propiedad correcta o manejar undefined
+        this.countries = (data as CountryInteface[]).filter(country => {
+          // Si no tiene la propiedad isActive, se considera activo por defecto
+          return country.isActive !== false;
+        });
       },
       error: (error) => {
         this.handleError(error);
@@ -92,5 +96,11 @@ export class HomePage implements OnInit {
 
     await alert.present();
     console.error('Error al cargar países:', error);
+  }
+
+  // Método helper para obtener la imagen del país
+  getCountryImage(country: CountryInteface): string {
+    // Usar avatar si existe, sino usar image, sino una imagen por defecto
+    return country.avatar || country.image || 'https://ionicframework.com/docs/img/demos/card-media.png';
   }
 }

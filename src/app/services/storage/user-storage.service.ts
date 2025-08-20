@@ -1,48 +1,36 @@
 import { Injectable } from '@angular/core';
 import { UserInterface } from 'src/app/interfaces/user-interface';
-import { AuthStorageService } from './auth-storage.service';
-import { Preferences } from '@capacitor/preferences';
-import { Router } from '@angular/router';
+import { Storage } from '@ionic/storage-angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserStorageService {
+  private _storage: Storage | null = null;
 
-  public user: UserInterface;
-
-  constructor(
-    private _router: Router
-  ) { }
-
-  public async saveUser(user: UserInterface) {
-    this.setUser(user);
-
-    await Preferences.set({
-      key: 'USER',
-      value: JSON.stringify(user)
-    });
-
+  constructor(private storage: Storage) {
+    this.init();
   }
 
-  public async getUser(): Promise<UserInterface> {
-    const { value } = await Preferences.get({key: 'USER'});
-    return JSON.parse(value);
+  async init() {
+    const storage = await this.storage.create();
+    this._storage = storage;
   }
 
-  private setUser(user: UserInterface): void {
-    this.user = user;
+  public async saveUser(user: UserInterface): Promise<void> {
+    await this._storage?.set('user', user);
   }
 
-  public async signOut(): Promise<void>{
-
-    await Preferences.remove({key: 'JWT'});
-    await Preferences.remove({key: 'USER'});
-
-    
-    this._router.navigate(["/"]);
-
+  public async getUser(): Promise<UserInterface | null> {
+    return await this._storage?.get('user');
   }
 
+  public async signOut(): Promise<void> {
+    await this._storage?.remove('user');
+    // Redirect to login or handle sign out logic
+  }
 
+  public async removeUser(): Promise<void> {
+    await this._storage?.remove('user');
+  }
 }
