@@ -1,6 +1,6 @@
 {
-  "name": "MF-Seguridad",
-  "version": "0.0.1",
+  "name": "Zentry",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "ng": "ng",
@@ -56,6 +56,7 @@
     "@angular/compiler-cli": "^18.2.13",
     "@angular/language-service": "^18.2.13",
     "@capacitor/cli": "^6.1.2",
+    "@types/jasmine": "^5.1.9",
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
     "eslint": "^8.45.0",
