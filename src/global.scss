@@ -9,6 +9,12 @@
  * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
+/*
+* NOTA: El TAMAÑO del logo no se define en este archivo global.
+* Se ajusta en los archivos SCSS de cada página específica,
+* por ejemplo, en 'splash.page.scss' y 'login.page.scss'.
+*/
+
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
 
@@ -17,8 +23,8 @@
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import '@ionic/angular/css/display.css';
-/* @import "leaflet/dist/leaflet.css";  // Importa los estilos principales de Leaflet */
-/* @import "@asymmetrik/ngx-leaflet/styles.css";  // Importa los estilos para ngx-leaflet */
+/* @import "leaflet/dist/leaflet.css"; // Importa los estilos principales de Leaflet */
+/* @import "@asymmetrik/ngx-leaflet/styles.css"; // Importa los estilos para ngx-leaflet */
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
@@ -27,18 +33,17 @@
 @import "@ionic/angular/css/flex-utils.css";
 
 
-/********************************************************************
-* For dark mode, invert logo colors from dark to white for example. *
-*********************************************************************/
-@media (prefers-color-scheme: dark) {
-    ion-avatar.logo, img.logo, ion-img.logo{
-        filter: invert(100%);
-    }
-}
+/*
+* -----------------------------------------------------------------
+* CORRECCIÓN DEL LOGO ROJO
+* -----------------------------------------------------------------
+* Aquí existía un bloque @media (prefers-color-scheme: dark) que contenía
+* la regla "filter: invert(100%)". Esa regla es la que provocaba que
+* los colores del logo se invirtieran, haciendo que se viera rojo.
+* Se ha eliminado ese bloque completo para solucionar el problema.
+* -----------------------------------------------------------------
+*/
 
-h1,h2,h3,h4,h5,h6{
-    color: var(--ion-color-primary);
-}
 
 th, td{
   color: var(--ion-color-dark);
@@ -73,13 +78,13 @@ ion-datetime {
 
 // ANIMATIONS animista.net
 .ping {
-	-webkit-animation: ping 0.8s ease-in-out infinite both;
-	        animation: ping 0.8s ease-in-out infinite both;
+  -webkit-animation: ping 0.8s ease-in-out infinite both;
+          animation: ping 0.8s ease-in-out infinite both;
 }
 
 .ping-d {
-	-webkit-animation: ping 1.6s ease-in-out infinite both;
-	        animation: ping 1.6s ease-in-out infinite both;
+  -webkit-animation: ping 1.6s ease-in-out infinite both;
+          animation: ping 1.6s ease-in-out infinite both;
 }
 
 /* ----------------------------------------------
@@ -173,8 +178,8 @@ ion-datetime {
 
 
 .slide-in-bck-center {
-	-webkit-animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+  -webkit-animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+          animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 /* ----------------------------------------------
@@ -215,7 +220,7 @@ ion-datetime {
 }
 
 .slide-in-blurred-bottom {
-	animation: slide-in-blurred-bottom 0.6s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+  animation: slide-in-blurred-bottom 0.6s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
 }
 
 /* ----------------------------------------------
