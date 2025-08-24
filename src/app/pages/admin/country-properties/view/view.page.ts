@@ -1,14 +1,38 @@
 import { Component, OnInit } from '@angular/core';
-import { PropertiesService } from '../../../../services/properties/properties.service';
-import { Property_OwnerInterface } from 'src/app/interfaces/property_owner-interface';
-import { PropertyPage } from 'src/app/modals/properties/property/property.page';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ModalController } from '@ionic/angular';
+
+//Servicios
+import { PropertiesService } from '../../../../services/properties/properties.service';
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
+
+//Interfaces
+import { Property_OwnerInterface } from 'src/app/interfaces/property_owner-interface';
+
+//Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
+
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+import { PropertyPage } from 'src/app/modals/properties/property/property.page';
+
 
 @Component({
   selector: 'app-view',
   templateUrl: './view.page.html',
   styleUrls: ['./view.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    RouterModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
 })
 export class ViewPage implements OnInit {
 
@@ -56,9 +80,7 @@ export class ViewPage implements OnInit {
     });
 
     await modal.present();
-
     const { data, role } = await modal.onWillDismiss();
-
     if (role === 'confirm') {
       this.message = `Hello, ${data}!`;
       this.loadProperties(); // Recargamos las propiedades por si hubo cambios.

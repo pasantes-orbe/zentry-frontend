@@ -1,16 +1,35 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ScheduleInterface } from 'src/app/interfaces/schedule-interface';
-import { Schedule } from 'src/app/models/schedule-class';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
+//Servicios
 import { LoadingService } from 'src/app/services/helpers/loading.service';
 import { ScheduleService } from '../../../../services/schedule/schedule.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
-import { Router } from '@angular/router';
+
+// Interfaces
+import { ScheduleInterface } from 'src/app/interfaces/schedule-interface';
+
+// Modelos
+import { Schedule } from 'src/app/models/schedule-class';
+
+// Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+
 
 @Component({
   selector: 'app-add-laboral-schedule',
   templateUrl: './add-laboral-schedule.page.html',
   styleUrls: ['./add-laboral-schedule.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    ReactiveFormsModule,
+    NavbarBackComponent
+  ]
 })
 export class AddLaboralSchedulePage implements OnInit {
 

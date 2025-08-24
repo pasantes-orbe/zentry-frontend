@@ -2,54 +2,53 @@
 
 <ion-content>
 
-  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey" placeholder="Buscar por estado, lugar, o nombre"></ion-searchbar>
+  <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey"
+    placeholder="Buscar por estado, lugar, o nombre"></ion-searchbar>
   <div class="table-responsive container">
-  <table class="table text-center">
-    <thead>
-      <tr>
-        <th scope="col">Cambiar Estado</th>
-        <th scope="col">Estado</th>
-        <th scope="col">Fecha</th>
-        <th scope="col">Lugar</th>
-        <th scope="col">Reservado por</th>
-        <th scope="col">Invitados</th>
-
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let reservation of reservations | filterBy: searchKey ; let i = index">
-        <td *ngIf="reservation.status === 'pendiente'" > 
-          <ion-button (click)="resolverPeticion(true, reservation.id)" shape="round" color="success">Aceptar</ion-button> 
-          <ion-button (click)="resolverPeticion(false, reservation.id)" shape="round" color="danger">Rechazar</ion-button>
-        </td>
-        <td *ngIf="reservation.status !== 'pendiente'" > 
+    <table class="table text-center">
+      <thead>
+        <tr>
+          <th scope="col">Cambiar Estado</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Lugar</th>
+          <th scope="col">Reservado por</th>
+          <th scope="col">Invitados</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reservation of reservations | filterBy: searchKey ; let i = index">
+          <td *ngIf="reservation.status === 'pendiente'">
+            <ion-button (click)="resolverPeticion(true, reservation.id)" shape="round"
+              color="success">Aceptar</ion-button>
+            <ion-button (click)="resolverPeticion(false, reservation.id)" shape="round"
+              color="danger">Rechazar</ion-button>
+          </td>
+          <td *ngIf="reservation.status !== 'pendiente'">
             <p>-</p>
-        </td>
-        <td *ngIf="reservation.status === 'aprobado'"><ion-badge color="success">Aprobado</ion-badge></td>
-        <td *ngIf="reservation.status === 'rechazado'"><ion-badge color="danger">Rechazado</ion-badge></td>
-        <td *ngIf="reservation.status === 'pendiente'"><ion-badge color="warning">Pendiente</ion-badge></td>
-        <td>{{reservation.date | date: 'dd/MM/yyyy hh:mm'}}</td>
-        <td class="text-center">{{reservation.amenity.name}}</td>
-        <td> {{reservation.user.name}} - {{reservation.user.lastname}}  </td>
-        <td> 
-          <ion-button size="small" (click)="openModal(reservation, i)" shape="round">
-            Ver Invitados
-          </ion-button> 
-        </td>
-
-      </tr>
-      
-      
-    </tbody>
-  </table>
-</div>
-
-<ion-toolbar>
-  <div class="text-center">
-    <ion-button  routerLink="/reservar" expand="block">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Agregar Evento
-    </ion-button>
+          </td>
+          <td *ngIf="reservation.status === 'aprobado'"><ion-badge color="success">Aprobado</ion-badge></td>
+          <td *ngIf="reservation.status === 'rechazado'"><ion-badge color="danger">Rechazado</ion-badge></td>
+          <td *ngIf="reservation.status === 'pendiente'"><ion-badge color="warning">Pendiente</ion-badge></td>
+          <td>{{reservation.date | date: 'dd/MM/yyyy hh:mm'}}</td>
+          <td class="text-center">{{reservation.amenity.name}}</td>
+          <td> {{reservation.user.name}} - {{reservation.user.lastname}} </td>
+          <td>
+            <ion-button size="small" (click)="openModal(reservation, i)" shape="round">
+              Ver Invitados
+            </ion-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-</ion-toolbar>
+
+  <ion-toolbar>
+    <div class="text-center">
+      <ion-button routerLink="/reservar" expand="block">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Agregar Evento
+      </ion-button>
+    </div>
+  </ion-toolbar>
 </ion-content>

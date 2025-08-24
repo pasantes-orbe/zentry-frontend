@@ -1,5 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+//Servicios
 import { AmenitieService } from '../../../../services/amenities/amenitie.service';
+
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
 // Es una buena práctica definir una interfaz para la forma de tus datos.
 interface Amenity {
@@ -12,6 +21,15 @@ interface Amenity {
   selector: 'app-view-all',
   templateUrl: './view-all.page.html',
   styleUrls: ['./view-all.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    RouterModule,
+    NavbarBackComponent
+
+  ]
 })
 export class ViewAllPage implements OnInit {
 

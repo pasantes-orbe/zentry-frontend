@@ -1,7 +1,6 @@
 <app-navbar-back title="Mi Perfil"></app-navbar-back>
 
 <ion-content>
-
     <div class="container">
         <ion-card class="text-center">
             <div class="content">
@@ -9,48 +8,51 @@
                     <ion-avatar>
                         <img src="assets/logos/user.png" />
                     </ion-avatar>
-                    <ion-icon *ngIf="readonly == false" slot="icon-only" class="shadow" name="create-outline"></ion-icon>
+                    <ion-icon *ngIf="readonly == false" slot="icon-only" class="shadow"
+                        name="create-outline"></ion-icon>
                 </ion-button>
-
                 <form [formGroup]="getForm()" (ngSubmit)="updateUser()">
                     <ion-item>
                         <ion-label position="floating"> Nombre </ion-label>
-                        <ion-input [readonly]="readonly" required formControlName="name" [value]="user?.name" type="text"></ion-input>
+                        <ion-input [readonly]="readonly" required formControlName="name" [value]="user?.name"
+                            type="text"></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-label position="floating"> Apellido </ion-label>
-                        <ion-input [readonly]="readonly" required formControlName="lastname" [value]="user?.lastname" type="text"></ion-input>
+                        <ion-input [readonly]="readonly" required formControlName="lastname" [value]="user?.lastname"
+                            type="text"></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-label position="floating">Telefono</ion-label>
-                        <ion-input [readonly]="readonly" required formControlName="phone" [value]="user?.phone" type="text"></ion-input>
-                    </ion-item>                    
+                        <ion-input [readonly]="readonly" required formControlName="phone" [value]="user?.phone"
+                            type="text"></ion-input>
+                    </ion-item>
                     <ion-item>
                         <ion-label position="floating">Email</ion-label>
-                        <ion-input [readonly]="readonly" required formControlName="email" [value]="user?.email" type="text"></ion-input>
+                        <ion-input [readonly]="readonly" required formControlName="email" [value]="user?.email"
+                            type="text"></ion-input>
                     </ion-item>
                     <ion-item>
                         <ion-label class="ion-text-wrap birthday" position="stacked">Cumpleaños</ion-label>
                         <ion-datetime-button [disabled]="readonly" datetime="datetime"></ion-datetime-button>
                     </ion-item>
-
                     <ion-modal [keepContentsMounted]="true">
                         <ng-template>
-                            <ion-datetime formControlName="birthday" [value]="user?.birthday" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
+                            <ion-datetime formControlName="birthday" [value]="user?.birthday"
+                                (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true" id="datetime"
+                                presentation="date">
                                 <span slot="title">ELIGE LA FECHA DE TU CUMPLEAÑOS</span>
                             </ion-datetime>
                         </ng-template>
                     </ion-modal>
-
-                    <ion-button *ngIf="readonly == false"  [disabled]="this.getForm().pristine" class="mt-4 mb-4" expand="block" size="large" color="primary" shape="round" type="submit">
+                    <ion-button *ngIf="readonly == false" [disabled]="this.getForm().pristine" class="mt-4 mb-4"
+                        expand="block" size="large" color="primary" shape="round" type="submit">
                         <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
                         Guardar
                     </ion-button>
                 </form>
             </div>
-
         </ion-card>
     </div>
-
 
 </ion-content>

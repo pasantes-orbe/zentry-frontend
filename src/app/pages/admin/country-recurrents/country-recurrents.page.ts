@@ -1,32 +1,103 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { SearchbarCustomEvent } from '@ionic/angular';
 
-// Componentes
-import { RecurrentsViewAllComponent } from 'src/app/components/recurrentsViewAll/recurrents-view-all/recurrents-view-all.component';
-import { NavbarAdminComponent } from 'src/app/components/navbars/navbar-admin/navbar-admin.component';
+//Servicios
+import { AlertService } from 'src/app/services/helpers/alert.service';
+import { PropertiesService } from '../../../services/properties/properties.service';
+import { RecurrentsService } from 'src/app/services/recurrents/recurrents.service';
+import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
+
+//Interfaces
+import { RecurrentsInterface } from 'src/app/interfaces/recurrents-interface';
+
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
 @Component({
-  selector: 'app-country-recurrents',
+  selector: 'app-recurrents-view-all',
   templateUrl: './country-recurrents.page.html',
   styleUrls: ['./country-recurrents.page.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
+    CommonModule, // Para *ngIf y *ngFor
     IonicModule,
-    RecurrentsViewAllComponent,
-    NavbarAdminComponent
+    ReactiveFormsModule,
+    NavbarBackComponent
   ]
 })
-export class CountryRecurrentsPage implements OnInit {
+export class RecurrentsViewAllComponent implements OnInit {
 
-  constructor() { }
+  @Input('role') role: string = '';
+  @Input('readOnly') readOnly: boolean = false;
 
-  ngOnInit() {
+  public searchKey: string = '';
+  recurrents: RecurrentsInterface[] = [];
+
+  constructor(
+    private _recurrentsService: RecurrentsService,
+    private _ownerStorage: OwnerStorageService
+  ) { }
+
+  async ngOnInit(): Promise<void> {
+    try {
+      if (this.role === 'owner') {
+        const owner = await this._ownerStorage.getOwner();
+        const hasPropertyId =
+          owner?.property?.id !== undefined && owner.property.id !== null;
+
+        if (owner && hasPropertyId) {
+          const id_property = owner!.property!.id;
+          this._recurrentsService.getByPropertyID(id_property).subscribe({
+            next: (recurrents) => {
+              this.recurrents = recurrents ?? [];
+            },
+            error: (err) => {
+              console.error('Error al obtener recurrents por propiedad', err);
+            }
+          });
+        } else {
+          // Opcional: manejo cuando no hay propiedad
+          this.recurrents = [];
+        }
+      } else {
+        // Caso país/global
+        const recurrentsObservable = await this._recurrentsService.getRecurrentsByCountry();
+        recurrentsObservable.subscribe({
+          next: (recurrents) => {
+            this.recurrents = recurrents ?? [];
+          },
+          error: (err) => {
+            console.error('Error al obtener recurrents por país', err);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error en ngOnInit de RecurrentsViewAllComponent: ', error);
+    }
   }
 
+  public cambiarStatus(recurrent: RecurrentsInterface, i: number): void {
+    if (
+      recurrent &&
+      recurrent.id !== undefined &&
+      recurrent.status !== undefined
+    ) {
+      this._recurrentsService.patchStatus(recurrent.id, !recurrent.status).subscribe({
+        next: () => {
+          // Actualizar estado local de forma segura
+          if (this.recurrents && this.recurrents[i]) {
+            this.recurrents[i].status = !this.recurrents[i].status;
+          }
+        },
+        error: (err) => {
+          console.error('Error al cambiar estado del recurrente', err);
+        }
+      });
+    }
+  }
 }

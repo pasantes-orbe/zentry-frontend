@@ -1,7 +1,18 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+
+//Servicios
 import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+
+// Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+
+// Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
 // Es una buena práctica definir una interfaz para la forma de tus datos.
 interface AntipanicEvent {
@@ -15,6 +26,14 @@ interface AntipanicEvent {
   selector: 'app-antipanic-historial',
   templateUrl: './antipanic-historial.page.html',
   styleUrls: ['./antipanic-historial.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
 })
 export class AntipanicHistorialPage implements OnInit {
 

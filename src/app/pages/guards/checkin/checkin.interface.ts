@@ -10,5 +10,4 @@ export interface CheckinInterface {
     transport: string,
     patent: string,
     observations: string
-      
 }

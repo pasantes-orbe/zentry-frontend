@@ -1,15 +1,29 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+
+//Servicios
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { EmailHelperService } from 'src/app/services/helpers/email-helper.service';
 import { RegisterService } from '../../../../services/auth/register.service';
+
+// Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
 @Component({
   selector: 'app-add-guard',
   templateUrl: './add-guard.page.html',
   styleUrls: ['./add-guard.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    ReactiveFormsModule,
+    NavbarBackComponent
+  ]
 })
 export class AddGuardPage implements OnInit {
 
@@ -23,7 +37,6 @@ export class AddGuardPage implements OnInit {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
-
   ngOnInit() {
   }
 
@@ -31,12 +44,8 @@ export class AddGuardPage implements OnInit {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onload = e => this.newImg = reader.result;
-
     reader.readAsDataURL(file);
-
     if (event.target.files.length > 0) {
-
-
       const file = event.target.files[0];
       this.form.patchValue({
         fileSource: file
@@ -83,20 +92,16 @@ private changeIcon(input): void {
 }
 
 protected showPassword(input): void {
-
   (this.getPasswordType(input) === "password")
     ? this.setPasswordType(input, "text")
     : this.setPasswordType(input, "password");
-
   this.changeIcon(input);
 
 }
 private getPasswordType(input): string {
   return input.type;
 }
-
 private setPasswordType(input, type): void {
   input.type = type;
 }
-
 }

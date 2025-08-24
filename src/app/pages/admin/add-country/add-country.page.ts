@@ -1,6 +1,9 @@
 // --- Archivo: src/app/pages/admin/add-country/add-country.page.ts (Corregido) ---
 
 import { AfterViewInit, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule } from '@angular/forms';
 // import 'leaflet/dist/leaflet.css'; // PASO 1: Se comenta la importación de Leaflet.
 // import * as L from 'leaflet'; // PASO 2: Se comenta la importación de Leaflet.
 // import 'leaflet-defaulticon-compatibility'; // PASO 3: Se comenta la importación de Leaflet.
@@ -10,10 +13,19 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 @Component({
   selector: 'app-add-country',
   templateUrl: './add-country.page.html',
   styleUrls: ['./add-country.page.scss'],
+  standalone: true,
+ imports: [
+  CommonModule,
+  IonicModule,
+  ReactiveFormsModule,
+  NavbarBackComponent
+]
 })
 export class AddCountryPage implements AfterViewInit {
 

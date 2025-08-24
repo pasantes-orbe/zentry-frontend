@@ -1,50 +1,44 @@
 <app-navbar-back title="Panel de Administración"></app-navbar-back>
 
 <ion-content>
-
   <div class="text-center">
     <ion-button class="top-button" routerLink="/admin/nueva-propiedad" expand="block">
       <ion-icon slot="start" name="add"></ion-icon>
       Nueva Propiedad
     </ion-button>
   </div>
-
-  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar por Dirección"></ion-searchbar>
+  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500"
+    placeholder="Buscar por Dirección"></ion-searchbar>
   <div class="table-responsive container">
-  <table class="table text-center">
-    <thead>
-      <tr>
-        <th scope="col">N° Lote</th>
-        <th scope="col">Dirección</th>
-        <th scope="col">Propietario/s</th>
-        <th scope="col">Editar</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let propertie of properties | filterBy: searchKey ; let i = index">
-        <td class="text-center">{{propertie.property.number}}</td>
-        <td>{{propertie.property.address}}</td>
-        <td>
-          <ion-list lines="none">
-            <ion-item *ngFor="let owner of propertie.owners" >
-              <ion-label>{{owner.user.name}} {{owner.user.lastname}}, </ion-label>
-            </ion-item>
-          </ion-list>
-        </td>
-
-        <td>
-          <ion-icon size="large" (click)="editProperty(propertie.property.id, i)" name="create-outline"></ion-icon>
-        </td>
-
-        <!-- <td>
+    <table class="table text-center">
+      <thead>
+        <tr>
+          <th scope="col">N° Lote</th>
+          <th scope="col">Dirección</th>
+          <th scope="col">Propietario/s</th>
+          <th scope="col">Editar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let propertie of properties | filterBy: searchKey ; let i = index">
+          <td class="text-center">{{propertie.property.number}}</td>
+          <td>{{propertie.property.address}}</td>
+          <td>
+            <ion-list lines="none">
+              <ion-item *ngFor="let owner of propertie.owners">
+                <ion-label>{{owner.user.name}} {{owner.user.lastname}}, </ion-label>
+              </ion-item>
+            </ion-list>
+          </td>
+          <td>
+            <ion-icon size="large" (click)="editProperty(propertie.property.id, i)" name="create-outline"></ion-icon>
+          </td>
+          <!-- <td>
           <ion-icon size="large" (click)="deleteProperty(propertie.property.id, i)" name="trash-outline"></ion-icon>
         </td> -->
-
-      </tr>
-      <tr>
-      
-
-    </tbody>
-  </table>
-</div>
+        </tr>
+        <tr>
+      </tbody>
+    </table>
+  </div>
 </ion-content>

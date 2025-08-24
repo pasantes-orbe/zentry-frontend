@@ -1,13 +1,37 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { LoadingController, ModalController, ToastController } from '@ionic/angular';
-import { InvitationsComponent } from 'src/app/components/invitations/invitations/invitations.component';
-import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
+
+//Servicios
 import { ReservationsService } from 'src/app/services/amenities/reservations.service';
+
+//Interfaces
+import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
+
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+import { InvitationsComponent } from 'src/app/components/invitations/invitations/invitations.component';
+
+//Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
 @Component({
   selector: 'app-events-historial',
   templateUrl: './events-historial.page.html',
   styleUrls: ['./events-historial.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    RouterModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
+
 })
 export class EventsHistorialPage implements OnInit {
 

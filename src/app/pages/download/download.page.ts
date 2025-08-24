@@ -1,9 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-download',
   templateUrl: './download.page.html',
   styleUrls: ['./download.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule
+  ]
 })
 export class DownloadPage implements OnInit {
 
@@ -37,22 +44,17 @@ export class DownloadPage implements OnInit {
     };
 
     const localStorageKeyValue = localStorage.getItem(localStorageKey);
-  const iosInstallModalShown = localStorageKeyValue
-    ? JSON.parse(localStorageKeyValue)
-    : false;
-  const shouldShowModalResponse =
-    isIos() && !isInStandaloneMode() && !iosInstallModalShown;
-  if (shouldShowModalResponse) {
-    localStorage.setItem(localStorageKey, "true");
-    this.showInstallButton = true;
+    const iosInstallModalShown = localStorageKeyValue
+      ? JSON.parse(localStorageKeyValue)
+      : false;
+    const shouldShowModalResponse =
+      isIos() && !isInStandaloneMode() && !iosInstallModalShown;
+    if (shouldShowModalResponse) {
+      localStorage.setItem(localStorageKey, "true");
+      this.showInstallButton = true;
+    }
+    return shouldShowModalResponse;
   }
-  return shouldShowModalResponse;
-
-
-   }
-
-   
-
 
   promptInstallPWA() {
     if (this.deferredPrompt) {
@@ -72,8 +74,6 @@ export class DownloadPage implements OnInit {
       });
     }
   }
-
-  
 
   // showInstallBanner() {
   //   if (this.deferredPrompt !== undefined && this.deferredPrompt !== null) {

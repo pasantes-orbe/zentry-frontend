@@ -1,4 +1,3 @@
-
 <!-- --- Archivo: src/app/pages/admin/add-country/add-country.page.html (Corregido) --- -->
 
 <app-navbar-back title="Volver"></app-navbar-back>
@@ -12,12 +11,13 @@
   -->
   <form [formGroup]="form" (ngSubmit)="addCountry()">
     <ion-label position="floating">Ubicá el marcador en el Country</ion-label>
-    
+
     <div class="map-container">
       <div class="map-frame">
         <!-- SE COMENTA EL DIV DEL MAPA Y SE AÑADE UN MENSAJE TEMPORAL -->
         <!-- <div id="map"></div> -->
-        <div style="text-align: center; padding: 20px; color: #999; border: 1px dashed #ccc; border-radius: 10px; margin-top: 10px;">
+        <div
+          style="text-align: center; padding: 20px; color: #999; border: 1px dashed #ccc; border-radius: 10px; margin-top: 10px;">
           <ion-icon name="map-outline" style="font-size: 48px;"></ion-icon>
           <p>El mapa está temporalmente desactivado para la migración.</p>
         </div>
@@ -35,7 +35,8 @@
 
     <ion-card button>
       <img [src]="newImg" alt="Vista previa de la imagen">
-      <ion-input (change)="onFileChange($event)" formControlName="countryAvatar" type="file" name="countryAvatar"></ion-input>
+      <ion-input (change)="onFileChange($event)" formControlName="countryAvatar" type="file"
+        name="countryAvatar"></ion-input>
     </ion-card>
 
     <!-- 

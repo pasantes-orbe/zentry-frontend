@@ -1,5 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
 import { AlertController } from '@ionic/angular';
+
+//Interfaces y Servicios
 import { CheckInOrOut } from '../../../interfaces/checkInOrOut-interface';
 import { CheckInService } from '../../../services/check-in/check-in.service';
 import { CheckoutService } from '../../../services/checkout/checkout.service';
@@ -7,10 +12,20 @@ import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
 
+// Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
+
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.page.html',
   styleUrls: ['./checkout.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    FilterByPipe
+  ]
 })
 // Se implementa OnDestroy para limpiar la suscripción al socket cuando el componente se destruye.
 export class CheckoutPage implements OnInit, OnDestroy {

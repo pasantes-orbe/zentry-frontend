@@ -1,10 +1,10 @@
 <app-navbar-admin></app-navbar-admin>
- <!-- <ion-content *ngIf="!this.country; else divDashboard">
+<!-- <ion-content *ngIf="!this.country; else divDashboard">
   <ion-label> No existe dashboard</ion-label>
 </ion-content> -->
 
 
- <!-- <ng-template #divDashboard>--> 
+<!-- <ng-template #divDashboard>-->
 <ion-content class="ion-padding">
   <ion-fab slot="fixed" horizontal="center" vertical="bottom">
     <ion-fab-button routerLink="/admin/home">
@@ -22,60 +22,49 @@
     <ion-segment-button value="vigiladores">
       <ion-label>vigiladores</ion-label>
     </ion-segment-button>
-    
   </ion-segment>
 
-  
-  <div *ngIf="type == 'propiedades'">
-    
-    <ion-button routerLink="/admin/ver-propiedades" color="secondary" size="large" expand="block" shape="round">
-      Ver todas las propiedades 
-    </ion-button>
 
+  <div *ngIf="type == 'propiedades'">
+    <ion-button routerLink="/admin/ver-propiedades" color="secondary" size="large" expand="block" shape="round">
+      Ver todas las propiedades
+    </ion-button>
     <ion-button routerLink="/admin/ver-propietarios" color="secondary" size="large" expand="block" shape="round">
       Ver todos los Propietarios
     </ion-button>
-    
     <ion-button routerLink="/admin/invitados-recurrentes" color="secondary" size="large" expand="block" shape="round">
       Invitados Recurrentes
     </ion-button>
   </div>
 
   <div *ngIf="type == 'vigiladores'">
-    
     <ion-button routerLink="/admin/todos-los-guardias" color="secondary" size="large" expand="block" shape="round">
       Ver todos los vigiladores
     </ion-button>
 
-    <ion-button routerLink="/admin/registro-checkin-y-checkout" color="secondary" size="large" expand="block" shape="round">
+    <ion-button routerLink="/admin/registro-checkin-y-checkout" color="secondary" size="large" expand="block"
+      shape="round">
       Registro de CheckIn & CheckOut
     </ion-button>
 
     <ion-button routerLink="/admin/registro-de-antipanico" color="secondary" size="large" expand="block" shape="round">
       Registro de Botón Antipánico
     </ion-button>
-
     <ion-button routerLink="/admin/map-guards" color="secondary" size="large" expand="block" shape="round">
       Ver Ubicacion de los vigiladores
     </ion-button>
-
   </div>
 
   <div *ngIf="type == 'eventos'">
-
     <ion-button routerLink="/admin/ver-amenities" color="secondary" size="large" expand="block" shape="round">
       Lugares de Reserva
     </ion-button>
-    
+
     <ion-button routerLink="/admin/registro-de-eventos" color="secondary" size="large" expand="block" shape="round">
       Registro de eventos
     </ion-button>
-
   </div>
-
-  
-
 
 </ion-content>
 
-<!--</ng-template>--> 
+<!--</ng-template>-->
