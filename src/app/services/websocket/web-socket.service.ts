@@ -1,5 +1,5 @@
 import { Injectable, LOCALE_ID } from '@angular/core';
-import { io, Socket } from 'socket.io-client'; 
+import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
@@ -19,96 +19,79 @@ export class WebSocketService {
   private socket: Socket;
   private datePipeString: string;
 
-constructor(
-  private alertController: AlertController,
-  private alerts: AlertService
-){
-  this.socket = io(environment.URL)
-}
+  constructor(
+    private alertController: AlertController,
+    private alerts: AlertService
+  ) {
+    this.socket = io(environment.URL)
+  }
 
-conectar(){
-  this.socket.on('error', () =>
-  {
+  conectar() {
+    this.socket.on('error', () => {
       console.log("Sorry, there seems to be an issue with the connection!");
-  });
+    });
 
+    this.socket.on('connect_error', (err) => {
+      console.log("connect failed" + err);
+    });
 
-  this.socket.on('connect_error', (err) =>
-  {
-      console.log("connect failed"+err);
-  });
-
-
-  this.socket.on('connect', () =>
-  {
+    this.socket.on('connect', () => {
       console.log("CONECTADO AL SOCKET")
-      
-  });
-
-}
-
-  propietarioConectado(){
-    this.socket.emit('propietario-conectado', {msg: "asdfasdf"})
+    });
   }
 
+  propietarioConectado() {
+    this.socket.emit('propietario-conectado', { msg: "asdfasdf" })
+  }
 
-  newOwnerConnected(data){
-
+  newOwnerConnected(data) {
     this.socket.emit('owner-connected', data)
-
   }
 
-  notificarCheckIn(data){
+  notificarCheckIn(data) {
     this.socket.emit('notificar-check-in', data)
   }
-  
 
-  notificarAntipanico(data){
+  notificarAntipanico(data) {
     this.socket.emit('notificar-antipanico', data)
   }
 
-  notificarNuevoConfirmedByOwner(data){
+  notificarNuevoConfirmedByOwner(data) {
     this.socket.emit('notificar-nuevo-confirmedByOwner', data)
     console.log("SE ENVIIO", data);
   }
 
-  disconnectGuardUbication(data){
+  disconnectGuardUbication(data) {
     this.socket.emit('disconnectGuardUbication', data)
   }
 
-
-   escucharNotificacionesCheckin(){
-    this.socket.on('notificacion-check-in', async (payload) =>{
+  escucharNotificacionesCheckin() {
+    this.socket.on('notificacion-check-in', async (payload) => {
       console.log(payload)
       await this.alerts.presentAlert(payload)
     })
   }
 
-  escucharNuevoConfirmedByOwner(){
-    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) =>{
+  escucharNuevoConfirmedByOwner() {
+    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) => {
       console.log(payload['response']);
       return payload['response']
     })
-    return false; 
+    return false;
   }
 
-  escucharNotificacionesAntipanico(){
-    this.socket.on('notificacion-antipanico', async (payload) =>{
+  escucharNotificacionesAntipanico() {
+    this.socket.on('notificacion-antipanico', async (payload) => {
       console.log(payload)
       const alert = await this.alerts.presentAlertPanic(payload)
 
-
-      this.socket.on('notificacion-antipanico-finalizado', (payload) =>{
+      this.socket.on('notificacion-antipanico-finalizado', (payload) => {
         console.log("ANTIPANICO ATENDIDO");
         alert.dismiss()
-      })  
-
+      })
     })
   }
 
-  
-
-
 }
-    
-  
+
+

@@ -1,6 +1,10 @@
 // --- Archivo: src/app/pages/incomes/new-income/new-income.page.ts (Corregido) ---
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CheckInService } from '../../../services/check-in/check-in.service';
 import { RecurrentsService } from '../../../services/recurrents/recurrents.service';
@@ -13,6 +17,13 @@ import { AlertService } from 'src/app/services/helpers/alert.service';
   selector: 'app-new-income',
   templateUrl: './new-income.page.html',
   styleUrls: ['./new-income.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    RouterModule,
+    ReactiveFormsModule
+  ]
 })
 export class NewIncomePage implements OnInit {
 

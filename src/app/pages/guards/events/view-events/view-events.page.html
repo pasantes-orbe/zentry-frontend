@@ -1,11 +1,8 @@
 <app-navbar-back title="Ver Eventos"></app-navbar-back>
 
 <ion-content>
-
   <div class="table-responsive container padding-top">
-  
     <h5>Reserva de Eventos</h5>
-    
     <table class="table">
       <thead>
         <tr>
@@ -13,12 +10,11 @@
           <th scope="col">Reserva</th>
           <th scope="col">Fecha</th>
           <th scope="col">Invitados</th>
-
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let reservation of reservations; let i = index" >
-          <th *ngIf=" 0 === 0 " scope="row"><ion-badge color="success">aprobado</ion-badge></th>
+          <th *ngIf=" 0 === 0 " scope="row"><ion-badge color="success">Aprobado</ion-badge></th>
           <td>{{reservation.amenity.name}}</td>
           <td>{{reservation.date | date: 'short'}}</td>
           <td>
@@ -26,14 +22,8 @@
               Ver Invitados
             </ion-button>
           </td>
-
         </tr>
       </tbody>
     </table>
-    
-    
     </div>
-
-
-
 </ion-content>

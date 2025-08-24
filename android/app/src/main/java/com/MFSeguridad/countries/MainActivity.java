@@ -1,4 +1,4 @@
-package com.MFSeguridad;
+package com.MFSeguridad.countries;
 
 import com.getcapacitor.BridgeActivity;
 

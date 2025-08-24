@@ -1,9 +1,26 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+
+//CComponentes
+import { NavbarBackComponent } from 'src/app/components/navbars/navbar-back/navbar-back.component';
+
+// Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
 @Component({
   selector: 'app-check-in-and-check-out',
   templateUrl: './check-in-and-check-out.page.html',
   styleUrls: ['./check-in-and-check-out.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
 })
 export class CheckInAndCheckOutPage implements OnInit {
 
@@ -15,7 +32,7 @@ export class CheckInAndCheckOutPage implements OnInit {
         lastname: "Perez",
         fullname : "Juan Perez",
         dni: 49788569,
-        date: "27/10/2022",
+        date: "27/07/2025",
         time: "07:25"
       },
       checkOut: {
@@ -24,7 +41,7 @@ export class CheckInAndCheckOutPage implements OnInit {
         lastname: "Perez",
         fullname : "Juan Perez",
         dni: 49788569,
-        date: "27/10/2022",
+        date: "27/07/2025",
         time: "18:15"
       }
     },
@@ -35,7 +52,7 @@ export class CheckInAndCheckOutPage implements OnInit {
         lastname: "Gomez",
         fullname : "Ludmila Gomez",
         dni: 40999887,
-        date: "24/10/2022",
+        date: "24/07/2025",
         time: "12:45"
       },
       checkOut: {}
@@ -47,7 +64,7 @@ export class CheckInAndCheckOutPage implements OnInit {
         lastname: "Bernal",
         fullname : "Javier Bernal",
         dni: 40999888,
-        date: "24/10/2022",
+        date: "24/07/2025",
         time: "12:45"
       },
       checkOut: {
@@ -56,7 +73,7 @@ export class CheckInAndCheckOutPage implements OnInit {
         lastname: "Bernal",
         fullname : "Javier Bernal",
         dni: 40999888,
-        date: "24/10/2022",
+        date: "24/07/2025",
         time: "20:30"
       }
     }
@@ -83,7 +100,6 @@ export class CheckInAndCheckOutPage implements OnInit {
 }
 
 interface Register{
-
   checkIn: {
     id: number,
     name: string,
@@ -102,5 +118,4 @@ interface Register{
     date?: string,
     time?: string
   }
-
 }
