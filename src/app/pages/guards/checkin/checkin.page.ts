@@ -1,5 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+//Interfaces y Servicios
 import { CheckinInterface } from './checkin.interface';
 import { UserStorageService } from '../../../services/storage/user-storage.service';
 import { OwnersService } from '../../../services/owners/owners.service';
@@ -8,10 +13,21 @@ import { CheckInService } from '../../../services/check-in/check-in.service';
 import { IonSearchbar, IonSelect, IonTextarea, SearchbarCustomEvent } from '@ionic/angular';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 
+// Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
+
 @Component({
   selector: 'app-checkin',
   templateUrl: './checkin.page.html',
   styleUrls: ['./checkin.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FilterByPipe
+  ]
 })
 export class CheckinPage implements OnInit {
 

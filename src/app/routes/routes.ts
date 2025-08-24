@@ -32,29 +32,49 @@ export const routes: Routes = [
       import('../pages/incomes/auth-incomes/auth-incomes.page').then(m => m.AuthIncomesPage)
   },
   {
-  path: 'new-income',
-  loadComponent: () =>
-    import('../pages/incomes/new-income/new-income.page').then(m => m.NewIncomePage)
+    path: 'new-income',
+    loadComponent: () =>
+      import('../pages/incomes/new-income/new-income.page').then(m => m.NewIncomePage)
   },
   {
-  path: 'guards-schedule',
-  loadComponent: () =>
-    import('../pages/guardsSchedule/guards-schedule/guards-schedule.page').then(m => m.GuardsSchedulePage)
+    path: 'guards-schedule',
+    loadComponent: () =>
+      import('../pages/guardsSchedule/guards-schedule/guards-schedule.page').then(m => m.GuardsSchedulePage)
   },
   {
-  path: 'guards/home',
-  loadComponent: () =>
-    import('../pages/guards/home/home.page').then(m => m.HomePage)
+    path: 'checkout',
+    loadComponent: () =>
+      import('../pages/guards/checkout/checkout.page').then(m => m.CheckoutPage)
   },
   {
-  path: 'view-events',
-  loadComponent: () =>
-    import('../pages/guards/events/view-events/view-events.page').then(m => m.ViewEventsPage)
+    path: 'checkin',
+    loadComponent: () =>
+      import('../pages/guards/checkin/checkin.page').then(m => m.CheckinPage)
   },
   {
-  path: 'check-in-and-check-out',
-  loadComponent: () => 
-    import('../pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.page').then(m => m.CheckInAndCheckOutPage)
+    path: 'guards/authorizations',
+    loadComponent: () =>
+      import('../pages/guards/authorizations/authorizations.page').then(m => m.AuthorizationsPage)
+  },
+  {
+    path: 'guards/home',
+    loadComponent: () =>
+      import('../pages/guards/home/home.page').then(m => m.HomePage)
+  },
+  {
+    path: 'view-events',
+    loadComponent: () =>
+      import('../pages/guards/events/view-events/view-events.page').then(m => m.ViewEventsPage)
+  },
+  {
+    path: 'check-in-and-check-out',
+    loadComponent: () =>
+      import('../pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.page').then(m => m.CheckInAndCheckOutPage)
+  },
+  {
+    path: 'guards/authorizations',
+    loadComponent: () =>
+      import('../pages/guards/authorizations/authorizations.page').then(m => m.AuthorizationsPage)
   },
   {
     path: 'home',
@@ -88,7 +108,81 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../pages/admin/home/home.page').then(m => m.HomePage)
   },
-
+  {
+    path: 'event-reservation',
+    loadComponent: () =>
+      import('../pages/event-reservation/event-reservation.page').then(m => m.EventReservationPage)
+  },
+  {
+    path: 'download',
+    loadComponent: () =>
+      import('../pages/download/download.page').then(m => m.DownloadPage)
+  },
+  {
+    path: 'map-guards',
+    loadComponent: () =>
+      import('../pages/admin/map-guards/map-guards.page').then(m => m.MapGuardsPage)
+  },
+  {
+    path: 'admin/add-country',
+    loadComponent: () =>
+      import('../pages/admin/add-country/add-country.page').then(m => m.AddCountryPage)
+  },
+  {
+    path: 'admin/add-amenity',
+    loadComponent: () =>
+      import('../pages/admin/country-amenities/add-amenity/add-amenity.page').then(m => m.AddAmenityPage)
+  },
+  {
+    path: 'admin/view-all-amenities',
+    loadComponent: () =>
+      import('../pages/admin/country-amenities/view-all/view-all.page').then(m => m.ViewAllPage)
+  },
+  {
+    path: 'admin/country-dashboard',
+    loadComponent: () =>
+      import('../pages/admin/country-dashboard/country-dashboard.page').then(m => m.CountryDashboardPage)
+  },
+  {
+    path: 'admin/add-country-owner',
+    loadComponent: () =>
+      import('../pages/admin/country-owners/add-country-owner/add-country-owner.page').then(m => m.AddCountryOwnerPage)
+  },
+  {
+    path: 'admin/assign-country-to-owner',
+    loadComponent: () =>
+      import('../pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.page').then(m => m.AssignCountryToOwnerPage)
+  },
+  {
+  path: 'admin/view-owners',
+  loadComponent: () =>
+    import('../pages/admin/country-owners/view/view.page').then(m => m.ViewPage)
+  },
+  {
+  path: 'admin/add-property',
+  loadComponent: () =>
+    import('../pages/admin/country-properties/add-property/add-property.page').then(m => m.AddPropertyPage)
+  },
+  {
+  path: 'admin/view-properties',
+  loadComponent: () =>
+    import('../pages/admin/country-properties/view/view.page').then(m => m.ViewPage)
+  },
+  {
+  path: 'admin/add-recurrent',
+  loadComponent: () =>
+    import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page').then(m => m.AddRecurrentPage)
+  },
+  {
+  path: 'admin/country-recurrents',
+  loadComponent: () =>
+    import('../pages/admin/country-recurrents/country-recurrents.page').then(m => m.RecurrentsViewAllComponent)
+  },
+{
+  path: 'admin/events-historial',
+  loadComponent: () =>
+    import('../pages/admin/events-segment/events-historial/events-historial.page').then(m => m.EventsHistorialPage)
+  },
   {
     path: '**',
     redirectTo: 'splash-screen'

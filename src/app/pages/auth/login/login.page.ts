@@ -6,20 +6,7 @@ import { ModalController } from '@ionic/angular';
 
 // Componentes Standalone de Ionic
 import {
-  IonContent,
-  IonHeader,
-  IonToolbar,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  IonIcon,
-  IonSpinner,
-  IonText,
-  IonCard,
-  IonCardHeader,
-  IonAvatar,
-  IonCardContent
+  IonContent, IonHeader, IonToolbar, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner, IonText, IonCard, IonCardHeader, IonAvatar, IonCardContent
 } from '@ionic/angular/standalone';
 
 // Íconos
@@ -69,7 +56,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
     IonCardHeader,
     IonAvatar,
     IonCardContent
-]
+  ]
 })
 export class LoginPage implements OnInit {
 

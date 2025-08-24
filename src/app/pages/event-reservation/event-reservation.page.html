@@ -2,11 +2,12 @@
 
 <ion-content class="ion-padding">
 
-  <form form  [formGroup]="getForm()"(keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
+  <form form [formGroup]="getForm()" (keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
     <ion-item>
       <ion-label position="floating">Seleccionar Lugar</ion-label>
-      <ion-select formControlName="amenitieID"  placeholder="Seleccionar">
-        <ion-select-option *ngFor="let amenitie of amenities; let i = index" [value]="amenitie.id" >{{amenitie.name}}</ion-select-option>
+      <ion-select formControlName="amenitieID" placeholder="Seleccionar">
+        <ion-select-option *ngFor="let amenitie of amenities; let i = index"
+          [value]="amenitie.id">{{amenitie.name}}</ion-select-option>
       </ion-select>
     </ion-item>
 
@@ -18,68 +19,56 @@
 
     <ion-button class="paddingbutton" (click)="addGuest()" size="small" shape="round">
       <ion-icon name="add-circle-outline"></ion-icon>
-        Añadir Invitado
-      </ion-button>
+      Añadir Invitado
+    </ion-button>
 
     <ion-list>
+      <ion-row class="borderBottom" *ngFor="let guest of guests; let i = index">
+        <ion-col size="6">
+
+          <ion-item>
+            <ion-input [(ngModel)]="guests[i].name" [ngModelOptions]="{standalone: true}" type="text"
+              placeholder="Nombre"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-item>
+            <ion-input [(ngModel)]="guests[i].lastname" [ngModelOptions]="{standalone: true}" type="text"
+              placeholder="Apellido"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12">
+          <ion-item>
+            <ion-input [(ngModel)]="guests[i].dni" [ngModelOptions]="{standalone: true}" type="number"
+              placeholder="DNI"></ion-input>
+          </ion-item>
+
+        </ion-col>
 
 
-        <ion-row class="borderBottom" *ngFor="let guest of guests; let i = index">
-          <ion-col size="6">
-
-            <ion-item>
-                <ion-input  [(ngModel)]="guests[i].name" [ngModelOptions]="{standalone: true}" type="text" placeholder="Nombre"></ion-input>                
-            </ion-item>
-        
-          </ion-col>
-    
-    
-          <ion-col size="6">
-    
-            <ion-item>
-                <ion-input [(ngModel)]="guests[i].lastname" [ngModelOptions]="{standalone: true}" type="text" placeholder="Apellido"></ion-input>                
-            </ion-item>
-        
-          </ion-col>
-          
-
-          <ion-col size="12">
-
-            <ion-item>
-              <ion-input [(ngModel)]="guests[i].dni" [ngModelOptions]="{standalone: true}" type="number" placeholder="DNI"></ion-input>
-            </ion-item>
-
-          </ion-col>
-
-
-        </ion-row>
-
-  
-
-
-
+      </ion-row>
     </ion-list>
 
-
-    <ion-modal  [keepContentsMounted]="true">
+    <ion-modal [keepContentsMounted]="true">
       <ng-template>
-          <ion-datetime formControlName="fecha" presentation="date-time" color="primary" [showDefaultTitle]="true"  id="datetime">
+        <ion-datetime formControlName="fecha" presentation="date-time" color="primary" [showDefaultTitle]="true"
+          id="datetime">
           <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
-          </ion-datetime>
+        </ion-datetime>
       </ng-template>
     </ion-modal>
     <!--  -->
 
-    
-
     <ion-item>
       <ion-label position="stacked">Aclaraciones / Detalles</ion-label>
-      <ion-textarea formControlName="detalles" rows="4" placeholder="Aclara al administrador el motivo de la reserva"></ion-textarea>
+      <ion-textarea formControlName="detalles" rows="4"
+        placeholder="Aclara al administrador el motivo de la reserva"></ion-textarea>
     </ion-item>
-   
 
     <div class="text-center">
-      <ion-button  shape="round" block color="primary" type="submit" [disabled]="getForm().invalid">
+      <ion-button shape="round" block color="primary" type="submit" [disabled]="getForm().invalid">
         Solicitar Reserva
       </ion-button>
     </div>

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 // import * as L from 'leaflet'; // PASO 1: Se comenta la importación de Leaflet.
@@ -10,6 +12,10 @@ import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
   selector: 'app-map-guards',
   templateUrl: './map-guards.page.html',
   styleUrls: ['./map-guards.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule]
 })
 export class MapGuardsPage implements OnInit {
 

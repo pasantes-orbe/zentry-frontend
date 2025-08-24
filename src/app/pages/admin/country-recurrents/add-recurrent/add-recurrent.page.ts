@@ -1,16 +1,33 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AlertService } from 'src/app/services/helpers/alert.service';
-import { PropertiesService } from '../../../../services/properties/properties.service';
-import { PropertyInterface } from '../../../../interfaces/property-interface';
-import { RecurrentsService } from '../../../../services/recurrents/recurrents.service';
 import { Router } from '@angular/router';
 import { SearchbarCustomEvent } from '@ionic/angular';
+
+//Servicios
+import { AlertService } from 'src/app/services/helpers/alert.service';
+import { PropertiesService } from '../../../../services/properties/properties.service';
+import { RecurrentsService } from '../../../../services/recurrents/recurrents.service';
+
+//Interfaces
+import { PropertyInterface } from '../../../../interfaces/property-interface';
+
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
 @Component({
   selector: 'app-add-recurrent',
   templateUrl: './add-recurrent.page.html',
   styleUrls: ['./add-recurrent.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    ReactiveFormsModule,
+    NavbarBackComponent
+  ]
 })
 export class AddRecurrentPage implements OnInit {
 

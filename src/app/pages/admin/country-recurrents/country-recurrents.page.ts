@@ -1,29 +1,31 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
 // Componentes de Ionic
 import { IonList, IonItem, IonLabel, IonToggle, IonSearchbar } from '@ionic/angular/standalone';
 
-// Servicios y otros
-import { RecurrentsInterface } from 'src/app/interfaces/recurrents-interface';
+// Servicios
 import { RecurrentsService } from 'src/app/services/recurrents/recurrents.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 
+//Interface
+import { RecurrentsInterface } from 'src/app/interfaces/recurrents-interface';
+
+//Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+
 @Component({
   selector: 'app-recurrents-view-all',
-  templateUrl: './add-recurrentrecurrents-view-all/recurrents-view-all.component.html',
-  styleUrls: ['./recurrents-view-all.component.scss'],
+  templateUrl: './country-recurrents.page.html',
+  styleUrls: ['country-recurrents.page.scss'],
   standalone: true,
-  // Se agregan las importaciones que faltaban
   imports: [
     CommonModule, // Para *ngIf y *ngFor
-    FormsModule,  // Para [(ngModel)] en la barra de búsqueda
-    IonList,
-    IonItem,
-    IonLabel,
-    IonToggle,
-    IonSearchbar
+    IonicModule,
+    FormsModule,
+    NavbarBackComponent
   ]
 })
 export class RecurrentsViewAllComponent implements OnInit {

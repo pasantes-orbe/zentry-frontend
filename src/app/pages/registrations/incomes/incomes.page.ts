@@ -10,7 +10,12 @@ import { IncomesComponent } from "src/app/components/incomes/incomes.component";
   templateUrl: './incomes.page.html',
   styleUrls: ['./incomes.page.scss'],
   standalone: true,
-  imports: [ CommonModule, IonicModule, NavbarBackComponent, IncomesComponent],
+  imports: [
+    CommonModule,
+    IonicModule,
+    NavbarBackComponent,
+    IncomesComponent
+  ],
 })
 export class IncomesPage implements OnInit {
 
