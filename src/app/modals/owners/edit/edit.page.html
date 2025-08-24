@@ -1,52 +1,54 @@
 <ion-header>
-    <ion-toolbar>
-  
-      <ion-header>
-        <ion-toolbar>
-          <ion-buttons slot="end">
-            <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
-          </ion-buttons>
-          <ion-title> Editar Perfil </ion-title>
-        </ion-toolbar>
-      </ion-header>
-    </ion-toolbar>
-  </ion-header>
+  <ion-toolbar>
+
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+        </ion-buttons>
+        <ion-title> Editar Perfil </ion-title>
+      </ion-toolbar>
+    </ion-header>
+  </ion-toolbar>
+</ion-header>
 
 
 <ion-content>
   <form [formGroup]="getForm()" (ngSubmit)="updateOwner()">
     <ion-item>
-        <ion-label position="floating"> Nombre </ion-label>
-        <ion-input required formControlName="name" [value]="user?.name" type="text"></ion-input>
+      <ion-label position="floating"> Nombre </ion-label>
+      <ion-input required formControlName="name" [value]="user?.name" type="text"></ion-input>
     </ion-item>
     <ion-item>
-        <ion-label position="floating"> Apellido </ion-label>
-        <ion-input required formControlName="lastname" [value]="user?.lastname" type="text"></ion-input>
+      <ion-label position="floating"> Apellido </ion-label>
+      <ion-input required formControlName="lastname" [value]="user?.lastname" type="text"></ion-input>
     </ion-item>
     <ion-item>
-        <ion-label position="floating">Telefono</ion-label>
-        <ion-input required formControlName="phone" [value]="user?.phone" type="text"></ion-input>
-    </ion-item>                    
-    <ion-item>
-        <ion-label position="floating">Email</ion-label>
-        <ion-input required formControlName="email" [value]="user?.email" type="text"></ion-input>
+      <ion-label position="floating">Telefono</ion-label>
+      <ion-input required formControlName="phone" [value]="user?.phone" type="text"></ion-input>
     </ion-item>
     <ion-item>
-        <ion-label class="ion-text-wrap birthday" position="stacked" class="ion-padding-bottom"  >Cumpleaños</ion-label>
-        <ion-datetime-button  datetime="datetime"></ion-datetime-button>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input required formControlName="email" [value]="user?.email" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label class="ion-text-wrap birthday" position="stacked" class="ion-padding-bottom">Cumpleaños</ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
     </ion-item>
 
     <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-            <ion-datetime formControlName="birthday" [value]="user?.birthday" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true"  id="datetime" presentation="date">
-                <span slot="title">ELIGE LA FECHA DE TU CUMPLEAÑOS</span>
-            </ion-datetime>
-        </ng-template>
+      <ng-template>
+        <ion-datetime formControlName="birthday" [value]="user?.birthday" (ionChange)="getDate($event)" color="primary"
+          [showDefaultTitle]="true" id="datetime" presentation="date">
+          <span slot="title">ELIGE LA FECHA DE TU CUMPLEAÑOS</span>
+        </ion-datetime>
+      </ng-template>
     </ion-modal>
 
-    <ion-button  [disabled]="this.getForm().pristine" class="mt-4 mb-4" expand="block" size="large" color="primary" shape="round" type="submit">
-        <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
-        Guardar
+    <ion-button [disabled]="this.getForm().pristine" class="mt-4 mb-4" expand="block" size="large" color="primary"
+      shape="round" type="submit">
+      <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
+      Guardar
     </ion-button>
-</form>
+  </form>
 </ion-content>

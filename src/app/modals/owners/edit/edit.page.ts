@@ -1,17 +1,42 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ModalController, ToastController } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { checkmarkCircleOutline } from 'ionicons/icons';
+
+//Servicios
 import { UserService } from 'src/app/services/user/user.service';
+
+// Componentes
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonDatetimeButton, IonModal, IonDatetime, IonIcon, ModalController, ToastController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.page.html',
   styleUrls: ['./edit.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonButton,
+    IonTitle,
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonDatetimeButton,
+    IonModal,
+    IonDatetime,
+    IonIcon
+  ]
 })
 export class EditPage implements OnInit {
 
   @Input("id_owner") id_owner;
-
 
   private readonly: boolean;
   private formBuilder: FormBuilder;
@@ -22,15 +47,13 @@ export class EditPage implements OnInit {
   public phone;
   public email;
   public birthday;
-  
-  constructor(protected _formBuilder: FormBuilder, private _userService: UserService, private modalCtrl: ModalController, private toastController: ToastController) { 
+
+  constructor(protected _formBuilder: FormBuilder, private _userService: UserService, private modalCtrl: ModalController, private toastController: ToastController) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
 
   async ngOnInit() {
-
-
     this._userService.getUserByID(this.id_owner).subscribe(
       res => {
         this.user = res
@@ -39,13 +62,10 @@ export class EditPage implements OnInit {
         this.form.controls['phone'].setValue(res.phone);
         this.form.controls['birthday'].setValue(res.birthday);
         this.form.controls['email'].setValue(res.email);
-        
+
       }
     )
-
-
     // this.user = user
-
     // this.form.controls['name'].setValue(user.name);
     // this.form.controls['lastname'].setValue(user.lastname);
     // this.form.controls['phone'].setValue(user.phone);
@@ -53,67 +73,51 @@ export class EditPage implements OnInit {
     // this.form.controls['email'].setValue(user.email);
 
     console.log(this.readonly);
-
   }
-  
 
- 
-
-  private createForm(): FormGroup{
+  private createForm(): FormGroup {
     return this.formBuilder.group({
       name: [''],
-      lastname :[''],
+      lastname: [''],
       phone: [''],
       birthday: [''],
       email: ['']
     });
-}
+  }
 
-cancel() {
-  return this.modalCtrl.dismiss(null, 'cancel');
-}
+  cancel() {
+    return this.modalCtrl.dismiss(null, 'cancel');
+  }
 
-  updateOwner(){
+  updateOwner() {
     // this._userService.updateUser(this.user.id, 
     //                               this.form.get('name').value,
     //                               this.form.get('lastname').value,
     //                               this.form.get('birthday').value,
     //                               this.form.get('email').value,
     //                               this.form.get('phone').value)
-                                
+
     //                             this.form.markAsPristine()
-                              
-  console.log(this.user.id, 
-                                  this.form.get('name').value,
-                                  this.form.get('lastname').value,
-                                  this.form.get('birthday').value,
-                                  this.form.get('email').value,
-                                  this.form.get('phone').value)
-                                
-                                  this._userService.updateUser(this.user.id, 
-                                    this.form.get('name').value,
-                                    this.form.get('lastname').value,
-                                    this.form.get('birthday').value,
-                                    this.form.get('email').value,
-                                    this.form.get('phone').value)
-                                    
-                                 this.form.markAsPristine()
 
-                              
+    console.log(this.user.id,
+      this.form.get('name').value,
+      this.form.get('lastname').value,
+      this.form.get('birthday').value,
+      this.form.get('email').value,
+      this.form.get('phone').value)
 
-                                
-                                
+    this._userService.updateUser(this.user.id,
+      this.form.get('name').value,
+      this.form.get('lastname').value,
+      this.form.get('birthday').value,
+      this.form.get('email').value,
+      this.form.get('phone').value)
+    this.form.markAsPristine()
   }
 
-  
-
-
-  getDate(event){
-    
+  getDate(event) {
     const { value } = event.detail;
-
     console.log(value);
-    
   }
 
   public getForm(): FormGroup {

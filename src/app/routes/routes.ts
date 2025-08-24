@@ -154,74 +154,84 @@ export const routes: Routes = [
       import('../pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.page').then(m => m.AssignCountryToOwnerPage)
   },
   {
-  path: 'admin/view-owners',
-  loadComponent: () =>
-    import('../pages/admin/country-owners/view/view.page').then(m => m.ViewPage)
+    path: 'admin/view-owners',
+    loadComponent: () =>
+      import('../pages/admin/country-owners/view/view.page').then(m => m.ViewPage)
   },
   {
-  path: 'admin/add-property',
-  loadComponent: () =>
-    import('../pages/admin/country-properties/add-property/add-property.page').then(m => m.AddPropertyPage)
+    path: 'admin/add-property',
+    loadComponent: () =>
+      import('../pages/admin/country-properties/add-property/add-property.page').then(m => m.AddPropertyPage)
   },
   {
-  path: 'admin/view-properties',
-  loadComponent: () =>
-    import('../pages/admin/country-properties/view/view.page').then(m => m.ViewPage)
+    path: 'admin/view-properties',
+    loadComponent: () =>
+      import('../pages/admin/country-properties/view/view.page').then(m => m.ViewPage)
   },
   {
-  path: 'admin/add-recurrent',
-  loadComponent: () =>
-    import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page').then(m => m.AddRecurrentPage)
+    path: 'admin/add-recurrent',
+    loadComponent: () =>
+      import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page').then(m => m.AddRecurrentPage)
   },
   {
-  path: 'admin/country-recurrents',
-  loadComponent: () =>
-    import('../pages/admin/country-recurrents/country-recurrents.page').then(m => m.RecurrentsViewAllComponent)
-  },
-{
-  path: 'admin/events-historial',
-  loadComponent: () =>
-    import('../pages/admin/events-segment/events-historial/events-historial.page').then(m => m.EventsHistorialPage)
+    path: 'admin/country-recurrents',
+    loadComponent: () =>
+      import('../pages/admin/country-recurrents/country-recurrents.page').then(m => m.RecurrentsViewAllComponent)
   },
   {
-  path: 'admin/add-guard',
-  loadComponent: () =>
-    import('../pages/admin/guard-segment/add-guard/add-guard.page').then(m => m.AddGuardPage)
+    path: 'admin/events-historial',
+    loadComponent: () =>
+      import('../pages/admin/events-segment/events-historial/events-historial.page').then(m => m.EventsHistorialPage)
   },
   {
-  path: 'admin/add-laboral-schedule',
-  loadComponent: () =>
-    import('../pages/admin/guard-segment/add-laboral-schedule/add-laboral-schedule.page').then(m => m.AddLaboralSchedulePage)
+    path: 'admin/add-guard',
+    loadComponent: () =>
+      import('../pages/admin/guard-segment/add-guard/add-guard.page').then(m => m.AddGuardPage)
   },
   {
-  path: 'admin/all-guards',
-  loadComponent: () =>
-    import('../pages/admin/guard-segment/all-guards/all-guards.page').then(m => m.AllGuardsPage)
+    path: 'admin/add-laboral-schedule',
+    loadComponent: () =>
+      import('../pages/admin/guard-segment/add-laboral-schedule/add-laboral-schedule.page').then(m => m.AddLaboralSchedulePage)
   },
   {
-  path: 'admin/antipanic-historial',
-  loadComponent: () =>
-    import('../pages/admin/guard-segment/antipanic-historial/antipanic-historial.page').then(m => m.AntipanicHistorialPage)
+    path: 'admin/all-guards',
+    loadComponent: () =>
+      import('../pages/admin/guard-segment/all-guards/all-guards.page').then(m => m.AllGuardsPage)
   },
   {
-  path: 'admin/checkin-out-historial',
-  loadComponent: () =>
-    import('../pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.page').then(m => m.CheckinOutHistorialPage)
+    path: 'admin/antipanic-historial',
+    loadComponent: () =>
+      import('../pages/admin/guard-segment/antipanic-historial/antipanic-historial.page').then(m => m.AntipanicHistorialPage)
   },
   {
-  path: 'admin/password-requests',
-  loadComponent: () =>
-    import('../pages/admin/password-requests/password-requests/password-requests.page').then(m => m.PasswordRequestsPage)
+    path: 'admin/checkin-out-historial',
+    loadComponent: () =>
+      import('../pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.page').then(m => m.CheckinOutHistorialPage)
   },
   {
-  path: 'account/edit',
-  loadComponent: () =>
-    import('../pages/account/edit/edit.page').then(m => m.EditPage)
+    path: 'admin/password-requests',
+    loadComponent: () =>
+      import('../pages/admin/password-requests/password-requests/password-requests.page').then(m => m.PasswordRequestsPage)
   },
   {
-  path: 'account/password-change',
-  loadComponent: () =>
-    import('../pages/account/password-change/password-change.page').then(m => m.PasswordChangePage)
+    path: 'account/edit',
+    loadComponent: () =>
+      import('../pages/account/edit/edit.page').then(m => m.EditPage)
+  },
+  {
+    path: 'account/password-change',
+    loadComponent: () =>
+      import('../pages/account/password-change/password-change.page').then(m => m.PasswordChangePage)
+  },
+  {
+    path: 'edit-owner/:id',
+    loadComponent: () =>
+      import('../modals/owners/edit/edit.page').then(m => m.EditPage)
+  },
+  {
+    path: 'explore-container',
+    loadComponent: () =>
+      import('../explore-container/explore-container.component').then(m => m.ExploreContainerComponent)
   },
   {
     path: '**',
