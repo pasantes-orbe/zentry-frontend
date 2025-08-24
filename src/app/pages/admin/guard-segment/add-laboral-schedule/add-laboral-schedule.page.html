@@ -1,81 +1,80 @@
 <app-navbar-back title="Agregar Horario Laboral"></app-navbar-back>
 
-<ion-content >
+<ion-content>
   <ion-grid>
     <ion-row class="ion-text-center">
       <ion-col>
         <h5>Dia laboral </h5>
       </ion-col>
     </ion-row>
-    <form form  [formGroup]="getForm()"(keyup.enter)="guardarCalendario()" (ngSubmit)="guardarCalendario()">
-    <ion-row class="ion-padding ion-justify-content-center">
-      <ion-col>
-        <ion-list>
+    <form form [formGroup]="getForm()" (keyup.enter)="guardarCalendario()" (ngSubmit)="guardarCalendario()">
+      <ion-row class="ion-padding ion-justify-content-center">
+        <ion-col>
+          <ion-list>
+            <ion-item>
+              <ion-select formControlName="day" placeholder="Seleccione un Dia">
+                <ion-select-option value="Lunes">Lunes</ion-select-option>
+                <ion-select-option value="Martes">Martes</ion-select-option>
+                <ion-select-option value="Miercoles">Miércoles</ion-select-option>
+                <ion-select-option value="Jueves">Jueves</ion-select-option>
+                <ion-select-option value="Viernes">Viernes</ion-select-option>
+                <ion-select-option value="Sabado">Sabado</ion-select-option>
+                <ion-select-option value="Domingo">Domingo</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+
+      <ion-row class="ion-padding ion-text-center ion-justify-content-center">
+        <ion-col>
+          <p>Seleccione horario de inicio </p>
           <ion-item>
-            <ion-select formControlName="day" placeholder="Seleccione un Dia">
-              <ion-select-option value="Lunes">Lunes</ion-select-option>
-              <ion-select-option value="Martes">Martes</ion-select-option>
-              <ion-select-option value="Miercoles">Miércoles</ion-select-option>
-              <ion-select-option value="Jueves">Jueves</ion-select-option>
-              <ion-select-option value="Viernes">Viernes</ion-select-option>
-              <ion-select-option value="Sabado">Sabado</ion-select-option>
-              <ion-select-option value="Domingo">Domingo</ion-select-option>
-            </ion-select>
+            <ion-datetime size="cover" presentation="time" formControlName="start"></ion-datetime>
           </ion-item>
-        </ion-list>
-      </ion-col>
-    </ion-row>
+        </ion-col>
+      </ion-row>
 
+      <ion-row class="ion-padding ion-text-center ion-justify-content-center">
+        <ion-col>
+          <p>Seleccione horario de fin </p>
+          <ion-item>
+            <ion-datetime size="cover" presentation="time" formControlName="exit"></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-    <ion-row class="ion-padding ion-text-center ion-justify-content-center">
-      <ion-col>
-        <p>Seleccione horario de inicio </p>
-        <ion-item>
-        <ion-datetime size="cover" presentation="time" formControlName="start" ></ion-datetime>
-      </ion-item>
-      </ion-col>
-    </ion-row>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Dia</th>
+            <th scope="col" class="name">Horario de Inicio</th>
+            <th scope="col" class="name">Horario de Fin</th>
+          </tr>
+        </thead>
 
-    <ion-row class="ion-padding ion-text-center ion-justify-content-center">
-      <ion-col>
-        <p>Seleccione horario de fin </p>
-        <ion-item >
-        <ion-datetime size="cover" presentation="time" formControlName="exit" ></ion-datetime>
-      </ion-item>
-      </ion-col>
-    </ion-row>
+        <tbody>
+          <tr *ngFor="let hour of schedule; let i = index">
+            <td>{{hour.getDay() }} </td>
+            <td>{{hour.getStart() | date : 'shortTime' }}</td>
+            <td>{{hour.getExit() | date : 'shortTime' }}</td>
+          </tr>
+          <tr>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Dia</th>
-          <th scope="col" class="name">Horario de Inicio</th>
-          <th scope="col" class="name">Horario de Fin</th>
-        </tr>
-      </thead>
-      
-      <tbody>
-        <tr *ngFor="let hour of schedule; let i = index" >
-          <td>{{hour.getDay() }} </td>
-          <td>{{hour.getStart() | date : 'shortTime' }}</td>
-          <td>{{hour.getExit() | date : 'shortTime' }}</td>
-        </tr>
-        <tr>
-        
-      </tbody>
-    </table>
+        </tbody>
+      </table>
 
-    <ion-row>
-      <ion-col>
-        <ion-button expand="block" [disabled]="getForm().invalid" (click)="addHourToSchedule() "> Agregar Horario</ion-button>
-      </ion-col>
-      <ion-col >
-        <ion-button expand="block" [disabled]="this.schedule.length == 0" type="sumbit" [disabled]="" > Agregar a Calendario</ion-button>
-      </ion-col>
-    </ion-row>
-  </form>
-
+      <ion-row>
+        <ion-col>
+          <ion-button expand="block" [disabled]="getForm().invalid" (click)="addHourToSchedule() "> Agregar
+            Horario</ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button expand="block" [disabled]="this.schedule.length == 0" type="sumbit" [disabled]=""> Agregar a
+            Calendario</ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
   </ion-grid>
-
 
 </ion-content>

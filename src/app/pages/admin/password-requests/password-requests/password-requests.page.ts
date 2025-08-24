@@ -1,12 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { PasswordRecoverInterface } from 'src/app/interfaces/Password-requests-interface';
-import { PasswordRecoverService } from '../../../../services/auth/password-recover.service';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { LoadingController, ToastController } from '@ionic/angular';
+
+//Servicios
+import { PasswordRecoverService } from '../../../../services/auth/password-recover.service';
+
+//Interfaces
+import { PasswordRecoverInterface } from 'src/app/interfaces/Password-requests-interface';
+
+// Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
 @Component({
   selector: 'app-password-requests',
   templateUrl: './password-requests.page.html',
   styleUrls: ['./password-requests.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    NavbarBackComponent
+  ]
 })
 export class PasswordRequestsPage implements OnInit {
   
@@ -14,7 +29,6 @@ export class PasswordRequestsPage implements OnInit {
   protected loading;
   constructor(private _passwordRecoveryService: PasswordRecoverService, private loadingCtrl: LoadingController, private toastController: ToastController ) { }
 
-  
   ngOnInit() {
     this._passwordRecoveryService.pendientsPasswordRequests().subscribe((requests) => {this.requests = requests})
   }
@@ -37,7 +51,6 @@ export class PasswordRequestsPage implements OnInit {
     }))
     
   }
-
 
   public isLoading(){
     return true

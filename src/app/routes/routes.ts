@@ -184,6 +184,46 @@ export const routes: Routes = [
     import('../pages/admin/events-segment/events-historial/events-historial.page').then(m => m.EventsHistorialPage)
   },
   {
+  path: 'admin/add-guard',
+  loadComponent: () =>
+    import('../pages/admin/guard-segment/add-guard/add-guard.page').then(m => m.AddGuardPage)
+  },
+  {
+  path: 'admin/add-laboral-schedule',
+  loadComponent: () =>
+    import('../pages/admin/guard-segment/add-laboral-schedule/add-laboral-schedule.page').then(m => m.AddLaboralSchedulePage)
+  },
+  {
+  path: 'admin/all-guards',
+  loadComponent: () =>
+    import('../pages/admin/guard-segment/all-guards/all-guards.page').then(m => m.AllGuardsPage)
+  },
+  {
+  path: 'admin/antipanic-historial',
+  loadComponent: () =>
+    import('../pages/admin/guard-segment/antipanic-historial/antipanic-historial.page').then(m => m.AntipanicHistorialPage)
+  },
+  {
+  path: 'admin/checkin-out-historial',
+  loadComponent: () =>
+    import('../pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.page').then(m => m.CheckinOutHistorialPage)
+  },
+  {
+  path: 'admin/password-requests',
+  loadComponent: () =>
+    import('../pages/admin/password-requests/password-requests/password-requests.page').then(m => m.PasswordRequestsPage)
+  },
+  {
+  path: 'account/edit',
+  loadComponent: () =>
+    import('../pages/account/edit/edit.page').then(m => m.EditPage)
+  },
+  {
+  path: 'account/password-change',
+  loadComponent: () =>
+    import('../pages/account/password-change/password-change.page').then(m => m.PasswordChangePage)
+  },
+  {
     path: '**',
     redirectTo: 'splash-screen'
   }

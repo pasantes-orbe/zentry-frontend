@@ -1,12 +1,33 @@
 import { Component, OnInit } from '@angular/core';
-import { CheckInOrOut } from 'src/app/interfaces/checkInOrOut-interface';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+
+//Servicios
 import { CheckInService } from 'src/app/services/check-in/check-in.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+
+//Interfaces
+import { CheckInOrOut } from 'src/app/interfaces/checkInOrOut-interface';
+
+// Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+
+// Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
 @Component({
   selector: 'app-checkin-out-historial',
   templateUrl: './checkin-out-historial.page.html',
   styleUrls: ['./checkin-out-historial.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
 })
 export class CheckinOutHistorialPage implements OnInit {
 
@@ -41,8 +62,6 @@ export class CheckinOutHistorialPage implements OnInit {
   }
 
 }
-
-
 
 interface Register{
 

@@ -1,14 +1,38 @@
 import { Component, OnInit } from '@angular/core';
-import { GuardsService } from '../../../../services/guards/guards.service';
-import { GuardInterface } from '../../../../interfaces/guard-interface';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { AlertController, ModalController } from '@ionic/angular';
-import { EditGuardPage } from 'src/app/modals/guards/edit-guard/edit-guard.page';
+
+//Servicios
+import { GuardsService } from '../../../../services/guards/guards.service';
 import { UserService } from 'src/app/services/user/user.service';
+
+//Interfaces
+import { GuardInterface } from '../../../../interfaces/guard-interface';
+
+// Componentes
+import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
+import { EditGuardPage } from 'src/app/modals/guards/edit-guard/edit-guard.page';
+
+// Pipes
+import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
+
 
 @Component({
   selector: 'app-all-guards',
   templateUrl: './all-guards.page.html',
   styleUrls: ['./all-guards.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    FormsModule,
+    RouterModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
 })
 export class AllGuardsPage implements OnInit {
 

@@ -2,25 +2,26 @@
 
 <ion-content class="ion-padding">
 
-  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey" [debounce]="250"></ion-searchbar>
+  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey"
+    [debounce]="250"></ion-searchbar>
   <ion-list>
     <div class="register" *ngFor="let register of registers | filterBy: searchKey">
       <ion-item lines="none">
         <!-- CHECKIN   -->
 
-        <ion-icon  color="success" slot="start" [name]="icons.checkIn"></ion-icon>
+        <ion-icon color="success" slot="start" [name]="icons.checkIn"></ion-icon>
         <ion-text>
-           <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
+          <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
           <small>{{register.checkin.DNI}}</small>
         </ion-text>
         <ion-text slot="end">
           <p>{{register.checkin.income_date | date:'shortTime'}} hs</p>
           <small>{{register.checkin.income_date | date :'shortDate'}}</small>
-        </ion-text> 
+        </ion-text>
       </ion-item>
 
-     <ion-item lines="none" *ngIf="register.checkout != null">
-      <!--  CHECKOUT  -->
+      <ion-item lines="none" *ngIf="register.checkout != null">
+        <!--  CHECKOUT  -->
         <ion-icon color="danger" slot="start" [name]="icons.checkOut"></ion-icon>
         <ion-text>
           <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
@@ -33,14 +34,12 @@
       </ion-item>
 
       <ion-item lines="none" *ngIf="register.checkout == null">
-       <!--    CHECKOUT EMPTY  -->
+        <!--    CHECKOUT EMPTY  -->
         <ion-icon color="danger" slot="start" [name]="icons.noCheckOut"></ion-icon>
         <ion-text>
           <small>No se registró CheckOut</small>
-        </ion-text>        
+        </ion-text>
       </ion-item>
     </div>
-
   </ion-list>
 </ion-content>
-
