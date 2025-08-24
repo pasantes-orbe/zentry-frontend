@@ -6,8 +6,15 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 // import * as L from 'leaflet'; // PASO 1: Se comenta la importación de Leaflet.
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+
+//Interfaces
 import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
 
+//Pipes
+import { FilterByPipe } from '../../../pipes/filter-by.pipe';
+
+//Componentes
+import { NavbarBackComponent } from '../../../components/navbars/navbar-back/navbar-back.component';
 @Component({
   selector: 'app-map-guards',
   templateUrl: './map-guards.page.html',
@@ -15,7 +22,10 @@ import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
   standalone: true,
   imports: [
     CommonModule,
-    IonicModule]
+    IonicModule,
+    NavbarBackComponent,
+    FilterByPipe
+  ]
 })
 export class MapGuardsPage implements OnInit {
 

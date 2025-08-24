@@ -17,6 +17,9 @@ interface Amenity {
   // Añade aquí otras propiedades que pueda tener un amenity.
 }
 
+//Pipes
+import { FilterByPipe } from '../../../../pipes/filter-by.pipe';
+
 @Component({
   selector: 'app-view-all',
   templateUrl: './view-all.page.html',
@@ -27,8 +30,8 @@ interface Amenity {
     IonicModule,
     FormsModule,
     RouterModule,
-    NavbarBackComponent
-
+    NavbarBackComponent,
+    FilterByPipe
   ]
 })
 export class ViewAllPage implements OnInit {
