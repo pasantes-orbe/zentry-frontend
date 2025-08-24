@@ -1,18 +1,208 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="header-brand">
+      <img src="../../assets/logos/logo-48.png" class="header-logo" alt="Zentry Logo" />
+      <span class="header-title-text">Zentry</span>
+    </ion-buttons>
+    
+    <ion-buttons slot="end">
+      <ion-button fill="clear" class="notification-button" (click)="onNotificationClick()">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-avatar>
+        <img src="https://placehold.co/64x64/374151/FFFF?text=U" />
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-progress-bar type="indeterminate" *ngIf="isLoading()"></ion-progress-bar>
-  <div class="text-center" *ngIf="owner == null">
-    <h1>
-      No posee propiedad
-    </h1>
-  </div>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large" class="page-title">Inicio</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-  <div *ngIf="owner">
-  <ion-row>
-    <ion-col size-sm="12">
-      <app-reservations #reservationsComponent></app-reservations>
-    </ion-col>
-  </ion-row>
-</div>
-  <!-- <app-explore-container name="Tab 1 page"></app-explore-container> -->
+  <ion-grid>
+    <ion-row>
+      <!-- Columna Izquierda -->
+      <ion-col size="12" size-lg="7">
+        <div class="action-card quick-auth-card">
+          <h3 class="card-title">Autorizar Visita Rápida</h3>
+          <ion-item lines="none">
+            <ion-input 
+              placeholder="Nombre del Invitado"
+              [(ngModel)]="guestName"
+              clearInput="true">
+            </ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-input 
+              placeholder="DNI"
+              [(ngModel)]="guestDNI"
+              clearInput="true">
+            </ion-input>
+          </ion-item>
+          <ion-button 
+            expand="block" 
+            color="primary"
+            (click)="authorizeQuickVisit()"
+            [disabled]="!guestName.trim() || !guestDNI.trim()">
+            Autorizar
+          </ion-button>
+        </div>
+
+        <div class="action-card notifications-card">
+          <h3 class="card-title">Notificaciones Recientes</h3>
+          <ion-list>
+            <!-- Las notificaciones se cargarán aquí dinámicamente -->
+          </ion-list>
+        </div>
+      </ion-col>
+
+      <!-- Columna Derecha -->
+      <ion-col size="12" size-lg="5">
+        <div class="action-card secondary-action-card" (click)="reserveAmenity()">
+          <h3 class="card-title">Reservar Amenity</h3>
+          <p>Consulte disponibilidad y reserve.</p>
+        </div>
+
+        <div class="action-card secondary-action-card" (click)="manageRecurrent()">
+          <h3 class="card-title">Gestionar Recurrentes</h3>
+          <p>Administre el acceso de su personal.</p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Modal para Reservar Amenity -->
+  <ion-modal [isOpen]="isReservationModalOpen" (didDismiss)="closeReservationModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Reservar Amenity</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeReservationModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content>
+        <ion-list>
+          <ion-item>
+            <ion-select placeholder="Seleccionar Amenity" [(ngModel)]="selectedAmenity">
+              <ion-select-option *ngFor="let amenity of amenities" [value]="amenity">
+                {{amenity}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              type="date" 
+              placeholder="Fecha" 
+              [(ngModel)]="selectedDate">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              type="time" 
+              placeholder="Hora" 
+              [(ngModel)]="selectedTime">
+            </ion-input>
+          </ion-item>
+        </ion-list>
+        
+        <ion-button 
+          expand="block" 
+          (click)="confirmReservation()" 
+          style="margin: 20px;">
+          Confirmar Reserva
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal para Gestionar Recurrentes -->
+  <ion-modal [isOpen]="isRecurrentModalOpen" (didDismiss)="closeRecurrentModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Gestionar Recurrentes</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeRecurrentModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content>
+        <!-- Formulario para agregar recurrente -->
+        <div style="padding: 20px;">
+          <h4>Agregar Nuevo Recurrente</h4>
+          
+          <ion-item>
+            <ion-input 
+              placeholder="Nombre completo" 
+              [(ngModel)]="recurrentName">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              placeholder="DNI" 
+              [(ngModel)]="recurrentDNI">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              placeholder="Rol (ej: Empleada doméstica)" 
+              [(ngModel)]="recurrentRole">
+            </ion-input>
+          </ion-item>
+          
+          <div style="margin: 20px 0;">
+            <h5>Días de acceso:</h5>
+            <div *ngFor="let day of weekDays">
+              <ion-checkbox 
+                [checked]="selectedDays.includes(day.value)"
+                (ionChange)="onDayChange(day.value, $event)">
+              </ion-checkbox>
+              <span style="margin-left: 10px;">{{day.label}}</span>
+            </div>
+          </div>
+          
+          <ion-button expand="block" (click)="addRecurrent()">
+            Agregar Recurrente
+          </ion-button>
+        </div>
+        
+        <!-- Lista de recurrentes registrados -->
+        <div style="padding: 20px;">
+          <h4>Recurrentes Registrados</h4>
+          <ion-list>
+            <ion-item *ngFor="let recurrent of registeredRecurrents">
+              <div>
+                <h5>{{recurrent.name}}</h5>
+                <p>{{recurrent.role}} - DNI: {{recurrent.dni}}</p>
+                <p><small>Días: {{getFormattedDays(recurrent.days)}}</small></p>
+              </div>
+              <ion-button 
+                slot="end" 
+                fill="clear" 
+                color="danger"
+                (click)="removeRecurrent(recurrent.id)">
+                <ion-icon name="trash"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

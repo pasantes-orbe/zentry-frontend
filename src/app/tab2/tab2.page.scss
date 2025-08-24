@@ -1,0 +1,51 @@
+/* ====================================================== */
+/* TAB2.PAGE.SCSS */
+/* ====================================================== */
+:host {
+  .map-background {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url('/assets/icon/mapa-ejemplo.png');
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(0.5) brightness(0.7);
+  }
+
+  ion-fab {
+    /* Ajuste para que el botón no quede pegado al borde inferior */
+    margin-bottom: 16px;
+  }
+
+  .panic-button {
+    --background: var(--ion-color-danger);
+    --border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    /* CORRECCIÓN: Se aplica el border-radius al box-shadow para que el pulso sea redondo */
+    animation: pulse-red 2s infinite;
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    border-radius: 50%;
+
+    ion-icon {
+      font-size: 60px;
+    }
+  }
+
+  @keyframes pulse-red {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+  }
+}
