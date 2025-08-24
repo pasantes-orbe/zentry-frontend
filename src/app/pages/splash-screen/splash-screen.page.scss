@@ -1,53 +1,63 @@
 /* splash-screen.page.scss */
 
-/* Contenedor principal que centra todo vertical y horizontalmente */
-.splash-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  background-color: var(--ion-background-color);
-}
-
-/* Contenedor para el logo, con una animación de entrada */
-.logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-  animation: fadeIn 1.5s ease-in-out;
-}
-
 /*
-* CORRECCIÓN: Tamaño del logo.
-* Se aplica a la imagen que tenga la clase "app-logo".
-* Asegúrate de que tu HTML use <img class="app-logo" ... />
+* CORRECCIÓN: Usamos :host para asegurar que los estilos se apliquen
+* específicamente a este componente, dándoles más prioridad.
 */
-.app-logo {
-  height: 60vh; // Le das un alto, pero no un ancho.
-}
-
-/* Contenedor para el spinner*/
-.spinner-container {
-  position: absolute;
-  bottom: 20%;
-}
-
-
-.spinner-container ion-spinner {
-  width: 50px;
-  height: 50px;
-}
-
-/* Animación de entrada para el logo */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
+:host {
+  /* Contenedor principal que centra todo vertical y horizontalmente */
+  .splash-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: var(--ion-background-color);
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+
+  /* Contenedor para el logo, con una animación de entrada */
+  .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5rem;
+    animation: fadeIn 1.5s ease-in-out;
+  }
+
+  /*
+  * CORRECCIÓN: Tamaño del logo con !important.
+  * Se usa !important para forzar esta regla sobre cualquier otra que pueda
+  * estar afectando a la imagen.
+  */
+  .app-logo {
+    height: 150px !important;
+    width: 150px !important;
+  }
+
+  /* Contenedor para el spinner, lo posiciona en la parte inferior */
+  .spinner-container {
+    position: absolute;
+    bottom: 20%;
+  }
+
+  /*
+  * CORRECCIÓN: Spinner más grande y grueso.
+  */
+  .spinner-container ion-spinner {
+    width: 100px;
+    height: 100px;
+    --stroke-width: 10px;
+  }
+
+  /* Animación de entrada para el logo */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }
