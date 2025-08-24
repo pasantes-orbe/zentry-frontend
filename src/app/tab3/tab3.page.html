@@ -1,25 +1,227 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mi Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-    </ion-toolbar>
-  </ion-header>
-
-
-  <div *ngIf="owner">
-    <ion-row>
-      <ion-col size="12">
-        <app-incomes #incomesComponent></app-incomes>
-      </ion-col>
-    </ion-row>
+  <div class="profile-header">
+    <ion-avatar>
+      <img [src]="'https://placehold.co/128x128/374151/FFFF?text=' + getAvatarInitial()" />
+    </ion-avatar>
+    <h2 class="profile-name">{{ getOwnerName() }}</h2>
+    <p class="profile-info">{{ getPropertyInfo() }}</p>
   </div>
-
-  <ion-button class="ion-margin-top" (click)="viewRecurrents()" expand="block" fill="clear" shape="round">
-    Ver Recurrentes
-    <ion-icon *ngIf="recurrentsState" name="chevron-down-outline"></ion-icon>
-    <ion-icon *ngIf="!recurrentsState" name="chevron-forward-outline"></ion-icon>
-  </ion-button>
   
-  <div *ngIf="recurrentsState" >
-    <app-recurrents-view-all [readOnly]="false" role="owner" #recurrents ></app-recurrents-view-all>
+  <div class="settings-list-container">
+    <ion-list>
+      <ion-item 
+        lines="none" 
+        class="settings-item" 
+        button
+        (click)="onPersonalInfoClick()">
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-label class="settings-label">Información Personal</ion-label>
+      </ion-item>
+      
+      <ion-item 
+        lines="none" 
+        class="settings-item" 
+        button
+        (click)="onMyPropertiesClick()">
+        <ion-icon slot="start" name="home-outline"></ion-icon>
+        <ion-label class="settings-label">Mis Propiedades</ion-label>
+      </ion-item>
+
+      <ion-item 
+        lines="none" 
+        class="settings-item" 
+        button
+        (click)="onSecurityClick()">
+        <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+        <ion-label class="settings-label">Seguridad y Contraseña</ion-label>
+      </ion-item>
+      
+      <ion-item 
+        lines="none" 
+        class="settings-item logout-item" 
+        button 
+        (click)="onLogoutClick()">
+        <ion-icon slot="start" name="log-out-outline" color="danger"></ion-icon>
+        <ion-label class="settings-label" color="danger">Cerrar Sesión</ion-label>
+      </ion-item>
+    </ion-list>
   </div>
+
+  <!-- Action Sheet para Información Personal -->
+  <ion-action-sheet
+    [isOpen]="isActionSheetOpen"
+    header="Información Personal"
+    [buttons]="actionSheetButtons"
+    (didDismiss)="isActionSheetOpen = false">
+  </ion-action-sheet>
+
+  <!-- Alert de confirmación para Logout -->
+  <ion-alert
+    [isOpen]="isLogoutAlertOpen"
+    header="Cerrar Sesión"
+    message="¿Estás seguro que deseas cerrar tu sesión?"
+    [buttons]="logoutAlertButtons">
+  </ion-alert>
+
+  <!-- Modal para Editar Perfil -->
+  <ion-modal [isOpen]="isEditProfileModalOpen" (didDismiss)="closeEditProfileModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar Perfil</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeEditProfileModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content>
+        <div style="padding: 20px;">
+          <ion-item>
+            <ion-input 
+              label="Nombre completo"
+              labelPlacement="stacked"
+              [(ngModel)]="editName"
+              placeholder="Ingrese su nombre">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              label="Email"
+              labelPlacement="stacked"
+              type="email"
+              [(ngModel)]="editEmail"
+              placeholder="Ingrese su email">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              label="Teléfono"
+              labelPlacement="stacked"
+              [(ngModel)]="editPhone"
+              placeholder="Ingrese su teléfono">
+            </ion-input>
+          </ion-item>
+          
+          <ion-button 
+            expand="block" 
+            (click)="saveProfileChanges()"
+            style="margin-top: 20px;">
+            Guardar Cambios
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal para Mis Propiedades -->
+  <ion-modal [isOpen]="isPropertiesModalOpen" (didDismiss)="closePropertiesModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Mis Propiedades</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closePropertiesModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content>
+        <div style="padding: 20px;">
+          <ion-list>
+            <ion-item *ngFor="let property of properties">
+              <div>
+                <h4>{{property.type}}</h4>
+                <p><strong>Dirección:</strong> {{property.address}}</p>
+                <p><strong>Área:</strong> {{property.area}}</p>
+                <p><strong>Estado:</strong> 
+                  <span [style.color]="property.status === 'Activa' ? 'green' : 'red'">
+                    {{property.status}}
+                  </span>
+                </p>
+              </div>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal para Seguridad -->
+  <ion-modal [isOpen]="isSecurityModalOpen" (didDismiss)="closeSecurityModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Seguridad y Contraseña</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeSecurityModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content>
+        <div style="padding: 20px;">
+          <h4>Cambiar Contraseña</h4>
+          
+          <ion-item>
+            <ion-input 
+              label="Contraseña actual"
+              labelPlacement="stacked"
+              type="password"
+              [(ngModel)]="currentPassword"
+              placeholder="Ingrese su contraseña actual">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              label="Nueva contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [(ngModel)]="newPassword"
+              placeholder="Ingrese la nueva contraseña">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input 
+              label="Confirmar contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [(ngModel)]="confirmPassword"
+              placeholder="Confirme la nueva contraseña">
+            </ion-input>
+          </ion-item>
+          
+          <ion-button 
+            expand="block" 
+            (click)="changePassword()"
+            style="margin-top: 20px;">
+            Cambiar Contraseña
+          </ion-button>
+          
+          <div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+            <h5>Opciones de Seguridad Adicionales</h5>
+            <p>🛡️ <strong>Autenticación en 2 Pasos:</strong> Próximamente disponible</p>
+            <p>📋 <strong>Historial de Accesos:</strong> Revise su actividad reciente</p>
+            <p>🔐 <strong>Sesiones Activas:</strong> Gestione sus dispositivos conectados</p>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

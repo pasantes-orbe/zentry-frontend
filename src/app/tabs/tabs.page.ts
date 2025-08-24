@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -6,12 +6,15 @@ import { environment } from 'src/environments/environment';
 // Componentes Standalone de Ionic
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 
-// Íconos
+// Íconos que realmente usas
 import { addIcons } from 'ionicons';
-import { home, newspaper, person, call } from 'ionicons/icons';
-
-// Tus componentes
-import { NavbarDefaultComponent } from '../components/navbars/navbar-default/navbar-default.component';
+import { 
+  homeOutline, 
+  shieldOutline, 
+  personCircleOutline,
+  alertOutline,
+  notificationsOutline 
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -24,28 +27,44 @@ import { NavbarDefaultComponent } from '../components/navbars/navbar-default/nav
     IonTabBar,
     IonTabButton,
     IonIcon,
-    IonLabel,
-    NavbarDefaultComponent
+    IonLabel
   ]
 })
 export class TabsPage implements OnInit {
-
-  @ViewChild('navbar') navbar: NavbarDefaultComponent;
   private socket: Socket;
 
   constructor() {
     this.socket = io(environment.URL);
-    addIcons({ home, newspaper, person, call });
+    
+    // Registrar todos los íconos que usas en la app
+    addIcons({ 
+      homeOutline, 
+      shieldOutline, 
+      personCircleOutline,
+      alertOutline,
+      notificationsOutline 
+    });
   }
 
   ngOnInit(): void {
-    // Lógica de Sockets
+    // Conectar socket
+    this.socket.on('connect', () => {
+      console.log('Socket conectado');
+    });
+
     this.socket.on('notificacion-check-in', (payload) => {
-      setTimeout(async cb => await this.navbar.ngOnInit(), 1000);
+      console.log('Notificación check-in recibida:', payload);
+      // Aquí puedes mostrar una notificación toast o similar
     });
 
     this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) => {
-      setTimeout(async cb => await this.navbar.ngOnInit(), 1000);
+      console.log('Notificación confirmada por propietario:', payload);
     });
+  }
+
+  ngOnDestroy() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 }

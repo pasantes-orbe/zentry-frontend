@@ -1,0 +1,22 @@
+/* ====================================================== */
+/* TABS.PAGE.SCSS */
+/* ====================================================== */
+/*
+  Estilos para la barra de navegación principal.
+  Se aplica el fondo oscuro, el color de acento para el ítem seleccionado
+  y la tipografía definida en las variables globales.
+*/
+ion-tab-bar {
+  --background: var(--ion-toolbar-background);
+  --border: none;
+  --color-selected: var(--ion-color-primary);
+  --color: var(--color-text-secondary);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: 5px;
+  border-top: 1px solid var(--color-border);
+}
+
+ion-tab-button {
+  font-family: var(--font-heading);
+  font-weight: 500;
+}
