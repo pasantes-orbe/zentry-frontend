@@ -19,8 +19,16 @@ export class SecurityGuard  implements RoleGuard {
   ){}
 
   canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+  
+  console.log('🔒 SecurityGuard ejecutándose...');
+  console.log('🔒 Retornando TRUE');
+  
+  // RETORNAR SIEMPRE TRUE:
+  
+    // COMENTAR TODA LA VALIDACIÓN TEMPORALMENTE:
+    /*
     return this._loginService.isRole(this.roleType).then(
       validJWT => {
 
@@ -29,12 +37,12 @@ export class SecurityGuard  implements RoleGuard {
           return false;
         }
 
-
         return true;        
       }
     );
+    */
+    
+    // RETORNAR SIEMPRE TRUE PARA PERMITIR ACCESO:
+    return true;
   }
-
-  
-  
 }
