@@ -61,4 +61,78 @@
       font-weight: 500;
     }
   }
+
+  // ====================================================
+  // ESTILOS PARA MODALES - TEXTO BLANCO
+  // ====================================================
+  ion-modal {
+    --background: rgba(31, 41, 55, 0.95);
+    
+    ion-header {
+      ion-toolbar {
+        --background: rgba(17, 24, 39, 0.95);
+        --color: #FFFFFF;
+        
+        ion-title {
+          color: #FFFFFF !important;
+        }
+        
+        ion-button {
+          --color: #FFFFFF;
+        }
+      }
+    }
+    
+    ion-content {
+      --background: rgba(31, 41, 55, 0.95);
+      --color: #FFFFFF;
+      
+      ion-item {
+        --background: transparent;
+        --color: #FFFFFF;
+        
+        ion-label {
+          color: #FFFFFF !important;
+        }
+        
+        ion-input {
+          --color: #FFFFFF;
+          --placeholder-color: #9CA3AF;
+        }
+        
+        ion-select {
+          --color: #FFFFFF;
+          --placeholder-color: #9CA3AF;
+        }
+        
+        ion-datetime {
+          --color: #FFFFFF;
+        }
+        
+        ion-radio {
+          --color: #FFFFFF;
+          --color-checked: var(--ion-color-primary);
+        }
+      }
+      
+      ion-radio-group {
+        ion-item {
+          ion-label {
+            color: #FFFFFF !important;
+          }
+        }
+      }
+      
+      ion-button {
+        &.cancel-button {
+          --color: #EF4444;
+        }
+        
+        &.confirm-button {
+          --background: var(--ion-color-primary);
+          --color: #FFFFFF;
+        }
+      }
+    }
+  }
 }
