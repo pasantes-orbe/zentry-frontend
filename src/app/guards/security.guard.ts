@@ -18,12 +18,12 @@ export class SecurityGuard  implements RoleGuard {
     private _router: Router
   ){}
 
-  canActivate(
+  /*canActivate(
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
   
   console.log('🔒 SecurityGuard ejecutándose...');
-  console.log('🔒 Retornando TRUE');
+  console.log('🔒 Retornando TRUE');/*
   
   // RETORNAR SIEMPRE TRUE:
   
@@ -43,6 +43,6 @@ export class SecurityGuard  implements RoleGuard {
     */
     
     // RETORNAR SIEMPRE TRUE PARA PERMITIR ACCESO:
-    return true;
-  }
+    //return true;
+  //}
 }
