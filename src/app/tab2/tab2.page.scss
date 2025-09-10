@@ -3,16 +3,12 @@
 /* ====================================================== */
 :host {
   .map-background {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-image: url('/assets/icon/mapa-ejemplo.png');
-    background-size: cover;
-    background-position: center;
-    filter: grayscale(0.5) brightness(0.7);
-  }
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
   ion-fab {
     /* Ajuste para que el botón no quede pegado al borde inferior */

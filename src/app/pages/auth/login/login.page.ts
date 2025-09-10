@@ -6,7 +6,7 @@ import { ModalController } from '@ionic/angular';
 
 // Componentes Standalone de Ionic
 import {
-  IonContent, IonHeader, IonToolbar, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner, IonText, IonCard, IonCardHeader, IonAvatar, IonCardContent
+  IonContent, IonHeader, IonToolbar, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner, IonText, IonCard, IonCardHeader, IonAvatar, IonCardContent, 
 } from '@ionic/angular/standalone';
 
 // Íconos
@@ -14,6 +14,7 @@ import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline } from 'ionicons/icons';
 
 // Servicios y otros
+
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 import { LoginService } from 'src/app/services/auth/login.service';
 import { GuardsService } from 'src/app/services/guards/guards.service';
@@ -55,7 +56,7 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
     IonCard,
     IonCardHeader,
     IonAvatar,
-    IonCardContent
+    IonCardContent,
   ]
 })
 export class LoginPage implements OnInit {

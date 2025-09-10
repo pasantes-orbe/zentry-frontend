@@ -33,6 +33,7 @@ import { ReservationsComponent } from '../components/reservations/reservations.c
   ]
 })
 export class Tab1Page implements OnInit {
+  
   private loading: boolean = true;
   private userID: any;
   protected owner: OwnerResponse | null = null;

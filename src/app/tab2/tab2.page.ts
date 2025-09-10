@@ -17,8 +17,8 @@ import { CountryMapComponent } from '../components/maps/country-map/country-map.
     IonContent,
     IonIcon,
     IonFab,
-    IonFabButton
-    // CountryMapComponent - comentado hasta que lo uses en el template
+    IonFabButton,
+    CountryMapComponent
   ]
 })
 export class Tab2Page implements OnInit {

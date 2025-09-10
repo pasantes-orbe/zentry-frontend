@@ -10,17 +10,20 @@ export class RedirectService {
     private _router: Router
   ) { }
 
-  public redirectByRole(role: string){
-
-    var getUrl = window.location;
-    var baseUrl = getUrl .protocol + "//" + getUrl.host;
-    
-    //TODO: VER SI FUNCIONA BIEN EN EL APK
-    window.location.href = `${getUrl .protocol + "//" + getUrl.host}/menu/home`;
-
-
-    if(role == "propietario") window.location.href = `${getUrl .protocol + "//" + getUrl.host}/home`;
-    if(role == "vigilador") window.location.href = `${getUrl .protocol + "//" + getUrl.host}/vigiladores/home`; 
-    if(role == "administrador") window.location.href = `${getUrl .protocol + "//" + getUrl.host}/admin/home`;
+  public redirectByRole(role: string) {
+    switch (role) {
+      case 'propietario':
+        this._router.navigate(['/home']); // Redirige a la página de propietario
+        break;
+      case 'vigilador':
+        this._router.navigate(['/vigiladores/home']); // Redirige a la página de vigilador
+        break;
+      case 'administrador':
+        this._router.navigate(['/admin/home']); // Redirige a la página de administrador
+        break;
+      default:
+        this._router.navigate(['/menu/home']); // Redirige a una página por defecto
+        break;
+    }
   }
 }

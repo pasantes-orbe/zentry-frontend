@@ -13,11 +13,13 @@
     height: 100%;
   }
   
+  // Después (Recomendado)
   #map {
-    margin-top: 55px;
-    height: 75%;
-    z-index: -1;
+  height: 100%; // Ocupa todo el alto del contenedor ion-content
+  width: 100%;  // Ocupa todo el ancho
+  z-index: 0;   // Se asegura que esté visible
   }
+  
 
   .guard-avatar{
     background-color: red;

@@ -70,6 +70,14 @@
   --ion-color-medium-shade: #808289;
   --ion-color-medium-tint: #9d9fa6;
 
+   /** gray **/
+ --ion-color-gray: #9ca3af;
+ --ion-color-gray-rgb: 156, 163, 175;
+ --ion-color-gray-contrast: #ffffff;
+ --ion-color-gray-contrast-rgb: 255, 255, 255;
+ --ion-color-gray-shade: #8a919b;
+ --ion-color-gray-tint: #a6adb8;
+
   /** light **/
   --ion-color-light: #f4f5f8;
   --ion-color-light-rgb: 244, 245, 248;
@@ -94,6 +102,8 @@
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
   --ion-font-family: var(--font-body);
+
+ 
 }
 
 
@@ -104,6 +114,41 @@ body {
   --ion-background-color: #111827;
   --ion-toolbar-background: #1F2937;
   --ion-item-background: #1F2937;
-  --ion-text-color: #F9FAFB;
+  --ion-text-color: #f9fafb;
   --ion-card-background: #1F2937;
+}
+
+/* =================================================================== */
+/* ============== PALETA DE COLORES BASE DE LA APLICACIÓN ============== */
+/* =================================================================== */
+:root {
+  /* --- Paleta Estándar de Ionic (para usar con color="primary", etc.) --- */
+  --ion-color-primary: #3B82F6;
+  --ion-color-secondary: #6B7280;
+  --ion-color-tertiary: #10B981;
+  --ion-color-success: var(--ion-color-tertiary);
+  --ion-color-warning: #F59E0B;
+  --ion-color-danger: #EF4444;
+
+  /* --- Variables Semánticas Personalizadas de Zentry (Nuestro Branding) --- */
+  --zentry-color-background: #111827;
+  --zentry-color-component: #1F2937;
+  --zentry-color-border: #374151;
+  --zentry-color-text-primary: #F9FAFB;
+  --zentry-color-text-secondary: #9ca3af;
+
+  /* --- Tipografía --- */
+  --ion-font-family: 'Inter', sans-serif;
+}
+
+/* =================================================================== */
+/* ============= APLICACIÓN GLOBAL DEL TEMA OSCURO ZENTRY ============= */
+/* =================================================================== */
+body {
+  --ion-background-color: var(--zentry-color-background);
+  --ion-text-color: var(--zentry-color-text-primary);
+  --ion-toolbar-background: var(--zentry-color-component);
+  --ion-item-background: var(--zentry-color-component);
+  --ion-card-background: var(--zentry-color-component);
+  --ion-border-color: var(--zentry-color-border);
 }

@@ -110,17 +110,19 @@
               {
                 "glob": "**/*",
                 "input": "src/assets",
-                "output": "/assets"
+                "output": "/assets/leaflet"
               },
               {
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",
-                "output": "./assets"
+                "output": "./assets/leaflet"
               },
               "src/manifest.webmanifest"
             ],
             "styles": [],
-            "scripts": []
+            "scripts": [
+              "node_modules/leaflet/dist/leaflet.js"
+            ]
           }
         },
         "lint": {

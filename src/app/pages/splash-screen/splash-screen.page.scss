@@ -5,15 +5,16 @@
 * específicamente a este componente, dándoles más prioridad.
 */
 :host {
-  /* Contenedor principal que centra todo vertical y horizontalmente */
-  .splash-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    background-color: var(--ion-background-color);
+  ion-content { --background: var(--ion-background-color); }
+  .splash-logo {
+    max-width: 220px;
+    width: 60vw;
+    height: auto;
+    display: block;
+    margin: 20vh auto 0;
   }
+}
+
 
   /* Contenedor para el logo, con una animación de entrada */
   .logo-container {
@@ -59,5 +60,6 @@
       opacity: 1;
       transform: scale(1);
     }
+    
   }
-}
+

@@ -1,20 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { CountriesService } from 'src/app/services/countries/countries.service';
-import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
-// import * as L from 'leaflet'; // PASO 1: Se comenta la importación de Leaflet.
-import { Socket, io } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
+import * as L from 'leaflet';
 
-//Interfaces
-import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
-
-//Pipes
-import { FilterByPipe } from '../../../pipes/filter-by.pipe';
-
-//Componentes
+// Componentes
 import { NavbarBackComponent } from '../../../components/navbars/navbar-back/navbar-back.component';
+
+// Fix para iconos de Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+  iconUrl: 'assets/leaflet/marker-icon.png',
+  shadowUrl: 'assets/leaflet/marker-shadow.png',
+});
+
 @Component({
   selector: 'app-map-guards',
   templateUrl: './map-guards.page.html',
@@ -24,121 +23,100 @@ import { NavbarBackComponent } from '../../../components/navbars/navbar-back/nav
     CommonModule,
     IonicModule,
     NavbarBackComponent,
-    FilterByPipe
   ]
 })
-export class MapGuardsPage implements OnInit {
+export class MapGuardsPage implements AfterViewInit, OnDestroy {
 
-  protected socket: Socket;
-  protected countryLat: any;
-  protected countryLng: any;
-  protected tileLayer: any;
-  protected map: any; // Se cambia a 'any' para evitar errores de tipo al desactivar Leaflet.
-  public markers = [];
-  protected activeGuards: GuardPointInterface[];
-  protected id_country: any;
+  private map: L.Map | null = null;
+  private tileLayer: L.TileLayer | null = null; 
+  private markers: L.CircleMarker[] = [];
 
-  constructor(private _countryService: CountriesService, private countryStorage: CountryStorageService) {
-    this.socket = io(environment.URL);
+  constructor() {}
+
+  ngAfterViewInit() {
+    const latitudLaRivera = -27.4302;
+    const longitudLaRivera = -58.9643;
+    
+    setTimeout(() => {
+        this.initMap(latitudLaRivera, longitudLaRivera);
+        this._simularGuardiasLaRivera();
+    }, 50); 
   }
 
-  async ngOnInit() {
-    const country = await this.countryStorage.getCountry();
-    const countryID = country.id;
-    console.log(countryID);
-
-    this.id_country = countryID;
-
-    console.log(this.id_country);
-    this.socket.on('get-actives-guards', (payload) => {
-      this.removeMarkers();
-      this.activeGuards = payload;
-      this.activeGuards.forEach((data) => {
-        if (data.id_country == this.id_country)
-          this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`);
-      });
-    });
-
-    this.socket.on('guardDisconnected', (payload) => {
-      this.removeMarkers();
-    });
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+    }
   }
+  
+  private _simularGuardiasLaRivera(): void {
+    const guardiasFalsos = [
+      { lat: -27.429969, lng: -58.963919, user_name: 'Guardia', user_lastname: 'Entrada' },
+      { lat: -27.427316, lng: -58.964532, user_name: 'Guardia', user_lastname: 'Centro' },
+      { lat: -27.423088, lng: -58.965417, user_name: 'Guardia', user_lastname: 'Fondo' }
+    ];
 
-  async ngAfterViewInit() {
-    const country = await this.countryStorage.getCountry();
-    const countryID = country.id;
-
-    this._countryService.getByID(countryID).subscribe(res => {
-      console.log(res);
-      this.countryLat = res['latitude'];
-      this.countryLng = res['longitude'];
-      // Se comenta la llamada a la inicialización del mapa.
-      // this.initMap(res['latitude'], res['longitude']); 
+    this.removeMarkers();
+    guardiasFalsos.forEach(guardia => {
+      const popupHtml = `Vigilador: <b>${guardia.user_name} ${guardia.user_lastname}</b>`;
+      this.addPoint(guardia.lat, guardia.lng, popupHtml);
     });
   }
 
-  private initMap(mapLat, mapLng): void {
-    // --- PASO 2: Se comenta todo el cuerpo de la función para desactivar la lógica del mapa. ---
-    /*
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    if (prefersDark.matches) {
-      this.setTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-    } else {
-      this.setTileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+  private initMap(mapLat: number, mapLng: number): void {
+    if (this.map) {
+      this.map.setView([mapLat, mapLng]);
+      return;
     }
 
-    this.map = L.map('map', {
+    const southWest = L.latLng(-27.430294, -58.963896);
+    const northEast = L.latLng(-27.421497, -58.966106);
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    if (prefersDark.matches) {
+      this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
+    } else {
+      this.setTileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+    }
+
+    this.map = L.map('adminMap', {
       zoomControl: true,
-      layers: [this.getTileLayer()],
+      layers: [this.getTileLayer()!],
+      maxBounds: bounds,
+      maxBoundsViscosity: 1.0 
     }).setView([mapLat, mapLng], 15);
 
-    setTimeout(() => {
-      this.getMap().invalidateSize(true);
-    }, 100);
-    */
-  }
+    this.map.setMinZoom(17);
 
-  public addPoint(lat: number, lng: number, html: string = null): void {
-    // Se comenta la lógica que crea el marcador en el mapa.
-    /*
-    const marker = L.circle([lat, lng], {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5,
-      radius: 15
-    })
-      .bindPopup(html, { closeButton: false })
-      .addTo(this.getMap());
-
-    this.markers.push(marker);
-    */
+    setTimeout(() => this.map?.invalidateSize(true), 100);
   }
-
-  public getMap() {
-    return this.map;
+  
+  public setTileLayer(url: string): void {
+    this.tileLayer = L.tileLayer(url, {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    });
   }
-  public getTileLayer(): any {
+  
+  public getTileLayer(): L.TileLayer | null {
     return this.tileLayer;
   }
 
-  public removeMarkers() {
-    // Se comenta la lógica para evitar errores si this.getMarkers() está vacío.
-    /*
-    this.getMarkers().forEach(marker => {
-      this.removeMarker(marker);
-    });
-    */
+  private addPoint(lat: number, lng: number, html: string = ''): void {
+    if (!this.map) return;
+    const marker = L.circleMarker([lat, lng], {
+      color: '#ff0000',      
+      fillColor: '#ff0000',  
+      fillOpacity: 0.7,
+      radius: 8,
+      weight: 2
+    }).bindPopup(html, { closeButton: false }).addTo(this.map);
+    this.markers.push(marker);
   }
 
-  public removeMarker(marker) {
-    // this.map.removeLayer(marker);
-  }
-
-  public getMarkers() {
-    return this.markers;
-  }
-
-  public setTileLayer(url: any): void {
-    // this.tileLayer = L.tileLayer(url, { attribution: '' });
+  private removeMarkers(): void {
+    this.markers.forEach(marker => marker.remove());
+    this.markers = [];
   }
 }

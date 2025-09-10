@@ -1,97 +1,172 @@
-import { Injectable, LOCALE_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AlertController } from '@ionic/angular';
-import { CheckInInterfaceResponse } from 'src/app/interfaces/checkIn-interface';
-import { AntipanicService } from '../antipanic/antipanic.service';
-import { formatDate } from '@angular/common';
-import { CheckInService } from '../check-in/check-in.service';
 import { AlertService } from '../helpers/alert.service';
 import { environment } from 'src/environments/environment';
-
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class WebSocketService {
 
-  private socket: Socket;
-  private datePipeString: string;
+  private socket: Socket | null = null;
+  private connectionStatus: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(
     private alertController: AlertController,
     private alerts: AlertService
-  ) {
-    this.socket = io(environment.URL)
+  ) {}
+
+  /**
+   * Conectar al servidor WebSocket
+   */
+  public conectar(): void {
+    try {
+      this.socket = io(environment.URL);
+
+      this.socket.on('connect', () => {
+        console.log('Conectado al servidor WebSocket.');
+        this.connectionStatus.next(true);
+      });
+
+      this.socket.on('disconnect', () => {
+        console.log('Desconectado del servidor WebSocket.');
+        this.connectionStatus.next(false);
+      });
+
+      this.socket.on('connect_error', (err) => {
+        console.error('Error de conexión:', err);
+      });
+
+    } catch (error) {
+      console.error('Error al conectar al servidor WebSocket:', error);
+    }
   }
 
-  conectar() {
-    this.socket.on('error', () => {
-      console.log("Sorry, there seems to be an issue with the connection!");
+  /**
+   * Desconectar del servidor WebSocket
+   */
+  public desconectar(): void {
+    try {
+      if (this.socket) {
+        this.socket.disconnect();
+        this.socket = null;
+        console.log('Conexión WebSocket cerrada.');
+        this.connectionStatus.next(false);
+      }
+    } catch (error) {
+      console.error('Error al desconectar del servidor WebSocket:', error);
+    }
+  }
+
+  /**
+   * Obtener el estado de conexión del WebSocket
+   * @returns Observable<boolean>
+   */
+  public getConnectionStatus(): Observable<boolean> {
+    return this.connectionStatus.asObservable();
+  }
+
+  /**
+   * Emitir un evento al servidor
+   * @param evento - Nombre del evento
+   * @param data - Datos a enviar
+   */
+  public emitirEvento(evento: string, data: any): void {
+    try {
+      if (this.socket) {
+        this.socket.emit(evento, data);
+        console.log(`Evento emitido: ${evento}`, data);
+      } else {
+        console.warn('No se puede emitir el evento. El socket no está conectado.');
+      }
+    } catch (error) {
+      console.error(`Error al emitir el evento ${evento}:`, error);
+    }
+  }
+
+  /**
+   * Escuchar un evento del servidor
+   * @param evento - Nombre del evento
+   * @param callback - Función a ejecutar cuando se reciba el evento
+   */
+  public escucharEvento(evento: string, callback: (data: any) => void): void {
+    try {
+      if (this.socket) {
+        this.socket.on(evento, callback);
+        console.log(`Escuchando evento: ${evento}`);
+      } else {
+        console.warn('No se puede escuchar el evento. El socket no está conectado.');
+      }
+    } catch (error) {
+      console.error(`Error al escuchar el evento ${evento}:`, error);
+    }
+  }
+
+  /**
+   * Eliminar un listener de un evento
+   * @param evento - Nombre del evento
+   */
+  public eliminarListener(evento: string): void {
+    try {
+      if (this.socket) {
+        this.socket.off(evento);
+        console.log(`Listener eliminado para el evento: ${evento}`);
+      } else {
+        console.warn('No se puede eliminar el listener. El socket no está conectado.');
+      }
+    } catch (error) {
+      console.error(`Error al eliminar el listener del evento ${evento}:`, error);
+    }
+  }
+
+  /**
+   * Escuchar notificaciones de check-in
+   */
+  public escucharNotificacionesCheckin(): void {
+    this.escucharEvento('notificacion-check-in', async (payload) => {
+      console.log('Notificación de check-in recibida:', payload);
+      await this.alerts.presentAlert(payload);
     });
-
-    this.socket.on('connect_error', (err) => {
-      console.log("connect failed" + err);
-    });
-
-    this.socket.on('connect', () => {
-      console.log("CONECTADO AL SOCKET")
-    });
   }
 
-  propietarioConectado() {
-    this.socket.emit('propietario-conectado', { msg: "asdfasdf" })
-  }
-
-  newOwnerConnected(data) {
-    this.socket.emit('owner-connected', data)
-  }
-
-  notificarCheckIn(data) {
-    this.socket.emit('notificar-check-in', data)
-  }
-
-  notificarAntipanico(data) {
-    this.socket.emit('notificar-antipanico', data)
-  }
-
-  notificarNuevoConfirmedByOwner(data) {
-    this.socket.emit('notificar-nuevo-confirmedByOwner', data)
-    console.log("SE ENVIIO", data);
-  }
-
-  disconnectGuardUbication(data) {
-    this.socket.emit('disconnectGuardUbication', data)
-  }
-
-  escucharNotificacionesCheckin() {
-    this.socket.on('notificacion-check-in', async (payload) => {
-      console.log(payload)
-      await this.alerts.presentAlert(payload)
-    })
-  }
-
-  escucharNuevoConfirmedByOwner() {
-    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) => {
-      console.log(payload['response']);
-      return payload['response']
-    })
-    return false;
-  }
-
-  escucharNotificacionesAntipanico() {
-    this.socket.on('notificacion-antipanico', async (payload) => {
-      console.log(payload)
-      const alert = await this.alerts.presentAlertPanic(payload)
-
-      this.socket.on('notificacion-antipanico-finalizado', (payload) => {
-        console.log("ANTIPANICO ATENDIDO");
-        alert.dismiss()
-      })
-    })
-  }
-
+  public notificarCheckIn(data: any): void {
+  this.emitirEvento('notificar-check-in', data);
+  console.log('Evento notificar-check-in enviado:', data);
 }
 
+  /**
+   * Escuchar notificaciones de antipánico
+   */
+  public escucharNotificacionesAntipanico(): void {
+    this.escucharEvento('notificacion-antipanico', async (payload) => {
+      console.log('Notificación de antipánico recibida:', payload);
+      const alert = await this.alerts.presentAlertPanic(payload);
 
+      this.escucharEvento('notificacion-antipanico-finalizado', () => {
+        console.log('Antipánico finalizado.');
+        alert.dismiss();
+      });
+    });
+  }
+
+  /**
+   * Notificar un nuevo evento confirmado por el propietario
+   * @param data - Datos del evento
+   */
+  public notificarNuevoConfirmedByOwner(data: any): void {
+    this.emitirEvento('notificar-nuevo-confirmedByOwner', data);
+    console.log('Evento notificar-nuevo-confirmedByOwner enviado:', data);
+  }
+
+
+  /**
+   * Notificar un evento de antipánico
+   * @param data - Datos del evento
+   */
+  public notificarAntipanico(data: any): void {
+    this.emitirEvento('notificar-antipanico', data);
+    console.log('Evento notificar-antipanico enviado:', data);
+  }
+}
