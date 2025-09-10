@@ -1,3 +1,4 @@
+//src/app/pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';

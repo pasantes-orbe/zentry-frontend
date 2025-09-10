@@ -100,13 +100,21 @@
           </ion-item>
           
           <ion-item>
+            <ion-datetime 
+              presentation="date" 
+              placeholder="Seleccionar Fecha" 
+              [(ngModel)]="selectedDate">
+            </ion-datetime>
+          </ion-item>
+
+        <!-- <ion-item>
             <ion-input 
               type="date" 
               placeholder="Fecha" 
               [(ngModel)]="selectedDate">
             </ion-input>
           </ion-item>
-          
+        -->
           <ion-item>
             <ion-input 
               type="time" 

@@ -123,19 +123,10 @@ export class Tab1Page implements OnInit {
   // Función para autorizar visita rápida
   public authorizeQuickVisit() {
     if (!this.guestName.trim() || !this.guestDNI.trim()) {
-      this.alerts.presentAlert({
-        title: 'Error',
-        message: 'Nombre y DNI son obligatorios'
-      });
+      this.alerts.showAlert('Error', 'Nombre y DNI son obligatorios');
       return;
     }
-
-    this.alerts.presentAlert({
-      title: 'Visita Autorizada',
-      message: `Visita autorizada para:<br><strong>${this.guestName}</strong><br>DNI: ${this.guestDNI}`
-    });
-
-    // Limpiar formulario después de autorizar
+    this.alerts.showAlert('Visita Autorizada', `Visita autorizada para:<br><strong>${this.guestName}</strong><br>DNI: ${this.guestDNI}`);
     this.guestName = '';
     this.guestDNI = '';
   }
@@ -147,17 +138,12 @@ export class Tab1Page implements OnInit {
       { id: 2, type: 'delivery', message: 'Paquete entregado en recepción', time: '09:15 AM' },
       { id: 3, type: 'maintenance', message: 'Mantenimiento programado mañana', time: 'Ayer' }
     ];
-
     let message = '<strong>Notificaciones Recientes:</strong><br><br>';
     notifications.forEach(notif => {
       const icon = notif.type === 'visit' ? '👤' : notif.type === 'delivery' ? '📦' : '🔧';
       message += `${icon} ${notif.message}<br><small style="color: #666;">${notif.time}</small><br><br>`;
     });
-
-    this.alerts.presentAlert({
-      title: 'Notificaciones',
-      message: message
-    });
+    this.alerts.showAlert('Notificaciones', message);
   }
 
   // Función para reservar amenity - CORREGIDA
@@ -168,22 +154,23 @@ export class Tab1Page implements OnInit {
   // Confirmar reserva de amenity
   public confirmReservation() {
     if (!this.selectedAmenity || !this.selectedDate || !this.selectedTime) {
-      this.alerts.presentAlert({
-        title: 'Error',
-        message: 'Por favor complete todos los campos'
-      });
+      this.alerts.showAlert('Error', 'Por favor complete todos los campos.');
       return;
     }
-
-    this.alerts.presentAlert({
-      title: 'Reserva Confirmada',
-      message: `
-        <strong>Amenity:</strong> ${this.selectedAmenity}<br>
-        <strong>Fecha:</strong> ${new Date(this.selectedDate).toLocaleDateString()}<br>
-        <strong>Hora:</strong> ${this.selectedTime}
-      `
-    });
-
+    let formattedDate = 'Fecha no válida';
+    try {
+      const dateObject = new Date(this.selectedDate);
+      if (!isNaN(dateObject.getTime())) {
+        formattedDate = dateObject.toLocaleDateString();
+      }
+    } catch (error) {
+      console.error('Error al convertir la fecha:', error);
+    }
+    this.alerts.showAlert('Reserva Confirmada', `
+      <strong>Amenity:</strong> ${this.selectedAmenity}<br>
+      <strong>Fecha:</strong> ${formattedDate}<br>
+      <strong>Hora:</strong> ${this.selectedTime}
+    `);
     this.closeReservationModal();
   }
 
@@ -203,13 +190,9 @@ export class Tab1Page implements OnInit {
   // Agregar recurrente
   public addRecurrent() {
     if (!this.recurrentName.trim() || !this.recurrentDNI.trim() || !this.recurrentRole.trim() || this.selectedDays.length === 0) {
-      this.alerts.presentAlert({
-        title: 'Error',
-        message: 'Por favor complete todos los campos'
-      });
+      this.alerts.showAlert('Error', 'Por favor complete todos los campos');
       return;
     }
-
     const newRecurrent = {
       id: this.registeredRecurrents.length + 1,
       name: this.recurrentName,
@@ -217,24 +200,15 @@ export class Tab1Page implements OnInit {
       role: this.recurrentRole,
       days: [...this.selectedDays]
     };
-
     this.registeredRecurrents.push(newRecurrent);
-
-    this.alerts.presentAlert({
-      title: 'Recurrente Agregado',
-      message: `${this.recurrentName} ha sido agregado exitosamente`
-    });
-
+    this.alerts.showAlert('Recurrente Agregado', `${this.recurrentName} ha sido agregado exitosamente`);
     this.clearRecurrentForm();
   }
 
   // Eliminar recurrente
   public removeRecurrent(id: number) {
     this.registeredRecurrents = this.registeredRecurrents.filter(r => r.id !== id);
-    this.alerts.presentAlert({
-      title: 'Recurrente Eliminado',
-      message: 'El recurrente ha sido eliminado exitosamente'
-    });
+    this.alerts.showAlert('Recurrente Eliminado', 'El recurrente ha sido eliminado exitosamente');
   }
 
   // Cerrar modal de recurrentes
