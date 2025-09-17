@@ -1,3 +1,4 @@
+//src/app/interfaces/owner-interface.ts
 export interface OwnerInterface {
     id:       number;
     email:    string;

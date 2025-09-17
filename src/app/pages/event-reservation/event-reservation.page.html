@@ -11,7 +11,6 @@
       </ion-select>
     </ion-item>
 
-    <!--  -->
     <ion-item>
       <ion-label class="ion-text-wrap mb-3" position="stacked">Fecha y hora de ingreso</ion-label>
       <ion-datetime-button datetime="datetime"></ion-datetime-button>
@@ -25,29 +24,23 @@
     <ion-list>
       <ion-row class="borderBottom" *ngFor="let guest of guests; let i = index">
         <ion-col size="6">
-
           <ion-item>
             <ion-input [(ngModel)]="guests[i].name" [ngModelOptions]="{standalone: true}" type="text"
               placeholder="Nombre"></ion-input>
           </ion-item>
         </ion-col>
-
         <ion-col size="6">
           <ion-item>
             <ion-input [(ngModel)]="guests[i].lastname" [ngModelOptions]="{standalone: true}" type="text"
               placeholder="Apellido"></ion-input>
           </ion-item>
         </ion-col>
-
         <ion-col size="12">
           <ion-item>
             <ion-input [(ngModel)]="guests[i].dni" [ngModelOptions]="{standalone: true}" type="number"
               placeholder="DNI"></ion-input>
           </ion-item>
-
         </ion-col>
-
-
       </ion-row>
     </ion-list>
 
@@ -59,7 +52,6 @@
         </ion-datetime>
       </ng-template>
     </ion-modal>
-    <!--  -->
 
     <ion-item>
       <ion-label position="stacked">Aclaraciones / Detalles</ion-label>

@@ -1,3 +1,4 @@
+//src/app/interfaces/ownerResponse-interface.ts
 export interface OwnerResponse {
     id: number;
     user: UserInterface; // Usar UserInterface consistentemente

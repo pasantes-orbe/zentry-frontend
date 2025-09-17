@@ -1,4 +1,4 @@
-
+//src/app/interfaces/reservations-interface.ts
 export interface ReservationsInterface {
     id: number;
     date: Date;

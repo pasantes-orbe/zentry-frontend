@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 // Ionic standalone
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton,
   IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
-  IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox, IonToggle
+  IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox,
+  IonToggle, IonRefresher, IonRefresherContent
 } from '@ionic/angular/standalone';
 
 // Theme
@@ -18,6 +20,7 @@ import { OwnerStorageService } from '../services/storage/owner-interface-storage
 import { OwnersService } from '../services/owners/owners.service';
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
 import { AlertService } from '../services/helpers/alert.service';
+import { ReservationsService } from '../services/amenities/reservations.service';
 
 // Componentes
 import { ReservationsComponent } from '../components/reservations/reservations.component';
@@ -31,7 +34,8 @@ import { ReservationsComponent } from '../components/reservations/reservations.c
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton,
     IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
-    IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox, IonToggle
+    IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox,
+    IonToggle, IonRefresher, IonRefresherContent
   ]
 })
 export class Tab1Page implements OnInit {
@@ -48,11 +52,19 @@ export class Tab1Page implements OnInit {
   public isReservationModalOpen = false;
   public isRecurrentModalOpen = false;
 
-  // Amenity
-  public selectedAmenity = '';
-  public selectedDate = '';
-  public selectedTime = '';
-  public amenities = ['SUM','Cancha de Fútbol','Cancha de Básquet','Campo de Golf','Quincho/Piscina'];
+  // Reserva de amenity (mantengo el mapa de nombres → ID que vino del remoto)
+  public selectedAmenity: string = '';
+  public selectedDate: string = '';
+  public selectedTime: string = '';
+
+  private amenityIdMap: { [key: string]: number } = {
+    'Cancha de Fútbol': 1,
+    'SUM': 2,
+    'Cancha de Básquet': 3,
+    'Campo de Golf': 4,
+    'Quincho/Piscina': 5,
+  };
+  public amenities = Object.keys(this.amenityIdMap);
 
   // Recurrentes
   public recurrentName = '';
@@ -82,14 +94,15 @@ export class Tab1Page implements OnInit {
     private _ownerStorageService: OwnerStorageService,
     private _ownersService: OwnersService,
     private alerts: AlertService,
-    public theme: ThemeService // usar directo en template
+    public theme: ThemeService, // para usar directo en template
+    private _reservationsService: ReservationsService,
+    private router: Router
   ) {
     this.setLoading(true);
-    this.getData();
   }
 
   async ngOnInit() {
-    // Inicializa el tema para propietario (cambiá el rol si esta página es para otro)
+    // Inicializa el tema para propietario (ajustá el rol si corresponde otra página)
     this.theme.init('owner');
 
     try {
@@ -100,22 +113,27 @@ export class Tab1Page implements OnInit {
           next: (owner) => {
             this.owner = owner;
             this._ownerStorageService.saveOwner(owner);
+            this.setLoading(false);
           },
           error: (error) => {
             console.error('Error loading owner:', error);
             this.owner = null;
+            this.setLoading(false);
           }
         });
+      } else {
+        this.setLoading(false);
       }
     } catch (error) {
       console.error('Error in ngOnInit:', error);
       this.owner = null;
+      this.setLoading(false);
     }
   }
 
   onThemeToggle(ev: any) {
     const checked = ev?.detail?.checked ?? (ev?.target as HTMLInputElement)?.checked ?? false;
-    this.theme.set('owner', checked ? 'dark' : 'light'); // mismo rol que en init()
+    this.theme.set('owner', checked ? 'dark' : 'light');
   }
 
   async ionViewWillEnter() {
@@ -151,24 +169,55 @@ export class Tab1Page implements OnInit {
     this.alerts.showAlert('Notificaciones', message);
   }
 
-  public reserveAmenity() { this.isReservationModalOpen = true; }
+  public reserveAmenity() {
+    this.isReservationModalOpen = true;
+  }
 
-  public confirmReservation() {
+  public async confirmReservation() {
     if (!this.selectedAmenity || !this.selectedDate || !this.selectedTime) {
       this.alerts.showAlert('Error', 'Por favor complete todos los campos.');
       return;
     }
-    let formattedDate = 'Fecha no válida';
+
+    const id_amenity = this.amenityIdMap[this.selectedAmenity];
+    if (!id_amenity) {
+      this.alerts.showAlert('Error', 'Amenity no válido.');
+      return;
+    }
+
+    if (!this.userID) {
+      this.alerts.showAlert('Error', 'No se pudo obtener el ID del usuario.');
+      return;
+    }
+
+    // Combinar fecha + hora de forma robusta
+    const dateObj = new Date(this.selectedDate);
+    const [hours, minutes] = this.selectedTime.split(':').map(Number);
+    dateObj.setHours(hours, minutes, 0, 0);
+    const combinedDateTime = dateObj.toISOString();
+
+    const reservationData = {
+      id_amenity: id_amenity,
+      id_user: this.userID,
+      date: combinedDateTime
+    };
+
     try {
-      const d = new Date(this.selectedDate);
-      if (!isNaN(d.getTime())) formattedDate = d.toLocaleDateString();
-    } catch {}
-    this.alerts.showAlert('Reserva Confirmada', `
-      <strong>Amenity:</strong> ${this.selectedAmenity}<br>
-      <strong>Fecha:</strong> ${formattedDate}<br>
-      <strong>Hora:</strong> ${this.selectedTime}
-    `);
-    this.closeReservationModal();
+      await this._reservationsService.createReservation(reservationData);
+      this.alerts.showAlert('Reserva Confirmada', `
+        <strong>Amenity:</strong> ${this.selectedAmenity}<br>
+        <strong>Fecha y Hora:</strong> ${new Date(combinedDateTime).toLocaleString()}
+      `);
+      this.closeReservationModal();
+    } catch (error: any) {
+      console.error('Error al crear la reserva:', error);
+      if (error?.error?.errors?.length > 0) {
+        const msg = error.error.errors[0].msg;
+        this.alerts.showAlert('Error', msg);
+      } else {
+        this.alerts.showAlert('Error', 'Hubo un problema al crear la reserva. Intente de nuevo.');
+      }
+    }
   }
 
   public closeReservationModal() {

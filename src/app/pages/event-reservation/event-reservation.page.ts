@@ -1,3 +1,4 @@
+//event-reservation.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -77,16 +78,29 @@ export class EventReservationPage implements OnInit {
   }
 
   public saveAmenitie() {
-    console.log(this.guests);
-    console.log(this.getForm().get('amenitieID').value)
-    console.log(this.getForm().get('fecha').value)
-    console.log(this.getForm().get('detalles').value)
+    const reservationData = {
+      id_amenity: this.getForm().get('amenitieID').value,
+      date: this.getForm().get('fecha').value,
+      details: this.getForm().get('detalles').value,
+      guests: this.guests
+    };
+    
+    console.log('FRONTEND: Enviando datos de reserva:', reservationData);
 
-    this._reservationsService.createReservation(this.getForm().get('amenitieID').value,
-      this.getForm().get('fecha').value,
-      this.getForm().get('detalles').value,
-      this.guests)
+    this._reservationsService.createReservation(reservationData);
   }
+
+  //public saveAmenitie() {
+  //  console.log(this.guests);
+  //  console.log(this.getForm().get('amenitieID').value)
+  //  console.log(this.getForm().get('fecha').value)
+  //  console.log(this.getForm().get('detalles').value)
+
+  //  this._reservationsService.createReservation(this.getForm().get('amenitieID').value,
+  //    this.getForm().get('fecha').value,
+  //    this.getForm().get('detalles').value,
+  //    this.guests)
+  //}
 
   addGuest() {
     this.guests.push({
