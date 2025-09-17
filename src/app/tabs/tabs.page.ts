@@ -1,3 +1,4 @@
+//src/app/tabs/tabs.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { io, Socket } from 'socket.io-client';

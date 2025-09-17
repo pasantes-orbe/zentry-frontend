@@ -1,0 +1,29 @@
+<!--src/app/components/notifications-popover/notifications-popover.html-->
+<ion-content class="notifications-popover-content">
+  <ion-list class="notifications-list">
+    <ion-item-divider sticky="true">
+      <ion-label>Notificaciones</ion-label>
+      <ion-icon name="close" slot="end" (click)="close()" class="close-icon"></ion-icon>
+    </ion-item-divider>
+
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <ion-item *ngIf="notifications.length === 0 && !loading" lines="none">
+      <ion-label class="ion-text-wrap ion-text-center">
+        <p>No tienes notificaciones.</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item *ngFor="let notification of notifications" [class.unread]="!notification.read"
+      (click)="markAsRead(notification)">
+      <ion-icon name="notifications-outline" slot="start" [color]="notification.read ? 'medium' : 'primary'"></ion-icon>
+      <ion-label>
+        <h3>{{ notification.title }}</h3>
+        <p>{{ notification.content }}</p>
+        <ion-note slot="end">{{ notification.createdAt | date: 'short' }}</ion-note>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

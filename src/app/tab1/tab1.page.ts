@@ -1,3 +1,4 @@
+//src/app/tab1/tab1.page.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

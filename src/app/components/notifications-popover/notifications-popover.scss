@@ -1,0 +1,49 @@
+// src/app/components/notifications-popover/notifications-popover.component.scss
+.notifications-list {
+    min-width: 300px;
+    max-width: 400px;
+    background: var(--ion-background-color);
+}
+
+.notifications-list ion-item {
+    --padding-start: 10px;
+    --inner-padding-end: 10px;
+    --inner-border-width: 0;
+    cursor: pointer;
+    --background-hover: var(--ion-color-light-shade);
+}
+
+.notifications-list ion-item.unread {
+    --background: var(--ion-color-light);
+    font-weight: bold;
+}
+
+.notifications-list ion-label {
+    margin: 0;
+}
+
+.notifications-list ion-label h3 {
+    font-size: 1em;
+    font-weight: bold;
+    color: var(--ion-color-dark);
+    margin-bottom: 2px;
+}
+
+.notifications-list ion-label p {
+    font-size: 0.8em;
+    color: var(--ion-color-medium);
+    margin: 0;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to two lines */
+    line-clamp: 2; /* Standard property for compatibility */
+    -webkit-box-orient: vertical;
+}
+
+.close-icon {
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+}

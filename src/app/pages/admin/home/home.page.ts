@@ -1,19 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
-import { AlertController, PopoverController } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
 
-// Servicios
+// Importamos los servicios e interfaces para las notificaciones
+import { NotificationInterface } from 'src/app/interfaces/notification-interface';
+import { NotificationsService } from 'src/app/services/notifications/notifications.service';
+import { UserInterface } from 'src/app/interfaces/user-interface'; // Se agregó la interfaz del usuario para tipado
+
+// Servicios existentes
 import { CountriesService } from 'src/app/services/countries/countries.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
-// Interfaces
+// Interfaces existentes
 import { CountryInteface } from '../../../interfaces/country-interface';
 
 // Componentes
 import { NavbarAdminComponent } from 'src/app/components/navbars/navbar-admin/navbar-admin.component';
 import { CountryPopoverComponent } from 'src/app/components/country-popover/country-popover.component';
+import { NotificationsPopoverComponent } from 'src/app/components/notifications-popover/notifications-popover';
 
 // Interfaces para mock data
 interface MockProperty {
@@ -67,8 +73,13 @@ interface MockGuard {
     CountryPopoverComponent
   ]
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy { // Se agregó OnDestroy
   protected countries: CountryInteface[] = [];
+  private notifications: NotificationInterface[] = [];
+  protected user: UserInterface | null = null;
+  public unreadCount: number = 0;
+  private readonly REFRESH_INTERVAL = 30000; // 30 segundos
+  private refreshIntervalId: any;
 
   // MOCK DATA PARA DEMO
   public mockCountry: CountryInteface = {
@@ -106,7 +117,7 @@ export class HomePage implements OnInit {
     { id: 4, name: 'Ana', lastname: 'Martínez', dni: '45678901', email: 'ana.martinez@email.com', phone: '3794456789', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
     { id: 5, name: 'Luis', lastname: 'Fernández', dni: '56789012', email: 'luis.fernandez@email.com', phone: '3794567890', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
     { id: 6, name: 'Laura', lastname: 'Sánchez', dni: '67890123', email: 'laura.sanchez@email.com', phone: '3794678901', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-    { id: 7, name: 'Pedro', lastname: 'Ramírez', dni: '78901234', email: 'pedro.ramirez@email.com', phone: '3794789012', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150' },
+    { id: 7, name: 'Pedro', lastname: 'Ramírez', dni: '78901234', email: 'pedro.ramirez@security.com', phone: '3794789012', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150' },
     { id: 8, name: 'Carmen', lastname: 'Torres', dni: '89012345', email: 'carmen.torres@email.com', phone: '3794890123', avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150' },
     { id: 9, name: 'Miguel', lastname: 'Vargas', dni: '90123456', email: 'miguel.vargas@email.com', phone: '3794901234', avatar: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150' },
     { id: 10, name: 'Isabel', lastname: 'Herrera', dni: '01234567', email: 'isabel.herrera@email.com', phone: '3794012345', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
@@ -139,29 +150,66 @@ export class HomePage implements OnInit {
   ];
 
   constructor(
+    private notificationsService: NotificationsService,
+    private userStorage: UserStorageService,
     private countriesService: CountriesService,
     private countryStorage: CountryStorageService,
-    private alertCtrl: AlertController,
     private popoverController: PopoverController,
     private router: Router
-  ) {}
+  ) { }
 
-  ngOnInit() {
-    this.loadMockData();
+  async ngOnInit() {
+    this.user = await this.userStorage.getUser();
+    
+    // TEMPORAL: Llamamos a la carga de notificaciones y a la suscripción
+    // de WebSocket directamente para pruebas.
+    this.loadNotifications();
+    this.notificationsService.onNewNotification().subscribe(payload => {
+        console.log('Notificación recibida en el componente:', payload);
+        this.notifications.unshift(payload);
+        this.unreadCount = this.getUnreadCount();
+    });
+
+    // TEMPORAL: Configurar el refresco automático para pruebas.
+    this.refreshIntervalId = setInterval(() => {
+        this.loadNotifications();
+    }, this.REFRESH_INTERVAL);
   }
 
-  ionViewWillEnter() {
-    this.loadMockData();
+  // Se añadió el método para limpiar el intervalo cuando la página se abandona
+  ngOnDestroy() {
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId);
+    }
   }
 
-  // Método para cargar datos mock en lugar de la base de datos
+  // Se corrige el método para cargar las notificaciones desde el backend
+  public loadNotifications() {
+    // TEMPORAL: se comenta la validación de usuario para permitir pruebas sin autenticación
+    // if (this.user && this.user.id) {
+    this.notificationsService.getAllByUser(1).subscribe(data => { // Se usa un ID de usuario de prueba (ej: 1)
+      this.notifications = data;
+      this.unreadCount = this.getUnreadCount();
+      console.log('Notificaciones cargadas:', this.notifications);
+    });
+    // } else {
+    //   console.warn('Usuario no encontrado. No se pueden cargar las notificaciones.');
+    // }
+  }
+
+  // Se añade el método auxiliar para contar notificaciones no leídas
+  public getUnreadCount(): number {
+    return this.notifications.filter(n => !n.read).length;
+  }
+
+  // ====================================================
+  // MÉTODOS EXISTENTES (mantenidos para compatibilidad)
+  // ====================================================
+
+  // MOCK DATA
   private loadMockData() {
-    // Asignar propiedades a propietarios aleatoriamente
     this.assignPropertiesToOwners();
-    
-    // Simular carga de países con el mock country
     this.countries = [this.mockCountry];
-    
     console.log('Mock data loaded:', {
       countries: this.countries,
       properties: this.mockProperties,
@@ -171,21 +219,18 @@ export class HomePage implements OnInit {
     });
   }
 
-  // Asignar propiedades a propietarios
   private assignPropertiesToOwners() {
-    // Asignar las primeras 15 propiedades a los primeros 15 propietarios
     for (let i = 0; i < 15 && i < this.mockOwners.length; i++) {
       this.mockOwners[i].property = this.mockProperties[i];
     }
   }
 
-  // Métodos públicos para acceder a los datos mock
   public getMockProperties() {
     return this.mockProperties;
   }
 
   public getMockOwners() {
-    return this.mockOwners.filter(owner => owner.property); // Solo propietarios con propiedad asignada
+    return this.mockOwners.filter(owner => owner.property);
   }
 
   public getMockAmenities() {
@@ -207,7 +252,7 @@ export class HomePage implements OnInit {
   // ====================================================
   // MÉTODOS DE NAVEGACIÓN
   // ====================================================
-  
+
   navigateToCountries() {
     this.router.navigate(['/admin/country-dashboard']);
   }
@@ -252,12 +297,7 @@ export class HomePage implements OnInit {
     this.router.navigate(['/admin/add-property']);
   }
 
-  // ====================================================
-  // MÉTODOS EXISTENTES (mantenidos para compatibilidad)
-  // ====================================================
-
   private getCountriesFromDB() {
-    // Usar datos mock en lugar de base de datos para la demo
     this.loadMockData();
   }
 
@@ -274,46 +314,30 @@ export class HomePage implements OnInit {
         country: country
       }
     });
-
     popover.onDidDismiss().then((data) => {
       if (data?.data?.deleted) {
         this.loadMockData();
       }
     });
-
     return await popover.present();
   }
 
-  private async handleError(error: any) {
-    const alert = await this.alertCtrl.create({
-      header: 'Error',
-      message: 'No se pudieron cargar los datos. Usando datos de demostración.',
-      buttons: ['OK']
+  public async openNotificationsPopover(ev: any) {
+    const popover = await this.popoverController.create({
+      component: NotificationsPopoverComponent,
+      event: ev,
+      translucent: true,
+      componentProps: {
+        notifications: this.notifications
+      }
     });
 
-    await alert.present();
-    console.error('Error al cargar datos:', error);
-    // Cargar datos mock como fallback
-    this.loadMockData();
-  }
+    popover.onDidDismiss().then(() => {
+      // Al cerrar el popover, recargamos las notificaciones para actualizar el estado de "leído"
+      this.loadNotifications();
+    });
 
-  getCountryImage(country: CountryInteface): string {
-    return country.avatar || country.image || 'https://ionicframework.com/docs/img/demos/card-media.png';
-  }
-
-  // Método para mostrar estadísticas de la demo
-  public showDemoStats() {
-    const stats = {
-      countries: this.countries.length,
-      properties: this.mockProperties.length,
-      owners: this.getMockOwners().length,
-      amenities: this.getMockAmenities().length,
-      guards: this.mockGuards.length,
-      workingGuards: this.getMockWorkingGuards().length
-    };
-
-    console.log('Demo Statistics:', stats);
-    return stats;
+    return await popover.present();
   }
 }
 

@@ -8,7 +8,9 @@
       <span class="header-title-text"></span>
     </ion-buttons>
     <ion-buttons slot="end" class="header-user">
-      <ion-icon name="notifications-outline" class="notification-icon"></ion-icon>
+      <!-- Botón de notificaciones con evento click y contador de no leídas -->
+      <ion-badge color="danger" *ngIf="unreadCount > 0" class="notification-badge"> Nuevas </ion-badge>
+      <ion-icon name="notifications-outline" class="notification-icon" (click)="openNotificationsPopover($event)" ></ion-icon>
       <ion-avatar>
         <img src="https://placehold.co/64x64/374151/FFFFFF?text=A" />
       </ion-avatar>

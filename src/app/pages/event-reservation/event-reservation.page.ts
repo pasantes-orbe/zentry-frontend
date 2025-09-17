@@ -84,6 +84,9 @@ export class EventReservationPage implements OnInit {
       details: this.getForm().get('detalles').value,
       guests: this.guests
     };
+    
+    console.log('FRONTEND: Enviando datos de reserva:', reservationData);
+
     this._reservationsService.createReservation(reservationData);
   }
 

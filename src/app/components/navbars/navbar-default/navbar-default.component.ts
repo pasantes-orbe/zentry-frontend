@@ -1,3 +1,4 @@
+//src/app/components/navbars/navbar-default/navbar-default.component.ts
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -8,7 +9,7 @@ import {
 
 // Íconos
 import { addIcons } from 'ionicons';
-import { notifications, menuOutline } from 'ionicons/icons';
+import { notifications, menuOutline, shieldHalfOutline, trashOutline, personCircleOutline, bookOutline, logOutOutline } from 'ionicons/icons';
 
 // Servicios y otros
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
@@ -21,7 +22,8 @@ import { NavigationService } from 'src/app/helpers/navigation.service';
 interface Notification {
   id: number;
   is_read: boolean;
-  // Añade aquí otros campos específicos de tu notificación
+  title: string;
+  content: string; // Asumimos 'content' es el mensaje
   [key: string]: any;
 }
 
@@ -56,7 +58,12 @@ export class NavbarDefaultComponent implements OnInit {
     // Añadir íconos de Ionicons
     addIcons({ 
       notifications, 
-      menuOutline 
+      menuOutline,
+      trashOutline,
+      personCircleOutline,
+      bookOutline,
+      shieldHalfOutline,
+      logOutOutline 
     });
   }
 
