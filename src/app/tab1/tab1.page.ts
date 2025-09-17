@@ -2,12 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-// Usar componentes standalone en lugar de IonicModule
-import { 
+// Ionic standalone
+import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton,
-  IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput, 
-  IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox
+  IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
+  IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox, IonToggle
 } from '@ionic/angular/standalone';
+
+// Theme
+import { ThemeService } from '../services/theme/theme.service';
 
 // Servicios
 import { UserStorageService } from '../services/storage/user-storage.service';
@@ -25,43 +28,36 @@ import { ReservationsComponent } from '../components/reservations/reservations.c
   styleUrls: ['tab1.page.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
+    CommonModule, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton,
     IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
-    IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox
+    IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox, IonToggle
   ]
 })
 export class Tab1Page implements OnInit {
-  
-  private loading: boolean = true;
+
+  private loading = true;
   private userID: any;
   protected owner: OwnerResponse | null = null;
-  
-  // Variables para el formulario
-  public guestName: string = '';
-  public guestDNI: string = '';
 
-  // Variables para modals
+  // Form
+  public guestName = '';
+  public guestDNI = '';
+
+  // Modals
   public isReservationModalOpen = false;
   public isRecurrentModalOpen = false;
 
-  // Variables para reserva de amenity
-  public selectedAmenity: string = '';
-  public selectedDate: string = '';
-  public selectedTime: string = '';
-  public amenities = [
-    'SUM',
-    'Cancha de Fútbol',
-    'Cancha de Básquet', 
-    'Campo de Golf',
-    'Quincho/Piscina'
-  ];
+  // Amenity
+  public selectedAmenity = '';
+  public selectedDate = '';
+  public selectedTime = '';
+  public amenities = ['SUM','Cancha de Fútbol','Cancha de Básquet','Campo de Golf','Quincho/Piscina'];
 
-  // Variables para recurrentes
-  public recurrentName: string = '';
-  public recurrentDNI: string = '';
-  public recurrentRole: string = '';
+  // Recurrentes
+  public recurrentName = '';
+  public recurrentDNI = '';
+  public recurrentRole = '';
   public selectedDays: string[] = [];
   public weekDays = [
     { value: 'lunes', label: 'Lunes' },
@@ -73,11 +69,10 @@ export class Tab1Page implements OnInit {
     { value: 'domingo', label: 'Domingo' }
   ];
 
-  // Lista de recurrentes registrados
   public registeredRecurrents = [
-    { id: 1, name: 'María Gómez', dni: '12345678', role: 'Empleada doméstica', days: ['lunes', 'miercoles', 'viernes'] },
+    { id: 1, name: 'María Gómez', dni: '12345678', role: 'Empleada doméstica', days: ['lunes','miercoles','viernes'] },
     { id: 2, name: 'Carlos Ruiz', dni: '87654321', role: 'Jardinero', days: ['martes'] },
-    { id: 3, name: 'Ana Torres', dni: '11223344', role: 'Niñera', days: ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'] }
+    { id: 3, name: 'Ana Torres', dni: '11223344', role: 'Niñera', days: ['lunes','martes','miercoles','jueves','viernes'] }
   ];
 
   @ViewChild('reservationsComponent') reservationsComponent!: ReservationsComponent;
@@ -86,13 +81,17 @@ export class Tab1Page implements OnInit {
     private _userStorageService: UserStorageService,
     private _ownerStorageService: OwnerStorageService,
     private _ownersService: OwnersService,
-    private alerts: AlertService
+    private alerts: AlertService,
+    public theme: ThemeService // usar directo en template
   ) {
     this.setLoading(true);
     this.getData();
   }
 
   async ngOnInit() {
+    // Inicializa el tema para propietario (cambiá el rol si esta página es para otro)
+    this.theme.init('owner');
+
     try {
       const user = await this._userStorageService.getUser();
       if (user) {
@@ -114,24 +113,30 @@ export class Tab1Page implements OnInit {
     }
   }
 
+  onThemeToggle(ev: any) {
+    const checked = ev?.detail?.checked ?? (ev?.target as HTMLInputElement)?.checked ?? false;
+    this.theme.set('owner', checked ? 'dark' : 'light'); // mismo rol que en init()
+  }
+
   async ionViewWillEnter() {
     if (this.reservationsComponent) {
       // await this.reservationsComponent.ngOnInit();
     }
   }
 
-  // Función para autorizar visita rápida
   public authorizeQuickVisit() {
     if (!this.guestName.trim() || !this.guestDNI.trim()) {
       this.alerts.showAlert('Error', 'Nombre y DNI son obligatorios');
       return;
     }
-    this.alerts.showAlert('Visita Autorizada', `Visita autorizada para:<br><strong>${this.guestName}</strong><br>DNI: ${this.guestDNI}`);
+    this.alerts.showAlert(
+      'Visita Autorizada',
+      `Visita autorizada para:<br><strong>${this.guestName}</strong><br>DNI: ${this.guestDNI}`
+    );
     this.guestName = '';
     this.guestDNI = '';
   }
 
-  // Función para mostrar notificaciones
   public onNotificationClick() {
     const notifications = [
       { id: 1, type: 'visit', message: 'Juan Pérez solicitó acceso', time: '10:30 AM' },
@@ -139,19 +144,15 @@ export class Tab1Page implements OnInit {
       { id: 3, type: 'maintenance', message: 'Mantenimiento programado mañana', time: 'Ayer' }
     ];
     let message = '<strong>Notificaciones Recientes:</strong><br><br>';
-    notifications.forEach(notif => {
-      const icon = notif.type === 'visit' ? '👤' : notif.type === 'delivery' ? '📦' : '🔧';
-      message += `${icon} ${notif.message}<br><small style="color: #666;">${notif.time}</small><br><br>`;
+    notifications.forEach(n => {
+      const icon = n.type === 'visit' ? '👤' : n.type === 'delivery' ? '📦' : '🔧';
+      message += `${icon} ${n.message}<br><small style="color:#666;">${n.time}</small><br><br>`;
     });
     this.alerts.showAlert('Notificaciones', message);
   }
 
-  // Función para reservar amenity - CORREGIDA
-  public reserveAmenity() {
-    this.isReservationModalOpen = true;
-  }
+  public reserveAmenity() { this.isReservationModalOpen = true; }
 
-  // Confirmar reserva de amenity
   public confirmReservation() {
     if (!this.selectedAmenity || !this.selectedDate || !this.selectedTime) {
       this.alerts.showAlert('Error', 'Por favor complete todos los campos.');
@@ -159,13 +160,9 @@ export class Tab1Page implements OnInit {
     }
     let formattedDate = 'Fecha no válida';
     try {
-      const dateObject = new Date(this.selectedDate);
-      if (!isNaN(dateObject.getTime())) {
-        formattedDate = dateObject.toLocaleDateString();
-      }
-    } catch (error) {
-      console.error('Error al convertir la fecha:', error);
-    }
+      const d = new Date(this.selectedDate);
+      if (!isNaN(d.getTime())) formattedDate = d.toLocaleDateString();
+    } catch {}
     this.alerts.showAlert('Reserva Confirmada', `
       <strong>Amenity:</strong> ${this.selectedAmenity}<br>
       <strong>Fecha:</strong> ${formattedDate}<br>
@@ -174,7 +171,6 @@ export class Tab1Page implements OnInit {
     this.closeReservationModal();
   }
 
-  // Cerrar modal de reserva
   public closeReservationModal() {
     this.isReservationModalOpen = false;
     this.selectedAmenity = '';
@@ -182,12 +178,8 @@ export class Tab1Page implements OnInit {
     this.selectedTime = '';
   }
 
-  // Función para gestionar recurrentes - CORREGIDA
-  public manageRecurrent() {
-    this.isRecurrentModalOpen = true;
-  }
+  public manageRecurrent() { this.isRecurrentModalOpen = true; }
 
-  // Agregar recurrente
   public addRecurrent() {
     if (!this.recurrentName.trim() || !this.recurrentDNI.trim() || !this.recurrentRole.trim() || this.selectedDays.length === 0) {
       this.alerts.showAlert('Error', 'Por favor complete todos los campos');
@@ -205,19 +197,16 @@ export class Tab1Page implements OnInit {
     this.clearRecurrentForm();
   }
 
-  // Eliminar recurrente
   public removeRecurrent(id: number) {
     this.registeredRecurrents = this.registeredRecurrents.filter(r => r.id !== id);
     this.alerts.showAlert('Recurrente Eliminado', 'El recurrente ha sido eliminado exitosamente');
   }
 
-  // Cerrar modal de recurrentes
   public closeRecurrentModal() {
     this.isRecurrentModalOpen = false;
     this.clearRecurrentForm();
   }
 
-  // Limpiar formulario de recurrentes
   private clearRecurrentForm() {
     this.recurrentName = '';
     this.recurrentDNI = '';
@@ -225,40 +214,23 @@ export class Tab1Page implements OnInit {
     this.selectedDays = [];
   }
 
-  // Manejar selección de días
   public onDayChange(day: string, event: any) {
-    if (event.detail.checked) {
-      this.selectedDays.push(day);
-    } else {
-      this.selectedDays = this.selectedDays.filter(d => d !== day);
-    }
+    if (event.detail.checked) this.selectedDays.push(day);
+    else this.selectedDays = this.selectedDays.filter(d => d !== day);
   }
 
-  // Obtener días formateados
   public getFormattedDays(days: string[]): string {
-    return days.map(day => {
-      const dayObj = this.weekDays.find(d => d.value === day);
-      return dayObj ? dayObj.label : day;
-    }).join(', ');
+    return days.map(day => this.weekDays.find(d => d.value === day)?.label ?? day).join(', ');
   }
 
   protected doRefresh(event: any) {
-    setTimeout(() => {
-      event.target.complete();
-    }, 1000);
+    setTimeout(() => event.target.complete(), 1000);
   }
 
   private getData() {
-    setTimeout(() => {
-      this.setLoading(false);
-    }, 3000);
+    setTimeout(() => this.setLoading(false), 3000);
   }
 
-  public isLoading(): boolean {
-    return this.loading;
-  }
-
-  public setLoading(loading: boolean): void {
-    this.loading = loading;
-  }
+  public isLoading(): boolean { return this.loading; }
+  public setLoading(loading: boolean): void { this.loading = loading; }
 }

@@ -1,12 +1,10 @@
-// theme/variables.scss
+/* theme/variables.scss */
 
-/** Ionic CSS Variables **/
+/* ===========================
+   BASE (TEMA CLARO / :root)
+   =========================== */
 :root {
-  /* * NUEVA PALETA DE ZENTRY
-   * Reemplazamos la paleta anterior con los nuevos colores del branding.
-   */
-
-  /** primary **/
+  /* Paleta Ionic */
   --ion-color-primary: #3B82F6;
   --ion-color-primary-rgb: 59, 130, 246;
   --ion-color-primary-contrast: #ffffff;
@@ -46,7 +44,6 @@
   --ion-color-warning-shade: #d88b0a;
   --ion-color-warning-tint: #f6a823;
 
-  /** danger **/
   --ion-color-danger: #EF4444;
   --ion-color-danger-rgb: 239, 68, 68;
   --ion-color-danger-contrast: #ffffff;
@@ -54,7 +51,6 @@
   --ion-color-danger-shade: #d23c3c;
   --ion-color-danger-tint: #f05757;
 
-  /** dark **/
   --ion-color-dark: #222428;
   --ion-color-dark-rgb: 34, 36, 40;
   --ion-color-dark-contrast: #ffffff;
@@ -62,7 +58,6 @@
   --ion-color-dark-shade: #1e2023;
   --ion-color-dark-tint: #383a3e;
 
-  /** medium **/
   --ion-color-medium: #92949c;
   --ion-color-medium-rgb: 146, 148, 156;
   --ion-color-medium-contrast: #ffffff;
@@ -70,15 +65,13 @@
   --ion-color-medium-shade: #808289;
   --ion-color-medium-tint: #9d9fa6;
 
-   /** gray **/
- --ion-color-gray: #9ca3af;
- --ion-color-gray-rgb: 156, 163, 175;
- --ion-color-gray-contrast: #ffffff;
- --ion-color-gray-contrast-rgb: 255, 255, 255;
- --ion-color-gray-shade: #8a919b;
- --ion-color-gray-tint: #a6adb8;
+  --ion-color-gray: #9ca3af;
+  --ion-color-gray-rgb: 156, 163, 175;
+  --ion-color-gray-contrast: #ffffff;
+  --ion-color-gray-contrast-rgb: 255, 255, 255;
+  --ion-color-gray-shade: #8a919b;
+  --ion-color-gray-tint: #a6adb8;
 
-  /** light **/
   --ion-color-light: #f4f5f8;
   --ion-color-light-rgb: 244, 245, 248;
   --ion-color-light-contrast: #000000;
@@ -86,69 +79,102 @@
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
 
-  /* * NUEVAS VARIABLES DE ZENTRY
-   * Estas son variables personalizadas para el tema oscuro.
-   */
-  --ion-background-color: #111827;
-  --ion-background-color-rgb: 17, 24, 39;
-  --ion-toolbar-background: #1F2937;
-  --ion-text-color: #F9FAFB;
-  --ion-text-color-rgb: 249, 250, 251;
-  
-  --color-card: #1F2937;
-  --color-border: #374151;
-  --color-text-secondary: #ffffff;
+  /* Tema claro (default) */
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #000000;
+  --ion-text-color-rgb: 0, 0, 0;
+  --ion-toolbar-background: #f8f9fa;
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+  --ion-border-color: #e5e7eb;
 
+  /* Semánticas Zentry (opcional) */
+  --zentry-color-background: #ffffff;
+  --zentry-color-component: #f8f9fa;
+  --zentry-color-border: #e5e7eb;
+  --zentry-color-text-primary: #000000;
+  --zentry-color-text-secondary: #6b7280;
+
+  /* Tipografía */
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
   --ion-font-family: var(--font-body);
 
- 
+  /* Sombras por defecto (claro) */
+  --ion-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --ion-card-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-
-/* * Forzamos el tema oscuro de Zentry.
- * No usaremos la configuración del sistema (prefers-color-scheme).
- */
-body {
+/* ===========================
+   TEMA OSCURO (aplicado en <html>)
+   =========================== */
+html.dark-theme {
   --ion-background-color: #111827;
-  --ion-toolbar-background: #1F2937;
-  --ion-item-background: #1F2937;
+  --ion-background-color-rgb: 17, 24, 39;
   --ion-text-color: #f9fafb;
-  --ion-card-background: #1F2937;
-}
+  --ion-text-color-rgb: 249, 250, 251;
 
-/* =================================================================== */
-/* ============== PALETA DE COLORES BASE DE LA APLICACIÓN ============== */
-/* =================================================================== */
-:root {
-  /* --- Paleta Estándar de Ionic (para usar con color="primary", etc.) --- */
-  --ion-color-primary: #3B82F6;
-  --ion-color-secondary: #6B7280;
-  --ion-color-tertiary: #10B981;
-  --ion-color-success: var(--ion-color-tertiary);
-  --ion-color-warning: #F59E0B;
-  --ion-color-danger: #EF4444;
+  --ion-toolbar-background: #1f2937;
+  --ion-item-background: #1f2937;
+  --ion-card-background: #1f2937;
+  --ion-border-color: #374151;
 
-  /* --- Variables Semánticas Personalizadas de Zentry (Nuestro Branding) --- */
+  /* Semánticas Zentry */
   --zentry-color-background: #111827;
-  --zentry-color-component: #1F2937;
+  --zentry-color-component: #1f2937;
   --zentry-color-border: #374151;
-  --zentry-color-text-primary: #F9FAFB;
+  --zentry-color-text-primary: #f9fafb;
   --zentry-color-text-secondary: #9ca3af;
 
-  /* --- Tipografía --- */
-  --ion-font-family: 'Inter', sans-serif;
+  /* Ajustes para tokens Ionic en oscuro */
+  --ion-color-medium: #6b7280;
+  --ion-color-medium-rgb: 107, 114, 128;
+
+  --ion-color-light: #374151;
+  --ion-color-light-rgb: 55, 65, 81;
+  --ion-color-light-contrast: #ffffff;
+  --ion-color-light-contrast-rgb: 255, 255, 255;
+
+  /* Steps (inputs/sliders/etc.) */
+  --ion-color-step-50:  #1f2937;
+  --ion-color-step-100: #374151;
+  --ion-color-step-150: #4b5563;
+  --ion-color-step-200: #6b7280;
+  --ion-color-step-250: #9ca3af;
+  --ion-color-step-300: #d1d5db;
+  --ion-color-step-350: #e5e7eb;
+  --ion-color-step-400: #f3f4f6;
+  --ion-color-step-450: #f9fafb;
+  --ion-color-step-500: #ffffff;
+
+  /* Sombras en oscuro */
+  --ion-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --ion-card-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* =================================================================== */
-/* ============= APLICACIÓN GLOBAL DEL TEMA OSCURO ZENTRY ============= */
-/* =================================================================== */
-body {
-  --ion-background-color: var(--zentry-color-background);
-  --ion-text-color: var(--zentry-color-text-primary);
-  --ion-toolbar-background: var(--zentry-color-component);
-  --ion-item-background: var(--zentry-color-component);
-  --ion-card-background: var(--zentry-color-component);
-  --ion-border-color: var(--zentry-color-border);
+/* ===========================
+   UX: Transiciones acotadas
+   =========================== */
+:root,
+html.dark-theme,
+body,
+ion-content,
+ion-toolbar,
+ion-item,
+ion-card,
+ion-list,
+ion-modal,
+ion-popover,
+ion-action-sheet,
+ion-toast {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+/* Evitar transición en containers que pueden parpadear */
+ion-router-outlet,
+ion-nav,
+ion-tab-bar,
+ion-tabs {
+  transition: none !important;
 }

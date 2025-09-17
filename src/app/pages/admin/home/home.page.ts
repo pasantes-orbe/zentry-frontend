@@ -159,7 +159,7 @@ export class HomePage implements OnInit {
     // Asignar propiedades a propietarios aleatoriamente
     this.assignPropertiesToOwners();
     
-    // Simular carga de países con el mock country
+    // Simular carga con el mock country
     this.countries = [this.mockCountry];
     
     console.log('Mock data loaded:', {

@@ -6,6 +6,16 @@
     </ion-buttons>
     
     <ion-buttons slot="end">
+      <!-- Toggle de tema -->
+      <ion-item lines="none">
+        <ion-icon name="moon" slot="start"></ion-icon>
+        <ion-toggle
+          [checked]="theme.isDark()"
+          (ionChange)="onThemeToggle($event)"
+          aria-label="Cambiar tema">
+        </ion-toggle>
+      </ion-item>
+
       <ion-button fill="clear" class="notification-button" (click)="onNotificationClick()">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
@@ -107,14 +117,6 @@
             </ion-datetime>
           </ion-item>
 
-        <!-- <ion-item>
-            <ion-input 
-              type="date" 
-              placeholder="Fecha" 
-              [(ngModel)]="selectedDate">
-            </ion-input>
-          </ion-item>
-        -->
           <ion-item>
             <ion-input 
               type="time" 
