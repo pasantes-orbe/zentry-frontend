@@ -1,53 +1,46 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { OwnerStorageService } from '../storage/owner-interface-storage.service';
-import { UserStorageService } from '../storage/user-storage.service';
-import { WebSocketService } from '../websocket/web-socket.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface AntipanicCreateDto {
+  id_owner: string | number;
+  address: string;
+  id_country: string | number;
+  propertyNumber: string | number;
+  latitude: number;   // <- ahora sí en el payload
+  longitude: number;  // <- ahora sí en el payload
+}
+
+@Injectable({ providedIn: 'root' })
 export class AntipanicService {
+  private readonly base = `${environment.URL}/api/antipanic`;
+  private readonly jsonHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  constructor(
-    private _ownerStorage: OwnerStorageService,
-    private _userStorage: UserStorageService,
-    private _http: HttpClient,
-    private _socketService: WebSocketService
-  ) { }
+  constructor(private http: HttpClient) {}
 
-  activateAntipanic(ownerID: string, ownerAddress: string, countryID: string, propertyNumber: string): Observable<any> {
-    const formData = new FormData();
-
-    console.log('Activando antipánico:', { ownerID, ownerAddress, countryID, propertyNumber });
-    
-    formData.append('id_owner', ownerID);
-    formData.append('address', ownerAddress);
-    formData.append('id_country', countryID);
-    formData.append('propertyNumber', propertyNumber);
-
-    return this._http.post(`${environment.URL}/api/antipanic`, formData);
+  // Enviar JSON, no FormData
+  activateAntipanic(payload: AntipanicCreateDto): Observable<any> {
+    // Opcional: log de control
+    console.log('Activando antipánico (JSON):', payload);
+    return this.http.post<any>(this.base, payload, { headers: this.jsonHeaders });
   }
 
-  desactivateAntipanic(id: string): Observable<any> {
+  // PATCH sin body (o agregá lo que el backend espere)
+  desactivateAntipanic(id: string | number): Observable<any> {
     console.log('Desactivando antipánico:', id);
-    return this._http.patch(`${environment.URL}/api/antipanic/${id}`, {});
+    return this.http.patch<any>(`${this.base}/${id}`, {}, { headers: this.jsonHeaders });
   }
 
-  // Cambié el tipo de parámetro para aceptar tanto string como number
   getAllAntipanicByCountry(id_country: string | number): Observable<any[]> {
-    return this._http.get<any[]>(`${environment.URL}/api/antipanic/${id_country}`);
+    return this.http.get<any[]>(`${this.base}/${id_country}`);
   }
 
-  // Método adicional para obtener el estado de una alerta específica
-  getAntipanicStatus(id: string): Observable<any> {
-    return this._http.get(`${environment.URL}/api/antipanic/status/${id}`);
+  getAntipanicStatus(id: string | number): Observable<any> {
+    return this.http.get<any>(`${this.base}/status/${id}`);
   }
 
-  // Método para obtener todas las alertas activas de un propietario
   getActiveAlertsByOwner(ownerId: string | number): Observable<any[]> {
-    return this._http.get<any[]>(`${environment.URL}/api/antipanic/owner/${ownerId}/active`);
+    return this.http.get<any[]>(`${this.base}/owner/${ownerId}/active`);
   }
 }

@@ -1,20 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Componentes Standalone de Ionic
+// Ionic standalone
 import { IonContent, IonIcon, IonFab, IonFabButton } from '@ionic/angular/standalone';
 
-// Tu componente de mapa
+// Mapa
 import { CountryMapComponent } from '../components/maps/country-map/country-map.component';
 
 // Servicios
-import { AntipanicService } from '../services/antipanic/antipanic.service';
+import { AntipanicService, AntipanicCreateDto } from '../services/antipanic/antipanic.service';
 import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
 import { UserStorageService } from '../services/storage/user-storage.service';
 import { AlertService } from '../services/helpers/alert.service';
 
 // Interfaces
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
+
+// RxJS
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tab2',
@@ -31,12 +34,13 @@ import { OwnerResponse } from '../interfaces/ownerResponse-interface';
   ]
 })
 export class Tab2Page implements OnInit {
-  @ViewChild('maps') maps: CountryMapComponent;
-  
-  public isPanicActive: boolean = false;
-  public isLoading: boolean = false;
+  @ViewChild('maps') maps?: CountryMapComponent;
+
+  public isPanicActive = false;
+  public isLoading = false;
+
   private owner: OwnerResponse | null = null;
-  private currentPanicId: string | null = null;
+  private currentPanicId: string | number | null = null;
 
   constructor(
     private antipanicService: AntipanicService,
@@ -47,12 +51,11 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      // Cargar datos del propietario
       this.owner = await this.ownerStorage.getOwner();
       if (!this.owner) {
         const user = await this.userStorage.getUser();
         if (user) {
-          // Aquí podrías cargar el owner desde el servicio si es necesario
+          // si hace falta, acá podrías pedir el owner al backend con el id del user
           console.log('Usuario cargado:', user.id);
         }
       }
@@ -63,11 +66,11 @@ export class Tab2Page implements OnInit {
 
   ionViewWillEnter() {
     if (this.maps) {
-      // this.maps.ionViewWillEnter()
+      // this.maps.ionViewWillEnter();
     }
   }
 
-  // Función del botón de pánico
+  // BOTÓN DE PÁNICO
   public async onPanicButtonClick(): Promise<void> {
     if (this.isPanicActive) {
       console.log('Pánico ya está activo');
@@ -79,86 +82,79 @@ export class Tab2Page implements OnInit {
       return;
     }
 
+    this.isPanicActive = true;
+    this.isLoading = true;
+
     try {
-      this.isPanicActive = true;
-      this.isLoading = true;
-      
       console.log('¡BOTÓN DE PÁNICO ACTIVADO!');
-      
-      // Obtener ubicación actual si está disponible
-      let currentLocation = 'Ubicación no disponible';
+
+      // 1) Obtener coordenadas (o fallback)
+      let latitude = -27.5615;
+      let longitude = -58.7521;
+
       if (navigator.geolocation) {
         try {
-          const position = await this.getCurrentPosition();
-          currentLocation = `${position.coords.latitude}, ${position.coords.longitude}`;
-        } catch (error) {
-          console.warn('No se pudo obtener la ubicación:', error);
+          const pos = await this.getCurrentPosition();
+          latitude = pos.coords.latitude;
+          longitude = pos.coords.longitude;
+        } catch (e) {
+          console.warn('No se pudo obtener la ubicación, uso fallback:', e);
         }
       }
 
-      // Usar la dirección de la propiedad o la ubicación GPS como fallback
-      const propertyAddress = this.owner.property.address || currentLocation;
+      // 2) Armar payload JSON esperado por backend
+      const dto: AntipanicCreateDto = {
+        id_owner: this.owner.id,
+        address: this.owner.property.address || `${latitude}, ${longitude}`,
+        id_country: this.owner.property.id_country,
+        propertyNumber: this.owner.property.number,
+        latitude,
+        longitude
+      };
 
-      // Activar antipánico con los datos correctos
-      const response = await this.antipanicService.activateAntipanic(
-        this.owner.id.toString(),
-        propertyAddress,
-        this.owner.property.id_country.toString(),
-        this.owner.property.number.toString()
-      ).toPromise();
+      // 3) Llamar service (JSON)
+      const resp = await firstValueFrom(this.antipanicService.activateAntipanic(dto));
 
-      if (response && response.id) {
-        this.currentPanicId = response.id;
+      if (resp && resp.id) {
+        this.currentPanicId = resp.id;
         this.alertService.showAlert(
-          '🚨 ALERTA ACTIVADA', 
-          `Se ha enviado la alerta de emergencia desde:<br><strong>${this.owner.property.name}</strong><br>Dirección: ${propertyAddress}<br><br>Las autoridades han sido notificadas.`
+          '🚨 ALERTA ACTIVADA',
+          `Se envió la alerta desde:<br><strong>${this.owner.property.name}</strong><br>
+           Dirección: ${dto.address}<br><small>(${latitude.toFixed(5)}, ${longitude.toFixed(5)})</small>`
         );
-        console.log('Alerta de pánico enviada exitosamente:', response);
+        console.log('Alerta de pánico enviada:', resp);
+      } else {
+        console.warn('Respuesta sin id:', resp);
       }
-
     } catch (error) {
       console.error('Error al activar el antipánico:', error);
-      this.alertService.showAlert(
-        'Error', 
-        'No se pudo enviar la alerta de emergencia. Intente nuevamente.'
-      );
+      this.alertService.showAlert('Error', 'No se pudo enviar la alerta de emergencia. Intente nuevamente.');
       this.isPanicActive = false;
     } finally {
       this.isLoading = false;
     }
   }
 
-  // Función para desactivar el antipánico
+  // DESACTIVAR
   public async deactivatePanic(): Promise<void> {
-    if (!this.isPanicActive || !this.currentPanicId) {
-      return;
-    }
+    if (!this.isPanicActive || !this.currentPanicId) return;
 
+    this.isLoading = true;
     try {
-      this.isLoading = true;
-      await this.antipanicService.desactivateAntipanic(this.currentPanicId);
-      
+      await firstValueFrom(this.antipanicService.desactivateAntipanic(this.currentPanicId));
       this.isPanicActive = false;
       this.currentPanicId = null;
-      
-      this.alertService.showAlert(
-        'Alerta Desactivada', 
-        'La alerta de emergencia ha sido desactivada.'
-      );
-      
+      this.alertService.showAlert('Alerta Desactivada', 'La alerta de emergencia ha sido desactivada.');
       console.log('Alerta de pánico desactivada');
     } catch (error) {
       console.error('Error al desactivar el antipánico:', error);
-      this.alertService.showAlert(
-        'Error', 
-        'No se pudo desactivar la alerta. Contacte con seguridad.'
-      );
+      this.alertService.showAlert('Error', 'No se pudo desactivar la alerta. Contacte con seguridad.');
     } finally {
       this.isLoading = false;
     }
   }
 
-  // Función para obtener ubicación actual
+  // Utils
   private getCurrentPosition(): Promise<GeolocationPosition> {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -169,19 +165,16 @@ export class Tab2Page implements OnInit {
     });
   }
 
-  // Función para obtener el estado del botón
   public getPanicButtonClass(): string {
     if (this.isLoading) return 'panic-button loading';
     return this.isPanicActive ? 'panic-button active' : 'panic-button';
-  }
+    }
 
-  // Función para obtener el texto del botón
   public getPanicButtonText(): string {
     if (this.isLoading) return 'Enviando...';
     return this.isPanicActive ? 'ALERTA ACTIVA' : 'EMERGENCIA';
   }
 
-  // Función para obtener información del propietario (útil para debugging)
   public getOwnerInfo(): string {
     if (!this.owner || !this.owner.property) return 'Sin datos';
     return `${this.owner.user.name} ${this.owner.user.lastname} - ${this.owner.property.name}`;
