@@ -8,28 +8,54 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form class="form-container">
+  <!-- Contenedor del mapa -->
+  <div id="map" class="map-container"></div>
+
+  <!-- Formulario -->
+  <form [formGroup]="form" (ngSubmit)="addCountry()" class="form-container">
+    <!-- Nombre del Country -->
     <ion-item>
       <ion-label position="floating">Nombre del Country<ion-text color="danger">*</ion-text></ion-label>
-      <ion-input required type="text"></ion-input>
+      <ion-input formControlName="countryName" required type="text"></ion-input>
     </ion-item>
 
+    <!-- Dirección -->
     <ion-item>
       <ion-label position="floating">Dirección<ion-text color="danger">*</ion-text></ion-label>
-      <ion-input required type="text"></ion-input>
+      <ion-input formControlName="address" required type="text"></ion-input>
     </ion-item>
 
+    <!-- Localidad -->
     <ion-item>
       <ion-label position="floating">Localidad</ion-label>
-      <ion-input type="text"></ion-input>
+      <ion-input formControlName="locality" type="text"></ion-input>
     </ion-item>
 
+    <!-- Teléfono de Contacto -->
     <ion-item>
       <ion-label position="floating">Teléfono de Contacto</ion-label>
-      <ion-input type="tel"></ion-input>
+      <ion-input formControlName="phone" type="tel"></ion-input>
     </ion-item>
 
-    <ion-button class="submit-button" size="large" expand="block" color="primary" type="submit">
+    <!-- Avatar del Country -->
+    <ion-item>
+      <ion-label>Avatar del Country<ion-text color="danger">*</ion-text></ion-label>
+      <input type="file" (change)="onFileChange($event)" />
+    </ion-item>
+
+    <!-- Vista previa del avatar -->
+    <div *ngIf="newImg" class="avatar-preview-container">
+      <img [src]="newImg" alt="Vista previa del avatar" class="avatar-preview" />
+    </div>
+
+    <!-- Coordenadas seleccionadas -->
+    <ion-item>
+      <ion-label position="stacked">Coordenadas Seleccionadas</ion-label>
+      <ion-text>{{ lat }}, {{ lng }}</ion-text>
+    </ion-item>
+
+    <!-- Botón Guardar -->
+    <ion-button class="submit-button" size="large" expand="block" color="primary" type="submit" [disabled]="form.invalid">
       Guardar Country
     </ion-button>
   </form>

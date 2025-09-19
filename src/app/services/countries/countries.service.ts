@@ -21,32 +21,40 @@ export class CountriesService {
 
   }
 
-  public async addCountry(avatar: File, name: string, latitude: string, longitude: string){
+  public async addCountry(
+  avatar: File,
+  name: string,
+  latitude: string,
+  longitude: string,
+  address: string,
+  locality: string,
+  phone: string
+): Promise<void> {
+  const formData = new FormData();
+  formData.append('avatar', avatar);
+  formData.append('name', name);
+  formData.append('latitude', latitude);
+  formData.append('longitude', longitude);
+  formData.append('address', address);
+  formData.append('locality', locality);
+  formData.append('phone', phone);
 
-    const formData = new FormData();
-    formData.append('avatar', avatar);
-    formData.append('name', name);
-    formData.append('latitude', latitude);
-    formData.append('longitude', longitude);
+  await this._alertService.setLoading();
 
-    await this._alertService.setLoading();
-
-    this._http.post(`${environment.URL}/api/countries`, formData)
-      .subscribe(async (res) => {
-        console.log(res);
-        await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Listo!", "El country se agregó con éxito");
-        this._router.navigate(['/admin/home']);
-      },
-      async (err) => {
-        console.log(err);
-        await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-        this._router.navigate([`/admin/home`]);
-    });
-
-
-  }
+  this._http.post(`${environment.URL}/api/countries`, formData).subscribe(
+    async (res) => {
+      console.log(res);
+      await this._alertService.removeLoading();
+      this._alertService.showAlert('¡Listo!', 'El country se agregó con éxito');
+      this._router.navigate(['/admin/home']);
+    },
+    async (err) => {
+      console.error(err);
+      await this._alertService.removeLoading();
+      this._alertService.showAlert('¡Ooops!', 'No se pudo agregar el country. Inténtalo de nuevo.');
+    }
+  );
+}
 
   public getByID(id:number): Observable<CountryInteface> {
     return this._http.get<CountryInteface>(`${environment.URL}/api/countries/${ id }`);

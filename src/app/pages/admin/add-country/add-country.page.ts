@@ -1,11 +1,9 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as L from 'leaflet';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertService } from 'src/app/services/helpers/alert.service';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 
@@ -16,8 +14,8 @@ import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navb
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-  iconUrl: 'assets/leaflet/marker-icon.png',
-  shadowUrl: 'assets/leaflet/marker-shadow.png',
+  iconUrl: 'assets/marker.png',
+  shadowUrl: 'assets/logos/marker-shadow.png',
 });
 
 @Component({
@@ -34,18 +32,17 @@ L.Icon.Default.mergeOptions({
 })
 export class AddCountryPage implements AfterViewInit, OnDestroy {
   private map: L.Map | null = null;
-  public lat: number = -27.5615;
-  public lng: number = -58.7521;
+  public lat: number = -27.4512; // Coordenadas iniciales (Resistencia, Chaco)
+  public lng: number = -58.9867; // Coordenadas iniciales (Resistencia, Chaco)
   public marker: L.Marker | null = null;
-  public newImg: string = "https://ionicframework.com/docs/img/demos/card-media.png";
-  
+  public newImg: string | ArrayBuffer | null = null;
+
   public form: FormGroup;
 
   constructor(
     private _countries: CountriesService,
     private _formBuilder: FormBuilder,
     private _alertService: AlertService,
-    private http: HttpClient,
     private _router: Router
   ) {
     this.form = this.createForm();
@@ -54,7 +51,10 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
   private createForm(): FormGroup {
     return this._formBuilder.group({
       countryName: ['', [Validators.required, Validators.minLength(3)]],
-      countryAvatar: new FormControl(null, [Validators.required]),
+      address: ['', [Validators.required]],
+      locality: [''],
+      phone: [''],
+      countryAvatar: new FormControl(null, []),
       fileSource: new FormControl(null, [Validators.required])
     });
   }
@@ -70,16 +70,16 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
   }
 
   private initMap(): void {
-    // Crear mapa centrado en coordenadas por defecto
+    // Crear mapa centrado en Resistencia, Chaco
     this.map = L.map('map', {
       center: [this.lat, this.lng],
-      zoom: 8
+      zoom: 12 // Ajustar el nivel de zoom para un enfoque más cercano
     });
 
     // Agregar tiles
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: '© OpenStreetMap contributors'
     });
     tiles.addTo(this.map);
 
@@ -92,25 +92,36 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
 
     this.map.attributionControl.setPrefix(false);
 
-    // Crear marcador arrastrable
+    // Configurar icono personalizado para el marcador
+    const customIcon = L.icon({
+      iconUrl: 'assets/marker.png', // Ruta del icono personalizado
+      shadowUrl: 'assets/logos/marker-shadow.png', // Ruta de la sombra del marcador
+      iconSize: [35, 35], // Tamaño del icono
+      shadowSize: [50, 64], // Tamaño de la sombra
+      iconAnchor: [17, 35], // Punto de anclaje del icono
+      shadowAnchor: [4, 62], // Punto de anclaje de la sombra
+      popupAnchor: [0, -35] // Punto de anclaje del popup
+    });
+
+    // Crear marcador arrastrable con el icono personalizado
     this.marker = L.marker([this.lat, this.lng], {
-      draggable: true
+      draggable: true,
+      icon: customIcon
     }).addTo(this.map);
 
-    // Listener para cuando se arrastra el marcador
-    this.marker.on('dragend', (event) => {
+    // Actualizar coordenadas al mover el marcador
+    this.marker.on('drag', (event) => {
       const position = (event.target as L.Marker).getLatLng();
       this.lat = position.lat;
       this.lng = position.lng;
-      console.log('Nueva posición:', this.lat, this.lng);
     });
 
-    // Listener para clicks en el mapa
+    // Actualizar coordenadas al hacer clic en el mapa
     this.map.on('click', (event) => {
       const { lat, lng } = event.latlng;
       this.lat = lat;
       this.lng = lng;
-      
+
       if (this.marker) {
         this.marker.setLatLng([lat, lng]);
       }
@@ -132,33 +143,41 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
       reader.onload = () => this.newImg = reader.result as string;
       reader.readAsDataURL(file);
 
+      // Actualizar el valor del campo fileSource
       this.form.patchValue({
         fileSource: file
       });
+
+      // Depuración: Verificar que el archivo se haya cargado correctamente
+      console.log('Archivo cargado:', file);
     }
   }
 
   public addCountry(): void {
+    // Depuración: Verificar el estado del formulario
+    console.log('Estado del formulario:', this.form.status);
+    console.log('Errores del formulario:', this.form.errors);
+    console.log('Valores del formulario:', this.form.value);
+
     if (this.form.invalid) {
       this._alertService.presentAlert('Formulario Inválido: Por favor, complete todos los campos.');
       return;
     }
 
     this.setCoords();
-    
-    this._countries.addCountry(
-      this.form.value.fileSource,
-      this.form.value.countryName,
-      String(this.lat),
-      String(this.lng)
-    )
-      .then(() => {
-        this._alertService.presentAlert('Éxito: El país ha sido agregado correctamente.');
-        this._router.navigate(['/admin/home']);
-      })
-      .catch(err => {
-        console.error("Error al agregar el país:", err);
-        this._alertService.presentAlert('Error: No se pudo agregar el país.');
-      });
+
+    const { countryName, address, locality, phone, fileSource } = this.form.value;
+
+    console.log('Datos del formulario listos para enviar:', {
+      countryName,
+      address,
+      locality,
+      phone,
+      lat: this.lat,
+      lng: this.lng,
+      avatar: fileSource
+    });
+
+    this._alertService.presentAlert('Éxito , el formulario es válido y los datos están listos para enviarse.');
   }
 }

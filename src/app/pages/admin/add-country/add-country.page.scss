@@ -1,9 +1,13 @@
-/* ====================================================== */
-/* ADMIN/ADD-COUNTRY.PAGE.SCSS (Plantilla de Formulario) */
-/* ====================================================== */
 :host {
   ion-toolbar {
     --background: var(--ion-toolbar-background);
+  }
+
+  .map-container {
+    height: 300px; /* Altura fija para el mapa */
+    width: 100%;
+    border: 1px solid var(--color-border);
+    margin-bottom: 1rem; /* Espacio entre el mapa y el formulario */
   }
 
   .form-container {
@@ -16,6 +20,16 @@
     --border-color: var(--color-border);
     --border-radius: 8px;
     margin-bottom: 1rem;
+  }
+
+  .avatar-preview {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin: 1rem auto;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
   }
 
   .submit-button {
