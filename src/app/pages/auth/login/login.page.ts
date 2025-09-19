@@ -1,8 +1,10 @@
+// src/app/pages/auth/login/login.page.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
+import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service'; //borrar si no se ocupa 
 
 // Componentes Standalone de Ionic
 import {
@@ -26,7 +28,7 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 // ¡¡¡CORRECCIÓN CRÍTICA ACA!!!
 // Se debe importar Storage desde '@ionic/storage-angular', no desde '@ionic/storage'.
-import { Storage } from '@ionic/storage-angular';
+//import { Storage } from '@ionic/storage-angular'; //borrar si no se ocupa
 import { PushService } from 'src/app/services/pushNotifications/push.service';
 import { Capacitor } from '@capacitor/core';
 
@@ -70,7 +72,7 @@ export class LoginPage implements OnInit {
   constructor(
     private _router: Router,
     // La inyección ahora funcionará porque el tipo importado es el correcto.
-    private storage: Storage,
+    //private storage: Storage, //borrar si no se ocupa
     private _modalCtrl: ModalController,
     protected _formBuilder: FormBuilder,
     private _loginService: LoginService,
@@ -81,7 +83,9 @@ export class LoginPage implements OnInit {
     private _countryStorageService: CountryStorageService,
     private _redirectService: RedirectService,
     private _webSocketService: WebSocketService,
-    private _pushService: PushService
+    private _pushService: PushService,
+    private _ownerStorage: OwnerStorageService
+
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -110,6 +114,11 @@ export class LoginPage implements OnInit {
       data => {
         this._authStorage.saveJWT(data['token']);
         this._userStorage.saveUser(data['user']);
+        //borrar si no se ocupa
+        if (data['owner']) {
+          this._ownerStorage.saveOwner(data['owner']);
+        }
+
         const { name } = data['user'].role;
         if (Capacitor.getPlatform() === 'android') {
           this._pushService.setOneSignalID(data['user']['id'])

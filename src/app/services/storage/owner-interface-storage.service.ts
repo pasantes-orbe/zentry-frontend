@@ -1,8 +1,9 @@
+// src/app/services/storage/owner-interface-storage.service.ts
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
 import { OwnerResponse } from 'src/app/interfaces/ownerResponse-interface';
-import { OwnerInterface } from '../../interfaces/owner-interface';
+import { OwnerInterface } from '../../interfaces/owner-interface'; //VER SI ACA NO ES EL PROBLEMA SINO COMENTARLO NOMAS
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +26,14 @@ public owner: OwnerResponse;
 
   public async getOwner(): Promise<OwnerResponse>{
     const { value } = await Preferences.get({ key: 'OWNER' });
-    return JSON.parse(value);
-    
+//VER SI ACA NO ES EL PROBLEMA SINO COMENTARLO NOMAS o borrarlo 
+    if (value) {
+        return JSON.parse(value);
+        } else {
+      return null; // Devuelve 'null' de forma segura si no hay datos.
+    }   
   }
+
   private setOwner(owner: OwnerResponse): void {
     this.owner = owner;
   }
