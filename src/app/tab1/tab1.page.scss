@@ -1,5 +1,5 @@
 /* ====================================================== */
-/* TAB1.PAGE.SCSS */
+/* TAB1.PAGE.SCSS (VISTA INICIO/PROPIETARIO) */
 /* ====================================================== */
 :host {
   ion-header {
@@ -11,7 +11,7 @@
       margin-left: 16px;
     }
     .notification-button {
-      --color: var(--color-text-secondary);
+      --color: var(--zentry-color-text-secondary);
       font-size: 1.4rem;
     }
     ion-avatar {
@@ -28,58 +28,52 @@
     padding: 0 16px 16px;
   }
 
+  /* AJUSTE: Se reduce el padding y margen para tarjetas más compactas */
   .action-card {
-    background: var(--color-card, #3b3b3b); // Fondo oscuro por defecto
-    border-radius: 12px;
-    border: 1px solid var(--color-border, #333); // Borde oscuro por defecto
-    margin: 0 16px 12px;
-    padding: 14px;
-    transition: all 0.2s ease-in-out;
-
-    &:hover {
-      border-color: var(--ion-color-primary, #4caf50); // Color primario en hover
-    }
-
-    .card-title {
-      font-family: var(--font-heading, Arial, sans-serif);
-      font-weight: 600;
-      font-size: 1.05rem;
-      margin: 0 0 10px 0;
-      color: #FFFFFF !important; // Texto blanco
-    }
-
-    p {
-      font-size: 0.9rem;
-      color: #ffffff !important; // Texto gris claro
-      margin: 0;
-    }
-    .card-title {
-      color: var(--color-text-primary, #ffffff) !important;
-    }
-
-    .secondary-action-card p {
-      color: var(--color-text-secondary, #cccccc) !important;
-  }
+    padding: 12px;
+    margin: 0 16px 10px; 
   }
 
+  .card-title {
+    color: var(--ion-text-color); /* Usar variable */
+  }
+
+  .secondary-action-card p {
+    color: var(--zentry-color-text-secondary); /* Usar variable */
+  }
+  
   .quick-auth-card {
-    ion-item {
-      --background: #111827;
-      --border-radius: 8px;
-      margin-bottom: 10px;
-    }
     ion-button {
       margin-top: 10px;
       height: 44px;
     }
   }
 
-  .secondary-action-card {
-    p {
-      font-size: 0.9rem;
-      color: #D1D5DB !important; // Texto gris claro
-      margin: 0;
-    }
+  /* ====================================================== */
+  /* ========= FIX v4: REGLAS FORZADAS CON !important ========= */
+  /* ====================================================== */
+
+  .quick-auth-card ion-item {
+    --inner-padding-end: 0px;
+    --inner-padding-start: 0px;
+    --padding-start: 0;
+    --padding-end: 0;
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+
+  /* TEMA OSCURO */
+  :host-context(body.dark-theme) .quick-auth-card ion-item {
+    --background: #374151 !important;
+    --color: #F9FAFB !important;
+    border: 1px solid #4B5563;
+  }
+
+  /* TEMA CLARO */
+  :host-context(body:not(.dark-theme)) .quick-auth-card ion-item {
+    --background: #FFFFFF !important;
+    --color: #1F2937 !important;
+    border: 1px solid #D1D5DB;
   }
 
   .notifications-card {
@@ -100,7 +94,7 @@
       }
       p {
         font-size: 0.9rem;
-        color: var(--color-text-secondary);
+        color: var(--zentry-color-text-secondary);
       }
       &.success ion-icon {
         color: var(--ion-color-success);
@@ -109,75 +103,38 @@
     }
   }
 
-  // ====================================================
-  // ESTILOS PARA MODALES - TEXTO BLANCO
-  // ====================================================
+  /* ==================================================== */
+  /* ESTILOS PARA MODALES (USANDO VARIABLES) */
+  /* ==================================================== */
   ion-modal {
-    --background: rgba(31, 41, 55, 0.95);
-    
-    ion-header {
-      ion-toolbar {
-        --background: rgba(17, 24, 39, 0.95);
-        --color: #FFFFFF;
-        
-        ion-title {
-          color: #FFFFFF !important;
-        }
-        
-        ion-button {
-          --color: #FFFFFF;
-        }
+    ion-header ion-toolbar {
+      --background: var(--ion-toolbar-background);
+      --color: var(--ion-text-color);
+      ion-title, ion-button {
+        --color: var(--ion-text-color);
       }
     }
     
     ion-content {
-      --background: rgba(31, 41, 55, 0.95);
-      --color: #FFFFFF;
+      --background: var(--ion-background-color);
+      --color: var(--ion-text-color);
       
       ion-item {
         --background: transparent;
-        --color: #FFFFFF;
+        --color: var(--ion-text-color);
         
         ion-label {
-          color: #FFFFFF !important;
+          color: var(--ion-text-color) !important;
         }
         
-        ion-input {
-          --color: #FFFFFF;
-          --placeholder-color: #9CA3AF;
-        }
-        
-        ion-select {
-          --color: #FFFFFF;
-          --placeholder-color: #9CA3AF;
-        }
-        
-        ion-datetime {
-          --color: #FFFFFF;
+        ion-input, ion-select, ion-datetime {
+          --color: var(--ion-text-color);
+          --placeholder-color: var(--zentry-color-text-secondary);
         }
         
         ion-radio {
-          --color: #FFFFFF;
+          --color: var(--ion-text-color);
           --color-checked: var(--ion-color-primary);
-        }
-      }
-      
-      ion-radio-group {
-        ion-item {
-          ion-label {
-            color: #FFFFFF !important;
-          }
-        }
-      }
-      
-      ion-button {
-        &.cancel-button {
-          --color: #EF4444;
-        }
-        
-        &.confirm-button {
-          --background: var(--ion-color-primary);
-          --color: #FFFFFF;
         }
       }
     }

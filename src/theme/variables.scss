@@ -1,10 +1,10 @@
 /* theme/variables.scss */
 
 /* ===========================
-   BASE (TEMA CLARO / :root)
-   =========================== */
+    BASE (TEMA CLARO / :root)
+    =========================== */
 :root {
-  /* Paleta Ionic */
+  /* Paleta Ionic - Se mantiene el azul como primario */
   --ion-color-primary: #3B82F6;
   --ion-color-primary-rgb: 59, 130, 246;
   --ion-color-primary-contrast: #ffffff;
@@ -60,41 +60,52 @@
 
   --ion-color-medium: #92949c;
   --ion-color-medium-rgb: 146, 148, 156;
-  --ion-color-medium-contrast: #ffffff;
-  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-contrast: #000000; /* MODIFICADO: Contraste para tema claro */
+  --ion-color-medium-contrast-rgb: 0,0,0;
   --ion-color-medium-shade: #808289;
   --ion-color-medium-tint: #9d9fa6;
-
-  --ion-color-gray: #9ca3af;
-  --ion-color-gray-rgb: 156, 163, 175;
-  --ion-color-gray-contrast: #ffffff;
-  --ion-color-gray-contrast-rgb: 255, 255, 255;
-  --ion-color-gray-shade: #8a919b;
-  --ion-color-gray-tint: #a6adb8;
-
+  
   --ion-color-light: #f4f5f8;
   --ion-color-light-rgb: 244, 245, 248;
   --ion-color-light-contrast: #000000;
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+  
+  /* ========================================================== */
+  /* ========= INICIO DE MODIFICACIÓN: TEMA CLARO ========= */
+  /* ========================================================== */
 
-  /* Tema claro (default) */
-  --ion-background-color: #ffffff;
-  --ion-background-color-rgb: 255, 255, 255;
-  --ion-text-color: #000000;
-  --ion-text-color-rgb: 0, 0, 0;
-  --ion-toolbar-background: #f8f9fa;
-  --ion-item-background: #ffffff;
-  --ion-card-background: #ffffff;
-  --ion-border-color: #e5e7eb;
+  /* Fondo principal de la app (el "body") */
+  --ion-background-color: #F9FAFB; /* Blanco Hueso */
+  --ion-background-color-rgb: 249, 250, 251;
 
-  /* Semánticas Zentry (opcional) */
-  --zentry-color-background: #ffffff;
-  --zentry-color-component: #f8f9fa;
-  --zentry-color-border: #e5e7eb;
-  --zentry-color-text-primary: #000000;
-  --zentry-color-text-secondary: #6b7280;
+  /* Color principal del texto */
+  --ion-text-color: #1F2937; /* Gris Oxford */
+  --ion-text-color-rgb: 31, 41, 55;
+
+  /* Fondo de la barra de herramientas superior */
+  --ion-toolbar-background: #FFFFFF; /* Blanco Puro */
+
+  /* Fondo de componentes como items, inputs y modales */
+  --ion-item-background: #FFFFFF; /* Blanco Puro */
+
+  /* Fondo de las tarjetas */
+  --ion-card-background: #FFFFFF; /* Blanco Puro */
+
+  /* Color de los bordes y separadores */
+  --ion-border-color: #E5E7EB; /* Gris Pálido */
+
+  /* Semánticas Zentry (para consistencia) */
+  --zentry-color-background: var(--ion-background-color);
+  --zentry-color-component: var(--ion-item-background);
+  --zentry-color-border: var(--ion-border-color);
+  --zentry-color-text-primary: var(--ion-text-color);
+  --zentry-color-text-secondary: #4B5563; /* Gris Asfalto */
+
+  /* ======================================================== */
+  /* ========= FIN DE MODIFICACIÓN: TEMA CLARO ========= */
+  /* ======================================================== */
 
   /* Tipografía */
   --font-heading: 'Poppins', sans-serif;
@@ -102,13 +113,13 @@
   --ion-font-family: var(--font-body);
 
   /* Sombras por defecto (claro) */
-  --ion-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --ion-card-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --ion-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --ion-card-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* ===========================
-   TEMA OSCURO (aplicado en <html>)
-   =========================== */
+/* =================================================================== */
+/* ============ TEMA OSCURO (SIN CAMBIOS, SE MANTIENE IGUAL) ========= */
+/* =================================================================== */
 html.dark-theme {
   --ion-background-color: #111827;
   --ion-background-color-rgb: 17, 24, 39;
@@ -128,8 +139,10 @@ html.dark-theme {
   --zentry-color-text-secondary: #9ca3af;
 
   /* Ajustes para tokens Ionic en oscuro */
-  --ion-color-medium: #6b7280;
-  --ion-color-medium-rgb: 107, 114, 128;
+  --ion-color-medium: #9ca3af;
+  --ion-color-medium-rgb: 156, 163, 175;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
 
   --ion-color-light: #374151;
   --ion-color-light-rgb: 55, 65, 81;
@@ -154,8 +167,8 @@ html.dark-theme {
 }
 
 /* ===========================
-   UX: Transiciones acotadas
-   =========================== */
+    UX: Transiciones acotadas
+    =========================== */
 :root,
 html.dark-theme,
 body,
@@ -178,3 +191,4 @@ ion-tab-bar,
 ion-tabs {
   transition: none !important;
 }
+

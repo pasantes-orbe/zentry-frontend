@@ -1,17 +1,16 @@
 /* ====================================================== */
-/* TAB2.PAGE.SCSS */
+/* TAB2.PAGE.SCSS (VISTA ANTIPÁNICO) */
 /* ====================================================== */
 :host {
   .map-background {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 
   ion-fab {
-    /* Ajuste para que el botón no quede pegado al borde inferior */
     margin-bottom: 16px;
   }
 
@@ -20,7 +19,6 @@
     --border-radius: 50%;
     width: 100px;
     height: 100px;
-    /* CORRECCIÓN: Se aplica el border-radius al box-shadow para que el pulso sea redondo */
     animation: pulse-red 2s infinite;
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
     border-radius: 50%;

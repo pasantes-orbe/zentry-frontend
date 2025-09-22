@@ -8,6 +8,17 @@
       <span class="header-title-text"></span>
     </ion-buttons>
     <ion-buttons slot="end" class="header-user">
+
+      <!-- ***** 5. AÑADIR EL TOGGLE DE TEMA ***** -->
+      <ion-item lines="none" class="theme-toggle-item">
+        <ion-icon name="moon" slot="start"></ion-icon>
+        <ion-toggle
+          [checked]="theme.isDark()"
+          (ionChange)="onThemeToggle($event)"
+          aria-label="Cambiar tema">
+        </ion-toggle>
+      </ion-item>
+      
       <!-- Botón de notificaciones con evento click y contador de no leídas -->
       <ion-badge color="danger" *ngIf="unreadCount > 0" class="notification-badge"> Nuevas </ion-badge>
       <ion-icon name="notifications-outline" class="notification-icon" (click)="openNotificationsPopover($event)" ></ion-icon>

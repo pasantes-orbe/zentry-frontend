@@ -8,11 +8,38 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- Contenedor del mapa -->
+  <!-- ✅ NUEVA SECCIÓN: Indicador de paso actual -->
+  <ion-card>
+    <ion-card-content>
+      <ion-text color="primary">
+        <h3>{{ currentStep === 1 ? 'Paso 1: Marcar Centro del Barrio' : 'Paso 2: Marcar Perímetro del Barrio' }}</h3>
+      </ion-text>
+      <p *ngIf="currentStep === 1">Arrastra el marcador o haz clic para posicionar el centro del barrio.</p>
+      <p *ngIf="currentStep === 2">Haz clic en 4 puntos del mapa para delimitar el perímetro. Puntos marcados: {{ perimeterPoints.length }}/4</p>
+      
+      <!-- Botones de control del mapa -->
+      <div *ngIf="currentStep === 1">
+        <ion-button expand="block" color="success" (click)="confirmCenter()">
+          Confirmar Centro y Continuar
+        </ion-button>
+      </div>
+      
+      <div *ngIf="currentStep === 2">
+        <ion-button expand="block" color="warning" (click)="resetPerimeter()" [disabled]="perimeterPoints.length === 0">
+          Reiniciar Perímetro
+        </ion-button>
+        <ion-button expand="block" color="medium" (click)="backToStep1()">
+          Volver al Paso 1
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Contenedor del mapa (sin cambios) -->
   <div id="map" class="map-container"></div>
 
-  <!-- Formulario -->
-  <form [formGroup]="form" (ngSubmit)="addCountry()" class="form-container">
+  <!-- ✅ FORMULARIO: Solo se muestra cuando el perímetro está completo -->
+  <form [formGroup]="form" (ngSubmit)="addCountry()" class="form-container" *ngIf="currentStep === 2 && perimeterPoints.length === 4">
     <!-- Nombre del Country -->
     <ion-item>
       <ion-label position="floating">Nombre del Country<ion-text color="danger">*</ion-text></ion-label>
@@ -48,10 +75,15 @@
       <img [src]="newImg" alt="Vista previa del avatar" class="avatar-preview" />
     </div>
 
-    <!-- Coordenadas seleccionadas -->
+    <!-- ✅ ACTUALIZADO: Coordenadas del centro y perímetro -->
     <ion-item>
-      <ion-label position="stacked">Coordenadas Seleccionadas</ion-label>
+      <ion-label position="stacked">Centro del Barrio</ion-label>
       <ion-text>{{ lat }}, {{ lng }}</ion-text>
+    </ion-item>
+
+    <ion-item *ngIf="perimeterPoints.length === 4">
+      <ion-label position="stacked">Perímetro Definido</ion-label>
+      <ion-text color="success">✓ 4 puntos marcados correctamente</ion-text>
     </ion-item>
 
     <!-- Botón Guardar -->
@@ -59,4 +91,13 @@
       Guardar Country
     </ion-button>
   </form>
+
+  <!-- ✅ MENSAJE: Cuando el formulario no está disponible -->
+  <ion-card *ngIf="currentStep === 1 || perimeterPoints.length < 4">
+    <ion-card-content>
+      <ion-text color="medium">
+        <p>Complete la marcación del mapa para acceder al formulario de datos del country.</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

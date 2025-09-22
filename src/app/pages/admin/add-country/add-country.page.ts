@@ -37,6 +37,13 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
   public marker: L.Marker | null = null;
   public newImg: string | ArrayBuffer | null = null;
 
+  // ✅ NUEVAS PROPIEDADES PARA EL SISTEMA DE DOS PASOS
+  public currentStep: number = 1; // Paso actual (1 = centro, 2 = perímetro)
+  public centerCoords: { lat: number, lng: number } | null = null;
+  public perimeterPoints: L.LatLng[] = []; // Array de puntos del perímetro
+  public perimeterMarkers: L.Marker[] = []; // Marcadores del perímetro
+  public polygon: L.Polygon | null = null; // Polígono del perímetro
+
   public form: FormGroup;
 
   constructor(
@@ -73,7 +80,7 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
     // Crear mapa centrado en Resistencia, Chaco
     this.map = L.map('map', {
       center: [this.lat, this.lng],
-      zoom: 12 // Ajustar el nivel de zoom para un enfoque más cercano
+      zoom: 12
     });
 
     // Agregar tiles
@@ -92,40 +99,140 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
 
     this.map.attributionControl.setPrefix(false);
 
-    // Configurar icono personalizado para el marcador
-    const customIcon = L.icon({
-      iconUrl: 'assets/marker.png', // Ruta del icono personalizado
-      shadowUrl: 'assets/logos/marker-shadow.png', // Ruta de la sombra del marcador
-      iconSize: [35, 35], // Tamaño del icono
-      shadowSize: [50, 64], // Tamaño de la sombra
-      iconAnchor: [17, 35], // Punto de anclaje del icono
-      shadowAnchor: [4, 62], // Punto de anclaje de la sombra
-      popupAnchor: [0, -35] // Punto de anclaje del popup
+    // Configurar icono personalizado para el marcador del centro
+    const centerIcon = L.icon({
+      iconUrl: 'assets/marker.png',
+      shadowUrl: 'assets/logos/marker-shadow.png',
+      iconSize: [35, 35],
+      shadowSize: [50, 64],
+      iconAnchor: [17, 35],
+      shadowAnchor: [4, 62],
+      popupAnchor: [0, -35]
     });
 
-    // Crear marcador arrastrable con el icono personalizado
+    // Crear marcador arrastrable para el centro
     this.marker = L.marker([this.lat, this.lng], {
       draggable: true,
-      icon: customIcon
+      icon: centerIcon
     }).addTo(this.map);
 
-    // Actualizar coordenadas al mover el marcador
+    // Actualizar coordenadas al mover el marcador del centro
     this.marker.on('drag', (event) => {
       const position = (event.target as L.Marker).getLatLng();
       this.lat = position.lat;
       this.lng = position.lng;
     });
 
-    // Actualizar coordenadas al hacer clic en el mapa
+    // ✅ LISTENER PARA CLICKS EN EL MAPA (SEGÚN EL PASO ACTUAL)
     this.map.on('click', (event) => {
-      const { lat, lng } = event.latlng;
-      this.lat = lat;
-      this.lng = lng;
+      if (this.currentStep === 1) {
+        // PASO 1: Mover el marcador del centro
+        const { lat, lng } = event.latlng;
+        this.lat = lat;
+        this.lng = lng;
 
-      if (this.marker) {
-        this.marker.setLatLng([lat, lng]);
+        if (this.marker) {
+          this.marker.setLatLng([lat, lng]);
+        }
+      } else if (this.currentStep === 2) {
+        // PASO 2: Agregar puntos del perímetro
+        this.addPerimeterPoint(event.latlng);
       }
     });
+  }
+
+  // ✅ MÉTODO PARA CONFIRMAR EL CENTRO Y PASAR AL PASO 2
+  public confirmCenter(): void {
+    this.setCoords();
+    this.centerCoords = { lat: this.lat, lng: this.lng };
+    this.currentStep = 2;
+
+    // Hacer el marcador del centro no arrastrable
+    if (this.marker) {
+      this.marker.dragging?.disable();
+    }
+
+    this._alertService.presentAlert('Centro confirmado , Ahora haz clic en 4 puntos para marcar el perímetro del barrio.');
+  }
+
+  // ✅ MÉTODO PARA AGREGAR PUNTOS DEL PERÍMETRO
+  private addPerimeterPoint(latlng: L.LatLng): void {
+    if (this.perimeterPoints.length >= 4) {
+      this._alertService.presentAlert('Máximo alcanzado , Ya has marcado 4 puntos del perímetro.');
+      return;
+    }
+
+    // Agregar el punto al array
+    this.perimeterPoints.push(latlng);
+
+    // Crear marcador para el punto del perímetro
+    const perimeterIcon = L.icon({
+      iconUrl: 'assets/marker.png', // Puedes usar un icono diferente
+      iconSize: [25, 25],
+      iconAnchor: [12, 25],
+      popupAnchor: [0, -25]
+    });
+
+    const perimeterMarker = L.marker(latlng, {
+      icon: perimeterIcon
+    }).addTo(this.map!);
+
+    this.perimeterMarkers.push(perimeterMarker);
+
+    // Si ya tenemos 4 puntos, crear el polígono
+    if (this.perimeterPoints.length === 4) {
+      this.createPolygon();
+    }
+
+    console.log(`Punto ${this.perimeterPoints.length} del perímetro agregado:`, latlng);
+  }
+
+  // ✅ MÉTODO PARA CREAR EL POLÍGONO
+  private createPolygon(): void {
+    if (this.perimeterPoints.length === 4 && this.map) {
+      // Crear polígono con los 4 puntos
+      this.polygon = L.polygon(this.perimeterPoints, {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.3
+      }).addTo(this.map);
+
+      this._alertService.presentAlert('Perímetro completado el perímetro del barrio ha sido marcado. Ahora puedes completar el formulario.');
+    }
+  }
+
+  // ✅ MÉTODO PARA REINICIAR EL PERÍMETRO
+  public resetPerimeter(): void {
+    // Eliminar marcadores del perímetro
+    this.perimeterMarkers.forEach(marker => {
+      if (this.map) {
+        this.map.removeLayer(marker);
+      }
+    });
+
+    // Eliminar polígono
+    if (this.polygon && this.map) {
+      this.map.removeLayer(this.polygon);
+      this.polygon = null;
+    }
+
+    // Limpiar arrays
+    this.perimeterPoints = [];
+    this.perimeterMarkers = [];
+
+    console.log('Perímetro reiniciado');
+  }
+
+  // ✅ MÉTODO PARA VOLVER AL PASO 1
+  public backToStep1(): void {
+    this.currentStep = 1;
+    this.centerCoords = null;
+    this.resetPerimeter();
+
+    // Hacer el marcador del centro arrastrable nuevamente
+    if (this.marker) {
+      this.marker.dragging?.enable();
+    }
   }
 
   setCoords(): void {
@@ -143,20 +250,16 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
       reader.onload = () => this.newImg = reader.result as string;
       reader.readAsDataURL(file);
 
-      // Actualizar el valor del campo fileSource
       this.form.patchValue({
         fileSource: file
       });
 
-      // Depuración: Verificar que el archivo se haya cargado correctamente
       console.log('Archivo cargado:', file);
     }
   }
 
   public addCountry(): void {
-    // Depuración: Verificar el estado del formulario
     console.log('Estado del formulario:', this.form.status);
-    console.log('Errores del formulario:', this.form.errors);
     console.log('Valores del formulario:', this.form.value);
 
     if (this.form.invalid) {
@@ -164,20 +267,35 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
       return;
     }
 
+    if (this.perimeterPoints.length !== 4) {
+      this._alertService.presentAlert('Perímetro incompleto , debe marcar exactamente 4 puntos del perímetro.');
+      return;
+    }
+
     this.setCoords();
 
     const { countryName, address, locality, phone, fileSource } = this.form.value;
 
-    console.log('Datos del formulario listos para enviar:', {
+    // ✅ DATOS COMPLETOS INCLUYENDO CENTRO Y PERÍMETRO
+    const countryData = {
       countryName,
       address,
       locality,
       phone,
-      lat: this.lat,
-      lng: this.lng,
+      centerLat: this.lat,
+      centerLng: this.lng,
+      perimeterPoints: this.perimeterPoints.map(point => ({
+        lat: point.lat,
+        lng: point.lng
+      })),
       avatar: fileSource
-    });
+    };
 
-    this._alertService.presentAlert('Éxito , el formulario es válido y los datos están listos para enviarse.');
+    console.log('Datos completos para enviar:', countryData);
+
+    // Aquí llamarías al servicio actualizado
+    // this._countries.addCountry(...);
+    
+    this._alertService.presentAlert('Éxito , country con perímetro listo para enviar al backend.');
   }
 }

@@ -1,10 +1,10 @@
 /* ====================================================== */
-/* ADMIN/HOME.PAGE.SCSS */
+/* ADMIN/HOME.PAGE.SCSS (CORREGIDO USANDO VARIABLES DE TEMA) */
 /* ====================================================== */
 :host {
   ion-header:not([collapse="condense"]) ion-toolbar {
     --background: var(--ion-toolbar-background);
-    --color: #FFFFFF; // ← AGREGAR COLOR BLANCO AL HEADER
+    --color: var(--ion-text-color); // Se usa la variable de tema
   }
 
   .header-brand {
@@ -22,7 +22,7 @@
     font-weight: 600;
     font-size: 1.5rem;
     margin-left: 8px;
-    color: #FFFFFF !important; // ← FORZAR BLANCO
+    color: var(--ion-text-color); // Se usa la variable de tema
   }
   
   ion-avatar {
@@ -36,22 +36,22 @@
     font-weight: 700;
     font-size: 1.8rem;
     padding: 0;
-    color: #FFFFFF !important; // ← FORZAR BLANCO
+    color: var(--ion-text-color); // Se usa la variable de tema
   }
 
   .dashboard-card {
-    --background: var(--color-card);
+    /* El fondo ya se define en global.scss para ion-card */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    cursor: pointer; // ← AGREGAR CURSOR POINTER
-    transition: all 0.3s ease; // ← AGREGAR TRANSICIÓN
+    cursor: pointer;
+    transition: all 0.3s ease;
 
-    // ← AGREGAR HOVER EFFECT
+    /* El efecto hover se mantiene */
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--ion-card-box-shadow); /* Usamos la sombra de la variable para que cambie con el tema */
     }
 
     ion-card-header {
@@ -69,13 +69,13 @@
         font-family: var(--font-heading);
         font-weight: 600;
         font-size: 1.2rem;
-        color: #FFFFFF !important; // ← FORZAR BLANCO
+        color: var(--ion-text-color); // Se usa la variable de tema
       }
     }
 
     ion-card-content {
       p {
-        color: #D1D5DB !important; // ← FORZAR GRIS CLARO EN LUGAR DE VAR
+        color: var(--zentry-color-text-secondary); // Se usa la variable de tema para texto secundario
         font-size: 0.9rem;
         flex-grow: 1;
       }
@@ -89,8 +89,8 @@
     }
   }
 
-  // ← AGREGAR BACKGROUND AL CONTENT
+  /* Se elimina el fondo fijo para que ion-content use el del tema global */
   ion-content {
-    --background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    --background: var(--ion-background-color);
   }
 }

@@ -19,9 +19,11 @@ export class ThemeService {
     this.apply(theme);
   }
 
-  /** Toggle rápido para el rol */
+  /** Toggle rápido para el rol - MEJORADO */
   toggle(role: RoleKey) {
-    this.set(role, this.isDark() ? 'light' : 'dark');
+    const currentTheme = (localStorage.getItem(this.key(role)) as Theme) || 'light';
+    const newTheme: Theme = currentTheme === 'dark' ? 'light' : 'dark';
+    this.set(role, newTheme);
   }
 
   /** Estado actual */

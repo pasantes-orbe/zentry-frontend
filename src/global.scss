@@ -51,14 +51,13 @@
 }
 
 /* ====================================================== */
-/* ================= ANIMACIONES ====================== */
+/* ================= ANIMACIONES (SIN CAMBIOS) ====================== */
 /* ====================================================== */
 
 .ping {
   -webkit-animation: ping 0.8s ease-in-out infinite both;
           animation: ping 0.8s ease-in-out infinite both;
 }
-
 .ping-d {
   -webkit-animation: ping 1.6s ease-in-out infinite both;
           animation: ping 1.6s ease-in-out infinite both;
@@ -256,105 +255,6 @@
   }
 }
 
-/* ====================================================== */
-/* ============ ESTILOS GLOBALES PARA AMBOS TEMAS ====== */
-/* ====================================================== */
-
-/* Aplicar colores de texto heredados a todos los elementos */
-body, ion-content, ion-item, ion-label, ion-input, ion-select, 
-ion-textarea, ion-card-title, ion-card-subtitle, ion-note, 
-p, span, div, h1, h2, h3, h4, h5, h6 {
-  color: var(--ion-text-color);
-}
-
-/* Tablas */
-th, td {
-  color: var(--ion-text-color);
-  border-color: var(--ion-border-color);
-}
-
-/* Items */
-ion-item {
-  --border-color: var(--ion-border-color);
-  --background: var(--ion-item-background);
-  --color: var(--ion-text-color);
-}
-
-/* ====================================================== */
-/* ============== ESTILOS PARA FORMULARIOS ============= */
-/* ====================================================== */
-
-/* DateTime Picker */
-ion-datetime {
-  --background: var(--ion-item-background);
-  color: var(--ion-text-color);
-  --title-color: var(--ion-text-color);
-  --wheel-active-background: var(--ion-color-primary);
-  --wheel-fade-background: var(--ion-background-color);
-  --wheel-text-color: var(--ion-text-color);
-  --wheel-highlight-color: var(--ion-color-primary);
-  --picker-background: var(--ion-item-background);
-  --picker-toolbar-background: var(--ion-item-background);
-  --picker-toolbar-color: var(--ion-text-color);
-  --picker-button-color: var(--ion-text-color);
-  --picker-header-color: var(--ion-text-color);
-}
-
-/* Inputs */
-ion-input {
-  --color: var(--ion-text-color);
-  --placeholder-color: var(--ion-color-medium);
-  --background: transparent;
-}
-
-/* Selects */
-ion-select {
-  --color: var(--ion-text-color);
-  --placeholder-color: var(--ion-color-medium);
-}
-
-/* Labels */
-ion-label {
-  --color: var(--ion-text-color);
-}
-
-/* Buttons */
-ion-button {
-  --color: var(--ion-text-color);
-  --background: var(--ion-item-background);
-  --border-color: var(--ion-border-color);
-}
-
-ion-button[fill="clear"],
-ion-button[fill="outline"] {
-  --color: var(--ion-text-color);
-  --color-activated: var(--ion-color-primary);
-  --color-focused: var(--ion-color-primary);
-  --color-hover: var(--ion-color-primary);
-}
-
-/* Checkboxes */
-ion-checkbox {
-  --background-checked: var(--ion-color-primary);
-  --border-color: var(--ion-text-color);
-  --border-color-checked: var(--ion-color-primary);
-  --checkmark-color: var(--ion-text-color);
-}
-
-/* Radio Buttons */
-ion-radio {
-  --color: var(--ion-color-primary);
-  --color-checked: var(--ion-color-primary);
-  --border-color: var(--ion-text-color);
-}
-
-/* Toggles */
-ion-toggle {
-  --background: var(--ion-color-medium);
-  --background-checked: var(--ion-color-primary);
-  --handle-background: var(--ion-text-color);
-  --handle-background-checked: var(--ion-text-color);
-}
 
 /* ====================================================== */
 /* ============== ESTILOS PARA OVERLAYS ================ */
@@ -403,11 +303,11 @@ ion-toggle {
   background: var(--ion-color-primary-tint);
 }
 
-/* Modals */
+/* Modals, Popovers, etc. */
 ion-modal,
 ion-popover,
 ion-action-sheet {
-  --background: var(--ion-background-color);
+  --background: rgba(0,0,0,0.4);
   --color: var(--ion-text-color);
 }
 
@@ -436,7 +336,15 @@ ion-loading {
 /* =============== ESTILOS PARA LEAFLET ================ */
 /* ====================================================== */
 
-/* Controles del mapa (botones + y -) */
+/* FIX: Se le da un color de fondo sólido al mapa para evitar la cuadrícula */
+.leaflet-container {
+  background-color: #DDDEE3 !important;
+}
+body.dark-theme .leaflet-container {
+  background-color: #111827 !important; /* Un gris oscuro para el fondo del mapa */
+}
+
+
 .leaflet-control-zoom a,
 .leaflet-control-layers-toggle,
 .leaflet-control a {
@@ -448,10 +356,9 @@ ion-loading {
 .leaflet-control-zoom a:hover,
 .leaflet-control a:hover {
   background-color: var(--ion-color-primary) !important;
-  color: var(--ion-text-color) !important;
+  color: white !important;
 }
 
-/* Popups y tooltips del mapa */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip,
 .leaflet-tooltip {
@@ -460,119 +367,89 @@ ion-loading {
   border-color: var(--ion-border-color) !important;
 }
 
-.leaflet-popup-content {
-  color: var(--ion-text-color) !important;
-}
-
-/* Texto en el mapa (nombres de guardias, etc.) */
-.leaflet-marker-icon,
-.leaflet-div-icon {
-  color: var(--ion-text-color) !important;
-  background-color: var(--ion-item-background) !important;
-  border-color: var(--ion-border-color) !important;
-}
 
 /* ====================================================== */
-/* ============ ESTILOS ADICIONALES ==================== */
+/* ==================== BRANDING ======================== */
 /* ====================================================== */
 
-/* Searchbars */
-ion-searchbar {
-  --background: var(--ion-item-background);
-  --color: var(--ion-text-color);
-  --placeholder-color: var(--ion-color-medium);
-  --icon-color: var(--ion-text-color);
-  --clear-button-color: var(--ion-text-color);
+/* 1. Aplicar la tipografía a toda la app */
+body {
+  font-family: var(--font-body);
+}
+ion-title, .card-title, h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
 }
 
-/* Segments */
-ion-segment {
-  --background: var(--ion-item-background);
-}
-
-ion-segment-button {
-  --color: var(--ion-text-color);
-  --color-checked: var(--ion-text-color);
-  --background-checked: var(--ion-color-primary);
+/* 2. Estilos base para componentes que se repiten */
+ion-toolbar {
+  --border-width: 0 0 1px 0;
   --border-color: var(--ion-border-color);
+  box-shadow: none; /* Se quita la sombra por defecto de Ionic */
 }
-
-/* Progress Bars */
-ion-progress-bar {
-  --background: var(--ion-color-medium);
-  --progress-background: var(--ion-color-primary);
-}
-
-/* Range Sliders */
-ion-range {
-  --bar-background: var(--ion-color-medium);
-  --bar-background-active: var(--ion-color-primary);
-  --knob-background: var(--ion-color-primary);
-  --knob-border-color: var(--ion-text-color);
-  --pin-background: var(--ion-color-primary);
-  --pin-color: var(--ion-text-color);
-}
-
-/* Badges */
-ion-badge {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-text-color);
-}
-
-/* FAB Buttons */
-ion-fab-button {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-text-color);
-  --background-activated: var(--ion-color-primary-shade);
-  --background-focused: var(--ion-color-primary-tint);
-}
-
-/* Chips */
-ion-chip {
-  --background: var(--ion-item-background);
-  --color: var(--ion-text-color);
+ion-card, .action-card {
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow) !important;
+  border-radius: 12px;
+  margin: 16px;
+  padding: 16px;
   border: 1px solid var(--ion-border-color);
 }
+ion-item {
+  --background: transparent;
+  --border-color: var(--ion-border-color);
+  --inner-border-width: 0;
+}
 
-/* ====================================================== */
-/* ========== ESTILOS ESPECÍFICOS POR TEMA ============= */
-/* ====================================================== */
+/* 3. Estilos para el toggle de tema */
+ion-toggle {
+  --handle-background: var(--ion-card-background);
+  --handle-background-checked: var(--ion-card-background);
+}
 
-/* Ajustes adicionales para tema oscuro */
+/* 4. Placeholder global */
+ion-input, ion-textarea, ion-select, ion-searchbar {
+  --placeholder-color: var(--zentry-color-text-secondary);
+  --placeholder-opacity: 1;
+}
+
+/* =============================================================== */
+/* ==================== REGLAS ESPECÍFICAS ======================= */
+/* =============================================================== */
+
+/* TEMA CLARO */
+body:not(.dark-theme) {
+  ion-toolbar {
+    --background: var(--ion-toolbar-background);
+  }
+  ion-content {
+    --background: var(--ion-background-color);
+  }
+  
+  /* FIX DEFINITIVO: Forzar inputs y items a tener fondo blanco en tema claro */
+  .action-card ion-item, .dashboard-card ion-item {
+      --background: #ffffff !important;
+      --color: var(--zentry-color-text-primary) !important;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      margin-bottom: 12px;
+  }
+}
+
+/* TEMA OSCURO */
 body.dark-theme {
-  /* Mejorar contraste en tema oscuro */
-  ion-button[fill="clear"] {
+  ion-button[fill="clear"],
+  ion-button[fill="outline"] {
     --color: var(--ion-color-primary-tint);
   }
-  
-  /* Ajustar placeholders en tema oscuro */
-  ion-input,
-  ion-textarea,
-  ion-select,
-  ion-searchbar {
-    --placeholder-color: var(--zentry-color-text-secondary);
-  }
-  
-  /* Mejorar visibilidad de bordes en tema oscuro */
-  ion-item,
-  ion-card,
-  ion-chip {
-    border-color: var(--ion-border-color);
-  }
+
+  /* FIX DEFINITIVO: Forzar inputs en tema oscuro */
+   .action-card ion-item, .dashboard-card ion-item {
+      --background: #374151 !important;
+      --color: var(--zentry-color-text-primary) !important;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #4B5563;
+   }
 }
 
-/* Ajustes para tema claro */
-body:not(.dark-theme) {
-  /* Asegurar contraste adecuado en tema claro */
-  ion-button[fill="clear"] {
-    --color: var(--ion-color-primary);
-  }
-  
-  /* Placeholders más suaves en tema claro */
-  ion-input,
-  ion-textarea,
-  ion-select,
-  ion-searchbar {
-    --placeholder-color: #6b7280;
-  }
-}

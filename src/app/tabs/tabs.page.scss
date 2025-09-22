@@ -1,19 +1,14 @@
 /* ====================================================== */
-/* TABS.PAGE.SCSS */
+/* TABS.PAGE.SCSS (BARRA DE NAVEGACIÓN INFERIOR) */
 /* ====================================================== */
-/*
-  Estilos para la barra de navegación principal.
-  Se aplica el fondo oscuro, el color de acento para el ítem seleccionado
-  y la tipografía definida en las variables globales.
-*/
 ion-tab-bar {
   --background: var(--ion-toolbar-background);
-  --border: none;
+  --border-color: var(--ion-border-color); /* Usar variable para el borde */
   --color-selected: var(--ion-color-primary);
-  --color: var(--color-text-secondary);
+  --color: var(--zentry-color-text-secondary); /* Usar variable para texto no seleccionado */
   padding-bottom: env(safe-area-inset-bottom);
   padding-top: 5px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--ion-border-color); /* Usar variable */
 }
 
 ion-tab-button {
