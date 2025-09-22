@@ -28,7 +28,8 @@ export class CountriesService {
   longitude: string,
   address: string,
   locality: string,
-  phone: string
+  phone: string,
+  perimeterPoints: string
 ): Promise<void> {
   const formData = new FormData();
   formData.append('avatar', avatar);
@@ -38,6 +39,7 @@ export class CountriesService {
   formData.append('address', address);
   formData.append('locality', locality);
   formData.append('phone', phone);
+  formData.append('perimeterPoints', perimeterPoints);
 
   await this._alertService.setLoading();
 

@@ -1,3 +1,4 @@
+//src/app/pages/admin/add-country/add-country.page.ts
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -295,7 +296,19 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
 
     // Aquí llamarías al servicio actualizado
     // this._countries.addCountry(...);
-    
-    this._alertService.presentAlert('Éxito , country con perímetro listo para enviar al backend.');
-  }
+     this._countries.addCountry( // 👈 ¡DESCOMENTAR Y USAR NUEVOS CAMPOS!
+      fileSource as File,
+      countryName,
+      String(this.lat), // Center Lat
+      String(this.lng), // Center Lng
+      address,
+      locality,
+      phone,
+      JSON.stringify(countryData.perimeterPoints)
+    );
+
+
+    //this._alertService.presentAlert('Éxito , country con perímetro listo para enviar al backend.');
+  //}
+} // <-- Add this closing brace to properly close the class
 }
