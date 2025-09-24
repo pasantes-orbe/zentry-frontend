@@ -1,4 +1,3 @@
-
 import { AfterViewInit, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertController } from '@ionic/angular';
@@ -73,7 +72,7 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     
     // Desactivamos los listeners del socket real
-    // this.setupSocketListeners();
+    this.setupSocketListeners();
   }
 
   private setupSocketListeners(): void {
@@ -254,7 +253,10 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
     const owner = await this._ownerStorage.getOwner();
     const ownerID = owner.user.id;
     // ...resto de la lógica
-    //this._antipanicService.activateAntipanic(...).subscribe(...)
+    // this._antipanicService.activateAntipanic(ownerID).subscribe({
+    //   next: (response) => { /* handle success */ },
+    //   error: (err) => { /* handle error */ }
+    // });
   }
 
   async desactivateAntipanic() {

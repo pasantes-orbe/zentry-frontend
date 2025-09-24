@@ -1,3 +1,4 @@
+//src/app/services/properties/properties.service.ts
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -15,17 +16,34 @@ import { Property_OwnerInterface } from '../../interfaces/property_owner-interfa
 })
 export class PropertiesService {
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _authStorageService: AuthStorageService, private _countryStorageService: CountryStorageService) { }
+  constructor(
+    private _http: HttpClient, 
+    private _alertService: AlertService,
+    private _router: Router, 
+    private _authStorageService: AuthStorageService, 
+    private _countryStorageService: CountryStorageService
+  ){ }
   
-  public async addCountry(avatar: File, name: string, address: string, propertyNumber: any){
+    public async addProperty(formData: FormData): Promise<any> {
+
+  //public async addCountry(avatar: File, name: string, address: string, propertyNumber: any){
     const token = await this._authStorageService.getJWT();
     const country = await this._countryStorageService.getCountry(); 
+
+    //prueba temporal hasta que este la interfaz de seleccion de countries. 
+    //let country = await this._countryStorageService.getCountry();
+    //if (!country || !country.id) {
+    //  console.warn("ADVERTENCIA: No hay un 'country' seleccionado. Usando ID de prueba (1) para las pruebas.");
+      // Simula un 'country' de prueba con un ID que sabes que existe en tu DB
+    //  country = { id: 4, name: 'Laguna Arguello', latitude: -27.453830998597063, longitude: -58.97186279296876, image: '' }; // ✅ Puedes cambiar el ID según tu DB
+    //}
+
     const countryID = country.id;
-    const formData = new FormData();
-    formData.append('avatar', avatar);
-    formData.append('name', name);
-    formData.append('address', address);
-    formData.append('number', propertyNumber);
+    //const formData = new FormData();
+    //formData.append('avatar', avatar);
+    //formData.append('name', name);
+    //formData.append('address', address);
+    //formData.append('number', propertyNumber);
     formData.append('id_country', countryID.toString());
 
     const httpOptions = {
@@ -34,28 +52,28 @@ export class PropertiesService {
       }),
     };
 
-    await this._alertService.setLoading();
-    this._http.post(`${environment.URL}/api/properties`, formData, httpOptions)
-      .subscribe(async (res) => {
-        console.log(res);
-        await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Listo!", "La propiedad se agregó con éxito");
-        this._router.navigate([`/admin/ver-propiedades`]);
-  },
-  async (err) => {
-    console.log(err);
-    await this._alertService.removeLoading();
-    if(err['status'] == 0){
-      await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
-    } else {
-      await this._router.navigate([`/admin/ver-propiedades`]);
-      await this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-  }
-    }
+    //await this._alertService.setLoading();
+    return this._http.post(`${environment.URL}/api/properties`, formData, httpOptions)
+    //  .subscribe(async (res) => {
+    //    console.log(res);
+    //    await this._alertService.removeLoading();
+    //    this._alertService.showAlert("¡Listo!", "La propiedad se agregó con éxito");
+    //    this._router.navigate([`/admin/ver-propiedades`]);
+  //}//,
+  //async (err) => {
+  //  console.log(err);
+  //  await this._alertService.removeLoading();
+  //  if(err['status'] == 0){
+  //    await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
+  //  } else {
+  //    await this._router.navigate([`/admin/ver-propiedades`]);
+  //    await this._alertService.showAlert("¡Ooops!", `${err['error']}`);
+  //}
+  //  }
   
   
 
-  );
+  //);
 
 };
 
