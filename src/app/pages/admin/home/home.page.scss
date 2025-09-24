@@ -1,96 +1,46 @@
-/* ====================================================== */
-/* ADMIN/HOME.PAGE.SCSS (CORREGIDO USANDO VARIABLES DE TEMA) */
-/* ====================================================== */
 :host {
-  ion-header:not([collapse="condense"]) ion-toolbar {
+  ion-toolbar {
     --background: var(--ion-toolbar-background);
-    --color: var(--ion-text-color); // Se usa la variable de tema
+    --color: var(--ion-text-color);
   }
 
   .header-brand {
     display: flex;
     align-items: center;
   }
-  
-  .header-logo {
-    height: 32px;
-    margin-left: 16px;
-  }
-  
-  .header-title-text {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 1.5rem;
-    margin-left: 8px;
-    color: var(--ion-text-color); // Se usa la variable de tema
-  }
-  
-  ion-avatar {
-    width: 36px;
-    height: 36px;
-    margin-right: 16px;
+  .header-logo { height: 32px; margin-left: 12px; }
+  .header-title-text { margin-left: 8px; font-weight: 600; color: var(--ion-text-color); }
+
+  .theme-toggle-item {
+    --background: transparent;
+    --color: var(--ion-text-color);
   }
 
-  .page-title {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 1.8rem;
-    padding: 0;
-    color: var(--ion-text-color); // Se usa la variable de tema
-  }
+  .page-title { color: var(--ion-text-color); }
 
-  .dashboard-card {
-    /* El fondo ya se define en global.scss para ion-card */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    /* El efecto hover se mantiene */
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--ion-card-box-shadow); /* Usamos la sombra de la variable para que cambie con el tema */
-    }
-
-    ion-card-header {
-      display: flex;
-      align-items: center;
-      padding-bottom: 8px;
-
-      ion-icon {
-        font-size: 1.8rem;
-        color: var(--ion-color-primary);
-        margin-right: 12px;
-      }
-      
-      ion-card-title {
-        font-family: var(--font-heading);
-        font-weight: 600;
-        font-size: 1.2rem;
-        color: var(--ion-text-color); // Se usa la variable de tema
-      }
-    }
-
-    ion-card-content {
-      p {
-        color: var(--zentry-color-text-secondary); // Se usa la variable de tema para texto secundario
-        font-size: 0.9rem;
-        flex-grow: 1;
-      }
-      
-      .card-button {
-        --color: var(--ion-color-primary);
-        font-weight: 600;
-        margin-top: 16px;
-        justify-content: flex-end;
-      }
-    }
-  }
-
-  /* Se elimina el fondo fijo para que ion-content use el del tema global */
   ion-content {
     --background: var(--ion-background-color);
+  }
+
+  ion-card {
+    background: var(--ion-card-background, var(--ion-item-background));
+    color: var(--ion-text-color);
+    box-shadow: var(--ion-card-box-shadow);
+    transition: transform .2s ease;
+    &:hover { transform: translateY(-2px); }
+  }
+
+  .add-card ion-icon {
+    font-size: 1.6rem;
+    color: var(--ion-color-primary);
+    margin-right: 8px;
+  }
+
+  .country-card ion-card-title { color: var(--ion-text-color); }
+
+  .empty {
+    text-align: center;
+    color: var(--zentry-color-text-secondary);
+    padding: 24px 0;
   }
 }

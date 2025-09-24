@@ -1,15 +1,11 @@
-<!-- ====================================================== -->
-<!-- ADMIN/HOME.PAGE.HTML COMPLETO -->
-<!-- ====================================================== -->
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start" class="header-brand">
       <img src="assets/logos/logo-48.png" class="header-logo" alt="Zentry Logo" />
-      <span class="header-title-text"></span>
+      <span class="header-title-text">Admin</span>
     </ion-buttons>
-    <ion-buttons slot="end" class="header-user">
 
-      <!-- ***** 5. AÑADIR EL TOGGLE DE TEMA ***** -->
+    <ion-buttons slot="end">
       <ion-item lines="none" class="theme-toggle-item">
         <ion-icon name="moon" slot="start"></ion-icon>
         <ion-toggle
@@ -18,14 +14,6 @@
           aria-label="Cambiar tema">
         </ion-toggle>
       </ion-item>
-      
-      <!-- Botón de notificaciones con evento click y contador de no leídas -->
-      <ion-badge color="danger" *ngIf="unreadCount > 0" class="notification-badge"> Nuevas </ion-badge>
-      <ion-icon name="notifications-outline" class="notification-icon" (click)="openNotificationsPopover($event)" ></ion-icon>
-      <ion-avatar>
-        <img src="https://placehold.co/64x64/374151/FFFFFF?text=A" />
-      </ion-avatar>
-      <span class="user-name">Colussi,Facundo.</span>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -33,107 +21,46 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" class="page-title">Panel de Administración</ion-title>
+      <ion-title size="large" class="page-title">Countries</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-grid>
-    <ion-row>
-      <!-- Módulo Countries -->
-      <ion-col size="12" size-md="6" size-lg="4">
-        <ion-card class="dashboard-card" (click)="navigateToAddCountry()">
-          <ion-card-header>
-            <ion-icon name="business-outline"></ion-icon>
-            <ion-card-title>Countries</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>Gestionar countries, propiedades y amenities.</p>
-            <ion-button fill="clear" expand="block" class="card-button">
-              ADMINISTRAR
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+  <!-- Tarjeta principal: Añadir Country -->
+  <ion-card class="add-card" (click)="navigateToAddCountry()">
+    <ion-card-header>
+      <ion-icon name="add-circle-outline"></ion-icon>
+      <ion-card-title>Añadir Country</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Crea un nuevo country. Podrás marcar centro y perímetro en el mapa.</p>
+      <ion-button fill="clear" expand="block">CREAR</ion-button>
+    </ion-card-content>
+  </ion-card>
 
-      <!-- Módulo Propietarios -->
-      <ion-col size="12" size-md="6" size-lg="4">
-        <ion-card class="dashboard-card" (click)="navigateToAddOwner()">
-          <ion-card-header>
-            <ion-icon name="people-outline"></ion-icon>
-            <ion-card-title>Propietarios</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>Gestionar propietarios y visitantes recurrentes.</p>
-            <ion-button fill="clear" expand="block" class="card-button">
-              ADMINISTRAR
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
+  <!-- Lista de countries existentes -->
+  <ng-container *ngIf="!loading && countries.length > 0; else emptyOrLoading">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let c of countries">
+          <ion-card class="country-card" (click)="openCountryDashboard(c)">
+            <ion-img [src]="getCountryImage(c)"></ion-img>
+            <ion-card-header>
+              <ion-card-title>{{ c.name }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Lat: {{ c.latitude }} / Lng: {{ c.longitude }}</p>
+              <ion-button fill="clear" expand="block">ADMINISTRAR</ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ng-container>
 
-      <!-- Módulo Guardias -->
-      <ion-col size="12" size-md="6" size-lg="4">
-        <ion-card class="dashboard-card" (click)="navigateToMapGuards()">
-          <ion-card-header>
-            <ion-icon name="shield-outline"></ion-icon>
-            <ion-card-title>Guardias</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>Gestionar personal de seguridad y turnos.</p>
-            <ion-button fill="clear" expand="block" class="card-button">
-              ADMINISTRAR
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <!-- Módulo Amenidades -->
-      <ion-col size="12" size-md="6" size-lg="4">
-        <ion-card class="dashboard-card" (click)="navigateToViewAllAmenities()">
-          <ion-card-header>
-            <ion-icon name="fitness-outline"></ion-icon>
-            <ion-card-title>Amenity</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>Ver y gestionar todas los Amenity</p>
-            <ion-button fill="clear" expand="block" class="card-button">
-              VER AMENIDADES
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <!-- Módulo Propiedades -->
-      <ion-col size="12" size-md="6" size-lg="4">
-        <ion-card class="dashboard-card" (click)="navigateToAddProperty()">
-          <ion-card-header>
-            <ion-icon name="home-outline"></ion-icon>
-            <ion-card-title>Propiedades</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>Gestionar propiedades del country.</p>
-            <ion-button fill="clear" expand="block" class="card-button">
-              ADMINISTRAR
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <!-- Módulo Asignaciones -->
-      <ion-col size="12" size-md="6" size-lg="4">
-        <ion-card class="dashboard-card" (click)="navigateToAssignCountryToOwner()">
-          <ion-card-header>
-            <ion-icon name="link-outline"></ion-icon>
-            <ion-card-title>Asignaciones</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>Asignar countries a propietarios.</p>
-            <ion-button fill="clear" expand="block" class="card-button">
-              ASIGNAR
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <ng-template #emptyOrLoading>
+    <div class="empty">
+      <ion-spinner *ngIf="loading"></ion-spinner>
+      <p *ngIf="!loading">No hay countries creados todavía.</p>
+    </div>
+  </ng-template>
 </ion-content>
