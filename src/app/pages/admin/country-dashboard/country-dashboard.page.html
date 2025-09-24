@@ -1,70 +1,183 @@
-<app-navbar-admin></app-navbar-admin>
-<!-- <ion-content *ngIf="!this.country; else divDashboard">
-  <ion-label> No existe dashboard</ion-label>
-</ion-content> -->
+<!-- Header superior con toggle de tema y volver -->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" class="header-brand">
+      <img src="assets/logos/logo-48.png" class="header-logo" alt="Zentry Logo" />
+      <span class="header-title-text">{{ countryName() }}</span>
+    </ion-buttons>
 
+    <ion-buttons slot="end">
+      <ion-item lines="none" class="theme-toggle-item">
+        <ion-icon name="moon" slot="start"></ion-icon>
+        <ion-toggle
+          [checked]="theme.isDark()"
+          (ionChange)="onThemeToggle($event)"
+          aria-label="Cambiar tema">
+        </ion-toggle>
+      </ion-item>
 
-<!-- <ng-template #divDashboard>-->
-<ion-content class="ion-padding">
-  <ion-fab slot="fixed" horizontal="center" vertical="bottom">
-    <ion-fab-button routerLink="/admin/home">
-      <ion-icon name="home-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+      <ion-button fill="clear" (click)="backToAdminHome()" aria-label="Volver a Admin Home">
+        <ion-icon name="home-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-segment [(ngModel)]="type" mode="ios" value="propiedades" [swipeGesture]="true">
-    <ion-segment-button value="eventos">
-      <ion-label>Eventos</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="propiedades" checked>
-      <ion-label>Propiedades</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="vigiladores">
-      <ion-label>vigiladores</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ countryName() }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-
-  <div *ngIf="type == 'propiedades'">
-    <ion-button routerLink="/admin/ver-propiedades" color="secondary" size="large" expand="block" shape="round">
-      Ver todas las propiedades
-    </ion-button>
-    <ion-button routerLink="/admin/ver-propietarios" color="secondary" size="large" expand="block" shape="round">
-      Ver todos los Propietarios
-    </ion-button>
-    <ion-button routerLink="/admin/invitados-recurrentes" color="secondary" size="large" expand="block" shape="round">
-      Invitados Recurrentes
-    </ion-button>
+  <!-- Hero con imagen del country -->
+  <div class="hero" *ngIf="!loading">
+    <ion-img [src]="getCountryImage()"></ion-img>
+    <div class="hero-overlay">
+      <h2>{{ country?.name }}</h2>
+      <p *ngIf="country">Lat: {{ country.latitude }} · Lng: {{ country.longitude }}</p>
+    </div>
   </div>
 
-  <div *ngIf="type == 'vigiladores'">
-    <ion-button routerLink="/admin/todos-los-guardias" color="secondary" size="large" expand="block" shape="round">
-      Ver todos los vigiladores
-    </ion-button>
-
-    <ion-button routerLink="/admin/registro-checkin-y-checkout" color="secondary" size="large" expand="block"
-      shape="round">
-      Registro de CheckIn & CheckOut
-    </ion-button>
-
-    <ion-button routerLink="/admin/registro-de-antipanico" color="secondary" size="large" expand="block" shape="round">
-      Registro de Botón Antipánico
-    </ion-button>
-    <ion-button routerLink="/admin/map-guards" color="secondary" size="large" expand="block" shape="round">
-      Ver Ubicacion de los vigiladores
-    </ion-button>
+  <!-- Estado de carga / vacío -->
+  <div class="state" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+  <div class="state" *ngIf="!loading && !country">
+    <p>No se encontró el country. Volvé a <a (click)="backToAdminHome()">Admin Home</a>.</p>
   </div>
 
-  <div *ngIf="type == 'eventos'">
-    <ion-button routerLink="/admin/ver-amenities" color="secondary" size="large" expand="block" shape="round">
-      Lugares de Reserva
-    </ion-button>
+  <ng-container *ngIf="!loading && country">
+    <!-- Segmento -->
+    <ion-segment [(ngModel)]="type" mode="ios" [swipeGesture]="true" class="dashboard-segment">
+      <ion-segment-button value="propiedades" checked>
+        <ion-label>Propiedades</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="vigiladores">
+        <ion-label>Vigiladores</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="eventos">
+        <ion-label>Eventos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-    <ion-button routerLink="/admin/registro-de-eventos" color="secondary" size="large" expand="block" shape="round">
-      Registro de eventos
-    </ion-button>
-  </div>
+    <!-- Sección: Propiedades -->
+    <div *ngIf="type === 'propiedades'" class="cards-grid">
+      <ion-card class="dash-card" (click)="goToViewProperties()">
+        <ion-card-header>
+          <ion-icon name="home-outline"></ion-icon>
+          <ion-card-title>Ver Propiedades</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Listado de propiedades del country.</p>
+          <ion-button fill="clear" expand="block">ABRIR</ion-button>
+        </ion-card-content>
+      </ion-card>
 
+      <ion-card class="dash-card" (click)="goToViewOwners()">
+        <ion-card-header>
+          <ion-icon name="people-outline"></ion-icon>
+          <ion-card-title>Ver Propietarios</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Listado de propietarios asignados.</p>
+          <ion-button fill="clear" expand="block">ABRIR</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="dash-card" (click)="goToRecurrents()">
+        <ion-card-header>
+          <ion-icon name="repeat-outline"></ion-icon>
+          <ion-card-title>Invitados Recurrentes</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Gestioná recurrentes del country.</p>
+          <ion-button fill="clear" expand="block">ABRIR</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="dash-card" (click)="goToAddProperty()">
+        <ion-card-header>
+          <ion-icon name="add-circle-outline"></ion-icon>
+          <ion-card-title>Añadir Propiedad</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Cargar nueva propiedad al country.</p>
+          <ion-button fill="clear" expand="block">CREAR</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Sección: Vigiladores -->
+    <div *ngIf="type === 'vigiladores'" class="cards-grid">
+      <ion-card class="dash-card" (click)="goToAllGuards()">
+        <ion-card-header>
+          <ion-icon name="shield-outline"></ion-icon>
+          <ion-card-title>Todos los Vigiladores</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Listado general del personal de seguridad.</p>
+          <ion-button fill="clear" expand="block">ABRIR</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="dash-card" (click)="goToCheckInOutHistorial()">
+        <ion-card-header>
+          <ion-icon name="swap-vertical-outline"></ion-icon>
+          <ion-card-title>Historial CheckIn/Out</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Registros de entradas y salidas.</p>
+          <ion-button fill="clear" expand="block">VER HISTORIAL</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="dash-card" (click)="goToAntipanicHistorial()">
+        <ion-card-header>
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <ion-card-title>Historial Antipánico</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Eventos del botón antipánico.</p>
+          <ion-button fill="clear" expand="block">VER HISTORIAL</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="dash-card" (click)="goToMapGuards()">
+        <ion-card-header>
+          <ion-icon name="map-outline"></ion-icon>
+          <ion-card-title>Mapa de Vigiladores</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Ubicación en vivo de vigiladores.</p>
+          <ion-button fill="clear" expand="block">ABRIR MAPA</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Sección: Eventos -->
+    <div *ngIf="type === 'eventos'" class="cards-grid">
+      <ion-card class="dash-card" (click)="goToAmenities()">
+        <ion-card-header>
+          <ion-icon name="fitness-outline"></ion-icon>
+          <ion-card-title>Amenidades</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Ver/gestionar amenities del country.</p>
+          <ion-button fill="clear" expand="block">ABRIR</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="dash-card" (click)="goToEventsHistorial()">
+        <ion-card-header>
+          <ion-icon name="time-outline"></ion-icon>
+          <ion-card-title>Historial de Eventos</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Registro de eventos generales.</p>
+          <ion-button fill="clear" expand="block">VER HISTORIAL</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </ng-container>
 </ion-content>
-
-<!--</ng-template>-->
