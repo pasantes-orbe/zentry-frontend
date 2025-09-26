@@ -1,89 +1,75 @@
 <app-navbar-back title="Nuevo Propietario"></app-navbar-back>
 
-<ion-content>
-  <ion-grid>
-    <form [formGroup]="getForm()" (keyup.enter)="register()" (ngSubmit)="register()">
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <ion-label>Nombre</ion-label>
-            <ion-input type="text" formControlName="ownerName"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+    <form class="form-container" [formGroup]="getForm()" (ngSubmit)="register()">
+      
+      <!-- SECCIÓN DE AVATAR -->
+      <div class="avatar-uploader">
+        <img class="avatar-preview" [src]="newImg" alt="Vista previa del avatar">
+        <label for="avatar-input" class="upload-button">
+          <ion-icon name="camera-outline"></ion-icon>
+          <input id="avatar-input" type="file" (change)="onFileChange($event)" formControlName="ownerAvatar" accept="image/*">
+        </label>
+      </div>
+      <p class="avatar-helper-text">Subir foto de perfil</p>
 
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <ion-label>Apellido</ion-label>
-            <ion-input formControlName="ownerLastname"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
+      <!-- GRID DE CAMPOS DEL FORMULARIO -->
+      <div class="form-grid">
+        <!-- Nombre -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input type="text" formControlName="ownerName"></ion-input>
+        </ion-item>
+        
+        <!-- Apellido -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Apellido</ion-label>
+          <ion-input type="text" formControlName="ownerLastname"></ion-input>
+        </ion-item>
+        
+        <!-- DNI -->
+        <ion-item class="form-field">
+          <ion-label position="floating">DNI</ion-label>
+          <ion-input type="number" formControlName="ownerDNI"></ion-input>
+        </ion-item>
+        
+        <!-- Email -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Email</ion-label>
+          <ion-input type="email" formControlName="ownerEmail"></ion-input>
+        </ion-item>
+        
+        <!-- Contraseña -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input #password type="password" formControlName="ownerPassword"></ion-input>
+          <ion-icon #passwordShowIcon button slot="end" (click)="showPassword(password)" name="eye-off-outline"></ion-icon>
+        </ion-item>
+        
+        <!-- Teléfono -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Número de Celular</ion-label>
+          <ion-input type="tel" formControlName="ownerPhone"></ion-input>
+        </ion-item>
+        
+        <!-- Fecha de Nacimiento -->
+        <ion-item class="form-field full-width-field">
+          <ion-label position="floating">Fecha de Nacimiento</ion-label>
+          <ion-input type="date" formControlName="ownerBirthdate"></ion-input>
+        </ion-item>
+      </div>
 
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <ion-label>DNI</ion-label>
-            <ion-input type="number" placeholder="" formControlName="ownerDNI"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <ion-label>email</ion-label>
-            <ion-input type="email" placeholder="" formControlName="ownerEmail"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <!-- <ion-label position="floating">Contraseña</ion-label> -->
-            <ion-icon #passwordShowIcon button slot="end" (click)="showPassword(password)" slot="end"
-              name="eye-outline">
-            </ion-icon>
-            <ion-label>Contraseña</ion-label>
-            <ion-input #password required type="password" placeholder="" formControlName="ownerPassword">
-            </ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <ion-label>Numero de celular</ion-label>
-            <ion-input type="number" placeholder="" formControlName="ownerPhone"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row class="ion-justify-content-center ion-padding-bottom">
-        <ion-col size="12">
-          <ion-item>
-            <ion-label>Fecha de Nacimiento</ion-label>
-            <ion-input type="date" placeholder="" formControlName="ownerBirthdate"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-
-      <ion-row class="ion-justify-content-center">
-        <ion-card button>
-          <img [src]="newImg" alt="">
-          <ion-input (change)="onFileChange($event)" formControlName="ownerAvatar" type="file"
-            placeholder="Awesome Input"></ion-input>
-        </ion-card>
-      </ion-row>
-
-      <ion-button type="submit" [disabled]="this.getForm().invalid" expand="block" shape="round">
-        <ion-icon slot="start" name="add"></ion-icon>
-        Añadir propietario
+      <!-- BOTÓN DE ACCIÓN -->
+      <ion-button 
+        class="submit-button"
+        type="submit" 
+        [disabled]="getForm().invalid" 
+        expand="block">
+        <ion-icon slot="start" name="person-add-outline"></ion-icon>
+        Añadir Propietario
       </ion-button>
+
     </form>
-  </ion-grid>
+  </div>
 </ion-content>

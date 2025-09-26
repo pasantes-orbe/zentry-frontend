@@ -1,1 +1,185 @@
-@use "/src/theme/tables.scss";
+//src/app/pages/admin/country-properties/view/view.page.scss
+// Fuentes y variables
+:host {
+  --page-padding: 16px;
+  --border-radius: 12px;
+  --border-color: rgba(0, 0, 0, 0.08);
+}
+
+// Contenedor principal de la página
+.page-container {
+  padding: var(--page-padding);
+}
+
+// Encabezado con título y controles
+.page-header {
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ion-color-dark-shade);
+  }
+  .controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+    ion-searchbar {
+      flex: 1;
+    }
+    ion-button {
+      --box-shadow: none;
+    }
+  }
+}
+
+// Contenedor de la tabla para el borde y sombra
+.pro-table-container {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--ion-color-background);
+  overflow: hidden; // Para que el border-radius afecte a las filas
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+// Estado de carga
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--ion-color-medium-shade);
+  ion-spinner {
+    transform: scale(1.5);
+    margin-bottom: 16px;
+  }
+}
+
+// ------------------------------------
+// --- ESTILOS MOBILE-FIRST (VISTA TARJETA) ---
+// ------------------------------------
+
+// El encabezado de la tabla se oculta en móvil
+.table-header {
+  display: none;
+}
+
+.table-row {
+  display: block; // Cada fila es un bloque
+  padding: var(--page-padding);
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.table-cell {
+  display: flex;
+  justify-content: space-between; // Label a la izq, valor a la der
+  align-items: center;
+  padding: 8px 0;
+  text-align: right; // El valor se alinea a la derecha
+
+  // El "data-label" del HTML se usa para crear el label en móvil
+  &::before {
+    content: attr(data-label);
+    font-weight: 500;
+    text-align: left;
+    color: var(--ion-color-dark-shade);
+  }
+}
+
+// Celda especial de acciones
+.actions-cell {
+  justify-content: flex-end; // Botones a la derecha
+  gap: 8px;
+  &::before {
+    display: none; // No necesita label
+  }
+}
+
+// Celda de propietarios
+.owner-cell {
+  display: block; // Apila el label y la lista
+  text-align: left;
+  .owner-list {
+    background: transparent;
+    margin-top: 8px;
+    ion-item {
+      --background: transparent;
+      --padding-start: 0;
+      --inner-padding-end: 0;
+      --min-height: 40px;
+      ion-avatar { width: 32px; height: 32px; }
+      ion-label { font-size: 0.9rem; }
+    }
+  }
+}
+
+
+// --------------------------------------------
+// --- ESTILOS DESKTOP (VISTA TABLA CON GRID) ---
+// --- Se activa en pantallas de 768px o más ---
+// --------------------------------------------
+@media (min-width: 768px) {
+  
+  .pro-table {
+    display: table;
+    width: 100%;
+  }
+
+  // Se muestra el encabezado
+  .table-header {
+    display: grid;
+    background-color: var(--ion-color-light);
+    border-bottom: 1px solid var(--border-color);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--ion-color-medium-shade);
+  }
+
+  .table-row {
+    display: grid;
+    padding: 0;
+    transition: background-color 0.2s ease;
+    &:hover {
+      background-color: var(--ion-color-light-tint);
+    }
+  }
+
+  // Definimos las columnas del grid para header y filas
+  .table-header, .table-row {
+    grid-template-columns: 100px 2fr 2fr 100px; // Lote | Dirección | Propietario | Acciones
+    align-items: center;
+  }
+
+  .table-cell {
+    padding: 12px var(--page-padding);
+    text-align: left;
+    // Ocultamos el label que creamos para móvil
+    &::before {
+      display: none;
+    }
+  }
+  
+  .actions-cell {
+    justify-content: center;
+  }
+
+  .owner-cell {
+    .owner-list { margin-top: 0; }
+  }
+}
+
+// Estado vacío (sin cambios de la versión anterior)
+.empty-state {
+  text-align: center;
+  padding: 48px var(--page-padding);
+  color: var(--ion-color-medium);
+  ion-icon { font-size: 3rem; margin-bottom: 12px; }
+  h3 { font-weight: 600; }
+}

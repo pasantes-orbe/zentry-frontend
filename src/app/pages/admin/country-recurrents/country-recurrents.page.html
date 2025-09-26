@@ -1,7 +1,35 @@
-<app-navbar-back title="Panel de Administración"></app-navbar-back>
+<!-- pages/admin/country-recurrents/country-recurrents.page.html -->
+<app-navbar-back title="Invitados Recurrentes"></app-navbar-back>
 
-<ion-content>
+<ion-content class="ion-padding">
+  <ion-spinner *ngIf="loading"></ion-spinner>
 
-  <app-recurrents-view-all [readOnly]="false" role="admin" #recurrents ></app-recurrents-view-all>
+  <ion-list *ngIf="!loading">
+    <ion-item *ngFor="let r of recurrents; let i = index">
+      <ion-label>
+        <h2>{{ r.guest_lastname }} {{ r.guest_name }}</h2>
+        <p>DNI: {{ r.dni }}</p>
+      </ion-label>
 
+      <!-- Toggle activo/inactivo -->
+      <ion-toggle [checked]="r.status" (ionChange)="cambiarStatus(r, i)"></ion-toggle>
+
+      <!-- Editar (usa ruta canónica si hay :id de country, sino la plana) -->
+      <ion-button fill="clear" slot="end"
+        [routerLink]="countryIdFromUrl
+          ? ['/admin/country', countryIdFromUrl, 'recurrents', 'edit', r.id]
+          : ['/admin/edit-recurrent', r.id]">
+        Editar
+      </ion-button>
+
+      <!-- Eliminar -->
+      <ion-button color="danger" fill="clear" slot="end"
+        (click)="eliminar(r, i)">
+        Eliminar
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <p *ngIf="!loading && recurrents.length === 0">No hay invitados recurrentes.</p>
 </ion-content>
+

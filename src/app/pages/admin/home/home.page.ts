@@ -124,4 +124,22 @@ export class HomePage implements OnInit, OnDestroy {
   getCountryImage(c: CountryInteface): string {
     return c.avatar || c.image || 'https://ionicframework.com/docs/img/demos/card-media.png';
   }
+
+  /**
+   * Cierra la sesión del usuario, limpia el storage y redirige al login.
+   */
+  public async logout(): Promise<void> {
+    console.log('Cerrando sesión...');
+    try {
+      // Limpia los datos del usuario del storage.
+      await this.userStorage.clearUser();
+      await this.countryStorage.clearCountry();
+      // Redirige a la página de login, reemplazando la URL en el historial.
+      this.router.navigate(['/auth/login'], { replaceUrl: true });
+    } catch (error) {
+      console.error('Error durante el logout:', error);
+      // Intenta redirigir incluso si falla la limpieza del storage.
+      this.router.navigate(['/auth/login'], { replaceUrl: true });
+    }
+  }
 }

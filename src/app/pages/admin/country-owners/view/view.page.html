@@ -1,50 +1,87 @@
-<!-- ====================================================== -->
-<!-- ADMIN/COUNTRY-OWNERS/VIEW.PAGE.HTML (Plantilla de Listado) -->
-<!-- ====================================================== -->
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button default-href="/admin/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Gestionar Propietarios</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-navbar-back title="Gestionar Propietarios"></app-navbar-back>
 
-<ion-content class="ion-padding">
-  <ion-card>
-    <ion-card-header class="table-header">
-      <ion-searchbar placeholder="Buscar propietario..."></ion-searchbar>
-      <ion-button shape="round">
-        <ion-icon slot="start" name="add-outline"></ion-icon>
-        Añadir Propietario
-      </ion-button>
-    </ion-card-header>
-    
-    <div class="table-responsive-wrapper">
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>DNI</th>
-            <th>Email</th>
-            <th>Propiedades</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Las filas se generarán dinámicamente -->
-          <tr>
-            <td>Juan Pérez</td>
-            <td>30.123.456</td>
-            <!--<td>juan.perez@hotmail.com</td> -->
-            <td>2</td>
-            <td class="action-cell">
-              <ion-button fill="clear" color="primary"><ion-icon slot="icon-only" name="pencil-outline"></ion-icon></ion-button>
-              <ion-button fill="clear" color="danger"><ion-icon slot="icon-only" name="trash-outline"></ion-icon></ion-button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-container">
+    <!-- Encabezado de la página y controles -->
+    <div class="page-header">
+      <h1>Listado de Propietarios</h1>
+      <div class="controls">
+        <ion-searchbar 
+          [(ngModel)]="searchKey"
+          mode="ios" 
+          animated="true" 
+          debounce="500"
+          placeholder="Buscar por nombre, DNI, etc...">
+        </ion-searchbar>
+        <!-- BOTÓN ELIMINADO -->
+      </div>
     </div>
-  </ion-card>
+
+    <!-- Contenedor de la tabla -->
+    <div class="pro-table-container">
+      <div *ngIf="loading" class="loading-container">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando propietarios...</p>
+      </div>
+
+      <ng-container *ngIf="!loading">
+        <div class="pro-table" *ngIf="filteredAndSortedOwners.length > 0; else noResults">
+          <!-- Encabezado de la tabla (solo visible en desktop) -->
+          <div class="table-header">
+            <div class="header-cell">Propietario</div>
+            <div class="header-cell">DNI</div>
+            <div class="header-cell">Email</div>
+            <div class="header-cell">Estado</div>
+            <div class="header-cell">Acciones</div>
+          </div>
+
+          <!-- Filas de datos -->
+          <div class="table-row" *ngFor="let owner of filteredAndSortedOwners; let i = index">
+            
+            <div class="table-cell owner-cell" data-label="Propietario">
+              <ion-avatar>
+                <img [src]="getOwnerAvatar(owner)" />
+              </ion-avatar>
+              <div class="owner-info">
+                <span class="owner-name">{{ owner.user.name }} {{ owner.user.lastname }}</span>
+                <span class="owner-property">{{ owner.property.name }}</span>
+              </div>
+            </div>
+            
+            <div class="table-cell" data-label="DNI">{{ owner.user.dni }}</div>
+            
+            <div class="table-cell" data-label="Email">{{ owner.user.email }}</div>
+
+            <div class="table-cell" data-label="Estado">
+              <ion-chip [outline]="true" [ngClass]="owner.user.isActive ? 'status-active' : 'status-inactive'">
+                <ion-label>{{ owner.user.isActive ? 'Activo' : 'Inactivo' }}</ion-label>
+              </ion-chip>
+            </div>
+
+            <div class="table-cell actions-cell">
+              <ion-button fill="clear" size="small" (click)="editUser(owner.user.id, i)" title="Editar propietario">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" color="danger" (click)="deleteOwner(owner.id, i)" title="Eliminar propietario">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noResults>
+          <div class="empty-state">
+            <ion-icon name="people-outline"></ion-icon>
+            <h3>No se encontraron propietarios</h3>
+            <p>No hay propietarios que coincidan con tu búsqueda o aún no se han creado.</p>
+          </div>
+        </ng-template>
+      </ng-container>
+
+    </div>
+  </div>
 </ion-content>

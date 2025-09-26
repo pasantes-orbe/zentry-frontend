@@ -1,61 +1,82 @@
-<app-navbar-back title="Asignar Propiedad"></app-navbar-back>
+<app-navbar-back title="Asignar Propiedad a Propietario"></app-navbar-back>
 
-<ion-content>
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+    <form class="form-container" [formGroup]="form" (ngSubmit)="asignarPropiedadAlUsuario()">
+      
+      <!-- Título principal del formulario -->
+      <div class="form-header">
+        <ion-icon name="swap-horizontal-outline"></ion-icon>
+        <h3>Asignación de Propiedades</h3>
+      </div>
 
-<form [formGroup]="form" (ngSubmit)="asignarPropiedadAlUsuario()" >
-  <ion-grid>
-    <ion-row class="ion-justify-content-center">
-      <ion-col>
-  <ion-searchbar placeholder="Buscar por Nombre o Apellido"  [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" > </ion-searchbar>
-  <ion-list >
-    <ion-radio-group formControlName="user_id" >
-      <ion-item *ngFor="let owner of owners | filterBy: searchKey ; let i = index ">
-        <ion-label>{{owner.user.name}} {{owner.user.lastname}}             -       {{owner.user.dni}}</ion-label>
-        <ion-radio  slot="end" [value]="owner.user.id"></ion-radio>
-      </ion-item>
-    </ion-radio-group>
-  </ion-list>
-</ion-col>
-</ion-row>
-<hr>
+      <!-- Grid principal que contiene los dos paneles de selección -->
+      <div class="assignment-grid">
+        
+        <!-- Panel de Selección de Propietarios -->
+        <div class="selection-panel">
+          <div class="panel-header">
+            <h4>Paso 1: Seleccionar Propietario</h4>
+          </div>
+          <ion-searchbar 
+            mode="ios" 
+            placeholder="Buscar propietario..." 
+            (ionInput)="onSearchOwners($event)">
+          </ion-searchbar>
+          <ion-list class="selection-list">
+            <ion-radio-group formControlName="user_id">
+              <ion-item *ngFor="let owner of filteredOwners" class="selection-item">
+                <ion-avatar slot="start">
+                  <img [src]="owner.user.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{ owner.user.name }} {{ owner.user.lastname }}</h2>
+                  <p>DNI: {{ owner.user.dni }}</p>
+                </ion-label>
+                <ion-radio slot="end" [value]="owner.user.id"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+        </div>
 
-<ion-row>
-  <ion-col>
-    <div class="ion-text-center">
-      <h3>Elija una propiedad para asignar al usuario</h3>
-    </div>
-</ion-col>
-</ion-row>
+        <!-- Panel de Selección de Propiedades -->
+        <div class="selection-panel" [class.is-disabled]="!form.get('user_id')?.value">
+          <div class="panel-header">
+            <h4>Paso 2: Seleccionar Propiedad</h4>
+          </div>
+          <ion-searchbar 
+            mode="ios" 
+            placeholder="Buscar propiedad..." 
+            (ionInput)="onSearchProperties($event)">
+          </ion-searchbar>
+          <ion-list class="selection-list">
+            <ion-radio-group formControlName="property_id">
+              <ion-item *ngFor="let property of filteredProperties" class="selection-item">
+                 <ion-avatar slot="start">
+                  <img [src]="property.property.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'" />
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{ property.property.name }}</h2>
+                  <p>Nº / Lote: {{ property.property.number }}</p>
+                </ion-label>
+                <ion-radio slot="end" [value]="property.property.id"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+        </div>
 
-<ion-row class="ion-justify-content-center">
-  <ion-col>
-  <ion-searchbar placeholder="Buscar por Nombre de Propiedad" [(ngModel)]="searchKey1" [ngModelOptions]="{standalone: true}" ></ion-searchbar>
-  <ion-list >
-    <ion-radio-group formControlName="property_id">
-      <ion-item *ngFor="let property of properties | filterBy: searchKey1 ; let i = index "> 
-        <ion-avatar>
-          <img alt="Avatar" [src]="property.property.avatar" />
-        </ion-avatar>
-        <ion-label>{{property.property.name}} - <b>Nº </b>  {{property.property.number}}</ion-label>
-        <ion-radio slot="end" [value]="property.property.id"></ion-radio>
-      </ion-item>
-    </ion-radio-group>
-  </ion-list>
-</ion-col>
-</ion-row>
+      </div>
 
-<ion-row class="ion-justify-content-center">
-  <ion-col>
-  <ion-button [disabled]="getForm().invalid" type="submit" expand="block" shape="round">
-    <ion-icon slot="start" name="add"></ion-icon>
-    Asignar Propiedad
-  </ion-button>
-</ion-col>
-</ion-row>
+      <!-- Botón de Acción -->
+      <ion-button 
+        class="submit-button"
+        type="submit" 
+        [disabled]="getForm().invalid" 
+        expand="block">
+        <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+        Asignar Propiedad
+      </ion-button>
 
-</ion-grid>
-
-</form>
-
-  
+    </form>
+  </div>
 </ion-content>
