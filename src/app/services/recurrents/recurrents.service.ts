@@ -4,71 +4,205 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { RecurrentsInterface } from '../../interfaces/recurrents-interface';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, map, take, timeout, tap } from 'rxjs/operators';
 import { CountryStorageService } from '../storage/country-storage.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class RecurrentsService {
+  // Activalo en true si querés forzar que el servicio NO llame al backend (para probar la UI)
+  private readonly SAFE_MODE = false;
+  private readonly HTTP_TIMEOUT_MS = 10000; // 10s para evitar que se “cuelgue” si la API no responde
 
-  constructor(private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _countryStorageService: CountryStorageService) { }
+  constructor(
+    private http: HttpClient,
+    private alert: AlertService,
+    private router: Router,
+    private countryStorage: CountryStorageService
+  ) {}
 
-  public async addRecurrent(id_property, name, lastname, dni, role){
 
+  // CREATE
+  
+  async addRecurrent(
+    id_property: number | string,
+    name: string,
+    lastname: string,
+    dni: string | number,
+    role: 'admin' | 'owner'
+  ): Promise<void> {
+    const fd = new FormData();
+    fd.append('id_property', String(id_property));
+    fd.append('guest_name', String(name));
+    fd.append('guest_lastname', String(lastname));
+    fd.append('dni', String(dni));
 
-    const formData = new FormData();
-    formData.append('id_property', id_property);
-    formData.append('guest_name', name);
-    formData.append('guest_lastname', lastname);
-    formData.append('dni', dni);
-    await this._alertService.setLoading();
-    
+    await this.alert.setLoading();
 
-    this._http.post(`${environment.URL}/api/recurrents`, formData)
-      .subscribe(
-        async (res) => {
-        console.log(res);
-        await this._alertService.removeLoading();
-        if(role == "admin"){
-          this._router.navigate([`/admin/invitados-recurrentes`])
-        } else {
-          this._router.navigate([`/home/tabs/tab1`])
-        }
-        this._alertService.showAlert("¡Listo!", "El Invitado se agregó con éxito");
-      },
-      async (err) => {
-        console.log(err);
-        await this._alertService.removeLoading();
-        this._alertService.showAlert("¡Ooops!", `${err['error']['msg']}`);
+    this.http.post(`${environment.URL}/api/recurrents`, fd).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      tap(() => console.log('[recurrents] POST /recurrents OK')),
+      catchError(async (err) => {
+        console.error('[recurrents] POST /recurrents ERROR', err);
+        await this.alert.removeLoading();
+        this.alert.showAlert('¡Ooops!', err?.error?.msg ?? 'No se pudo guardar el recurrente.');
+        throw err;
+      })
+    ).subscribe(async () => {
+      await this.alert.removeLoading();
+      this.alert.showAlert('¡Listo!', 'El invitado recurrente se agregó con éxito');
+      this.router.navigate(['/admin/country-recurrents']);
     });
-
   }
 
-  public async getRecurrentsByCountry(): Promise<Observable<RecurrentsInterface[]>> {
-    const country = await this._countryStorageService.getCountry();
-    const countryID = country.id;
-
-    return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents/get-by-country/${countryID}`);
   
+  // READ (listados)
+  
+  async getRecurrentsByCountry(): Promise<Observable<RecurrentsInterface[]>> {
+    if (this.SAFE_MODE) {
+      console.warn('[recurrents] SAFE_MODE habilitado → devolviendo []');
+      return of([]);
+    }
+
+    const c = await this.countryStorage.getCountry().catch(() => null);
+    const id = c?.id;
+    if (!id) {
+      console.warn('[recurrents] No hay country en storage → []');
+      return of([]);
+    }
+
+    const url = `${environment.URL}/api/recurrents/get-by-country/${id}`;
+    console.log('[recurrents] GET', url);
+
+    return this.http.get<RecurrentsInterface[]>(url).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      map(list => list ?? []),
+      tap(list => console.log('[recurrents] getRecurrentsByCountry OK, items:', list.length)),
+      catchError((err) => {
+        console.error('[recurrents] getRecurrentsByCountry ERROR', err);
+        return of([]);
+      })
+    );
   }
 
-  public getAll(): Observable<RecurrentsInterface[]> {
+  getRecurrentsByCountryId(countryId: number): Observable<RecurrentsInterface[]> {
+    if (this.SAFE_MODE) {
+      console.warn('[recurrents] SAFE_MODE habilitado → devolviendo []');
+      return of([]);
+    }
+    if (!countryId) return of([]);
 
-    return this._http.get<RecurrentsInterface[]>(`${environment.URL}/api/recurrents`);
+    const url = `${environment.URL}/api/recurrents/get-by-country/${countryId}`;
+    console.log('[recurrents] GET', url);
+
+    return this.http.get<RecurrentsInterface[]>(url).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      map(list => list ?? []),
+      tap(list => console.log('[recurrents] getRecurrentsByCountryId OK, items:', list.length)),
+      catchError((err) => {
+        console.error('[recurrents] getRecurrentsByCountryId ERROR', err);
+        return of([]);
+      })
+    );
+  }
+
+  getByPropertyID(id: number | string): Observable<RecurrentsInterface[]> {
+    if (this.SAFE_MODE) {
+      console.warn('[recurrents] SAFE_MODE habilitado → devolviendo []');
+      return of([]);
+    }
+
+    const url = `${environment.URL}/api/recurrents/get-by-property/${id}`;
+    console.log('[recurrents] GET', url);
+
+    return this.http.get<RecurrentsInterface[]>(url).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      map(list => list ?? []),
+      tap(list => console.log('[recurrents] getByPropertyID OK, items:', list.length)),
+      catchError((err) => {
+        console.error('[recurrents] getByPropertyID ERROR', err);
+        return of([]);
+      })
+    );
+  }
+
   
-    }
+  // READ (detalle)
+  
+  getById(id: number) {
+    const url = `${environment.URL}/api/recurrents/${id}`;
+    return this.http.get<RecurrentsInterface>(url).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      catchError(err => {
+        console.error('[recurrents] getById ERROR', err);
+        return of(null as any);
+      })
+    );
+  }
 
-    public getByPropertyID(id){
+  
+  // UPDATE (status / campos)
+  
+  patchStatus(recurrentId: number | string, newStatus: boolean): Observable<any> {
+    const fd = new FormData();
+    fd.append('status', String(newStatus));
 
-      return this._http.get<any[]>(`${environment.URL}/api/recurrents/get-by-property/${id}`)
-    }
+    const url = `${environment.URL}/api/recurrents/${recurrentId}`;
+    console.log('[recurrents] PATCH', url, '→', newStatus);
 
-  public patchStatus(id_property, recurrentStatus){
-    const recurrentStatusNew = !recurrentStatus
-    return this._http.patch(`${environment.URL}/api/recurrents/${id_property}`,
-    {
-      status: recurrentStatusNew
-    })
+    return this.http.patch(url, fd).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      tap(() => console.log('[recurrents] patchStatus OK')),
+      catchError((err) => {
+        console.error('[recurrents] patchStatus ERROR', err);
+        return of(null);
+      })
+    );
+  }
+
+  updateRecurrent(id: number, payload: {
+    id_property: number | string;
+    guest_name: string;
+    guest_lastname: string;
+    dni: string | number;
+  }) {
+    const fd = new FormData();
+    fd.append('id_property', String(payload.id_property));
+    fd.append('guest_name', String(payload.guest_name));
+    fd.append('guest_lastname', String(payload.guest_lastname));
+    fd.append('dni', String(payload.dni));
+
+    const url = `${environment.URL}/api/recurrents/${id}`;
+    return this.http.patch(url, fd).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      tap(() => console.log('[recurrents] updateRecurrent OK')),
+      catchError(err => {
+        console.error('[recurrents] updateRecurrent ERROR', err);
+        return of(null);
+      })
+    );
+  }
+
+  
+  // DELETE
+ 
+  deleteRecurrent(id: number) {
+    const url = `${environment.URL}/api/recurrents/${id}`;
+    return this.http.delete(url).pipe(
+      timeout(this.HTTP_TIMEOUT_MS),
+      take(1),
+      tap(() => console.log('[recurrents] deleteRecurrent OK')),
+      catchError(err => {
+        console.error('[recurrents] deleteRecurrent ERROR', err);
+        return of(null);
+      })
+    );
   }
 }

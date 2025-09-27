@@ -1,0 +1,129 @@
+// Variables para consistencia y compacidad
+:host {
+  --page-padding: 16px;
+  --form-padding: 20px;
+  --border-radius: 16px;
+  --border-color: rgba(0, 0, 0, 0.08);
+}
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--page-padding);
+}
+
+.form-container {
+  width: 100%;
+  max-width: 800px;
+  padding: var(--form-padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--ion-color-background);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+// --- SECCIÓN DE AVATAR (Más compacto) ---
+.avatar-uploader {
+  position: relative;
+  width: 100px; // Reducido
+  height: 100px; // Reducido
+  margin: 0 auto 4px auto;
+
+  .avatar-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-color);
+  }
+
+  .upload-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px; // Reducido
+    height: 36px; // Reducido
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 3px solid var(--ion-color-background);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    ion-icon {
+      font-size: 18px; // Reducido
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+  }
+}
+
+.avatar-helper-text {
+  text-align: center;
+  color: var(--ion-color-step-600);
+  font-size: 0.8rem; // Reducido
+  margin-bottom: 24px; // Reducido
+}
+
+// --- GRID DE CAMPOS ---
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr; // Mobile-first
+  gap: 12px; // Reducido
+  margin-bottom: 24px; // Reducido
+}
+
+.full-width-field {
+  grid-column: 1 / -1;
+}
+
+// Estilos para cada campo
+.form-field {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --background: var(--ion-color-light-tint);
+  border-radius: 8px;
+  --min-height: 55px; // Altura controlada
+
+  // ✅ SOLUCIÓN DE CLAUDE APLICADA:
+  // Añadimos padding superior al input para que no se pise con el label.
+  ion-input {
+    --padding-top: 20px;
+    --padding-start: 12px;
+  }
+  
+  ion-label {
+    --padding-start: 12px;
+  }
+  
+  ion-icon {
+    margin-right: 12px;
+  }
+}
+
+// --- BOTÓN DE ACCIÓN (Más compacto) ---
+.submit-button {
+  --border-radius: 12px;
+  height: 44px; // Reducido
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+// --- RESPONSIVE ---
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+

@@ -1,4 +1,4 @@
-// --- Archivo: assign-country-to-owner.page.ts (Corregido) ---
+// --- Archivo: assign-country-to-owner.page.ts (Corregido y Refactorizado) ---
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -19,9 +19,6 @@ import { Property_OwnerInterface } from '../../../../interfaces/property_owner-i
 //Componentes
 import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
-//Pipes
-import { FilterByPipe } from 'src/app/pipes/filter-by.pipe'
-
 @Component({
   selector: 'app-assign-country-to-owner',
   templateUrl: './assign-country-to-owner.page.html',
@@ -32,17 +29,23 @@ import { FilterByPipe } from 'src/app/pipes/filter-by.pipe'
     IonicModule,
     ReactiveFormsModule,
     FormsModule,
-    NavbarBackComponent,
-    FilterByPipe
+    NavbarBackComponent
+    // El FilterByPipe ya no es necesario
   ]
 })
 export class AssignCountryToOwnerPage implements OnInit {
 
   public form: FormGroup;
+  
+  // Listas originales con todos los datos
   public owners: Owner_CountryInterface[] = [];
   public properties: Property_OwnerInterface[] = [];
-  public searchKey: string = '';
-  public searchKey1: string = '';
+
+  // Listas que se mostrarán en la vista y que serán filtradas
+  public filteredOwners: Owner_CountryInterface[] = [];
+  public filteredProperties: Property_OwnerInterface[] = [];
+
+  public loading = true; // Añadimos estado de carga
 
   constructor(
     private _alertService: AlertService,
@@ -59,15 +62,60 @@ export class AssignCountryToOwnerPage implements OnInit {
   }
 
   async loadData() {
-    try {
-      const ownersObservable = await this._ownersService.getAllByCountry();
-      ownersObservable.subscribe(owners => this.owners = owners);
+    this.loading = true;
 
+    try {
+      // Cargar Propietarios desde el Backend
+      const ownersObservable = await this._ownersService.getAllByCountry();
+      ownersObservable.subscribe(ownersData => {
+        this.owners = ownersData || []; // Aseguramos que sea un array
+        this.filteredOwners = [...this.owners]; 
+      });
+
+      // Cargar Propiedades desde el Backend
       const propertiesObservable = await this._propertiesService.getAllProperty_OwnerByCountryID();
-      propertiesObservable.subscribe(properties => this.properties = properties);
+      propertiesObservable.subscribe(propertiesData => {
+        this.properties = propertiesData || []; // Aseguramos que sea un array
+        this.filteredProperties = [...this.properties];
+      });
+
     } catch (error) {
       console.error("Error al cargar los datos de la página:", error);
+      this._alertService.presentAlert('Error al cargar datos. Intente nuevamente.');
+    } finally {
+      this.loading = false;
     }
+  }
+
+  public onSearchOwners(event: any): void {
+    const searchTerm = (event.target.value || '').toLowerCase();
+    if (!searchTerm) {
+      this.filteredOwners = [...this.owners];
+      return;
+    }
+    this.filteredOwners = this.owners.filter(o => {
+      const user = o.user;
+      if (!user) return false;
+      //CORRECCIÓN: Convertimos el DNI a string antes de usar .includes()
+      return (user.name.toLowerCase().includes(searchTerm) ||
+              user.lastname.toLowerCase().includes(searchTerm) ||
+              String(user.dni).toLowerCase().includes(searchTerm));
+    });
+  }
+
+  public onSearchProperties(event: any): void {
+    const searchTerm = (event.target.value || '').toLowerCase();
+    if (!searchTerm) {
+      this.filteredProperties = [...this.properties];
+      return;
+    }
+    this.filteredProperties = this.properties.filter(p => {
+        const prop = p.property;
+        if (!prop) return false;
+        //CORRECCIÓN: Convertimos el número de propiedad a string
+        return (prop.name.toLowerCase().includes(searchTerm) ||
+                String(prop.number).toLowerCase().includes(searchTerm));
+    });
   }
 
   public createForm(): FormGroup {
@@ -82,10 +130,9 @@ export class AssignCountryToOwnerPage implements OnInit {
       this._alertService.presentAlert('Formulario Inválido: Por favor, seleccione un propietario y una propiedad.');
       return;
     }
-
     const userId = this.form.get('user_id')?.value;
     const propertyId = this.form.get('property_id')?.value;
-
+    
     try {
       await this._ownersService.relationWithProperty(userId, propertyId);
       this._alertService.presentAlert('Éxito: La propiedad ha sido asignada correctamente.');
@@ -96,8 +143,8 @@ export class AssignCountryToOwnerPage implements OnInit {
     }
   }
 
-  //  Función agregada para que funcione el HTML
   public getForm(): FormGroup {
     return this.form;
   }
 }
+

@@ -1,1 +1,166 @@
-@use "/src/theme/tables.scss";
+// Variables consistentes con el resto de la app
+:host {
+  --page-padding: 16px;
+  --border-radius: 12px;
+  --border-color: rgba(0, 0, 0, 0.08);
+}
+
+// Contenedor principal
+.page-container {
+  padding: var(--page-padding);
+}
+
+// Encabezado y controles
+.page-header {
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ion-color-dark-shade);
+  }
+  .controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+    ion-searchbar {
+      flex: 1;
+    }
+    ion-button {
+      --box-shadow: none;
+    }
+  }
+}
+
+// Contenedor de la tabla
+.pro-table-container {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--ion-color-background);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+// ------------------------------------
+// --- ESTILOS MOBILE-FIRST (VISTA TARJETA) ---
+// ------------------------------------
+.table-header {
+  display: none;
+}
+
+.table-row {
+  display: block;
+  padding: var(--page-padding);
+  border-bottom: 1px solid var(--border-color);
+  &:last-child { border-bottom: none; }
+}
+
+.table-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  text-align: right;
+  word-break: break-all; // Evita desbordamiento de emails largos
+
+  &::before {
+    content: attr(data-label);
+    font-weight: 500;
+    text-align: left;
+    color: var(--ion-color-dark-shade);
+    margin-right: 16px;
+  }
+}
+
+.owner-cell {
+  padding: 4px 0 12px 0;
+  &::before { display: none; } // El label no es necesario aquí
+  
+  .owner-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 12px;
+    .owner-name { font-weight: 600; }
+    .owner-property { font-size: 0.8rem; color: var(--ion-color-medium-shade); }
+  }
+}
+
+.actions-cell {
+  justify-content: flex-end;
+  gap: 8px;
+  &::before { display: none; }
+}
+
+ion-chip {
+  height: 28px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-active {
+  --color: var(--ion-color-success-shade);
+  --border-color: var(--ion-color-success-tint);
+}
+.status-inactive {
+  --color: var(--ion-color-danger-shade);
+  --border-color: var(--ion-color-danger-tint);
+}
+
+
+// --------------------------------------------
+// --- ESTILOS DESKTOP (VISTA TABLA CON GRID) ---
+// --------------------------------------------
+@media (min-width: 768px) {
+  
+  .pro-table { display: table; width: 100%; }
+
+  .table-header {
+    display: grid;
+    background-color: var(--ion-color-light);
+    border-bottom: 1px solid var(--border-color);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--ion-color-medium-shade);
+  }
+
+  .table-row {
+    display: grid;
+    padding: 0;
+    transition: background-color 0.2s ease;
+    &:hover { background-color: var(--ion-color-light-tint); }
+  }
+
+  .table-header, .table-row {
+    grid-template-columns: 2fr 1fr 1.5fr 1fr 100px; // Propietario | DNI | Email | Estado | Acciones
+    align-items: center;
+  }
+
+  .table-cell {
+    padding: 12px var(--page-padding);
+    text-align: left;
+    &::before { display: none; }
+  }
+  
+  .owner-cell {
+    display: flex;
+    align-items: center;
+    padding: 8px var(--page-padding);
+  }
+  
+  .actions-cell {
+    justify-content: center;
+  }
+}
+
+// Estado vacío
+.empty-state {
+  text-align: center;
+  padding: 48px var(--page-padding);
+  color: var(--ion-color-medium);
+  ion-icon { font-size: 3rem; margin-bottom: 12px; }
+  h3 { font-weight: 600; }
+}
+

@@ -5,18 +5,40 @@
       <span class="header-title-text">Admin</span>
     </ion-buttons>
 
+    <!-- El antiguo ion-item con el toggle se reemplaza por este botón -->
     <ion-buttons slot="end">
-      <ion-item lines="none" class="theme-toggle-item">
-        <ion-icon name="moon" slot="start"></ion-icon>
-        <ion-toggle
-          [checked]="theme.isDark()"
-          (ionChange)="onThemeToggle($event)"
-          aria-label="Cambiar tema">
-        </ion-toggle>
-      </ion-item>
+      <ion-button id="user-menu-trigger" class="user-menu-button">
+        <ion-avatar>
+          <!-- Idealmente, esta imagen sería la del usuario logueado -->
+          <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="User Avatar"/>
+        </ion-avatar>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<!-- Este es el menú desplegable. Se asocia al botón mediante el ID 'user-menu-trigger' -->
+<ion-popover trigger="user-menu-trigger" triggerAction="click" [dismissOnSelect]="true" class="user-menu-popover">
+  <ng-template>
+    <ion-content>
+      <ion-list lines="full">
+        <ion-item class="popover-item">
+          <ion-icon name="moon-outline" slot="start"></ion-icon>
+          <ion-label>Modo Oscuro</ion-label>
+          <ion-toggle
+            slot="end"
+            [checked]="theme.isDark()"
+            (ionChange)="onThemeToggle($event)">
+          </ion-toggle>
+        </ion-item>
+        <ion-item class="popover-item" (click)="logout()" button="true" detail="false">
+          <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+          <ion-label color="danger">Cerrar Sesión</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
@@ -25,22 +47,26 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Tarjeta principal: Añadir Country -->
-  <ion-card class="add-card" (click)="navigateToAddCountry()">
-    <ion-card-header>
-      <ion-icon name="add-circle-outline"></ion-icon>
-      <ion-card-title>Añadir Country</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Crea un nuevo country. Podrás marcar centro y perímetro en el mapa.</p>
-      <ion-button fill="clear" expand="block">CREAR</ion-button>
-    </ion-card-content>
-  </ion-card>
+  <!-- SPINNER DE CARGA -->
+  <div *ngIf="loading" class="loading-state">
+    <ion-spinner></ion-spinner>
+  </div>
 
-  <!-- Lista de countries existentes -->
-  <ng-container *ngIf="!loading && countries.length > 0; else emptyOrLoading">
-    <ion-grid>
+  <!-- CONTENIDO: CUANDO YA CARGÓ -->
+  <div *ngIf="!loading">
+    <!-- CASO 1: HAY COUNTRIES -->
+    <ion-grid *ngIf="countries.length > 0">
       <ion-row>
+        <!-- Tarjeta "Añadir" siempre primera -->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card class="add-card" (click)="navigateToAddCountry()" button="true">
+            <div class="add-card-content">
+              <ion-icon name="add-outline"></ion-icon>
+              <span>Crear Nuevo Country</span>
+            </div>
+          </ion-card>
+        </ion-col>
+        <!-- Tarjetas de countries existentes -->
         <ion-col size="12" size-md="6" size-lg="4" *ngFor="let c of countries">
           <ion-card class="country-card" (click)="openCountryDashboard(c)">
             <ion-img [src]="getCountryImage(c)"></ion-img>
@@ -55,12 +81,15 @@
         </ion-col>
       </ion-row>
     </ion-grid>
-  </ng-container>
-
-  <ng-template #emptyOrLoading>
-    <div class="empty">
-      <ion-spinner *ngIf="loading"></ion-spinner>
-      <p *ngIf="!loading">No hay countries creados todavía.</p>
+    <!-- CASO 2: NO HAY COUNTRIES (ESTADO VACÍO) -->
+    <div *ngIf="countries.length === 0" class="empty-state">
+      <ion-card class="add-card" (click)="navigateToAddCountry()" button="true">
+        <div class="add-card-content">
+          <ion-icon name="add-outline"></ion-icon>
+          <span>Crear tu Primer Country</span>
+        </div>
+      </ion-card>
+      <p class="empty-state-text">Aún no hay countries creados. ¡Empieza por aquí!</p>
     </div>
-  </ng-template>
+  </div>
 </ion-content>

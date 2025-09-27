@@ -1,46 +1,168 @@
+// SCSS for admin/countries/home/home.page.html
+
+// :host is a selector for the component's host element.
+// It's a good place to define styles that affect the whole component.
 :host {
+
+  // Styles for the main toolbar at the top of the page.
   ion-toolbar {
     --background: var(--ion-toolbar-background);
     --color: var(--ion-text-color);
   }
 
+  // Styles for the brand logo and title in the header.
   .header-brand {
     display: flex;
     align-items: center;
   }
-  .header-logo { height: 32px; margin-left: 12px; }
-  .header-title-text { margin-left: 8px; font-weight: 600; color: var(--ion-text-color); }
-
-  .theme-toggle-item {
-    --background: transparent;
-    --color: var(--ion-text-color);
+  .header-logo {
+    height: 32px;
+    margin-left: 12px;
+  }
+  .header-title-text {
+    margin-left: 8px;
+    font-weight: 600;
+    color: var(--ion-text-color);
   }
 
-  .page-title { color: var(--ion-text-color); }
+  // --- ESTILOS REFINADOS PARA EL MENÚ DE USUARIO ---
+  .user-menu-button {
+    // Reducimos el padding para un botón más compacto
+    --padding-start: 4px;
+    --padding-end: 8px;
+    ion-avatar {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--ion-color-light);
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+  }
 
+  // Style for the large condensed page title.
+  .page-title {
+    color: var(--ion-text-color);
+  }
+
+  // Styles for the main content area.
   ion-content {
     --background: var(--ion-background-color);
   }
 
+  // General styles for all ion-card elements on this page.
   ion-card {
     background: var(--ion-card-background, var(--ion-item-background));
     color: var(--ion-text-color);
     box-shadow: var(--ion-card-box-shadow);
-    transition: transform .2s ease;
-    &:hover { transform: translateY(-2px); }
+    transition: all 0.2s ease-in-out;
+    height: 100%; // Ensures all cards in a row have the same height.
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
   }
 
-  .add-card ion-icon {
-    font-size: 1.6rem;
-    color: var(--ion-color-primary);
-    margin-right: 8px;
+  // --- Specific styles for the "Add New Country" card ---
+  .add-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--ion-color-medium-tint);
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    min-height: 220px; // Altura mínima para consistencia
+
+    .add-card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--ion-color-medium-shade);
+      transition: color 0.2s ease-in-out;
+
+      ion-icon {
+        font-size: 2.5rem;
+      }
+      span {
+        font-weight: 500;
+        font-size: 1rem;
+      }
+    }
+
+    // Hover effect for the add card.
+    &:hover {
+      transform: translateY(0); // Override the general card hover effect.
+      box-shadow: none;
+      border-color: var(--ion-color-primary);
+      background: var(--ion-color-primary-tint);
+
+      .add-card-content {
+        color: var(--ion-color-primary);
+      }
+    }
   }
 
-  .country-card ion-card-title { color: var(--ion-text-color); }
+  // --- AJUSTES PARA HACER LA TARJETA DEL COUNTRY MÁS COMPACTA ---
+  .country-card {
+    ion-card-header {
+      padding: 12px 16px 8px 16px; // Padding vertical reducido
+    }
+    ion-card-title {
+      font-size: 1.1rem; // Título ligeramente más pequeño
+    }
+    ion-card-content {
+      padding: 0 16px 8px 16px; // Padding superior a 0
+      p {
+        font-size: 0.8rem; // Texto de coordenadas más pequeño
+        margin: 4px 0 8px 0;
+      }
+      ion-button {
+        --padding-top: 0;
+        --padding-bottom: 0;
+        height: 36px; // Botón un poco más bajo
+        font-size: 0.8rem;
+        margin-left: auto;
+        margin-right: -8px; // Para alinearlo mejor a la derecha
+      }
+    }
+  }
 
-  .empty {
-    text-align: center;
-    color: var(--zentry-color-text-secondary);
-    padding: 24px 0;
+
+  // --- ESTILOS PARA ESTADOS ---
+  .loading-state, .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 60vh; // Ocupa una buena porción de la pantalla
+  }
+
+  .empty-state {
+    .add-card {
+      width: 100%;
+      max-width: 300px; // Limita el ancho de la tarjeta en el centro
+    }
+    .empty-state-text {
+      margin-top: 16px;
+      color: var(--ion-color-medium-shade);
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Estilos para el Popover (fuera de :host para que Ionic los aplique correctamente)
+ion-popover.user-menu-popover {
+  // Reducimos el ancho para hacerlo más fino
+  --width: 220px; 
+  --box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  --border-radius: 8px; // Añadimos bordes redondeados
+
+  ion-item {
+    // Ajustamos el padding interno
+    --padding-start: 12px;
+    --inner-padding-end: 12px;
+    font-size: 0.9rem; // Hacemos el texto un poco más pequeño
   }
 }

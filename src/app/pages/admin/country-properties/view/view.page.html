@@ -1,44 +1,73 @@
-<app-navbar-back title="Panel de Administración"></app-navbar-back>
+<app-navbar-back title="Administración de Propiedades"></app-navbar-back>
 
-<ion-content>
-  <div class="text-center">
-    <ion-button class="top-button" routerLink="/admin/nueva-propiedad" expand="block">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Nueva Propiedad
-    </ion-button>
-  </div>
-  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500"
-    placeholder="Buscar por Dirección"></ion-searchbar>
-  <div class="table-responsive container">
-    <table class="table text-center">
-      <thead>
-        <tr>
-          <th scope="col">N° Lote</th>
-          <th scope="col">Dirección</th>
-          <th scope="col">Propietario/s</th>
-          <th scope="col">Editar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let propertie of properties | filterBy: searchKey ; let i = index">
-          <td class="text-center">{{propertie.property.number}}</td>
-          <td>{{propertie.property.address}}</td>
-          <td>
-            <ion-list lines="none">
-              <ion-item *ngFor="let owner of propertie.owners">
-                <ion-label>{{owner.user.name}} {{owner.user.lastname}}, </ion-label>
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-container">
+    <!-- Encabezado de la página y controles -->
+    <div class="page-header">
+      <h1>Listado de Propiedades</h1>
+      <div class="controls">
+        <ion-searchbar 
+          [(ngModel)]="searchKey" 
+          mode="ios" 
+          animated="true" 
+          debounce="500"
+          placeholder="Buscar propiedad o propietario...">
+        </ion-searchbar>
+        <!-- BOTÓN ELIMINADO -->
+      </div>
+    </div>
+
+    <!-- Contenedor de la tabla -->
+    <div class="pro-table-container">
+      <div *ngIf="loading" class="loading-container">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando propiedades...</p>
+      </div>
+
+      <div class="pro-table" *ngIf="!loading && filteredProperties.length > 0">
+        <div class="table-header">
+          <div class="header-cell">Lote/N°</div>
+          <div class="header-cell">Dirección</div>
+          <div class="header-cell">Propietario/s</div>
+          <div class="header-cell">Acciones</div>
+        </div>
+
+        <div class="table-row" *ngFor="let prop of filteredProperties; let i = index">
+          <div class="table-cell" data-label="Lote/N°">{{ prop.property.number }}</div>
+          
+          <div class="table-cell" data-label="Dirección">{{ prop.property.address }}</div>
+          
+          <div class="table-cell owner-cell" data-label="Propietario/s">
+            <ion-list lines="none" class="owner-list">
+              <ion-item *ngFor="let owner of prop.owners">
+                <ion-avatar slot="start">
+                  <img [src]="owner.user.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                </ion-avatar>
+                <ion-label>{{ owner.user.name }} {{ owner.user.lastname }}</ion-label>
               </ion-item>
             </ion-list>
-          </td>
-          <td>
-            <ion-icon size="large" (click)="editProperty(propertie.property.id, i)" name="create-outline"></ion-icon>
-          </td>
-          <!-- <td>
-          <ion-icon size="large" (click)="deleteProperty(propertie.property.id, i)" name="trash-outline"></ion-icon>
-        </td> -->
-        </tr>
-        <tr>
-      </tbody>
-    </table>
+          </div>
+
+          <div class="table-cell actions-cell">
+            <ion-button fill="clear" size="small" (click)="editProperty(prop.property.id, i)" title="Editar propiedad">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" color="danger" (click)="deleteProperty(prop.property.id, i)" title="Eliminar propiedad">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && filteredProperties.length === 0">
+        <ion-icon name="business-outline"></ion-icon>
+        <h3>No se encontraron propiedades</h3>
+        <p>No hay propiedades que coincidan con tu búsqueda o aún no se han creado.</p>
+      </div>
+    </div>
   </div>
 </ion-content>

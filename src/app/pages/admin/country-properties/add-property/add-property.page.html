@@ -1,46 +1,56 @@
 <app-navbar-back title="Nueva Propiedad"></app-navbar-back>
-<ion-content>
-<ion-grid>
-  <form [formGroup]="getForm()" (keyup.enter)="addProperty()" (ngSubmit)="addProperty()">
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-  <ion-col size="12">
-    <ion-item counter="true">
-      <ion-label position="floating">Nombre de la Propiedad</ion-label>
-      <ion-input maxlength="50" formControlName="propertyName" type="text"></ion-input>
-    </ion-item>
-  </ion-col>
-  </ion-row>
 
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12">
-    <ion-item counter="true">
-      <ion-label position="floating">Dirección de la Propiedad</ion-label>
-      <ion-input maxlength="50" formControlName="propertyAddress"></ion-input>
-    </ion-item>
-  </ion-col>
-  </ion-row>
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+    <form class="form-container" [formGroup]="getForm()" (ngSubmit)="addProperty()">
+      
+      <div class="form-header">
+        <ion-icon name="business-outline" color="primary"></ion-icon>
+        <h3>Datos de la Propiedad</h3>
+      </div>
+      
+      <!-- Grid para dos columnas -->
+      <div class="form-grid">
+        <!-- Nombre -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input maxlength="50" formControlName="propertyName" type="text"></ion-input>
+        </ion-item>
+        
+        <!-- Dirección -->
+        <ion-item class="form-field">
+          <ion-label position="floating">Dirección</ion-label>
+          <ion-input maxlength="50" formControlName="propertyAddress"></ion-input>
+        </ion-item>
 
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12">
-    <ion-item>
-      <ion-label>Numero de Propiedad</ion-label>
-      <ion-input type="number" placeholder="" formControlName="propertyNumber"></ion-input>
-    </ion-item>
-  </ion-col>
-  </ion-row>
+        <!-- Número de Propiedad / Lote (ocupa todo el ancho) -->
+        <ion-item class="form-field full-width-field">
+          <ion-label position="floating">Número de Propiedad / Lote</ion-label>
+          <ion-input type="number" formControlName="propertyNumber"></ion-input>
+        </ion-item>
+      </div>
+      
+      <!-- Uploader de Imagen Profesional -->
+      <div class="avatar-uploader">
+        <img class="avatar-preview" [src]="newImg" alt="Vista previa de la propiedad">
+        <label for="avatar-input" class="upload-button">
+          <ion-icon name="camera-outline"></ion-icon>
+          <input id="avatar-input" type="file" (change)="onFileChange($event)" formControlName="propertyAvatar" accept="image/*">
+        </label>
+      </div>
+      <p class="avatar-helper-text">Subir foto de la propiedad</p>
+      
+      <!-- Botón de Acción -->
+      <ion-button 
+        class="submit-button"
+        type="submit" 
+        [disabled]="getForm().invalid" 
+        expand="block">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Añadir Propiedad
+      </ion-button>
 
-  <ion-row class="ion-justify-content-center ">
-    <ion-card button>
-      <img [src]=" newImg " alt="">
-      <ion-input (change)="onFileChange($event)" formControlName="propertyAvatar" name="propertyAvatar" type="file" placeholder="Awesome Input"></ion-input>
-    </ion-card>
-  </ion-row>
-
-  <ion-button type="submit" [disabled]="getForm().invalid" expand="block" shape="round">
-    <ion-icon slot="start" name="add"></ion-icon>
-    Añadir Propiedad
-  </ion-button>
-
-</form>
-</ion-grid>
+    </form>
+  </div>
 </ion-content>
+

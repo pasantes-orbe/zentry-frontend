@@ -1,3 +1,139 @@
-ion-button{
-    margin: 20px 0;
+// Aplicamos las variables de nuestro sistema de diseño (versión final compacta)
+:host {
+  --page-padding: 16px;
+  --card-padding: 20px;
+  --border-radius: 16px;
+  --border-color: rgba(0, 0, 0, 0.08);
+}
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--page-padding);
+  align-items: center; // Centra verticalmente si hay espacio
+  min-height: 100%;
+}
+
+// Contenedor principal del formulario
+.form-container {
+  width: 100%;
+  max-width: 550px; // Un poco más ancho para las dos columnas
+  padding: var(--card-padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--ion-color-background);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+// Título del formulario
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
   }
+  ion-icon {
+    font-size: 1.5rem;
+  }
+}
+
+// Contenedor de los campos en formato Grid
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; // Dos columnas
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+// Campo que ocupa todo el ancho dentro del grid
+.full-width-field {
+  grid-column: 1 / -1; // Ocupa desde la primera a la última columna
+}
+
+// Estilo para cada campo del formulario
+.form-field {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --background: var(--ion-color-light-tint);
+  border-radius: 8px;
+  --min-height: 55px; // Altura controlada para ser más compacto
+
+  // ✅ SOLUCIÓN PROPUESTA POR CLAUDE:
+  // Aplicamos un padding superior directamente al ion-input
+  // usando la variable CSS que Ionic provee para ello.
+  // Esto crea el espacio necesario para el label flotante.
+  ion-input {
+    --padding-top: 20px;
+    --padding-start: 12px;
+  }
+  
+  ion-label {
+    --padding-start: 12px;
+  }
+}
+
+// --- UPLOADER DE IMAGEN (Compacto) ---
+.avatar-uploader {
+  position: relative;
+  width: 100%;
+  padding-top: 40%;
+  margin: 0 auto 4px auto; // Margen reducido
+
+  .avatar-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius);
+    object-fit: cover;
+    border: 2px solid var(--border-color); // Borde más fino
+  }
+
+  .upload-button {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 3px solid var(--ion-color-background);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    
+    ion-icon { font-size: 16px; }
+
+    input[type="file"] {
+      display: none;
+    }
+  }
+}
+
+.avatar-helper-text {
+  text-align: center;
+  color: var(--ion-color-step-600);
+  font-size: 0.8rem; // Más pequeño
+  margin-bottom: 20px;
+}
+
+// Botón de envío
+.submit-button {
+  --border-radius: 12px;
+  height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: none;
+  margin-top: 0;
+}
+
