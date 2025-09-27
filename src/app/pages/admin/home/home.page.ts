@@ -1,3 +1,4 @@
+//src/app/pages/admin/home/home.page.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -44,7 +45,12 @@ export class HomePage implements OnInit, OnDestroy {
 
     try {
       this.user = await this.userStorage.getUser();
-    } catch { this.user = null; }
+      // 🐛 DEBUG: Verificar que el usuario se carga correctamente
+      console.log('🔍 Usuario cargado en admin home:', this.user);
+    } catch { 
+      this.user = null; 
+      console.error('❌ Error cargando usuario en admin home');
+    }
 
     this.loadCountries();
     this.loadNotifications();
@@ -104,11 +110,27 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   loadNotifications(): void {
-    this.notificationsService.getAllByUser(1).subscribe({
+    // 🔧 CORRECCIÓN: Usar ID dinámico del usuario logueado en lugar del hardcodeado
+    // ❌ CÓDIGO ORIGINAL (COMENTADO): 
+    // this.notificationsService.getAllByUser(1).subscribe({
+
+    // ✅ CÓDIGO CORREGIDO: Usar this.user?.id dinámicamente
+    if (!this.user?.id) {
+      console.warn('⚠️ No hay usuario logueado, no se pueden cargar notificaciones');
+      this.unreadCount = 0;
+      return;
+    }
+
+    console.log('🔍 Cargando notificaciones para usuario ID:', this.user.id);
+    this.notificationsService.getAllByUser(this.user.id).subscribe({
       next: (list: any[]) => {
         this.unreadCount = (list || []).filter(n => !n.read).length;
+        console.log('✅ Notificaciones cargadas:', list?.length || 0, 'No leídas:', this.unreadCount);
       },
-      error: () => { this.unreadCount = 0; }
+      error: (err) => { 
+        console.error('❌ Error cargando notificaciones:', err);
+        this.unreadCount = 0; 
+      }
     });
   }
 

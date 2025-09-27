@@ -36,6 +36,23 @@ export class UserStorageService {
     try {
       const user = await this._storage?.get('user');
       console.log('Usuario obtenido:', user);
+
+      //INYECCION. CODIGO TEMPORAL
+      //let user = await this._storage?.get('user'); // 1. Intenta obtener el usuario. 
+      //if (!user) {
+      //const adminUser: UserInterface = {
+      //    id: 1, 
+      //    email: 'admin@prueba.com', // Usa el email registrado
+      //    name: 'Administrador',
+      //    lastname: 'Jefe',
+      //    roles: [{ id: 1, name: 'administrador' }] 
+      //  };
+      //  console.warn("ALERTA: Sesión forzada de Administrador para pruebas.");
+      //  await this.saveUser(adminUser); // Guarda la sesión en el storage
+      //  user = adminUser; // Usa este objeto para el retorno
+      //}
+
+      console.log('Usuario obtenido:', user);
       return user || null;
     } catch (error) {
       console.error('Error al obtener el usuario:', error);

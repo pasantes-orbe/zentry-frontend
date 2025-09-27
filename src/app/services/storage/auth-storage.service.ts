@@ -8,6 +8,7 @@ import { Preferences } from '@capacitor/preferences';
 export class AuthStorageService {
 
   private readonly JWT_KEY = 'JWT'; // Clave para almacenar el token JWT
+  private readonly TOKEN_JWT_ADMIN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyIiwiaWF0IjoxNzU4OTEwNDYwLCJleHAiOjE3NTk1MTUyNjB9.KcUPdY-qO5O3BuGBObOl1UDpFd9r8YPgcXYVYF87tdY'; // Token JWT de admin BD
 
   constructor() { }
 
@@ -16,7 +17,8 @@ export class AuthStorageService {
     try {
       await Preferences.set({
         key: this.JWT_KEY,
-        value: JSON.stringify(jwt)
+        //value: JSON.stringify(jwt)
+        value: jwt
       });
       console.log('Token JWT guardado correctamente.');
     } catch (error) {
@@ -28,7 +30,17 @@ export class AuthStorageService {
   public async getJWT(): Promise<string | null> {
     try {
       const { value } = await Preferences.get({ key: this.JWT_KEY });
-      return value ? JSON.parse(value) : null;
+      
+      // ========================================================
+      // INYECCIÓN DE TOKEN DE PRUEBA
+      if (!value) {
+        console.warn("ALERTA: Token JWT forzado para pruebas.");
+        await Preferences.set({ key: this.JWT_KEY, value: JSON.stringify(this.TOKEN_JWT_ADMIN) });
+        return this.TOKEN_JWT_ADMIN; 
+      }
+      // ========================================================
+      //return value ? JSON.parse(value) : null;
+      return value || null;
     } catch (error) {
       console.error('Error al obtener el token JWT:', error);
       return null;

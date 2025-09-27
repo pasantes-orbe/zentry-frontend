@@ -73,26 +73,32 @@ export class AddPropertyPage implements OnInit {
     formData.append('address', this.getForm().get('propertyAddress').value);
     formData.append('number', this.getForm().get('propertyNumber').value);
 
-    // ❌ INCORRECTO: La llamada original no usa await y no maneja el resultado de la promesa.
-    // this._properties.addCountry(this.getForm().get('fileSource').value, this.getForm().get('propertyName').value, this.getForm().get('propertyAddress').value, this.getForm().get('propertyNumber').value)
-    
-    // ✅ CORRECTO: Usamos un bloque try/catch para manejar la promesa que ahora devuelve el servicio.
-    try {
-      await this._alertService.setLoading(); // Muestra el loading
-      
-      // ✅ Await la llamada al nuevo método del servicio que ahora devuelve una Promise
-      const res: any = await this._properties.addProperty(formData);
-      
-      await this._alertService.removeLoading(); // Oculta el loading si la llamada fue exitosa
-      await this._alertService.showAlert("¡Listo!", res.msg);
-      this._router.navigate([`/admin/ver-propiedades`]);
-    } catch (err: any) {
-      await this._alertService.removeLoading(); // Oculta el loading si hay un error
-      console.error("Error al añadir la propiedad:", err);
-      const errorMessage = err.error?.msg || "No se pudo agregar la propiedad. Inténtalo de nuevo.";
-      await this._alertService.showAlert("¡Ooops!", errorMessage);
-    }
-    
+    // ❌ INCORRECTO: La llamada original no usa await y no maneja el resultado de la promesa.
+    // this._properties.addCountry(this.getForm().get('fileSource').value, this.getForm().get('propertyName').value, this.getForm().get('propertyAddress').value, this.getForm().get('propertyNumber').value)
+    
+    // ✅ CORRECTO: Usamos un bloque try/catch para manejar la promesa que ahora devuelve el servicio.
+    try {
+      await this._alertService.setLoading(); // Muestra el loading
+      
+      // ✅ Await la llamada al nuevo método del servicio que ahora devuelve una Promise
+      // Nota: Asumimos que el método addProperty del servicio fue modificado para devolver una Promesa (o un Observable convertido a Promise/lastValueFrom)
+      const res: any = await this._properties.addProperty(formData);
+      
+      await this._alertService.removeLoading(); // Oculta el loading si la llamada fue exitosa
+      await this._alertService.showAlert("¡Listo!", res.msg);
+      this._router.navigate([`/admin/ver-propiedades`]);
+    } catch (err: any) {
+      await this._alertService.removeLoading(); // Oculta el loading si hay un error
+      console.error("Error al añadir la propiedad:", err);
+      
+      // 🚨 CORRECCIÓN CRÍTICA: Se añade un manejo más seguro de errores con encadenamiento opcional (`?.`)
+      // para evitar el TypeError: Cannot read properties of undefined (reading 'msg')
+      // Captura `err.error.msg` (el mensaje del servidor), o `err.message` (el mensaje HTTP), o un mensaje por defecto.
+      const errorMessage = err.error?.msg || err.message || "No se pudo agregar la propiedad. Inténtalo de nuevo.";
+          
+      await this._alertService.showAlert("¡Ooops!", errorMessage);
+    }
+    
   }
 
   public getForm(): FormGroup {

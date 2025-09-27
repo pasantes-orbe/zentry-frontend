@@ -56,7 +56,7 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
     private _alerts: AlertService,
   ) { 
     // Comentamos la conexión real del socket para el modo simulación
-    // this.socket = io(environment.URL);
+    this.socket = io(environment.URL);
   }
 
   async ngOnInit() { 
