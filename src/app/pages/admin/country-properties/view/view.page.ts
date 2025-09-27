@@ -1,3 +1,4 @@
+//src/app/pages/admin/country-properties/view/view.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';

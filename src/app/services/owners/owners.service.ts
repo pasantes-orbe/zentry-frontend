@@ -1,3 +1,4 @@
+//src/app/services/owners/owners.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -31,6 +32,8 @@ export class OwnersService {
   public async getAllByCountry(): Promise<Observable<Owner_CountryInterface[]>>{
     const country = await this._countryStorageService.getCountry()
     const countryID = country.id
+    // ✅ NOTA: Esta función llama a la ruta correcta que lista propietarios por país.
+    // El componente de asignación de propiedad debe usar este método para cargar el listado.
     return this._http.get<Owner_CountryInterface[]>(`${environment.URL}/api/users/owners/get_by_country/${countryID}`)
   }
 
@@ -51,8 +54,10 @@ export class OwnersService {
      await this._alertService.setLoading();
 
     
-
-    this._http.post(`${environment.URL}/api/owners`, formData).subscribe(
+    // 🛑 CORRECCIÓN CRUCIAL: Se cambia el endpoint a '/api/user-properties'.
+    // Esta ruta es la que maneja la relación muchos a muchos a través de la tabla intermedia 'user_properties'.
+    // El endpoint anterior '/api/owners' probablemente causaba el error 400 o no tenía la lógica de asignación correcta.
+    this._http.post(`${environment.URL}/api/user-properties`, formData).subscribe(
       async (res) => {
         console.log(res)
         await this._alertService.removeLoading()
@@ -62,6 +67,7 @@ export class OwnersService {
       async (err) => {
         console.log(err);
         await this._alertService.removeLoading();
+        // NOTA: Se mantiene la lógica de mostrar el mensaje de error del backend.
         this._alertService.showAlert("¡Ooops!", `${err['error']['msg']}`);
         this._router.navigate([`/admin/ver-propietarios`]);
     }
