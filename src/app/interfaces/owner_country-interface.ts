@@ -1,3 +1,4 @@
+// src/app/interfaces/owner_country-interface.ts
 export interface Owner_CountryInterface {
     id:         number;
     id_user:    number;

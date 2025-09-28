@@ -53,24 +53,21 @@
     </ion-list>
   </div>
 
-  <!-- Action Sheet para Información Personal -->
-  <ion-action-sheet
+    <ion-action-sheet
     [isOpen]="isActionSheetOpen"
     header="Información Personal"
     [buttons]="actionSheetButtons"
     (didDismiss)="isActionSheetOpen = false">
   </ion-action-sheet>
 
-  <!-- Alert de confirmación para Logout -->
-  <ion-alert
+    <ion-alert
     [isOpen]="isLogoutAlertOpen"
     header="Cerrar Sesión"
     message="¿Estás seguro que deseas cerrar tu sesión?"
     [buttons]="logoutAlertButtons">
   </ion-alert>
 
-  <!-- Modal para Editar Perfil -->
-  <ion-modal [isOpen]="isEditProfileModalOpen" (didDismiss)="closeEditProfileModal()">
+    <ion-modal [isOpen]="isEditProfileModalOpen" (didDismiss)="closeEditProfileModal()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
@@ -124,8 +121,7 @@
     </ng-template>
   </ion-modal>
 
-  <!-- Modal para Mis Propiedades -->
-  <ion-modal [isOpen]="isPropertiesModalOpen" (didDismiss)="closePropertiesModal()">
+    <ion-modal [isOpen]="isPropertiesModalOpen" (didDismiss)="closePropertiesModal()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
@@ -141,17 +137,19 @@
       <ion-content>
         <div style="padding: 20px;">
           <ion-list>
-            <ion-item *ngFor="let property of properties">
+            
+            <div *ngIf="properties.length === 0" class="ion-padding">
+              <p>No tienes propiedades asignadas.</p>
+            </div>
+            
+            <ion-item *ngFor="let property of properties" lines="full">
               <div>
-                <h4>{{property.type}}</h4>
+                <h4>{{property.name || ('Propiedad N° ' + property.number)}}</h4>
+                
+                <p><strong>N° de Unidad:</strong> {{property.number}}</p>
                 <p><strong>Dirección:</strong> {{property.address}}</p>
-                <p><strong>Área:</strong> {{property.area}}</p>
-                <p><strong>Estado:</strong> 
-                  <span [style.color]="property.status === 'Activa' ? 'green' : 'red'">
-                    {{property.status}}
-                  </span>
-                </p>
-              </div>
+                
+                </div>
             </ion-item>
           </ion-list>
         </div>
@@ -159,8 +157,7 @@
     </ng-template>
   </ion-modal>
 
-  <!-- Modal para Seguridad -->
-  <ion-modal [isOpen]="isSecurityModalOpen" (didDismiss)="closeSecurityModal()">
+    <ion-modal [isOpen]="isSecurityModalOpen" (didDismiss)="closeSecurityModal()">
     <ng-template>
       <ion-header>
         <ion-toolbar>

@@ -1,3 +1,4 @@
+//src/app/tab2/tab2.page.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 

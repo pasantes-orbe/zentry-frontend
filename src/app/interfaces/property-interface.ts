@@ -1,3 +1,4 @@
+//src/app/interfaces/property-interface.ts
 export interface PropertyInterface {
      id: number
      name: string
