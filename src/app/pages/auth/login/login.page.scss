@@ -1,25 +1,121 @@
-/* login.page.scss */
-
-$mobile: 80px;
-$desktop: 130px;
-
-ion-card {
-  box-shadow: none;
+// Variables de diseño para la página de login
+:host {
+  --branding-background: var(--ion-color-primary);
+  --form-background: var(--ion-color-background);
+  --border-radius: 16px;
 }
 
-ion-item {
-  margin-bottom: 20px;
+// Layout principal de pantalla dividida
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr; // Mobile-first: una columna
+  height: 100%;
 }
 
-/*
-  CORRECCIÓN DEFINITIVA:
-  Se aplican los estilos directamente al ion-avatar dentro de esta página
-  para asegurar que siempre esté centrado, sin depender de clases globales.
-*/
-ion-avatar {
-  width: $desktop;
-  height: $desktop;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 1rem; /* Añade un poco de espacio debajo */
+// Panel del formulario
+.form-panel {
+  background: var(--form-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+// Encabezado del formulario
+.form-header {
+  text-align: center;
+  margin-bottom: 24px;
+  ion-icon {
+    font-size: 2.5rem;
+    color: var(--ion-color-primary);
+    margin-bottom: 8px;
+  }
+  h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+}
+
+// Mensaje de error
+.error-message {
+  display: block;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+// Estilo de los campos del formulario
+.form-field {
+  --background: var(--ion-color-light-tint);
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+
+  // Solución de Claude para el bug del label
+  ion-input {
+    --padding-top: 20px;
+    --padding-start: 16px;
+  }
+  ion-label {
+    --padding-start: 16px;
+  }
+  ion-icon {
+    margin-right: 12px;
+  }
+}
+
+// Contenedor de los botones
+.form-actions {
+  margin-top: 24px;
+}
+
+.submit-button {
+  --border-radius: 12px;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.forgot-password-button {
+  --color: var(--ion-color-medium-shade);
+  margin-top: 8px;
+  font-size: 0.9rem;
+  text-transform: none;
+}
+
+// Panel de Branding (solo para desktop)
+.branding-panel {
+  display: none; // Oculto en móviles
+  background: var(--branding-background);
+  color: var(--ion-color-primary-contrast);
+  text-align: center;
+}
+.branding-content {
+  padding: 32px;
+  h1 { font-size: 2.2rem; font-weight: 700; }
+  p { font-size: 1.1rem; opacity: 0.8; }
+}
+.branding-logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+}
+
+// --- RESPONSIVE: Dos columnas para pantallas más grandes ---
+@media (min-width: 992px) {
+  .split-layout {
+    grid-template-columns: 1fr 1fr; // Dos columnas
+  }
+  .branding-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

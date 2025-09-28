@@ -1,0 +1,388 @@
+// SCSS para add-guard - Formulario profesional SaaS
+:host {
+  // ===== VARIABLES DE DISEÑO =====
+  --primary-color: #3b82f6;
+  --primary-light: #dbeafe;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --background: #ffffff;
+  --surface: #f8fafc;
+  --surface-elevated: #ffffff;
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  // ===== CONTENEDOR PRINCIPAL =====
+  .form-content {
+    --background: var(--surface);
+    
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+  }
+
+  // ===== HEADER DEL FORMULARIO =====
+  .form-header {
+    text-align: center;
+    margin-bottom: 32px;
+    
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+      box-shadow: var(--shadow-lg);
+      
+      ion-icon {
+        font-size: 40px;
+        color: white;
+      }
+    }
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
+    }
+    
+    p {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      margin: 0;
+    }
+  }
+
+  // ===== FORMULARIO MODERNO =====
+  .modern-form {
+    .form-section {
+      background: var(--surface-elevated);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        
+        &::before {
+          content: '';
+          width: 4px;
+          height: 20px;
+          background: var(--primary-color);
+          border-radius: 2px;
+          margin-right: 12px;
+        }
+      }
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 0;
+      
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      
+      &.half {
+        flex: 1;
+        
+        @media (max-width: 768px) {
+          flex: none;
+        }
+      }
+      
+      .form-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+        
+        .required {
+          color: var(--danger-color);
+          margin-left: 2px;
+        }
+      }
+      
+      .form-item {
+        --background: var(--surface-elevated);
+        --border-color: var(--border);
+        --border-radius: var(--radius-sm);
+        --padding-start: 16px;
+        --padding-end: 16px;
+        --min-height: 48px;
+        --highlight-color-focused: var(--primary-color);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+        
+        &.item-has-focus {
+          --border-color: var(--primary-color);
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+          transform: translateY(-1px);
+        }
+        
+        &.password-item {
+          --padding-end: 8px;
+          
+          .password-toggle {
+            --color: var(--text-muted);
+            --padding-start: 8px;
+            --padding-end: 8px;
+            margin: 0;
+            
+            &:hover {
+              --color: var(--primary-color);
+            }
+          }
+        }
+        
+        .form-input {
+          --color: var(--text-primary);
+          --placeholder-color: var(--text-muted);
+          font-size: 0.9375rem;
+        }
+        
+        ion-icon[slot="start"] {
+          margin-right: 8px;
+          font-size: 18px;
+        }
+      }
+      
+      .form-error {
+        margin-top: 6px;
+        
+        ion-text {
+          font-size: 0.8125rem;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // ===== UPLOAD DE AVATAR =====
+  .avatar-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .avatar-preview {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+        
+        .avatar-overlay {
+          opacity: 1;
+        }
+      }
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        
+        ion-icon {
+          font-size: 24px;
+          color: white;
+          margin-bottom: 4px;
+        }
+        
+        span {
+          color: white;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+      }
+    }
+    
+    .upload-controls {
+      flex: 1;
+      
+      .upload-button {
+        --border-color: var(--border);
+        --color: var(--text-primary);
+        --border-radius: var(--radius-sm);
+        --box-shadow: var(--shadow);
+        height: 48px;
+        width: 100%;
+        max-width: 300px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        
+        &:hover {
+          --background: var(--primary-light);
+          --color: var(--primary-color);
+          --border-color: var(--primary-color);
+        }
+      }
+      
+      .upload-hint {
+        color: var(--text-muted);
+        font-size: 0.8125rem;
+        margin: 0;
+      }
+    }
+  }
+
+  // ===== ACCIONES DEL FORMULARIO =====
+  .form-actions {
+    margin-top: 32px;
+    text-align: center;
+    
+    .submit-button {
+      --background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
+      --color: white;
+      --border-radius: var(--radius-sm);
+      --box-shadow: var(--shadow-lg);
+      font-weight: 700;
+      height: 56px;
+      max-width: 400px;
+      margin: 0 auto 16px auto;
+      text-transform: none;
+      letter-spacing: 0.5px;
+      
+      &:not([disabled]):hover {
+        --background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        transform: translateY(-2px);
+        --box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      
+      &[disabled] {
+        --background: var(--text-muted);
+        --color: white;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+    
+    .form-summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      
+      ion-text {
+        font-size: 0.875rem;
+        font-weight: 500;
+        
+        ion-icon {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+
+  // ===== RESPONSIVE DESIGN =====
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 16px 12px;
+    }
+    
+    .form-header {
+      margin-bottom: 24px;
+      
+      .header-icon {
+        width: 64px;
+        height: 64px;
+        
+        ion-icon {
+          font-size: 32px;
+        }
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      p {
+        font-size: 1rem;
+      }
+    }
+    
+    .modern-form .form-section {
+      padding: 20px 16px;
+      margin-bottom: 16px;
+    }
+  }
+
+  // ===== ANIMACIONES =====
+  .modern-form {
+    animation: fadeInUp 0.4s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  // Animación escalonada para los campos
+  .form-group {
+    animation: fadeInUp 0.3s ease-out;
+    animation-fill-mode: both;
+    
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.05s};
+      }
+    }
+  }
+}

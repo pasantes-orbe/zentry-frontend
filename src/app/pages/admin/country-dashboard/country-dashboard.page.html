@@ -6,7 +6,13 @@
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <!-- Botón del menú de usuario -->
+      <!-- Campanita de notificaciones -->
+      <ion-button id="notifications-trigger" class="notifications-button">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <ion-badge *ngIf="unreadCount > 0" class="notif-badge">{{ unreadCount }}</ion-badge>
+      </ion-button>
+
+      <!-- Menú de usuario -->
       <ion-button id="user-menu-trigger" class="user-menu-button">
         <ion-avatar>
           <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="User Avatar"/>
@@ -16,15 +22,21 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- Popover de notificaciones -->
+<ion-popover trigger="notifications-trigger" triggerAction="click" [dismissOnSelect]="false" class="notifications-popover">
+  <ng-template>
+    <app-notifications-popover [notifications]="notifications"></app-notifications-popover>
+  </ng-template>
+</ion-popover>
+
 <!-- Popover de usuario -->
 <ion-popover trigger="user-menu-trigger" triggerAction="click" [dismissOnSelect]="true" class="user-menu-popover">
   <ng-template>
     <ion-content>
       <ion-list lines="full">
-        <!-- Toggle de tema -->
         <ion-item class="popover-item">
           <ion-icon name="moon-outline" slot="start"></ion-icon>
-          <ion-label>Dark/Light</ion-label>
+          <ion-label>Modo Oscuro</ion-label>
           <ion-toggle
             slot="end"
             [checked]="theme.isDark()"
@@ -32,13 +44,11 @@
           </ion-toggle>
         </ion-item>
 
-        <!-- Volver a Admin Home -->
         <ion-item class="popover-item" (click)="backToAdminHome()" button="true" detail="false">
           <ion-icon name="home-outline" slot="start" color="primary"></ion-icon>
-          <ion-label>Home</ion-label>
+          <ion-label>Volver a Admin Home</ion-label>
         </ion-item>
 
-        <!-- Cerrar Sesión -->
         <ion-item class="popover-item" (click)="logout()" button="true" detail="false">
           <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
           <ion-label color="danger">Cerrar Sesión</ion-label>
@@ -55,7 +65,6 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Hero con imagen del country -->
   <div class="hero" *ngIf="!loading">
     <ion-img [src]="getCountryImage()"></ion-img>
     <div class="hero-overlay">
@@ -64,7 +73,6 @@
     </div>
   </div>
 
-  <!-- Estado de carga / vacío -->
   <div class="state" *ngIf="loading">
     <ion-spinner name="crescent"></ion-spinner>
   </div>
@@ -73,7 +81,6 @@
   </div>
 
   <ng-container *ngIf="!loading && country">
-    <!-- Segmento -->
     <ion-segment [(ngModel)]="type" mode="ios" [swipeGesture]="true" class="dashboard-segment">
       <ion-segment-button value="propiedades" checked>
         <ion-label>Propiedades</ion-label>
@@ -86,7 +93,6 @@
       </ion-segment-button>
     </ion-segment>
 
-    <!-- Sección: Propiedades -->
     <div *ngIf="type === 'propiedades'" class="cards-grid">
       <ion-card class="dash-card" (click)="goToViewProperties()">
         <ion-card-header>
@@ -155,7 +161,6 @@
       </ion-card>
     </div>
 
-    <!-- Sección: Vigiladores -->
     <div *ngIf="type === 'vigiladores'" class="cards-grid">
       <ion-card class="dash-card" (click)="goToAllGuards()">
         <ion-card-header>
@@ -200,9 +205,21 @@
           <ion-button fill="clear" expand="block">ABRIR MAPA</ion-button>
         </ion-card-content>
       </ion-card>
+
+      <ion-card class="dash-card" (click)="goToAddGuard()">
+        <ion-card-header>
+          <ion-icon name="person-add-outline"></ion-icon>
+          <ion-card-title>Añadir Vigilador</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Dar de alta un nuevo vigilador para este country.</p>
+          <ion-button fill="clear" expand="block">AÑADIR</ion-button>
+        </ion-card-content>
+      </ion-card>
     </div>
 
-    <!-- Sección: Eventos -->
+    
+
     <div *ngIf="type === 'eventos'" class="cards-grid">
       <ion-card class="dash-card" (click)="goToAmenities()">
         <ion-card-header>
