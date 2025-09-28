@@ -1,3 +1,4 @@
+// src/app/interfaces/property_owner-interface.ts
 export interface Property_OwnerInterface {
     property: Property;
     owners:   Owner[];

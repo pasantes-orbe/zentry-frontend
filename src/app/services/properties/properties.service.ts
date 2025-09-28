@@ -109,6 +109,21 @@ public async getBySearchTerm(searchTerm) : Promise<Observable<PropertyInterface[
   return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties/${countryID}/${searchTerm}`, httpOptions);
 }
 
+    // 🟢 NUEVO MÉTODO: Obtiene las propiedades del usuario logueado
+    public async getOwnerProperties(): Promise<Observable<PropertyInterface[]>> {
+        const token = await this._authStorageService.getJWT();
+        
+        // El Interceptor que implementamos DEBERÍA manejar esto, pero si no se usa:
+        const httpOptions = {
+            headers: new HttpHeaders({
+                'Authorization': `Bearer ${token}`, // Se incluye por si acaso el Interceptor falla o no se usa
+            }),
+        };
+
+        // Llama a la nueva ruta protegida /api/properties/owner-properties
+        return this._http.get<PropertyInterface[]>(`${environment.URL}/api/properties/owner-properties`, httpOptions);
+    }
+
 
 public async getAllProperty_OwnerByCountryID():Promise<Observable<Property_OwnerInterface[]>> {
   const token = await this._authStorageService.getJWT();

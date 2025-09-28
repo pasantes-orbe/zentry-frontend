@@ -1,11 +1,11 @@
-// --- Archivo: assign-country-to-owner.page.ts (Corregido y Refactorizado) ---
-
+// src/app/pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin, catchError, of, finalize, Observable } from 'rxjs'; // Importamos finalize y Observable
 
 //Servicios
 import { OwnersService } from '../../../../services/owners/owners.service';
@@ -20,139 +20,166 @@ import { Property_OwnerInterface } from '../../../../interfaces/property_owner-i
 import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
 @Component({
-  selector: 'app-assign-country-to-owner',
-  templateUrl: './assign-country-to-owner.page.html',
-  styleUrls: ['./assign-country-to-owner.page.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    IonicModule,
-    ReactiveFormsModule,
-    FormsModule,
-    NavbarBackComponent
-    // El FilterByPipe ya no es necesario
-  ]
+  selector: 'app-assign-country-to-owner',
+  templateUrl: './assign-country-to-owner.page.html',
+  styleUrls: ['./assign-country-to-owner.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    ReactiveFormsModule,
+    FormsModule,
+    NavbarBackComponent
+  ]
 })
 export class AssignCountryToOwnerPage implements OnInit {
 
-  public form: FormGroup;
-  
-  // Listas originales con todos los datos
-  public owners: Owner_CountryInterface[] = [];
-  public properties: Property_OwnerInterface[] = [];
+  public form: FormGroup;
 
-  // Listas que se mostrarán en la vista y que serán filtradas
-  public filteredOwners: Owner_CountryInterface[] = [];
-  public filteredProperties: Property_OwnerInterface[] = [];
+  // Listas originales con todos los datos
+  public owners: Owner_CountryInterface[] = [];
+  public properties: Property_OwnerInterface[] = [];
 
-  public loading = true; // Añadimos estado de carga
+  // Listas que se mostrarán en la vista y que serán filtradas
+  public filteredOwners: Owner_CountryInterface[] = [];
+  public filteredProperties: Property_OwnerInterface[] = [];
 
-  constructor(
-    private _alertService: AlertService,
-    private _router: Router,
-    private _formBuilder: FormBuilder,
-    private _ownersService: OwnersService,
-    private _propertiesService: PropertiesService
-  ) {
-    this.form = this.createForm();
-  }
+  public loading = true; // Añadimos estado de carga
 
-  ngOnInit() {
-    this.loadData();
-  }
+  constructor(
+    private _alertService: AlertService,
+    private _router: Router,
+    private _formBuilder: FormBuilder,
+    private _ownersService: OwnersService,
+    private _propertiesService: PropertiesService,
+    private _toastCtrl: ToastController // Se añade para feedback
+  ) {
+    this.form = this.createForm();
+  }
 
-  async loadData() {
-    this.loading = true;
+  ngOnInit() {
+    this.loadData();
+  }
 
-    try {
-      // ✅ NOTA: Esta función es la correcta que llama a la ruta '/api/users/owners/get_by_country/:id_country'
-      // y resuelve el problema del listado.
-      // Cargar Propietarios desde el Backend
-      const ownersObservable = await this._ownersService.getAllByCountry();
-      ownersObservable.subscribe(ownersData => {
-        this.owners = ownersData || []; // Aseguramos que sea un array
-        this.filteredOwners = [...this.owners]; 
-      });
+  /**
+   * Carga los propietarios y propiedades usando forkJoin para manejo concurrente de Observables.
+   */
+  public async loadData(): Promise<void> {
+    this.loading = true;
 
-      // Cargar Propiedades desde el Backend
-      const propertiesObservable = await this._propertiesService.getAllProperty_OwnerByCountryID();
-      propertiesObservable.subscribe(propertiesData => {
-        this.properties = propertiesData || []; // Aseguramos que sea un array
-        this.filteredProperties = [...this.properties];
-      });
+    // 1. Definimos los Observables con manejo de errores local
+    const owners$: Observable<Owner_CountryInterface[]> = this._ownersService.getAllByCountry().pipe(
+      catchError(err => {
+        console.error("Error al cargar propietarios:", err);
+        // Mostrar alerta de error de carga para propietarios
+        this.presentToast('Error al cargar propietarios. Se muestra lista vacía.', 'danger');
+        return of([]); 
+      })
+    );
 
-    } catch (error) {
-      console.error("Error al cargar los datos de la página:", error);
-      this._alertService.presentAlert('Error al cargar datos. Intente nuevamente.');
-    } finally {
-      this.loading = false;
-    }
-  }
+    // Asumimos que _propertiesService.getAllProperty_OwnerByCountryID() devuelve un Observable<Property_OwnerInterface[]>.
+    const properties$: Observable<Property_OwnerInterface[]> = (await this._propertiesService.getAllProperty_OwnerByCountryID()).pipe(
+      catchError(err => {
+        console.error("Error al cargar propiedades:", err);
+        // Mostrar alerta de error de carga para propiedades
+        this.presentToast('Error al cargar propiedades. Se muestra lista vacía.', 'danger');
+        return of([]); 
+      })
+    );
 
-  public onSearchOwners(event: any): void {
-    const searchTerm = (event.target.value || '').toLowerCase();
-    if (!searchTerm) {
-      this.filteredOwners = [...this.owners];
-      return;
-    }
-    this.filteredOwners = this.owners.filter(o => {
-      const user = o.user;
-      if (!user) return false;
-      //CORRECCIÓN: Convertimos el DNI a string antes de usar .includes()
-      return (user.name.toLowerCase().includes(searchTerm) ||
-              user.lastname.toLowerCase().includes(searchTerm) ||
-              String(user.dni).toLowerCase().includes(searchTerm));
-    });
-  }
+    // 2. Usamos forkJoin para esperar a que ambos Observables emitan un valor
+    forkJoin([owners$, properties$]).pipe(
+      // Utilizamos 'finalize' para desactivar el loader después de que la subscripción se complete (éxito o error).
+      finalize(() => this.loading = false) 
+    ).subscribe({
+      next: ([ownersData, propertiesData]) => {
+        // Asignación de Propietarios
+        this.owners = ownersData || [];
+        this.filteredOwners = [...this.owners];
 
-  public onSearchProperties(event: any): void {
-    const searchTerm = (event.target.value || '').toLowerCase();
-    if (!searchTerm) {
-      this.filteredProperties = [...this.properties];
-      return;
-    }
-    this.filteredProperties = this.properties.filter(p => {
-        const prop = p.property;
-        if (!prop) return false;
-        //CORRECCIÓN: Convertimos el número de propiedad a string
-        return (prop.name.toLowerCase().includes(searchTerm) ||
-                String(prop.number).toLowerCase().includes(searchTerm));
-    });
-  }
+        // Asignación de Propiedades
+        this.properties = propertiesData || [];
+        this.filteredProperties = [...this.properties];
+      },
+      error: (err) => {
+         // Este bloque solo se alcanza si el flujo de RxJS falla de una manera no manejada
+         console.error("Fallo inesperado después de catchError:", err);
+      }
+    });
+  }
 
-  public createForm(): FormGroup {
-    return this._formBuilder.group({
-      user_id: ['', [Validators.required]],
-      property_id: ['', [Validators.required]],
-    });
-  }
+  public onSearchOwners(event: any): void {
+    const searchTerm = (event.target.value || '').toLowerCase();
+    if (!searchTerm) {
+      this.filteredOwners = [...this.owners];
+      return;
+    }
+    this.filteredOwners = this.owners.filter(o => {
+      // 🚨 CORRECCIÓN FINAL: Solo usamos 'o.user' para coincidir con Owner_CountryInterface.
+      const user = o.user; 
+      
+      if (!user) return false;
+      
+      return (user.name?.toLowerCase().includes(searchTerm) ||
+              user.lastname?.toLowerCase().includes(searchTerm) ||
+              // Se convierte DNI a string para que la búsqueda por inclusión funcione
+              String(user.dni || '').toLowerCase().includes(searchTerm)); 
+    });
+  }
 
-  public async asignarPropiedadAlUsuario() {
-    if (this.form.invalid) {
-      this._alertService.presentAlert('Formulario Inválido: Por favor, seleccione un propietario y una propiedad.');
-      return;
-    }
-    const userId = this.form.get('user_id')?.value;
-    const propertyId = this.form.get('property_id')?.value;
-    
-    try {
-      // 🛑 CORRECCIÓN: La función 'relationWithProperty' en el servicio 
-      // ya maneja su propia subscripción, loading y navegación.
-      // Por lo tanto, no necesita ser 'await'-eada ni envuelta en try/catch aquí
-      // si devuelve void (que es lo que hace al usar .subscribe()).
-      // Llamada al servicio (ya corregido en el paso anterior para usar POST /api/user-properties)
-      this._ownersService.relationWithProperty(userId, propertyId);
-      
-      // Eliminamos las líneas de alert y navegación que se duplican con la lógica del servicio.
-      // this._alertService.presentAlert('Éxito: La propiedad ha sido asignada correctamente.');
-      this.form.reset();
-    } catch (err) {
-      // El error se maneja en el servicio. Solo registramos en consola aquí.
-      console.error("Error al asignar propiedad:", err);
-    }
-  }
+  public onSearchProperties(event: any): void {
+    const searchTerm = (event.target.value || '').toLowerCase();
+    if (!searchTerm) {
+      this.filteredProperties = [...this.properties];
+      return;
+    }
+    this.filteredProperties = this.properties.filter(p => {
+        const prop = p.property;
+        if (!prop) return false;
+        
+        return (prop.name?.toLowerCase().includes(searchTerm) ||
+                prop.address?.toLowerCase().includes(searchTerm) ||
+                // Asumo que 'prop.number' es una propiedad válida para la búsqueda
+                String((prop as any).number || '').toLowerCase().includes(searchTerm));
+    });
+  }
 
-  public getForm(): FormGroup {
-    return this.form;
-  }
+  public createForm(): FormGroup {
+    return this._formBuilder.group({
+      user_id: ['', [Validators.required]],
+      property_id: ['', [Validators.required]],
+    });
+  }
+
+  // Se mantiene 'async' para el manejo de la alerta
+  public async asignarPropiedadAlUsuario() {
+    if (this.form.invalid) {
+      this._alertService.presentAlert('Formulario Inválido: Por favor, seleccione un propietario y una propiedad.');
+      return;
+    }
+    const userId = this.form.get('user_id')?.value;
+    const propertyId = this.form.get('property_id')?.value;
+    
+    // Asumimos que relationWithProperty ya maneja su subscripción/promesa internamente.
+    this._ownersService.relationWithProperty(userId, propertyId);
+    
+    // Opcional: Mostrar un toast de éxito temporal
+    this.presentToast('Asignación enviada...', 'success');
+    
+    this.form.reset();
+  }
+
+  public getForm(): FormGroup {
+    return this.form;
+  }
+
+  private async presentToast(message: string, color: string = 'primary'): Promise<void> {
+    const toast = await this._toastCtrl.create({
+      message: message,
+      duration: 2500,
+      color: color,
+      position: 'bottom'
+    });
+    await toast.present();
+  }
 }

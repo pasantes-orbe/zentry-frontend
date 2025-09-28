@@ -7,11 +7,14 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { IonicStorageModule } from '@ionic/storage-angular';
 
 // 1. Importa el proveedor de HttpClient
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app/routes/routes';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
+
+import { authInterceptor } from './app/interceptors/auth.interceptor'; // <--- NUEVA LÍNEA
+
 
 if (environment.production) {
   enableProdMode();
@@ -25,7 +28,9 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(IonicStorageModule.forRoot()),
 
     // 2. Agrega el proveedor aquí para que esté disponible en toda la app
-    provideHttpClient(),
+    provideHttpClient(
+      withInterceptors([authInterceptor]) // <--- AÑADE EL INTERCEPTOR AQUÍ 
+    ),
 
     provideRouter(routes),
   ],

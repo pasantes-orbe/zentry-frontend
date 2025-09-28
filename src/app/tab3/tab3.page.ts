@@ -2,6 +2,9 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+// 🟢 Importación de PropertiesService (Ya estaba)
+import { PropertiesService } from '../services/properties/properties.service';
+import { PropertyInterface } from '../interfaces/property-interface';
 
 // Usar componentes standalone en lugar de IonicModule completo
 import {
@@ -107,7 +110,7 @@ export class Tab3Page implements OnInit {
       }
     ];
 
-    // Propiedades simuladas
+    /* Propiedades simuladas
     public properties = [
       { 
         id: 1, 
@@ -124,6 +127,8 @@ export class Tab3Page implements OnInit {
         status: 'Activa'
       }
     ];
+    */
+    public properties: PropertyInterface[] = [];
 
     @ViewChild('incomesComponent') incomesComponent: IncomesComponent;
 
@@ -132,7 +137,9 @@ export class Tab3Page implements OnInit {
       private _ownersService: OwnersService,
       private _ownerStorageService: OwnerStorageService,
       private alerts: AlertService,
-      private router: Router
+      private router: Router,
+      // 🟢 INYECCIÓN DEL SERVICIO PROPERTIES SERVICE
+      private _propertiesService: PropertiesService 
     ) {
       this.socket = io(environment.URL);
     }
@@ -149,8 +156,32 @@ export class Tab3Page implements OnInit {
         });
         this.nuevoPropietarioConectado();
         this.escucharNotificacionesCheckin();
+
+        // Cargar propiedades del propietario
+        this.loadOwnerProperties();
       }
     }
+
+    
+    // 🟢 FUNCIÓN PARA CARGAR PROPIEDADES (SIN CAMBIOS)
+    private async loadOwnerProperties() {
+        try {
+            // 🟢 CORRECCIÓN: this._propertiesService ahora existe gracias a la inyección en el constructor.
+            (await this._propertiesService.getOwnerProperties()).subscribe({
+                next: (properties: PropertyInterface[]) => {
+                    this.properties = properties;
+                    console.log('Propiedades sincronizadas:', this.properties);
+                },
+                error: (err) => {
+                    console.error('Error al sincronizar propiedades:', err);
+                    this.alerts.showAlert('Error de Carga', 'No se pudieron cargar sus propiedades.');
+                }
+            });
+        } catch (e) {
+             console.error('Error al obtener token para propiedades:', e);
+        }
+    }
+
 
     ionViewWillEnter() {
       if (this.incomesComponent) {
