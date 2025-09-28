@@ -1,17 +1,21 @@
 :host {
-  // ===== VARIABLES DE DISEÑO =====
+  // ===== VARIABLES DE DISEÑO CON SOPORTE PARA MODO OSCURO =====
   --primary-color: #3b82f6;
   --primary-light: #dbeafe;
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --background: #ffffff;
-  --surface: #f8fafc;
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
+  
+  // Variables que heredan del tema global de Ionic
+  --text-primary: var(--ion-text-color);
+  --text-secondary: var(--ion-color-medium);
+  --text-muted: var(--ion-color-medium-shade);
+  --background: var(--ion-background-color);
+  --surface: var(--ion-card-background);
+  --surface-elevated: var(--ion-item-background);
+  --border: var(--ion-item-border-color);
+  --border-light: var(--ion-color-light);
+  
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --radius: 12px;

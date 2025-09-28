@@ -19,7 +19,7 @@ export class CountryStorageService {
       });
       console.log('Datos del país guardados correctamente.');
     } catch (error) {
-      console.error('Error al guardar los datos del país:', error);
+      console.error('Error al guardar los datos del Country:', error);
     }
   }
 
@@ -28,7 +28,7 @@ export class CountryStorageService {
       const { value } = await Preferences.get({ key: this.COUNTRY_KEY });
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      console.error('Error al obtener los datos del país:', error);
+      console.error('Error al obtener los datos del Country:', error);
       return null;
     }
   }
@@ -38,7 +38,7 @@ export class CountryStorageService {
       const { value } = await Preferences.get({ key: this.COUNTRY_KEY });
       return !!value;
     } catch (error) {
-      console.error('Error al verificar si existe un país:', error);
+      console.error('Error al verificar si existe un Country:', error);
       return false;
     }
   }
@@ -46,9 +46,9 @@ export class CountryStorageService {
   public async clearCountry(): Promise<void> {
     try {
       await Preferences.remove({ key: this.COUNTRY_KEY });
-      console.log('Datos del país eliminados correctamente.');
+      console.log('Datos del Country eliminados correctamente.');
     } catch (error) {
-      console.error('Error al eliminar los datos del país:', error);
+      console.error('Error al eliminar los datos del Country:', error);
     }
   }
 

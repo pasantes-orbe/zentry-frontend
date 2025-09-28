@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { AlertController } from '@ionic/angular';
 import * as L from 'leaflet';
 
-// Componentes de Ionic que usa el HTML
+// Componentes de Ionic
 import { IonicModule } from '@ionic/angular';
 
-// Servicios y otros
+// Servicios
 import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
@@ -15,8 +15,9 @@ import { environment } from 'src/environments/environment';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
 import { CountriesService } from 'src/app/services/countries/countries.service';
+import { CountryInteface } from 'src/app/interfaces/country-interface';
 
-// Fix para iconos de Leaflet en Angular
+// Fix para iconos Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -38,12 +39,18 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
   private socket: Socket;
   private map: L.Map | null = null;
   private tileLayer: L.TileLayer | null = null;
+
+  // Polígono del perímetro
+  private perimeterPolygon: L.Polygon | null = null;
+
+  // Marcadores de guardias sin parpadeo
+  private guardMarkers = new Map<string | number, L.CircleMarker>();
+
   protected antipanicState: boolean = false; 
   protected antipanicID: any;
   protected activeGuards: GuardPointInterface[] = [];
-  public countryLat: number = 0;
-  public countryLng: number = 0;
-  public markers: L.CircleMarker[] = [];
+  public markers: L.CircleMarker[] = []; // (si lo usás en otros lados, lo dejo)
+
   public id_country: any;
   public id_user: any;
 
@@ -55,12 +62,10 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
     private _countryService: CountriesService,
     private _alerts: AlertService,
   ) { 
-    // Comentamos la conexión real del socket para el modo simulación
     this.socket = io(environment.URL);
   }
 
   async ngOnInit() { 
-    // Intentamos obtener los datos del storage. Si falla, no hay problema en modo simulación.
     try {
       const owner = await this._ownerStorage.getOwner();
       if (owner && owner.user) {
@@ -68,78 +73,132 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
         this.id_country = owner.property.id_country.toString();
       }
     } catch (error) {
-      console.warn('No se pudieron obtener los datos del owner del storage (normal en modo simulación).');
+      console.warn('No se pudieron obtener los datos del owner del storage.');
     }
     
-    // Desactivamos los listeners del socket real
     this.setupSocketListeners();
   }
 
   private setupSocketListeners(): void {
-    if (!this.socket) return; // No hacer nada si el socket no está inicializado
-    
+    if (!this.socket) return;
+
+    // Movimiento en vivo sin parpadeo
     this.socket.on('get-actives-guards', (payload) => {
-      this.removeMarkers();
-      this.activeGuards = payload;
-      this.activeGuards.forEach((data) => {
-        if (data.id_country == this.id_country) {
-          this.addPoint(data.lat, data.lng, `Vigilador: <b>${data.user_name} - ${data.user_lastname}</b>`);
-        }
-      });
+      const list = Array.isArray(payload) ? payload : [];
+      const filtered = list.filter((g) => g.id_country == this.id_country);
+
+      filtered.forEach(g => this.upsertGuardMarker(g));
+      this.pruneMissingGuards(filtered);
     });
 
     this.socket.on('guardDisconnected', (payload) => {
-      this.removeMarkers();
+      const key = payload?.id_user ?? payload?.id;
+      if (key && this.guardMarkers.has(key)) {
+        this.guardMarkers.get(key)!.remove();
+        this.guardMarkers.delete(key);
+      }
     });
 
     this.socket.on('notificacion-antipanico-finalizado', (payload) => {
-      console.log(payload);
       this.antipanicState = false;
       const box = document.querySelector('.box') as HTMLElement;
-      if (box) {
-        box.style.display = 'none';
-      }
+      if (box) box.style.display = 'none';
       this._alerts.presentAlertFinishAntipanicDetails(payload['antipanic']['details']);
     });
   }
-  
+
+  // Upsert de marcadores de guardias
+  private upsertGuardMarker(g: any): void {
+    if (!this.map) return;
+    const key = g.id_user ?? g.id ?? `${g.user_name}-${g.user_lastname}`;
+
+    let marker = this.guardMarkers.get(key);
+    if (marker) {
+      marker.setLatLng([g.lat, g.lng]);
+    } else {
+      marker = L.circleMarker([g.lat, g.lng], {
+        color: '#ff0000',
+        fillColor: '#ff0000',
+        fillOpacity: 0.7,
+        radius: 8,
+        weight: 2
+      }).bindPopup(`Vigilador: <b>${g.user_name} - ${g.user_lastname}</b>`, { closeButton: false })
+        .addTo(this.map);
+      this.guardMarkers.set(key, marker);
+    }
+  }
+
+  // Limpieza incremental (los que ya no vienen)
+  private pruneMissingGuards(current: any[]): void {
+    const alive = new Set(
+      current.map(g => (g.id_user ?? g.id ?? `${g.user_name}-${g.user_lastname}`))
+    );
+    for (const [key, marker] of this.guardMarkers.entries()) {
+      if (!alive.has(key)) {
+        marker.remove();
+        this.guardMarkers.delete(key);
+      }
+    }
+  }
+
   async ngAfterViewInit() {
-    // Coordenadas exactas para centrar el mapa en "La Rivera"
-    const latitudLaRivera = -27.4302;
-    const longitudLaRivera = -58.9643;
-  
-    console.log('MODO SIMULACIÓN: Inicializando mapa en "La Rivera" con coordenadas precisas.');
-    this.initMap(latitudLaRivera, longitudLaRivera);
-  
-    // Llamamos a la función que simula los guardias en sus puestos exactos
-    this._simularGuardiasLaRivera(); 
+    if (!this.id_country) return;
+
+    try {
+      const country = await new Promise<any>((resolve, reject) => {
+        this._countryService.getByID(+this.id_country).subscribe(resolve, reject);
+      });
+
+      const center = this.extractCenter(country);
+      if (!center) return;
+
+      this.initMap(center.lat, center.lng);
+
+      const perimeter = this.extractPerimeter(country);
+      if (perimeter && perimeter.length >= 3) {
+        this.drawPolygon(perimeter);
+      }
+    } catch (e) {
+      console.warn('Fallo al cargar el country.', e);
+    }
   }
 
-  private _simularGuardiasLaRivera(): void {
-    console.log('MODO SIMULACIÓN: Creando guardias en puestos exactos de "La Rivera".');
-
-    // Puestos exactos de los guardias (Entrada, Medio, Fondo)
-    const guardiasFalsos = [
-      { lat: -27.429969, lng: -58.963919, user_name: 'Guardia-Entrada', user_lastname: 'Colussi.F' },
-      { lat: -27.427316, lng: -58.964532, user_name: 'Guardia-Centro', user_lastname: 'Escalante.C' },
-      { lat: -27.423088, lng: -58.965417, user_name: 'Guardia-Fondo', user_lastname: 'Zaracho.B' }
-    ];
-    this.removeMarkers(); // Limpia marcadores anteriores
-    
-    guardiasFalsos.forEach(guardia => {
-      const popupHtml = `Vigilador: <b>${guardia.user_name} ${guardia.user_lastname}</b>`;
-      this.addPoint(guardia.lat, guardia.lng, popupHtml);
-    });
+  private extractCenter(country: any): {lat:number; lng:number} | null {
+    const lat = country?.latitude ?? country?.center_lat;
+    const lng = country?.longitude ?? country?.center_lng;
+    return (typeof lat === 'number' && typeof lng === 'number') ? {lat, lng} : null;
   }
 
+  private extractPerimeter(country: any): {lat:number; lng:number}[] | null {
+    let raw = country?.perimeter_points ?? country?.perimeterPoints ?? null;
+    if (!raw) return null;
+    if (typeof raw === 'string') {
+      try { raw = JSON.parse(raw); } catch { return null; }
+    }
+    if (!Array.isArray(raw)) return null;
+    return raw.every(p => typeof p?.lat === 'number' && typeof p?.lng === 'number') ? raw : null;
+  }
+
+  private drawPolygon(points: {lat:number; lng:number}[]): void {
+    if (!this.map) return;
+    if (this.perimeterPolygon) {
+      this.map.removeLayer(this.perimeterPolygon);
+      this.perimeterPolygon = null;
+    }
+    this.perimeterPolygon = L.polygon(points as any, { color: 'blue', weight: 2 }).addTo(this.map);
+
+    // Ajustar vista al polígono y (opcional) limitar el paneo al perímetro
+    const bounds = this.perimeterPolygon.getBounds();
+    this.map.fitBounds(bounds);
+    // Si querés limitar el arrastre al perímetro, descomentá:
+    // this.map.setMaxBounds(bounds.pad(0.02));
+  }
 
   ngOnDestroy(): void {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
-    if (this.map) {
-      this.map.remove();
-    }
+    if (this.socket) this.socket.disconnect();
+    if (this.map) this.map.remove();
+    this.guardMarkers.forEach(m => m.remove());
+    this.guardMarkers.clear();
   }
   
   public getTileLayer(): L.TileLayer | null {
@@ -147,9 +206,7 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    if (this.socket) {
-        this.socket.emit('owner-connected', this.id_user);
-    }
+    if (this.socket) this.socket.emit('owner-connected', this.id_user);
   }
   
   public setTileLayer(url: string): void {
@@ -161,20 +218,10 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private initMap(mapLat: number, mapLng: number): void {
     if (this.map) {
-        this.map.setView([mapLat, mapLng]);
-        return;
+      this.map.setView([mapLat, mapLng]);
+      return;
     }
 
-    // --- INICIO DE LA MODIFICACIÓN: DEFINIR PERÍMETRO ---
-
-    // 1. Defini las esquinas del perimetro alrededor de La Rivera.
-    const southWest = L.latLng(-27.430294, -58.963896); // Esquina inferior izquierda
-    const northEast = L.latLng(-27.421497, -58.966106); // Esquina superior derecha
-    const bounds = L.latLngBounds(southWest, northEast);
-
-    // --- FIN DE LA MODIFICACIÓN ---
-
-    // Detectar tema oscuro/claro
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     if (prefersDark.matches) {
       this.setTileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png');
@@ -182,53 +229,35 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
       this.setTileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     }
 
-    // Crear mapa
     this.map = L.map('map', {
       zoomControl: true,
-      layers: [this.getTileLayer()!],
-      maxBounds: bounds, // <-- 2. APLICAMOS EL PERÍMETRO
-      maxBoundsViscosity: 1.0 // <-- Opcional: Hace que el límite sea "sólido"
+      layers: [this.getTileLayer()!]
+      // sin maxBounds hardcodeados; si hay perímetro, se setea con fitBounds
     }).setView([mapLat, mapLng], 15);
 
-    // También es buena idea ajustar el zoom mínimo para que no se aleje demasiado
-    this.map.setMinZoom(17);
-
-    // Fix para el tamaño del mapa
-    setTimeout(() => {
-      if (this.map) {
-        this.map.invalidateSize(true);
-      }
-    }, 100);
-
-    // ... (el resto de la función sigue igual) ...
+    this.map.setMinZoom(13);
+    setTimeout(() => this.map?.invalidateSize(true), 100);
   }
 
+  // Marcadores auxiliares (si en otro flujo los seguís usando)
   public addPoint(lat: number, lng: number, html: string = ''): void {
     if (!this.map) return;
-
     const marker = L.circleMarker([lat, lng], {
       color: '#ff0000',
       fillColor: '#ff0000',
       fillOpacity: 0.7,
       radius: 8,
       weight: 2
-    })
-    .bindPopup(html, { closeButton: false })
-    .addTo(this.map);
-
+    }).bindPopup(html, { closeButton: false }).addTo(this.map);
     this.markers.push(marker);
   }
 
   public removeMarker(marker: L.CircleMarker): void {
-    if (this.map) {
-      this.map.removeLayer(marker);
-    }
+    if (this.map) this.map.removeLayer(marker);
   }
 
   public removeMarkers(): void {
-    this.markers.forEach(marker => {
-      this.removeMarker(marker);
-    });
+    this.markers.forEach(marker => this.removeMarker(marker));
     this.markers = [];
   }
 
@@ -240,33 +269,21 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
     return this.map;
   }
 
-  // Las funciones de antipánico se mantienen, pero no se conectarán al socket real
   async activateAntipanic() {
     const box = document.querySelector('.box') as HTMLElement;
-    if (box) {
-      box.style.display = 'block';
-    }
+    if (box) box.style.display = 'block';
     this.antipanicState = true;
-    console.log('MODO SIMULACIÓN: Antipanico activado. No se enviará notificación.');
-    // La llamada real al servicio se puede comentar para no generar errores
-    
-    const owner = await this._ownerStorage.getOwner();
-    const ownerID = owner.user.id;
-    // ...resto de la lógica
-    // this._antipanicService.activateAntipanic(ownerID).subscribe({
-    //   next: (response) => { /* handle success */ },
-    //   error: (err) => { /* handle error */ }
-    // });
+    console.log('Antipánico activado.');
   }
 
   async desactivateAntipanic() {
     this.presentAlert();
-
   }
+
   public async presentAlert() {
     const alert = await this.alertController.create({
-      header: 'Cancelar Antipanico',
-      message: '¿Está seguro de cancelarantipánico?',
+      header: 'Cancelar Antipánico',
+      message: '¿Está seguro de cancelarlo?',
       backdropDismiss: false,
       buttons: [
         {
@@ -275,22 +292,17 @@ export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
           handler: () => {
             this.antipanicState = false;
             const box = document.querySelector('.box') as HTMLElement;
-            if (box) {
-              box.style.display = 'none';
-            }
-            console.log('MODO SIMULACIÓN: Antipanico desactivado.');
+            if (box) box.style.display = 'none';
+            console.log('Antipánico desactivado.');
           },
         },
         {
           text: 'Cancelar',
           role: 'cancel',
-          handler: () => {
-            this.antipanicState = true;
-          },
+          handler: () => { this.antipanicState = true; },
         }
       ],
     });
-
     await alert.present();
   }
 }

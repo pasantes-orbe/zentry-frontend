@@ -62,7 +62,7 @@ export class CountriesService {
   public getByID(id:number): Observable<CountryInteface> {
     return this._http.get<CountryInteface>(`${environment.URL}/api/countries/${ id }`);
   }
-  
+
   public deleteById(id){
     return this._http.patch(`${environment.URL}/api/countries/delete-country/${ id }`, {})
   }
