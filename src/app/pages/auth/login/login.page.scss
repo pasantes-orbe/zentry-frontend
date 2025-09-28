@@ -1,76 +1,127 @@
-// Variables de diseño para la página de login
 :host {
-  --branding-background: var(--ion-color-primary);
-  --form-background: var(--ion-color-background);
+  --page-padding: 24px;
+  --form-card-padding: 32px;
   --border-radius: 16px;
+  --field-border-radius: 8px;
+}
+
+ion-content {
+  --background: var(--ion-background-color);
 }
 
 // Layout principal de pantalla dividida
 .split-layout {
-  display: grid;
-  grid-template-columns: 1fr; // Mobile-first: una columna
+  display: flex;
   height: 100%;
 }
 
-// Panel del formulario
-.form-panel {
-  background: var(--form-background);
+// Estilo para ambos paneles
+.split-panel {
+  width: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+}
+
+//PANEL IZQUIERDO CON IMAGEN DE FONDO
+.branding-panel {
+  // La ruta debe ser relativa desde este archivo SCSS a la carpeta assets
+  background-image: url('src/assets/logos/img-login.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  color: #ffffff;
+
+  // Superposición oscura para mejorar la legibilidad del texto
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0; // Abarca todo el panel
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+}
+
+.branding-content {
+  position: relative; // Para que se muestre sobre la superposición
+  z-index: 2;
+  text-align: center;
   padding: 24px;
+
+  .branding-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+}
+
+
+// PANEL DERECHO CON FORMULARIO
+.form-panel {
+  background-color: var(--ion-background-color);
 }
 
 .form-wrapper {
   width: 100%;
   max-width: 400px;
+  padding: var(--page-padding);
 }
 
-// Encabezado del formulario
 .form-header {
   text-align: center;
   margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
   ion-icon {
     font-size: 2.5rem;
     color: var(--ion-color-primary);
-    margin-bottom: 8px;
   }
+
   h2 {
     margin: 0;
     font-size: 1.8rem;
     font-weight: 600;
+    color: var(--ion-text-color);
   }
 }
 
-// Mensaje de error
 .error-message {
   display: block;
   text-align: center;
   margin-bottom: 16px;
 }
 
-// Estilo de los campos del formulario
 .form-field {
   --background: var(--ion-color-light-tint);
   --padding-start: 0;
   --inner-padding-end: 0;
-  border-radius: 8px;
+  border-radius: var(--field-border-radius);
   margin-bottom: 16px;
 
-  // Solución de Claude para el bug del label
   ion-input {
-    --padding-top: 20px;
     --padding-start: 16px;
   }
-  ion-label {
-    --padding-start: 16px;
-  }
+
   ion-icon {
     margin-right: 12px;
+    color: var(--ion-color-medium-shade);
   }
 }
 
-// Contenedor de los botones
 .form-actions {
   margin-top: 24px;
 }
@@ -90,32 +141,12 @@
   text-transform: none;
 }
 
-// Panel de Branding (solo para desktop)
-.branding-panel {
-  display: none; // Oculto en móviles
-  background: var(--branding-background);
-  color: var(--ion-color-primary-contrast);
-  text-align: center;
-}
-.branding-content {
-  padding: 32px;
-  h1 { font-size: 2.2rem; font-weight: 700; }
-  p { font-size: 1.1rem; opacity: 0.8; }
-}
-.branding-logo {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 16px;
-}
-
-// --- RESPONSIVE: Dos columnas para pantallas más grandes ---
-@media (min-width: 992px) {
-  .split-layout {
-    grid-template-columns: 1fr 1fr; // Dos columnas
-  }
+// --- RESPONSIVE: Para pantallas pequeñas ---
+@media (max-width: 992px) {
   .branding-panel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none; // Ocultamos el panel de la imagen en móviles
+  }
+  .split-panel {
+    width: 100%; // El panel del formulario ocupa todo el ancho
   }
 }
