@@ -33,39 +33,73 @@ export class AddGuardPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
 
-  constructor(private _emailHelperService: EmailHelperService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router, private _registerService: RegisterService) {
+  constructor(
+    private _emailHelperService: EmailHelperService, 
+    protected _formBuilder: FormBuilder, 
+    protected _alertService: AlertService, 
+    private http: HttpClient, 
+    private _router: Router, 
+    private _registerService: RegisterService
+  ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
+  
   ngOnInit() {
   }
 
   onFileChange(event) {
     const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = e => this.newImg = reader.result;
-    reader.readAsDataURL(file);
-    if (event.target.files.length > 0) {
-      const file = event.target.files[0];
+    if (file) {
+      // Validar tamaño del archivo (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this._alertService.presentAlert('El archivo es muy grande. Máximo 5MB permitido.');
+        return;
+      }
+
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        this._alertService.presentAlert('Solo se permiten archivos de imagen.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = e => this.newImg = reader.result;
+      reader.readAsDataURL(file);
+      
       this.form.patchValue({
         fileSource: file
       });
     }
   }
 
-  addGuard(){
-    this._registerService.register(this.getForm().get('vigilatorName').value,
-    this.getForm().get('vigilatorLastname').value,
-    this.getForm().get('vigilatorDNI').value,
-    this.getForm().get('vigilatorEmail').value,
-    this.getForm().get('vigilatorPassword').value,
-    this.getForm().get('vigilatorPhone').value,
-    this.getForm().get('vigilatorBirthdate').value,
-    this.getForm().get('fileSource').value,
-    'vigilador')
-
-
+  // Método para activar el file input desde el botón
+  public triggerFileInput(): void {
+    const fileInput = document.getElementById('avatar-input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
   }
+
+  addGuard(){
+    if (this.form.invalid) {
+      this._alertService.presentAlert('Por favor, complete todos los campos obligatorios.');
+      return;
+    }
+
+    this._registerService.register(
+      this.getForm().get('vigilatorName').value,
+      this.getForm().get('vigilatorLastname').value,
+      this.getForm().get('vigilatorDNI').value,
+      this.getForm().get('vigilatorEmail').value,
+      this.getForm().get('vigilatorPassword').value,
+      this.getForm().get('vigilatorPhone').value,
+      this.getForm().get('vigilatorBirthdate').value,
+      this.getForm().get('fileSource').value,
+      'vigilador'
+    );
+  }
+
   public getForm(): FormGroup {
     return this.form;
   }
@@ -82,26 +116,26 @@ export class AddGuardPage implements OnInit {
       vigilatorAvatar: new FormControl('', [Validators.required]),
       fileSource: new FormControl('', [Validators.required])
     });
-}
+  }
 
-private changeIcon(input): void {
-  (this.getPasswordType(input) === "password")
-    ? this.passIcon.name = "eye-outline"
-    : this.passIcon.name = "eye-off-outline"
+  private changeIcon(input): void {
+    (this.getPasswordType(input) === "password")
+      ? this.passIcon.name = "eye-outline"
+      : this.passIcon.name = "eye-off-outline"
+  }
 
-}
-
-protected showPassword(input): void {
-  (this.getPasswordType(input) === "password")
-    ? this.setPasswordType(input, "text")
-    : this.setPasswordType(input, "password");
-  this.changeIcon(input);
-
-}
-private getPasswordType(input): string {
-  return input.type;
-}
-private setPasswordType(input, type): void {
-  input.type = type;
-}
+  protected showPassword(input): void {
+    (this.getPasswordType(input) === "password")
+      ? this.setPasswordType(input, "text")
+      : this.setPasswordType(input, "password");
+    this.changeIcon(input);
+  }
+  
+  private getPasswordType(input): string {
+    return input.type;
+  }
+  
+  private setPasswordType(input, type): void {
+    input.type = type;
+  }
 }

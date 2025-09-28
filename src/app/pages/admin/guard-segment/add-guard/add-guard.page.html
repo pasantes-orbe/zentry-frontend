@@ -1,89 +1,202 @@
 <app-navbar-back title="Nuevo Vigilador"></app-navbar-back>
 
-<ion-content>
-  <ion-grid>
-    <form [formGroup]="getForm()" (keyup.enter)="addGuard()" (ngSubmit)="addGuard()">
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12">
-      <ion-item>
-        <ion-label>Nombre</ion-label>
-        <ion-input  type="text" formControlName="vigilatorName"></ion-input>
-      </ion-item>
-    </ion-col>
-    </ion-row>
+<ion-content class="form-content">
+  <div class="form-container">
+    <!-- HEADER DEL FORMULARIO -->
+    <div class="form-header">
+      <div class="header-icon">
+        <ion-icon name="shield-outline"></ion-icon>
+      </div>
+      <h1>Registrar Nuevo Vigilador</h1>
+      <p>Complete la información personal y de contacto</p>
+    </div>
 
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <ion-col size="12">
-      <ion-item>
-        <ion-label>Apellido</ion-label>
-        <ion-input type="text" formControlName="vigilatorLastname"></ion-input>
-      </ion-item>
-    </ion-col>
-    </ion-row>
+    <!-- FORMULARIO -->
+    <form [formGroup]="getForm()" (keyup.enter)="addGuard()" (ngSubmit)="addGuard()" class="modern-form">
+      
+      <!-- SECCIÓN: INFORMACIÓN PERSONAL -->
+      <div class="form-section">
+        <h2 class="section-title">Información Personal</h2>
+        
+        <div class="form-row">
+          <div class="form-group half">
+            <label class="form-label">Nombre <span class="required">*</span></label>
+            <ion-item class="form-item">
+              <ion-input 
+                formControlName="vigilatorName" 
+                placeholder="Ej: Juan"
+                class="form-input">
+              </ion-input>
+            </ion-item>
+            <div class="form-error" *ngIf="getForm().get('vigilatorName')?.invalid && getForm().get('vigilatorName')?.touched">
+              <ion-text color="danger">El nombre es obligatorio (mín. 3 caracteres)</ion-text>
+            </div>
+          </div>
 
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <ion-col size="12">
-      <ion-item>
-        <ion-label>DNI</ion-label>
-        <ion-input type="number" placeholder="" formControlName="vigilatorDNI"></ion-input>
-      </ion-item>
-    </ion-col>
-    </ion-row>
+          <div class="form-group half">
+            <label class="form-label">Apellido <span class="required">*</span></label>
+            <ion-item class="form-item">
+              <ion-input 
+                formControlName="vigilatorLastname" 
+                placeholder="Ej: Pérez"
+                class="form-input">
+              </ion-input>
+            </ion-item>
+            <div class="form-error" *ngIf="getForm().get('vigilatorLastname')?.invalid && getForm().get('vigilatorLastname')?.touched">
+              <ion-text color="danger">El apellido es obligatorio (mín. 5 caracteres)</ion-text>
+            </div>
+          </div>
+        </div>
 
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <ion-col size="12">
-      <ion-item>
-        <ion-label>email</ion-label>
-        <ion-input type="email" placeholder="" formControlName="vigilatorEmail"></ion-input>
-      </ion-item>
-    </ion-col>
-    </ion-row>
+        <div class="form-row">
+          <div class="form-group half">
+            <label class="form-label">DNI <span class="required">*</span></label>
+            <ion-item class="form-item">
+              <ion-input 
+                formControlName="vigilatorDNI" 
+                type="number"
+                placeholder="12345678"
+                class="form-input">
+              </ion-input>
+            </ion-item>
+            <div class="form-error" *ngIf="getForm().get('vigilatorDNI')?.invalid && getForm().get('vigilatorDNI')?.touched">
+              <ion-text color="danger">DNI inválido (entre 1.000.000 y 100.000.000)</ion-text>
+            </div>
+          </div>
 
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <ion-col size="12">
-        <ion-item>
-          <!-- <ion-label position="floating">Contraseña</ion-label> -->
-          <ion-icon #passwordShowIcon button slot="end" (click)="showPassword(password)" slot="end" name="eye-outline">
-          </ion-icon>
-          <ion-label>Contraseña</ion-label>
-          <ion-input #password required type="password" placeholder="" formControlName="vigilatorPassword">
-          </ion-input>
-        </ion-item>
-    </ion-col>
-    </ion-row>
+          <div class="form-group half">
+            <label class="form-label">Fecha de Nacimiento <span class="required">*</span></label>
+            <ion-item class="form-item">
+              <ion-input 
+                formControlName="vigilatorBirthdate" 
+                type="date"
+                class="form-input">
+              </ion-input>
+            </ion-item>
+            <div class="form-error" *ngIf="getForm().get('vigilatorBirthdate')?.invalid && getForm().get('vigilatorBirthdate')?.touched">
+              <ion-text color="danger">La fecha de nacimiento es obligatoria</ion-text>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <ion-col size="12">
-      <ion-item>
-        <ion-label>Número de celular</ion-label>
-        <ion-input type="number" placeholder="" formControlName="vigilatorPhone"></ion-input>
-      </ion-item>
-    </ion-col>
-    </ion-row>
+      <!-- SECCIÓN: CONTACTO Y ACCESO -->
+      <div class="form-section">
+        <h2 class="section-title">Contacto y Acceso</h2>
+        
+        <div class="form-group">
+          <label class="form-label">Email <span class="required">*</span></label>
+          <ion-item class="form-item">
+            <ion-icon name="mail-outline" slot="start" color="medium"></ion-icon>
+            <ion-input 
+              formControlName="vigilatorEmail" 
+              type="email"
+              placeholder="vigilador@ejemplo.com"
+              class="form-input">
+            </ion-input>
+          </ion-item>
+          <div class="form-error" *ngIf="getForm().get('vigilatorEmail')?.invalid && getForm().get('vigilatorEmail')?.touched">
+            <ion-text color="danger">Email inválido o requerido</ion-text>
+          </div>
+        </div>
 
-    <ion-row class="ion-justify-content-center ion-padding-bottom">
-      <ion-col size="12">
-      <ion-item>
-        <ion-label>Fecha de Nacimiento</ion-label>
-        <ion-input type="date" placeholder="" formControlName="vigilatorBirthdate"></ion-input>
-      </ion-item>
-      </ion-col>
-    </ion-row>
+        <div class="form-group">
+          <label class="form-label">Teléfono <span class="required">*</span></label>
+          <ion-item class="form-item">
+            <ion-icon name="call-outline" slot="start" color="medium"></ion-icon>
+            <ion-input 
+              formControlName="vigilatorPhone" 
+              type="tel"
+              placeholder="+54 362 123-4567"
+              class="form-input">
+            </ion-input>
+          </ion-item>
+          <div class="form-error" *ngIf="getForm().get('vigilatorPhone')?.invalid && getForm().get('vigilatorPhone')?.touched">
+            <ion-text color="danger">Número de teléfono inválido</ion-text>
+          </div>
+        </div>
 
+        <div class="form-group">
+          <label class="form-label">Contraseña <span class="required">*</span></label>
+          <ion-item class="form-item password-item">
+            <ion-icon name="lock-closed-outline" slot="start" color="medium"></ion-icon>
+            <ion-input 
+              #password
+              formControlName="vigilatorPassword" 
+              type="password"
+              placeholder="Mínimo 4 caracteres"
+              class="form-input">
+            </ion-input>
+            <ion-button 
+              fill="clear" 
+              slot="end" 
+              class="password-toggle"
+              (click)="showPassword(password)">
+              <ion-icon #passwordShowIcon name="eye-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div class="form-error" *ngIf="getForm().get('vigilatorPassword')?.invalid && getForm().get('vigilatorPassword')?.touched">
+            <ion-text color="danger">Contraseña obligatoria (mín. 4 caracteres)</ion-text>
+          </div>
+        </div>
+      </div>
 
-    <ion-row class="ion-justify-content-center">
-      <ion-card button>
-        <img [src]="newImg" alt="">
-        <ion-input (change)="onFileChange($event)" formControlName="vigilatorAvatar" type="file" placeholder="Awesome Input"></ion-input>
-      </ion-card>
-    </ion-row>
+      <!-- SECCIÓN: FOTO DE PERFIL -->
+      <div class="form-section">
+        <h2 class="section-title">Foto de Perfil</h2>
+        
+        <div class="avatar-upload-container">
+          <div class="avatar-preview">
+            <img [src]="newImg" alt="Vista previa" />
+            <div class="avatar-overlay">
+              <ion-icon name="camera-outline"></ion-icon>
+              <span>Cambiar foto</span>
+            </div>
+          </div>
+          
+          <div class="upload-controls">
+            <input 
+              type="file" 
+              id="avatar-input"
+              accept="image/*"
+              formControlName="vigilatorAvatar"
+              (change)="onFileChange($event)"
+              hidden />
+            <ion-button 
+              fill="outline" 
+              class="upload-button"
+              (click)="triggerFileInput()">
+              <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+              Seleccionar imagen
+            </ion-button>
+            <p class="upload-hint">JPG, PNG o GIF. Máximo 5MB.</p>
+          </div>
+          
+          <div class="form-error" *ngIf="getForm().get('vigilatorAvatar')?.invalid && getForm().get('vigilatorAvatar')?.touched">
+            <ion-text color="danger">La foto de perfil es obligatoria</ion-text>
+          </div>
+        </div>
+      </div>
 
-    <ion-button type="submit" [disabled]="this.getForm().invalid" expand="block" shape="round">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Añadir Vigilador
-    </ion-button>
-
-
-  </form>
-  </ion-grid>
-  </ion-content>
+      <!-- BOTÓN DE ENVÍO -->
+      <div class="form-actions">
+        <ion-button 
+          type="submit" 
+          expand="block" 
+          size="large"
+          class="submit-button"
+          [disabled]="getForm().invalid">
+          <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+          Registrar Vigilador
+        </ion-button>
+        
+        <div class="form-summary" *ngIf="getForm().valid">
+          <ion-text color="success">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            Formulario completo y listo para enviar
+          </ion-text>
+        </div>
+      </div>
+    </form>
+  </div>
+</ion-content>

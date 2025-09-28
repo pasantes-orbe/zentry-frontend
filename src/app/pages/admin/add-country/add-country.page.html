@@ -1,103 +1,242 @@
-<ion-header>
-  <ion-toolbar>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button default-href="/admin/home"></ion-back-button>
+      <ion-back-button default-href="/admin/home" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>Añadir Nuevo Country</ion-title>
+    <ion-title class="page-title">Nuevo Country</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- NUEVA SECCIÓN: Indicador de paso actual -->
-  <ion-card>
-    <ion-card-content>
-      <ion-text color="primary">
-        <h3>{{ currentStep === 1 ? 'Paso 1: Marcar Centro del Barrio' : 'Paso 2: Marcar Perímetro del Barrio' }}</h3>
-      </ion-text>
-      <p *ngIf="currentStep === 1">Arrastra el marcador o haz clic para posicionar el centro del barrio.</p>
-      <p *ngIf="currentStep === 2">Haz clic en 4 puntos del mapa para delimitar el perímetro. Puntos marcados: {{ perimeterPoints.length }}/4</p>
-      
-      <!-- Botones de control del mapa -->
-      <div *ngIf="currentStep === 1">
-        <ion-button expand="block" color="success" (click)="confirmCenter()">
-          Confirmar Centro y Continuar
-        </ion-button>
-      </div>
-      
-      <div *ngIf="currentStep === 2">
-        <ion-button expand="block" color="warning" (click)="resetPerimeter()" [disabled]="perimeterPoints.length === 0">
-          Reiniciar Perímetro
-        </ion-button>
-        <ion-button expand="block" color="medium" (click)="backToStep1()">
-          Volver al Paso 1
-        </ion-button>
-      </div>
-    </ion-card-content>
-  </ion-card>
+  <!-- INDICADOR DE PROGRESO -->
+  <div class="progress-container">
+    <div class="progress-step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+      <div class="step-number">1</div>
+      <div class="step-label">Centro</div>
+    </div>
+    <div class="progress-line" [class.completed]="currentStep > 1"></div>
+    <div class="progress-step" [class.active]="currentStep === 2" [class.completed]="isPerimeterComplete">
+      <div class="step-number">2</div>
+      <div class="step-label">Perímetro</div>
+    </div>
+    <div class="progress-line" [class.completed]="isPerimeterComplete"></div>
+    <div class="progress-step" [class.active]="isPerimeterComplete">
+      <div class="step-number">3</div>
+      <div class="step-label">Datos</div>
+    </div>
+  </div>
 
-  <!-- Contenedor del mapa (sin cambios) -->
-  <div id="map" class="map-container"></div>
-
-  <!-- ✅ FORMULARIO: Solo se muestra cuando el perímetro está completo -->
-  <form [formGroup]="form" (ngSubmit)="addCountry()" class="form-container" *ngIf="currentStep === 2 && perimeterPoints.length === 4">
-    <!-- Nombre del Country -->
-    <ion-item>
-      <ion-label position="floating">Nombre del Country<ion-text color="danger">*</ion-text></ion-label>
-      <ion-input formControlName="countryName" required type="text"></ion-input>
-    </ion-item>
-
-    <!-- Dirección -->
-    <ion-item>
-      <ion-label position="floating">Dirección<ion-text color="danger">*</ion-text></ion-label>
-      <ion-input formControlName="address" required type="text"></ion-input>
-    </ion-item>
-
-    <!-- Localidad -->
-    <ion-item>
-      <ion-label position="floating">Localidad</ion-label>
-      <ion-input formControlName="locality" type="text"></ion-input>
-    </ion-item>
-
-    <!-- Teléfono de Contacto -->
-    <ion-item>
-      <ion-label position="floating">Teléfono de Contacto</ion-label>
-      <ion-input formControlName="phone" type="tel"></ion-input>
-    </ion-item>
-
-    <!-- Avatar del Country -->
-    <ion-item>
-      <ion-label>Avatar del Country<ion-text color="danger">*</ion-text></ion-label>
-      <input type="file" (change)="onFileChange($event)" />
-    </ion-item>
-
-    <!-- Vista previa del avatar -->
-    <div *ngIf="newImg" class="avatar-preview-container">
-      <img [src]="newImg" alt="Vista previa del avatar" class="avatar-preview" />
+  <!-- SECCIÓN DEL MAPA -->
+  <div class="map-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        {{ currentStep === 1 ? 'Ubicar Centro del Country' : 'Delimitar Perímetro' }}
+      </h2>
+      <p class="section-subtitle" *ngIf="currentStep === 1">
+        Arrastra el marcador o haz clic para posicionar el centro
+      </p>
+      <p class="section-subtitle" *ngIf="currentStep === 2">
+        Marca los puntos del perímetro (mín. {{ minPerimeterPoints }} puntos)
+      </p>
     </div>
 
-    <!-- ✅ ACTUALIZADO: Coordenadas del centro y perímetro -->
-    <ion-item>
-      <ion-label position="stacked">Centro del Barrio</ion-label>
-      <ion-text>{{ lat }}, {{ lng }}</ion-text>
-    </ion-item>
+    <!-- MAPA -->
+    <div id="map" class="map-container"></div>
 
-    <ion-item *ngIf="perimeterPoints.length === 4">
-      <ion-label position="stacked">Perímetro Definido</ion-label>
-      <ion-text color="success">✓ 4 puntos marcados correctamente</ion-text>
-    </ion-item>
+    <!-- CONTROLES DEL PASO 1 -->
+    <div *ngIf="currentStep === 1" class="map-controls">
+      <ion-button 
+        expand="block" 
+        size="large" 
+        class="primary-button"
+        (click)="confirmCenter()">
+        <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+        Confirmar Centro
+      </ion-button>
+    </div>
 
-    <!-- Botón Guardar -->
-    <ion-button class="submit-button" size="large" expand="block" color="primary" type="submit" [disabled]="form.invalid">
-      Guardar Country
-    </ion-button>
-  </form>
+    <!-- CONTROLES DEL PASO 2 -->
+    <div *ngIf="currentStep === 2" class="map-controls">
+      <!-- INFO DEL PERÍMETRO -->
+      <div class="perimeter-status">
+        <div class="status-item">
+          <ion-icon name="location" color="primary"></ion-icon>
+          <span>{{ perimeterPoints.length }} puntos marcados</span>
+        </div>
+        <div class="status-item" *ngIf="perimeterPoints.length >= minPerimeterPoints && !isPerimeterComplete">
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          <span>Listo para confirmar</span>
+        </div>
+        <div class="status-item" *ngIf="isPerimeterComplete">
+          <ion-icon name="checkmark-circle" color="success"></ion-icon>
+          <span>Perímetro confirmado</span>
+        </div>
+      </div>
 
-  <!-- ✅ MENSAJE: Cuando el formulario no está disponible -->
-  <ion-card *ngIf="currentStep === 1 || perimeterPoints.length < 4">
-    <ion-card-content>
-      <ion-text color="medium">
-        <p>Complete la marcación del mapa para acceder al formulario de datos del country.</p>
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
+      <!-- BOTONES DE CONTROL -->
+      <div class="control-buttons">
+        <ion-button 
+          fill="outline" 
+          size="default"
+          (click)="removeLastPoint()"
+          [disabled]="perimeterPoints.length === 0">
+          <ion-icon name="arrow-undo" slot="icon-only"></ion-icon>
+        </ion-button>
+
+        <ion-button 
+          fill="outline" 
+          size="default"
+          (click)="resetPerimeter()">
+          <ion-icon name="refresh" slot="icon-only"></ion-icon>
+        </ion-button>
+
+        <ion-button 
+          expand="block" 
+          class="confirm-button"
+          (click)="confirmPerimeter()"
+          [disabled]="perimeterPoints.length < minPerimeterPoints || isPerimeterComplete">
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          Confirmar Perímetro
+        </ion-button>
+      </div>
+
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        class="back-button"
+        (click)="backToStep1()">
+        <ion-icon name="arrow-back" slot="start"></ion-icon>
+        Cambiar centro
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- FORMULARIO DE DATOS -->
+  <div #formSection class="form-section" *ngIf="isPerimeterComplete">
+    <div class="section-header">
+      <h2 class="section-title">Información del Country</h2>
+      <p class="section-subtitle">Complete los datos principales</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="addCountry()" class="modern-form">
+      <!-- NOMBRE -->
+      <div class="form-group">
+        <label class="form-label">Nombre del Country <span class="required">*</span></label>
+        <ion-item class="form-item">
+          <ion-input 
+            formControlName="countryName" 
+            placeholder="Ej: Country San Patricio"
+            class="form-input">
+          </ion-input>
+        </ion-item>
+        <div class="form-error" *ngIf="form.get('countryName')?.invalid && form.get('countryName')?.touched">
+          <ion-text color="danger">El nombre es obligatorio (mín. 3 caracteres)</ion-text>
+        </div>
+      </div>
+
+      <!-- DIRECCIÓN -->
+      <div class="form-group">
+        <label class="form-label">Dirección <span class="required">*</span></label>
+        <ion-item class="form-item">
+          <ion-input 
+            formControlName="address" 
+            placeholder="Ej: Av. Principal 1234"
+            class="form-input">
+          </ion-input>
+        </ion-item>
+        <div class="form-error" *ngIf="form.get('address')?.invalid && form.get('address')?.touched">
+          <ion-text color="danger">La dirección es obligatoria</ion-text>
+        </div>
+      </div>
+
+      <!-- LOCALIDAD -->
+      <div class="form-group">
+        <label class="form-label">Localidad</label>
+        <ion-item class="form-item">
+          <ion-input 
+            formControlName="locality" 
+            placeholder="Ej: Resistencia"
+            class="form-input">
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <!-- TELÉFONO -->
+      <div class="form-group">
+        <label class="form-label">Teléfono de Contacto</label>
+        <ion-item class="form-item">
+          <ion-input 
+            formControlName="phone" 
+            type="tel"
+            placeholder="Ej: +54 362 123-4567"
+            class="form-input">
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <!-- AVATAR -->
+      <div class="form-group">
+        <label class="form-label">Logo/Avatar <span class="required">*</span></label>
+        <div class="file-upload-container">
+          <input 
+            type="file" 
+            id="avatar-input"
+            accept="image/*"
+            (change)="onFileChange($event)"
+            hidden />
+          <ion-button 
+            fill="outline" 
+            class="upload-button"
+            (click)="triggerFileInput()">
+            <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+            {{ newImg ? 'Cambiar imagen' : 'Seleccionar imagen' }}
+          </ion-button>
+        </div>
+        
+        <!-- VISTA PREVIA -->
+        <div class="image-preview" *ngIf="newImg">
+          <img [src]="newImg" alt="Preview" />
+          <div class="image-info">
+            <ion-text color="success">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              Imagen cargada correctamente
+            </ion-text>
+          </div>
+        </div>
+        <div class="form-error" *ngIf="form.get('fileSource')?.invalid && form.get('fileSource')?.touched">
+          <ion-text color="danger">La imagen es obligatoria</ion-text>
+        </div>
+      </div>
+
+      <!-- COORDENADAS INFO -->
+      <div class="coordinates-info">
+        <div class="coord-item">
+          <ion-icon name="location-outline" color="primary"></ion-icon>
+          <div>
+            <span class="coord-label">Centro:</span>
+            <span class="coord-value">{{ lat | number:'1.6-6' }}, {{ lng | number:'1.6-6' }}</span>
+          </div>
+        </div>
+        <div class="coord-item">
+          <ion-icon name="shapes-outline" color="success"></ion-icon>
+          <div>
+            <span class="coord-label">Perímetro:</span>
+            <span class="coord-value">{{ perimeterPoints.length }} puntos definidos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÓN GUARDAR -->
+      <ion-button 
+        type="submit"
+        expand="block" 
+        size="large"
+        class="submit-button"
+        [disabled]="form.invalid || isProcessing">
+        <ion-spinner name="crescent" *ngIf="isProcessing" slot="start"></ion-spinner>
+        <ion-icon name="save-outline" *ngIf="!isProcessing" slot="start"></ion-icon>
+        {{ isProcessing ? 'Guardando...' : 'Crear Country' }}
+      </ion-button>
+    </form>
+  </div>
 </ion-content>
