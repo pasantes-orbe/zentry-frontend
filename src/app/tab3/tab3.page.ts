@@ -144,27 +144,49 @@ export class Tab3Page implements OnInit {
       this.socket = io(environment.URL);
     }
 
-    async ngOnInit() {
-      const user = await this._userStorageService.getUser();
-      if (user) {
-        this.userID = String(user.id);
-        this._ownersService.getByID(this.userID).subscribe((owner) => {
-          this.owner = owner;
-          this._ownerStorageService.saveOwner(owner);
-          // Cargar datos para edición
-          this.loadEditData();
-        });
-        this.nuevoPropietarioConectado();
-        this.escucharNotificacionesCheckin();
-
-        // Cargar propiedades del propietario
-        this.loadOwnerProperties();
-      }
+        async ngOnInit() {
+      // 🛑 CÓDIGO ORIGINAL DE ngOnInit: Se comenta porque solo se ejecuta una vez. 
+      // const user = await this._userStorageService.getUser();
+      // if (user) {
+      //  this.userID = String(user.id);
+      //  this._ownersService.getByID(this.userID).subscribe((owner) => {
+      //    this.owner = owner;
+      //    this._ownerStorageService.saveOwner(owner);
+      //    // Cargar datos para edición
+      //    this.loadEditData();
+      //  });
+      //  this.nuevoPropietarioConectado();
+      //  this.escucharNotificacionesCheckin();
+      // Cargar propiedades del propietario
+      //  this.loadOwnerProperties();
+      // }
     }
 
+    // 🟢 NUEVO MÉTODO: Contiene toda la lógica de carga de perfil y propiedades.
+    private async loadProfileData() {
+        const user = await this._userStorageService.getUser();
+        if (user) {
+            this.userID = String(user.id);
+            // 1. Cargar el objeto Owner (actualiza this.owner y llama a loadEditData para actualizar el nombre visible)
+            this._ownersService.getByID(this.userID).subscribe((owner) => {
+                this.owner = owner;
+                this._ownerStorageService.saveOwner(owner);
+                this.loadEditData();
+            });
+            
+            // 2. Inicializar sockets
+            this.nuevoPropietarioConectado();
+            this.escucharNotificacionesCheckin();
+            
+            // 3. Cargar propiedades del propietario (actualiza this.properties para el contador)
+            this.loadOwnerProperties();
+        }
+    }
+
     
-    // 🟢 FUNCIÓN PARA CARGAR PROPIEDADES (SIN CAMBIOS)
+    // 🟢 FUNCIÓN PARA CARGAR PROPIEDADES (RESTAURADA con la lógica comentada)
     private async loadOwnerProperties() {
+        // const user = await this._userStorageService.getUser(); // Comentado, ya se obtiene en loadProfileData
         try {
             // 🟢 CORRECCIÓN: this._propertiesService ahora existe gracias a la inyección en el constructor.
             (await this._propertiesService.getOwnerProperties()).subscribe({
@@ -184,11 +206,14 @@ export class Tab3Page implements OnInit {
 
 
     ionViewWillEnter() {
+      // 🛑 CORRECCIÓN: Llamamos a la función de carga principal
+      this.loadProfileData(); 
+        
+      // Dejamos la lógica del componente de ingresos
       if (this.incomesComponent) {
         this.incomesComponent.ngOnInit();
       }
     }
-
     // Función para escuchar las notificaciones de check-in y manejar el error de fecha
     async escucharNotificacionesCheckin() {
       this.socket.on('notificacion-check-in', async (payload) => {

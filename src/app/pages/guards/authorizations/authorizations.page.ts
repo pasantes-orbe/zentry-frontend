@@ -1,3 +1,4 @@
+//src/app/pages/guards/authorizations/authorizations.page.ts
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular'
