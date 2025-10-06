@@ -32,15 +32,20 @@ export class SplashScreenPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    setTimeout(async () => {
-      // CORRECCIÓN: Se usa _userStorage en lugar de _user_storage
-      const user = await this._userStorage.getUser();
-      // Descomenta esta lógica si quieres que redirija automáticamente si ya hay sesión
-      // if(user){
-      //   this._redirectService.redirectByRole(user['role'].name)
-      // } else {
-      this.router.navigate(["/login"]);
-      // }
-    }, 3000);
+  const user = await this._userStorage.getUser();
+  const roleName = this.getRoleName(user);
+
+    if (roleName) {
+    this._redirectService.redirectByRole(roleName);
+    } else {
+    this.router.navigate(['/login']);
+   }
+  }
+
+  private getRoleName(user: any): string | null {
+  if (!user) return null;
+  // role único o lista de roles
+  const r = user.role ?? (Array.isArray(user.roles) ? user.roles[0] : user.roles);
+  return typeof r === 'string' ? r : r?.name ?? null;
   }
 }

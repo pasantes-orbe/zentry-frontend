@@ -1,10 +1,9 @@
+// src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
+import { AuthStorageService } from './services/storage/auth-storage.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-
-// 1. Importa el servicio de Storage
-import { Storage } from '@ionic/storage-angular';
 
 @Component({
   selector: 'app-root',
@@ -15,17 +14,12 @@ import { Storage } from '@ionic/storage-angular';
     CommonModule,
     RouterModule,
     IonicModule
-  ],
+  ]
 })
 export class AppComponent implements OnInit {
-  constructor(
-    // 2. Inyecta el servicio en el constructor
-    private storage: Storage
-  ) {}
+  constructor(private auth: AuthStorageService) {}
 
-  // Implementa OnInit para manejar la inicialización
   async ngOnInit() {
-    // 3. Inicializa el storage
-    await this.storage.create();
+    await this.auth.init(); // token queda en memoria antes de las requests
   }
 }

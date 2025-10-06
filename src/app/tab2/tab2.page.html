@@ -1,15 +1,8 @@
 <ion-content [fullscreen]="true">
-  <div class="map-background">
-    <!-- Aca va componente de mapa -->
-    <app-country-map #maps></app-country-map>
-  </div>
-
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button 
-      [class]="getPanicButtonClass()"
-      (click)="onPanicButtonClick()"
-      [disabled]="isPanicActive">
-      <ion-icon name="alert-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <app-country-map 
+    [countryId]="idCountryForMap"
+    [showPanicButton]="true"
+    [simulateGuards]="true"
+    [demoMode]="false">
+  </app-country-map>
 </ion-content>

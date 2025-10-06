@@ -1,65 +1,46 @@
-// src/app/services/auth/login.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { AuthStorageService } from '../storage/auth-storage.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class LoginService {
+  constructor(private http: HttpClient, private _authStorage: AuthStorageService) {}
 
-  constructor(
-    private http: HttpClient,
-    private _authStorage: AuthStorageService
-  ) { }
-
-  public login(data) {
-
-    console.log(data);
-    console.log(data);
-
-    
-    return this.http.post(`${environment.URL}/api/auth/login`, data);
-
+  /** Login normal */
+  public login(data: { email: string; password: string }) {
+    return this.http.post<{ token: string; role?: string }>(`${environment.URL}/api/auth/login`, data);
   }
 
-  public async validJWT() {
-
-    // Retornar true si es un JWT valido.
-
-    // Obtener el JWT de storage
+  /** Valida JWT contra backend. Devuelve true/false; jamás fuerza sesión. */
+  public async validJWT(): Promise<boolean> {
     const token = await this._authStorage.getJWT();
+    if (!token) return false;
 
-    // Validarlo con el backend
-    const resp = await fetch(`${environment.URL}/api/auth/jwt`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain',
-        'Authorization': token,
-      }
-    });
-
-    return resp;
+    try {
+      const resp = await fetch(`${environment.URL}/api/auth/jwt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain', Authorization: token },
+      });
+      return resp.status === 200;
+    } catch {
+      return false;
+    }
   }
 
-
-  public async isRole(roleSearch: string){
-
-    // Obtener el JWT de storage
+  /** Chequea rol en backend (opcional para route guards) */
+  public async isRole(roleSearch: string): Promise<boolean> {
     const token = await this._authStorage.getJWT();
+    if (!token) return false;
 
-    // Validarlo con el backend
-    const resp = await fetch(`${environment.URL}/api/auth/jwt/${roleSearch}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain',
-        'Authorization': token,
-      }
-    });
-
-    if(resp.status == 200) return true;
-    return false;
+    try {
+      const resp = await fetch(`${environment.URL}/api/auth/jwt/${roleSearch}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain', Authorization: token },
+      });
+      return resp.status === 200;
+    } catch {
+      return false;
+    }
   }
-
 }

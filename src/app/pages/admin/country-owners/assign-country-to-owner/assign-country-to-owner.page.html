@@ -1,66 +1,59 @@
-<!--src/app/pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.page.html-->
 <app-navbar-back title="Asignar Propiedad a Propietario"></app-navbar-back>
 
 <ion-content [fullscreen]="true">
   <div class="page-container">
     <form class="form-container" [formGroup]="form" (ngSubmit)="asignarPropiedadAlUsuario()">
-      
-      <!-- Título principal del formulario -->
+
       <div class="form-header">
         <ion-icon name="swap-horizontal-outline"></ion-icon>
         <h3>Asignación de Propiedades</h3>
       </div>
 
-      <!-- Grid principal que contiene los dos paneles de selección -->
       <div class="assignment-grid">
-        
-        <!-- Panel de Selección de Propietarios -->
+
+        <!-- Propietarios -->
         <div class="selection-panel">
-          <div class="panel-header">
-            <h4>Paso 1: Seleccionar Propietario</h4>
-          </div>
-          <ion-searchbar 
-            mode="ios" 
-            placeholder="Buscar propietario..." 
-            (ionInput)="onSearchOwners($event)">
-          </ion-searchbar>
+          <div class="panel-header"><h4>Paso 1: Seleccionar Propietario</h4></div>
+
+          <ion-searchbar mode="ios" placeholder="Buscar propietario..." (ionInput)="onSearchOwners($event)"></ion-searchbar>
+
           <ion-list class="selection-list">
             <ion-radio-group formControlName="user_id">
-              <ion-item *ngFor="let owner of filteredOwners" class="selection-item">
+              <ion-item *ngFor="let owner of filteredOwners; trackBy: trackOwner"
+                        class="selection-item"
+                        [disabled]="ownerId(owner) === null">
                 <ion-avatar slot="start">
-                  <img [src]="owner.user.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                  <img [src]="ownerAvatar(owner)" />
                 </ion-avatar>
                 <ion-label>
-                  <h2>{{ owner.user.name }} {{ owner.user.lastname }}</h2>
-                  <p>DNI: {{ owner.user.dni }}</p>
+                  <h2>{{ ownerName(owner) }} {{ ownerLastname(owner) }}</h2>
+                  <p>DNI: {{ ownerDni(owner) }}</p>
                 </ion-label>
-                <ion-radio slot="end" [value]="owner.user.id"></ion-radio>
+                <ion-radio slot="end" [value]="ownerId(owner)"></ion-radio>
               </ion-item>
             </ion-radio-group>
           </ion-list>
         </div>
 
-        <!-- Panel de Selección de Propiedades -->
+        <!-- Propiedades -->
         <div class="selection-panel" [class.is-disabled]="!form.get('user_id')?.value">
-          <div class="panel-header">
-            <h4>Paso 2: Seleccionar Propiedad</h4>
-          </div>
-          <ion-searchbar 
-            mode="ios" 
-            placeholder="Buscar propiedad..." 
-            (ionInput)="onSearchProperties($event)">
-          </ion-searchbar>
+          <div class="panel-header"><h4>Paso 2: Seleccionar Propiedad</h4></div>
+
+          <ion-searchbar mode="ios" placeholder="Buscar propiedad..." (ionInput)="onSearchProperties($event)"></ion-searchbar>
+
           <ion-list class="selection-list">
             <ion-radio-group formControlName="property_id">
-              <ion-item *ngFor="let property of filteredProperties" class="selection-item">
-                 <ion-avatar slot="start">
-                  <img [src]="property.property.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'" />
+              <ion-item *ngFor="let property of filteredProperties; trackBy: trackProperty"
+                        class="selection-item"
+                        [disabled]="propertyId(property) === null">
+                <ion-avatar slot="start">
+                  <img [src]="propertyAvatar(property)" />
                 </ion-avatar>
                 <ion-label>
-                  <h2>{{ property.property.name }}</h2>
-                  <p>Nº / Lote: {{ property.property.number }}</p>
+                  <h2>{{ propertyName(property) }}</h2>
+                  <p>Nº / Lote: {{ propertyNumber(property) }}</p>
                 </ion-label>
-                <ion-radio slot="end" [value]="property.property.id"></ion-radio>
+                <ion-radio slot="end" [value]="propertyId(property)"></ion-radio>
               </ion-item>
             </ion-radio-group>
           </ion-list>
@@ -68,12 +61,7 @@
 
       </div>
 
-      <!-- Botón de Acción -->
-      <ion-button 
-        class="submit-button"
-        type="submit" 
-        [disabled]="getForm().invalid" 
-        expand="block">
+      <ion-button class="submit-button" type="submit" [disabled]="form.invalid" expand="block">
         <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
         Asignar Propiedad
       </ion-button>

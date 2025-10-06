@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service'; //borrar si no se ocupa 
+import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 
 // Componentes Standalone de Ionic
 import {
@@ -16,7 +16,6 @@ import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline } from 'ionicons/icons';
 
 // Servicios y otros
-
 import { PasswordRecoverPage } from 'src/app/modals/auth/password-recover/password-recover.page';
 import { LoginService } from 'src/app/services/auth/login.service';
 import { GuardsService } from 'src/app/services/guards/guards.service';
@@ -26,14 +25,9 @@ import { AuthStorageService } from 'src/app/services/storage/auth-storage.servic
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
-// ¡¡¡CORRECCIÓN CRÍTICA ACA!!!
-// Se debe importar Storage desde '@ionic/storage-angular', no desde '@ionic/storage'.
-//import { Storage } from '@ionic/storage-angular'; //borrar si no se ocupa
 import { PushService } from 'src/app/services/pushNotifications/push.service';
 import { Capacitor } from '@capacitor/core';
-
 import { LoaderComponent } from '../../../components/loader/loader.component';
-
 
 @Component({
   selector: 'app-login',
@@ -71,8 +65,6 @@ export class LoginPage implements OnInit {
 
   constructor(
     private _router: Router,
-    // La inyección ahora funcionará porque el tipo importado es el correcto.
-    //private storage: Storage, //borrar si no se ocupa
     private _modalCtrl: ModalController,
     protected _formBuilder: FormBuilder,
     private _loginService: LoginService,
@@ -85,7 +77,6 @@ export class LoginPage implements OnInit {
     private _webSocketService: WebSocketService,
     private _pushService: PushService,
     private _ownerStorage: OwnerStorageService
-
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -112,11 +103,27 @@ export class LoginPage implements OnInit {
     }
     this._loginService.login(user).subscribe(
       data => {
+        // DEBUG: Ver qué devuelve el backend
+        console.log('==========================================');
+        console.log('RESPUESTA COMPLETA DEL LOGIN:', data);
+        console.log('USER:', data['user']);
+        console.log('USER NAME:', data['user']?.name, data['user']?.lastname);
+        console.log('USER EMAIL:', data['user']?.email);
+        console.log('---');
+        console.log('OWNER:', data['owner']);
+        console.log('OWNER ID:', data['owner']?.id);
+        console.log('OWNER NAME:', data['owner']?.user?.name, data['owner']?.user?.lastname);
+        console.log('OWNER EMAIL:', data['owner']?.user?.email);
+        console.log('PROPERTY NUMBER:', data['owner']?.property?.number);
+        console.log('PROPERTY NAME:', data['owner']?.property?.name);
+        console.log('==========================================');
+
         this._authStorage.saveJWT(data['token']);
         this._userStorage.saveUser(data['user']);
-        //borrar si no se ocupa
+        
         if (data['owner']) {
           this._ownerStorage.saveOwner(data['owner']);
+          console.log('Owner guardado en storage correctamente');
         }
 
         const { name } = data['user'].role;

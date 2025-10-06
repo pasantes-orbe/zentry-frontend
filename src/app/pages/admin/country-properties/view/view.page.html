@@ -6,30 +6,28 @@
   </ion-refresher>
 
   <div class="page-container">
-    <!-- Encabezado de la página y controles -->
     <div class="page-header">
       <h1>Listado de Propiedades</h1>
       <div class="controls">
-        <ion-searchbar 
-          [(ngModel)]="searchKey" 
-          mode="ios" 
-          animated="true" 
+        <ion-searchbar
+          [(ngModel)]="searchKey"
+          mode="ios"
+          animated="true"
           debounce="500"
-          placeholder="Buscar propiedad o propietario...">
-        </ion-searchbar>
-        <!-- BOTÓN ELIMINADO -->
+          placeholder="Buscar propiedad o propietario..."
+        ></ion-searchbar>
       </div>
     </div>
 
-    <!-- Contenedor de la tabla -->
     <div class="pro-table-container">
       <div *ngIf="loading" class="loading-container">
         <ion-spinner name="crescent"></ion-spinner>
         <p>Cargando propiedades...</p>
       </div>
 
-      <div class="pro-table" *ngIf="!loading && filteredProperties.length > 0">
+      <div class="pro-table pro-table--compact" *ngIf="!loading && filteredProperties.length > 0">
         <div class="table-header">
+          <div class="header-cell">Foto</div>
           <div class="header-cell">Lote/N°</div>
           <div class="header-cell">Dirección</div>
           <div class="header-cell">Propietario/s</div>
@@ -37,26 +35,60 @@
         </div>
 
         <div class="table-row" *ngFor="let prop of filteredProperties; let i = index">
-          <div class="table-cell" data-label="Lote/N°">{{ prop.property.number }}</div>
-          
-          <div class="table-cell" data-label="Dirección">{{ prop.property.address }}</div>
-          
-          <div class="table-cell owner-cell" data-label="Propietario/s">
-            <ion-list lines="none" class="owner-list">
-              <ion-item *ngFor="let owner of prop.owners">
-                <ion-avatar slot="start">
-                  <img [src]="owner.user.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-                </ion-avatar>
-                <ion-label>{{ owner.user.name }} {{ owner.user.lastname }}</ion-label>
-              </ion-item>
-            </ion-list>
+          <!-- FOTO -->
+          <div class="table-cell img-cell" data-label="Foto">
+            <ion-avatar class="prop-avatar">
+              <img [src]="getPropImg(prop)" alt="Foto propiedad" />
+            </ion-avatar>
           </div>
 
+          <!-- Nº -->
+          <div class="table-cell" data-label="Lote/N°">
+            {{ prop?.property?.number ?? '—' }}
+          </div>
+
+          <!-- Dirección -->
+          <div class="table-cell truncate" data-label="Dirección">
+            {{ prop?.property?.address ?? '—' }}
+          </div>
+
+          <!-- Propietarios (chips compactos) -->
+          <div class="table-cell owner-cell" data-label="Propietario/s">
+            <ng-container *ngIf="prop?.owners?.length; else noOwners">
+              <div class="owner-chips">
+                <ng-container *ngFor="let owner of prop.owners | slice:0:4">
+                  <img
+                    class="chip-avatar"
+                    [src]="getOwnerAvatar(owner)"
+                    [alt]="(owner?.user?.name || '') + ' ' + (owner?.user?.lastname || '')"
+                  />
+                </ng-container>
+                <span class="more" *ngIf="prop.owners.length > 4">+{{ prop.owners.length - 4 }}</span>
+              </div>
+            </ng-container>
+            <ng-template #noOwners>—</ng-template>
+          </div>
+
+          <!-- Acciones -->
           <div class="table-cell actions-cell">
-            <ion-button fill="clear" size="small" (click)="editProperty(prop.property.id, i)" title="Editar propiedad">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="editProperty(prop?.property?.id, i)"
+              [disabled]="!prop?.property?.id"
+              title="Editar propiedad"
+            >
               <ion-icon slot="icon-only" name="create-outline"></ion-icon>
             </ion-button>
-            <ion-button fill="clear" size="small" color="danger" (click)="deleteProperty(prop.property.id, i)" title="Eliminar propiedad">
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="danger"
+              (click)="deleteProperty(prop?.property?.id, i)"
+              [disabled]="!prop?.property?.id"
+              title="Eliminar propiedad"
+            >
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
             </ion-button>
           </div>

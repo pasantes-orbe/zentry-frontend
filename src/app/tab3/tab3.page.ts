@@ -1,21 +1,19 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-// 🟢 Importación de PropertiesService (Ya estaba)
-import { PropertiesService } from '../services/properties/properties.service';
-import { PropertyInterface } from '../interfaces/property-interface';
 
-// Usar componentes standalone en lugar de IonicModule completo
+// Ionic standalone
 import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonAvatar, IonList,
-  IonItem, IonLabel, IonIcon, IonActionSheet, IonAlert, IonModal,
-  IonInput, IonButton, IonButtons
+  IonHeader, IonToolbar, IonTitle, IonContent, IonAvatar, IonList,
+  IonItem, IonLabel, IonIcon, IonActionSheet, IonAlert, IonModal,
+  IonInput, IonButton, IonButtons
 } from '@ionic/angular/standalone';
 
 // Interfaces
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
 import { UserInterface } from '../interfaces/user-interface';
+import { PropertyInterface } from '../interfaces/property-interface';
 
 // Socket
 import { io, Socket } from 'socket.io-client';
@@ -26,378 +24,317 @@ import { UserStorageService } from '../services/storage/user-storage.service';
 import { OwnersService } from '../services/owners/owners.service';
 import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
 import { AlertService } from '../services/helpers/alert.service';
+import { PropertiesService } from '../services/properties/properties.service';
+import { AuthStorageService } from '../services/storage/auth-storage.service';
 
-// Componentes (solo se importan, no se usan en template para evitar warnings)
+// Componentes
 import { IncomesComponent } from '../components/incomes/incomes.component';
-import { RecurrentsViewAllComponent } from '../components/recurrentsViewAll/recurrents-view-all/recurrents-view-all.component';
 
 @Component({
-    selector: 'app-tab3',
-    templateUrl: 'tab3.page.html',
-    styleUrls: ['tab3.page.scss'],
-    standalone: true,
-    imports: [
-      CommonModule,
-      FormsModule,
-      IonHeader, IonToolbar, IonTitle, IonContent, IonAvatar, IonList,
-      IonItem, IonLabel, IonIcon, IonActionSheet, IonAlert, IonModal,
-      IonInput, IonButton, IonButtons
-    ]
+  selector: 'app-tab3',
+  templateUrl: 'tab3.page.html',
+  styleUrls: ['tab3.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonAvatar, IonList,
+    IonItem, IonLabel, IonIcon, IonActionSheet, IonAlert, IonModal,
+    IonInput, IonButton, IonButtons
+  ]
 })
-export class Tab3Page implements OnInit {
-    private user: UserInterface;
-    private userID: string;
-    protected owner: OwnerResponse;
-    private socket: Socket;
-    public recurrentsState = false;
+export class Tab3Page implements OnInit, OnDestroy {
+  private user: UserInterface | null = null;
+  private userID: string = '';
+  protected owner!: OwnerResponse;
+  private socket?: Socket;
 
-    // Estados para modals/alerts
-    public isActionSheetOpen = false;
-    public isLogoutAlertOpen = false;
-    public isPropertiesModalOpen = false;
-    public isSecurityModalOpen = false;
-    public isEditProfileModalOpen = false;
-    
-    // Variables para edición de perfil
-    public editName: string = '';
-    public editEmail: string = '';
-    public editPhone: string = '';
-    
-    // Variables para cambio de contraseña
-    public currentPassword: string = '';
-    public newPassword: string = '';
-    public confirmPassword: string = '';
-    
-    // Opciones del action sheet - CORREGIDAS
-    public actionSheetButtons = [
-      {
-        text: 'Editar Información',
-        icon: 'create-outline',
-        handler: () => {
-          this.openEditProfileModal();
-          return true;
-        }
-      },
-      {
-        text: 'Ver Datos Completos',
-        icon: 'eye-outline', 
-        handler: () => {
-          this.viewFullProfile();
-          return true;
-        }
-      },
-      {
-        text: 'Cancelar',
-        icon: 'close-outline',
-        role: 'cancel'
-      }
-    ];
+  public recurrentsState = false;
 
-    // Botones del alert de logout - CORREGIDO
-    public logoutAlertButtons = [
-      {
-        text: 'Cancelar',
-        role: 'cancel',
-        handler: () => {
-          this.cancelLogout();
-        }
-      },
-      {
-        text: 'Cerrar Sesión',
-        handler: () => {
-          this.confirmLogout();
-        }
-      }
-    ];
+  // Estados UI
+  public isActionSheetOpen = false;
+  public isLogoutAlertOpen = false;
+  public isPropertiesModalOpen = false;
+  public isSecurityModalOpen = false;
+  public isEditProfileModalOpen = false;
 
-    /* Propiedades simuladas
-    public properties = [
-      { 
-        id: 1, 
-        address: 'Av. Principal 123, Torre A, Piso 15, Apto 4A', 
-        type: 'Apartamento',
-        area: '120 m²',
-        status: 'Activa'
-      },
-      { 
-        id: 2, 
-        address: 'Calle Secundaria 456, Casa 2', 
-        type: 'Casa',
-        area: '250 m²',
-        status: 'Activa'
-      }
-    ];
-    */
-    public properties: PropertyInterface[] = [];
+  // Edición perfil
+  public editName: string = '';
+  public editEmail: string = '';
+  public editPhone: string = '';
 
-    @ViewChild('incomesComponent') incomesComponent: IncomesComponent;
+  // Cambio de contraseña
+  public currentPassword: string = '';
+  public newPassword: string = '';
+  public confirmPassword: string = '';
 
-    constructor(
-      private _userStorageService: UserStorageService,
-      private _ownersService: OwnersService,
-      private _ownerStorageService: OwnerStorageService,
-      private alerts: AlertService,
-      private router: Router,
-      // 🟢 INYECCIÓN DEL SERVICIO PROPERTIES SERVICE
-      private _propertiesService: PropertiesService 
-    ) {
-      this.socket = io(environment.URL);
-    }
+  // Lista de propiedades
+  public properties: PropertyInterface[] = [];
 
-    async ngOnInit() {
-      const user = await this._userStorageService.getUser();
-      if (user) {
-        this.userID = String(user.id);
-        this._ownersService.getByID(this.userID).subscribe((owner) => {
-          this.owner = owner;
-          this._ownerStorageService.saveOwner(owner);
-          // Cargar datos para edición
-          this.loadEditData();
-        });
-        this.nuevoPropietarioConectado();
-        this.escucharNotificacionesCheckin();
+  @ViewChild('incomesComponent') incomesComponent?: IncomesComponent;
 
-        // Cargar propiedades del propietario
-        this.loadOwnerProperties();
-      }
-    }
+  // ActionSheet (agregado "Cerrar sesión")
+  public actionSheetButtons = [
+    {
+      text: 'Editar Información',
+      icon: 'create-outline',
+      handler: () => { this.openEditProfileModal(); return true; }
+    },
+    {
+      text: 'Ver Datos Completos',
+      icon: 'eye-outline',
+      handler: () => { this.viewFullProfile(); return true; }
+    },
+    {
+      text: 'Cerrar sesión',
+      icon: 'log-out-outline',
+      role: 'destructive',
+      handler: () => { this.isLogoutAlertOpen = true; return true; }
+    },
+    { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
+  ];
 
-    
-    // 🟢 FUNCIÓN PARA CARGAR PROPIEDADES (SIN CAMBIOS)
-    private async loadOwnerProperties() {
-        try {
-            // 🟢 CORRECCIÓN: this._propertiesService ahora existe gracias a la inyección en el constructor.
-            (await this._propertiesService.getOwnerProperties()).subscribe({
-                next: (properties: PropertyInterface[]) => {
-                    this.properties = properties;
-                    console.log('Propiedades sincronizadas:', this.properties);
-                },
-                error: (err) => {
-                    console.error('Error al sincronizar propiedades:', err);
-                    this.alerts.showAlert('Error de Carga', 'No se pudieron cargar sus propiedades.');
-                }
-            });
-        } catch (e) {
-             console.error('Error al obtener token para propiedades:', e);
-        }
-    }
+  // Alert de logout
+  public logoutAlertButtons = [
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => { this.cancelLogout(); }
+    },
+    {
+      text: 'Cerrar Sesión',
+      handler: () => { this.confirmLogout(); }
+    }
+  ];
 
+  constructor(
+    private _userStorageService: UserStorageService,
+    private _ownersService: OwnersService,
+    private _ownerStorageService: OwnerStorageService,
+    private alerts: AlertService,
+    private router: Router,
+    private _propertiesService: PropertiesService,
+    private authStorage: AuthStorageService
+  ) {
+    this.socket = io(environment.URL);
+  }
 
-    ionViewWillEnter() {
-      if (this.incomesComponent) {
-        this.incomesComponent.ngOnInit();
-      }
-    }
+  async ngOnInit() {
+    const user = await this._userStorageService.getUser?.();
+    if (user) {
+      this.user = user as UserInterface;
+      this.userID = String(this.user.id);
 
-    // Función para escuchar las notificaciones de check-in y manejar el error de fecha
-    async escucharNotificacionesCheckin() {
-      this.socket.on('notificacion-check-in', async (payload) => {
-        console.log('Payload recibido del socket:', payload);
+      this._ownersService.getByID(this.userID).subscribe((owner) => {
+        this.owner = owner;
+        this._ownerStorageService.saveOwner(owner);
+        this.loadEditData();
+      });
 
-        // Asegurarse de que el payload no sea undefined y contenga los datos necesarios
-        if (payload && payload.guestName) {
-          // Construir un mensaje claro para el alert, evitando el error de fecha
-          const alertMessage = `
-            <strong>Check-in</strong><br>
-            <strong>Visita:</strong> ${payload.guestName}<br>
-            <strong>Unidad:</strong> ${payload.unitName || 'No especificada'}
-          `;
+      this.nuevoPropietarioConectado();
+      this.escucharNotificacionesCheckin();
+      this.loadOwnerProperties();
+    }
+  }
 
-          await this.alerts.showAlert('Nueva Entrada', alertMessage);
-          if (this.incomesComponent) {
-            this.incomesComponent.ngOnInit();
-          }
-        } else {
-          console.error('Payload de notificación de check-in inválido:', payload);
-          await this.alerts.showAlert('Error de Notificación', 'Se recibió un formato de notificación incorrecto.');
-        }
-      });
-    }
+  ionViewWillEnter() {
+    this.incomesComponent?.ngOnInit();
+  }
 
-    async nuevoPropietarioConectado() {
-      this.socket.emit('owner-connected', this.userID);
-    }
+  // ------- Datos -------
+  private loadEditData() {
+    if (this.owner && this.owner.user) {
+      this.editName = this.owner.user.name || '';
+      this.editEmail = this.owner.user.email || '';
+      this.editPhone = this.owner.user.phone || '';
+    } else {
+      this.editName = 'Propietario';
+      this.editEmail = 'email@ejemplo.com';
+      this.editPhone = '+54 11 1234-5678';
+    }
+  }
 
-    // Cargar datos para edición
-    private loadEditData() {
-      if (this.owner && this.owner.user) {
-        this.editName = this.owner.user.name || '';
-        this.editEmail = this.owner.user.email || '';
-        this.editPhone = this.owner.user.phone || '';
-      } else {
-        this.editName = 'Propietario';
-        this.editEmail = 'email@ejemplo.com';
-        this.editPhone = '+54 11 1234-5678';
-      }
-    }
+  private async loadOwnerProperties() {
+    try {
+      (await this._propertiesService.getOwnerProperties()).subscribe({
+        next: (properties: PropertyInterface[]) => {
+          this.properties = properties;
+          console.log('Propiedades sincronizadas:', this.properties);
+        },
+        error: (err) => {
+          console.error('Error al sincronizar propiedades:', err);
+          this.alerts.showAlert('Error de Carga', 'No se pudieron cargar sus propiedades.');
+        }
+      });
+    } catch (e) {
+      console.error('Error al obtener token para propiedades:', e);
+    }
+  }
 
-    // ==== FUNCIONES DE LOS BOTONES DEL PERFIL ====
+  // ------- Sockets -------
+  async escucharNotificacionesCheckin() {
+    this.socket?.on('notificacion-check-in', async (payload) => {
+      console.log('Payload recibido del socket:', payload);
+      if (payload && payload.guestName) {
+        const alertMessage = `
+          <strong>Check-in</strong><br>
+          <strong>Visita:</strong> ${payload.guestName}<br>
+          <strong>Unidad:</strong> ${payload.unitName || 'No especificada'}
+        `;
+        await this.alerts.showAlert('Nueva Entrada', alertMessage);
+        this.incomesComponent?.ngOnInit();
+      } else {
+        console.error('Payload de notificación de check-in inválido:', payload);
+        await this.alerts.showAlert('Error de Notificación', 'Se recibió un formato de notificación incorrecto.');
+      }
+    });
+  }
 
-    // Información Personal
-    public onPersonalInfoClick() {
-      console.log('Información Personal clickeada');
-      this.isActionSheetOpen = true;
-    }
+  async nuevoPropietarioConectado() {
+    if (this.userID) this.socket?.emit('owner-connected', this.userID);
+  }
 
-    // Abrir modal de edición de perfil
-    private openEditProfileModal() {
-      this.isActionSheetOpen = false;
-      this.isEditProfileModalOpen = true;
-    }
+  // ------- Perfil -------
+  public onPersonalInfoClick() {
+    this.isActionSheetOpen = true;
+  }
 
-    // Guardar cambios de perfil
-    public saveProfileChanges() {
-      if (!this.editName.trim() || !this.editEmail.trim()) {
-        this.alerts.showAlert('Error', 'Nombre y email son obligatorios');
-        return;
-      }
+  private openEditProfileModal() {
+    this.isActionSheetOpen = false;
+    this.isEditProfileModalOpen = true;
+  }
 
-      // Aquí harías la llamada al servicio para guardar
-      this.alerts.showAlert('Perfil Actualizado', 'Los cambios han sido guardados exitosamente');
+  public saveProfileChanges() {
+    if (!this.editName.trim() || !this.editEmail.trim()) {
+      this.alerts.showAlert('Error', 'Nombre y email son obligatorios');
+      return;
+    }
+    // Llamada a backend aquí si aplica
+    this.alerts.showAlert('Perfil Actualizado', 'Los cambios han sido guardados exitosamente');
+    this.isEditProfileModalOpen = false;
+  }
 
-      this.isEditProfileModalOpen = false;
-    }
+  public closeEditProfileModal() {
+    this.isEditProfileModalOpen = false;
+    this.loadEditData();
+  }
 
-    // Cerrar modal de edición
-    public closeEditProfileModal() {
-      this.isEditProfileModalOpen = false;
-      this.loadEditData(); // Recargar datos originales
-    }
+  private viewFullProfile() {
+    const ownerInfo = this.owner || null;
+    this.isActionSheetOpen = false;
+    this.alerts.showAlert('Perfil Completo', `
+      <strong>ID Usuario:</strong> ${ownerInfo?.user?.id || 'No disponible'}<br>
+      <strong>Nombre:</strong> ${this.editName}<br>
+      <strong>Email:</strong> ${this.editEmail}<br>
+      <strong>Teléfono:</strong> ${this.editPhone}<br>
+      <strong>Estado:</strong> Activo<br>
+      <strong>Tipo:</strong> Propietario
+    `);
+  }
 
-    private viewFullProfile() {
-      console.log('Viendo perfil completo...');
-      this.isActionSheetOpen = false;
-      
-      const ownerInfo = this.owner || null;
+  // ------- Propiedades -------
+  public onMyPropertiesClick() {
+    this.isPropertiesModalOpen = true;
+  }
 
-      this.alerts.showAlert('Perfil Completo', `
-        <strong>ID Usuario:</strong> ${ownerInfo?.user?.id || 'No disponible'}<br>
-        <strong>Nombre:</strong> ${this.editName}<br>
-        <strong>Email:</strong> ${this.editEmail}<br>
-        <strong>Teléfono:</strong> ${this.editPhone}<br>
-        <strong>Estado:</strong> Activo<br>
-        <strong>Tipo:</strong> Propietario
-      `);
-    }
+  public closePropertiesModal() {
+    this.isPropertiesModalOpen = false;
+  }
 
-    // Mis Propiedades - CORREGIDA
-    public onMyPropertiesClick() {
-      console.log('Mis Propiedades clickeada');
-      this.isPropertiesModalOpen = true;
-    }
+  // ------- Seguridad -------
+  public onSecurityClick() {
+    this.isSecurityModalOpen = true;
+  }
 
-    // Cerrar modal de propiedades
-    public closePropertiesModal() {
-      this.isPropertiesModalOpen = false;
-    }
+  public changePassword() {
+    if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
+      this.alerts.showAlert('Error', 'Todos los campos son obligatorios');
+      return;
+    }
+    if (this.newPassword !== this.confirmPassword) {
+      this.alerts.showAlert('Error', 'Las contraseñas no coinciden');
+      return;
+    }
+    if (this.newPassword.length < 6) {
+      this.alerts.showAlert('Error', 'La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    // Llamada a backend aquí si aplica
+    this.alerts.showAlert('Contraseña Actualizada', 'Su contraseña ha sido cambiada exitosamente');
+    this.closeSecurityModal();
+  }
 
-    // Seguridad y Contraseña - CORREGIDA
-    public onSecurityClick() {
-      console.log('Seguridad y Contraseña clickeada');
-      this.isSecurityModalOpen = true;
-    }
+  public closeSecurityModal() {
+    this.isSecurityModalOpen = false;
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+  }
 
-    // Cambiar contraseña
-    public changePassword() {
-      if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
-        this.alerts.showAlert('Error', 'Todos los campos son obligatorios');
-        return;
-      }
+  // ------- Logout -------
+  public onLogoutClick() {
+    this.isLogoutAlertOpen = true;
+  }
 
-      if (this.newPassword !== this.confirmPassword) {
-        this.alerts.showAlert('Error', 'Las contraseñas no coinciden');
-        return;
-      }
+  public async confirmLogout() {
+    this.isLogoutAlertOpen = false;
+    try {
+      // Cerrar sockets y limpiar listeners
+      if (this.socket) {
+        this.socket.removeAllListeners?.();
+        this.socket.disconnect();
+        this.socket = undefined;
+      }
 
-      if (this.newPassword.length < 6) {
-        this.alerts.showAlert('Error', 'La contraseña debe tener al menos 6 caracteres');
-        return;
-      }
+      // Limpiar credenciales y caches
+      await this.authStorage.clearJWT();
 
-      // Aquí harías la llamada al servicio
-      this.alerts.showAlert('Contraseña Actualizada', 'Su contraseña ha sido cambiada exitosamente');
+      // Si existen helpers de clear, usalos. Si no existen, no rompe.
+      await (this._userStorageService as any)?.clearUser?.();
+      await (this._ownerStorageService as any)?.clearOwner?.();
 
-      this.closeSecurityModal();
-    }
+      // Limpio datos en memoria
+      this.user = null;
+      this.userID = '';
+      this.properties = [];
 
-    // Cerrar modal de seguridad
-    public closeSecurityModal() {
-      this.isSecurityModalOpen = false;
-      this.currentPassword = '';
-      this.newPassword = '';
-      this.confirmPassword = '';
-    }
+      // Navegación sin posibilidad de volver
+      await this.router.navigateByUrl('/login', { replaceUrl: true });
 
-    // Cerrar Sesión
-    public onLogoutClick() {
-      console.log('Cerrar Sesión clickeada');
-      this.isLogoutAlertOpen = true;
-    }
+      // Aviso
+      await this.alerts.showAlert('Sesión Cerrada', 'Cerraste sesión correctamente.');
+    } catch (error) {
+      console.error('Error cerrando sesión:', error);
+      this.alerts.showAlert('Error', 'Hubo un problema al cerrar la sesión. Intente nuevamente.');
+    }
+  }
 
-    // Confirmar logout - CORREGIDO
-    public async confirmLogout() {
-      console.log('Cerrando sesión...');
-      this.isLogoutAlertOpen = false;
-      
-      try {
-        // Desconectar socket
-        if (this.socket) {
-          this.socket.disconnect();
-        }
-        
-        // Limpiar storage local (descomenta si tienes estos métodos)
-        // await this._userStorageService.clearUser();
-        // await this._ownerStorageService.clearOwner();
-        
-        // Redirigir al login
-        await this.router.navigate(['/login']);
-        
-        // Mostrar mensaje después de redirigir
-        await this.alerts.showAlert('Sesión Cerrada', 'Gracias por usar Zentry. ¡Hasta pronto!');
-        
-      } catch (error) {
-        console.error('Error cerrando sesión:', error);
-        this.alerts.showAlert('Error', 'Hubo un problema al cerrar la sesión. Intente nuevamente.');
-      }
-    }
+  public cancelLogout() {
+    this.isLogoutAlertOpen = false;
+  }
 
-    // Cancelar logout
-    public cancelLogout() {
-      this.isLogoutAlertOpen = false;
-      console.log('Logout cancelado');
-    }
+  // ------- Utilidades -------
+  public viewRecurrents() {
+    this.recurrentsState = !this.recurrentsState;
+  }
 
-    // ==== FUNCIONES ADICIONALES ====
+  public getAvatarInitial(): string {
+    if (this.owner?.user?.name) return this.owner.user.name.charAt(0).toUpperCase();
+    return 'U';
+  }
 
-    // Ver recurrentes (función existente mejorada)
-    public viewRecurrents() {
-      this.recurrentsState = !this.recurrentsState;
-      console.log('Estado recurrentes:', this.recurrentsState ? 'Abierto' : 'Cerrado');
-    }
+  public getOwnerName(): string {
+    return this.editName || 'Propietario';
+  }
 
-    // Función para obtener la inicial del nombre para el avatar
-    public getAvatarInitial(): string {
-      // Usa la propiedad anidada 'user.name' para obtener la inicial
-      if (this.owner && this.owner.user && this.owner.user.name) {
-        return this.owner.user.name.charAt(0).toUpperCase();
-      }
-      return 'U';
-    }
+  public getPropertyInfo(): string {
+    return `${this.properties.length} propiedad${this.properties.length !== 1 ? 'es' : ''} registrada${this.properties.length !== 1 ? 's' : ''}`;
+  }
 
-    // Función para obtener el nombre completo o placeholder
-    public getOwnerName(): string {
-      return this.editName || 'Propietario';
-    }
-
-    // Función para obtener la información de la propiedad
-    public getPropertyInfo(): string {
-      return `${this.properties.length} propiedad${this.properties.length !== 1 ? 'es' : ''} registrada${this.properties.length !== 1 ? 's' : ''}`;
-    }
-
-    // Limpiar recursos al salir
-    ngOnDestroy() {
-      if (this.socket) {
-        this.socket.disconnect();
-      }
-    }
+  ngOnDestroy() {
+    if (this.socket) {
+      this.socket.removeAllListeners?.();
+      this.socket.disconnect();
+    }
+  }
 }
