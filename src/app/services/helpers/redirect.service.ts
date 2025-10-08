@@ -6,23 +6,30 @@ import { Router } from '@angular/router';
 })
 export class RedirectService {
 
-  constructor(
-    private _router: Router
-  ) { }
+  constructor(private _router: Router) {}
 
   public redirectByRole(role: string) {
     switch (role) {
       case 'propietario':
-        this._router.navigate(['/home']); // Redirige a la página de propietario
+        this._router.navigate(['/home']); // OK
         break;
+
       case 'vigilador':
-        this._router.navigate(['/vigiladores/home']); // Redirige a la página de vigilador
+        // ❌ No existe '/vigiladores/home'
+        // this._router.navigate(['/vigiladores/home']);
+        // ✅ Ruta correcta según routes.ts
+        this._router.navigate(['/guards/home']);
         break;
+
       case 'administrador':
-        this._router.navigate(['/admin/home']); // Redirige a la página de administrador
+        this._router.navigate(['/admin/home']); // OK
         break;
+
       default:
-        this._router.navigate(['/menu/home']); // Redirige a una página por defecto
+        // ❌ No existe '/menu/home'
+        // this._router.navigate(['/menu/home']);
+        // ✅ Fallback realista
+        this._router.navigate(['/login']);
         break;
     }
   }

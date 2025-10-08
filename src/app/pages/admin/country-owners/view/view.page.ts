@@ -72,29 +72,27 @@ export class ViewPage implements OnInit {
     this.loading = true;
 
     try {
-      // Preferimos el endpoint más específico primero
+      // Preferimos el endpoint por country con fallback
       if (this.countryId) {
-        // 1) /api/users/owners/get_by_country/:countryID
         try {
-          const obs = await this.ownersSvc.getAllByCountry();
+          const obs = this.ownersSvc.getAllByCountry(); // Opción A
           obs.subscribe({
             next: (data) => this.assignOwners(data),
             error: async () => {
-              // 2) fallback /api/owners/country/get_by_id/:countryID
-              const obs2 = await this.ownersSvc.getAllByCountryID();
+              const obs2 = this.ownersSvc.getAllByCountryID();
               obs2.subscribe({
                 next: (data2) => this.assignOwners(data2),
                 error: () => this.loadAllOwnersFallback()
               });
             }
           });
-          return; // salgo, se maneja arriba
+          return;
         } catch {
           // si algo raro pasó antes, sigo al siguiente intento
         }
       }
 
-      // 3) Último recurso: todos los owners
+      // Último recurso: todos los owners
       this.loadAllOwnersFallback();
 
     } catch (e) {
@@ -134,11 +132,18 @@ export class ViewPage implements OnInit {
   }
 
   // Normalizador defensivo para que el HTML no rompa si cambia el shape
+  // Soporta:
+  //  - Sequelize con alias:   raw.OwnerUser
+  //  - Otros casos usados:    raw.user / raw.owner.user
+  //  - Propiedad opcional (puede venir vacía)
   private normalizeOwner = (raw: any) => {
-    // user puede venir como raw.user o raw.owner.user
-    const user = raw?.user || raw?.owner?.user || {};
-    // property puede venir como raw.property o raw.owner.property o en raw.properties[0]
-    const property = raw?.property || raw?.owner?.property || raw?.properties?.[0] || {};
+    const user = raw?.OwnerUser || raw?.user || raw?.owner?.user || {};
+    const property =
+      raw?.property ||
+      raw?.owner?.property ||
+      (Array.isArray(raw?.properties) ? raw.properties[0] : {}) ||
+      {};
+
     return {
       id: raw?.id ?? user?.id ?? null,
       user: {
@@ -163,13 +168,11 @@ export class ViewPage implements OnInit {
   // ================================
   // NAVEGACIÓN / ACCIONES
   // ================================
-  public editUser(userId: number, index: number) {
-    // Ruta que ya venías usando
+  public editUser(userId: number, _index: number) {
     this.router.navigate(['/admin/editar-propietario', userId]);
   }
 
-  // Tu OwnersService no expone delete.
-  // Dejo un placeholder que solo avisa al usuario.
+  // Placeholder (no hay endpoint de borrar propietario)
   public async deleteOwner(_ownerId: number, _index: number) {
     const t = await this.toastCtrl.create({
       message: 'Eliminar propietario aún no está disponible en el backend.',
@@ -184,7 +187,6 @@ export class ViewPage implements OnInit {
   // ================================
   get sortedOwners() {
     if (!this.owners) return [];
-    // copia para no ordenar el array original por referencia
     return [...this.owners].sort((a, b) => {
       const lnA = (a.user?.lastname || '').localeCompare(b.user?.lastname || '');
       if (lnA !== 0) return lnA;
@@ -210,7 +212,7 @@ export class ViewPage implements OnInit {
       });
     }
     return filtered;
-  }
+    }
 
   public getTotalOwnersCount(): number {
     return this.owners.length;

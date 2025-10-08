@@ -1,27 +1,17 @@
-import { AfterViewInit, Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  AfterViewInit, Component, OnDestroy, OnInit, OnChanges, SimpleChanges, Input
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AlertController } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import * as L from 'leaflet';
+import { firstValueFrom } from 'rxjs';
 
-// Ionic
-import { IonicModule } from '@ionic/angular';
-
-// Servicios
-import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
+import { AntipanicService, AntipanicCreateDto } from 'src/app/services/antipanic/antipanic.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 
-// Modelos / tipos
-import { GuardPointInterface } from 'src/app/interfaces/guardsPoints-interface';
-import { CountryInteface } from 'src/app/interfaces/country-interface';
-
-// Demo (simulador)
-import { GuardSimulatorService } from 'src/app/services/guards/guard-simulator.service';
-import { environment } from 'src/environments/environment';
-
-// Fix iconos Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -29,315 +19,435 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'assets/leaflet/marker-shadow.png',
 });
 
+type LatLngObj = { lat: number; lng: number };
+
 @Component({
   selector: 'app-country-map',
-  templateUrl: './country-map.component.html',
-  styleUrls: ['./country-map.component.scss'],
   standalone: true,
-  imports: [ CommonModule, IonicModule ]
+  imports: [CommonModule, IonicModule],
+  templateUrl: './country-map.component.html',
+  styleUrls: ['./country-map.component.scss']
 })
-export class CountryMapComponent implements AfterViewInit, OnInit, OnDestroy {
-  private map: L.Map | null = null;
-  private tileLayer: L.TileLayer | null = null;
+export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
 
-  // Polígono de perímetro
+  @Input() countryId?: number;
+  @Input() showPanicButton: boolean = true;
+  @Input() simulateGuards: boolean = true;
+  @Input() demoMode: boolean = false;
+
+  public antipanicState = false;
+  public isSending = false;
+
+  private map: L.Map | null = null;
+  private baseLayers: { [k: string]: L.TileLayer } = {};
+  private layersControl: L.Control.Layers | null = null;
+
   private perimeterPolygon: L.Polygon | null = null;
 
-  // Marcadores de guardias reales (upsert sin parpadeo)
-  private guardMarkers = new Map<string | number, L.CircleMarker>();
+  // marker del propietario
+  private ownerPointer: L.CircleMarker | null = null;
 
-  // Estado
-  protected antipanicState = false;
-  protected activeGuards: GuardPointInterface[] = [];
-  public markers: L.CircleMarker[] = []; // legacy/aux
+  // Sim guardias
+  private simTimer: any = null;
+  private simGuards: Array<{ id: number; marker: L.CircleMarker; edgeIdx: number; t: number; speed: number; }> = [];
+  private perimeterPath: L.LatLng[] = [];
+  private edgeLengths: number[] = [];
+  private totalPerimeter = 0;
 
-  // Contexto
   public id_country: number | null = null;
-  public id_user: number | null = null;
+  public loading = true;
+  public error: string | null = null;
+  private initialized = false;
+  private antipanicId: number | string | null = null;
 
   constructor(
-    private _antipanicService: AntipanicService,
-    private alertController: AlertController,
-    private _ownerStorage: OwnerStorageService,
-    private _socketService: WebSocketService,
-    private _countryService: CountriesService,
-    private _alerts: AlertService,
-    private sim: GuardSimulatorService
+    private antipanicSvc: AntipanicService,
+    private ownerStorage: OwnerStorageService,
+    private socketSvc: WebSocketService,
+    private countrySvc: CountriesService,
+    private alerts: AlertService,
+    private alertCtrl: AlertController,
   ) {}
 
-  // ---------------- Ciclo de vida ----------------
-
   async ngOnInit() {
-    try {
-      const owner = await this._ownerStorage.getOwner();
-      if (owner?.user) {
-        this.id_user = owner.user.id;
-        this.id_country = Number(owner.property.id_country);
-      }
-    } catch (error) {
-      console.warn('No se pudieron obtener datos del owner del storage.', error);
+    if (typeof this.countryId === 'number' && !isNaN(this.countryId)) {
+      this.id_country = this.countryId;
+    } else {
+      const owner = await this.ownerStorage.getOwner().catch(() => null);
+      const id = Number(owner?.property?.id_country);
+      this.id_country = !isNaN(id) ? id : null;
     }
 
-    // Conectar socket (centralizado)
-    this._socketService.conectar();
-    this.setupSocketListeners();
+    if (!this.demoMode) {
+      this.socketSvc.conectar();
+      this.setupSocketListeners();
+    }
   }
 
-  async ngAfterViewInit() {
-    if (!this.id_country) return;
-
-    try {
-      const country = await new Promise<CountryInteface>((resolve, reject) => {
-        this._countryService.getByID(this.id_country!).subscribe(resolve, reject);
-      });
-
-      const center = this.extractCenter(country);
-      if (!center) return;
-
-      this.initMap(center.lat, center.lng);
-
-      const perimeter = this.extractPerimeter(country);
-      if (perimeter && perimeter.length >= 3) {
-        this.drawPolygon(perimeter);
-
-        // DEMO: arranca simulación si está habilitada
-        if ((environment as any).DEMO_GUARDS && this.map) {
-          this.sim.start(this.map, perimeter, 3, 800);
-        }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['countryId'] && !changes['countryId'].firstChange) {
+      const next = Number(changes['countryId'].currentValue);
+      if (!isNaN(next)) {
+        this.id_country = next;
+        this.initialized = false;
+        this.safeLoad();
       }
-
-      // Notificar conexión de owner (si backend lo usa)
-      if (this.id_user) {
-        this._socketService.emitirEvento('owner-connected', this.id_user);
-      }
-
-    } catch (e) {
-      console.warn('Fallo al cargar el country.', e);
     }
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.safeLoad(), 0);
   }
 
   ngOnDestroy(): void {
-    // Apagar demo
-    this.sim.stop();
-
-    // Desconectar socket
-    this._socketService.desconectar();
-
-    // Limpiar mapa
+    this.stopGuardSimulation();
+    if (!this.demoMode) this.socketSvc.desconectar();
     if (this.map) this.map.remove();
-    this.guardMarkers.forEach(m => m.remove());
-    this.guardMarkers.clear();
   }
 
-  // ---------------- Sockets ----------------
+  private safeLoad(): void {
+    if (this.initialized) return;
+    if (!this.id_country) return;
+    this.initialized = true;
+    this.loading = true;
 
-  private setupSocketListeners(): void {
-    // Lista de guardias activos (recurrente)
-    this._socketService.escucharEvento('get-actives-guards', (payload: any[]) => {
-      const list = Array.isArray(payload) ? payload : [];
-      const filtered = this.id_country != null
-        ? list.filter((g) => Number(g.id_country) === this.id_country)
-        : list;
+    this.countrySvc.getByID(this.id_country!).subscribe({
+      next: (country: any) => {
+        const center = this.extractCenter(country);
+        if (!center) {
+          this.error = 'El country no tiene coordenadas válidas.';
+          this.loading = false;
+          return;
+        }
+        this.initMap(center.lat, center.lng);
 
-      // Si llegaron reales → apagar simulación
-      if (filtered.length > 0) this.sim.stop();
-
-      // Upsert sin parpadeo
-      filtered.forEach(g => this.upsertGuardMarker(g));
-      this.pruneMissingGuards(filtered);
-    });
-
-    // Baja puntual
-    this._socketService.escucharEvento('guardDisconnected', (payload: any) => {
-      const key = payload?.id_user ?? payload?.id;
-      if (key && this.guardMarkers.has(key)) {
-        this.guardMarkers.get(key)!.remove();
-        this.guardMarkers.delete(key);
-      }
-    });
-
-    // Fin de antipánico (UI)
-    this._socketService.escucharEvento('notificacion-antipanico-finalizado', (payload: any) => {
-      this.antipanicState = false;
-      const box = document.querySelector('.box') as HTMLElement;
-      if (box) box.style.display = 'none';
-      this._alerts.presentAlertFinishAntipanicDetails(payload?.antipanic?.details);
+        const perimeter = this.extractPerimeter(country);
+        if (perimeter?.length >= 3) {
+          this.drawPolygonOutline(perimeter);
+          if (this.simulateGuards) this.startGuardSimulation(perimeter);
+        }
+        setTimeout(() => this.map?.invalidateSize(true), 120);
+        this.loading = false;
+      },
+      error: () => { this.error = 'No se pudo cargar el country.'; this.loading = false; }
     });
   }
 
-  private upsertGuardMarker(g: any): void {
-    if (!this.map) return;
-    const key = g.id_user ?? g.id ?? `${g.user_name}-${g.user_lastname}`;
+  private extractCenter(country: any): LatLngObj | null {
+    const rawLat = country?.latitude ?? country?.center_lat;
+    const rawLng = country?.longitude ?? country?.center_lng;
+    const lat = Number(rawLat), lng = Number(rawLng);
+    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng };
 
-    let marker = this.guardMarkers.get(key);
-    if (marker) {
-      marker.setLatLng([g.lat, g.lng]);
-    } else {
-      marker = L.circleMarker([g.lat, g.lng], {
-        color: '#ff0000',
-        fillColor: '#ff0000',
-        fillOpacity: 0.7,
-        radius: 8,
-        weight: 2
-      }).bindPopup(`Vigilador: <b>${g.user_name} - ${g.user_lastname}</b>`, { closeButton: false })
-        .addTo(this.map!);
-      this.guardMarkers.set(key, marker);
+    const per = this.extractPerimeter(country);
+    if (per?.length) {
+      const avgLat = per.reduce((s: number, p: any) => s + Number(p.lat), 0) / per.length;
+      const avgLng = per.reduce((s: number, p: any) => s + Number(p.lng), 0) / per.length;
+      return { lat: avgLat, lng: avgLng };
     }
+    return null;
   }
 
-  private pruneMissingGuards(current: any[]): void {
-    const alive = new Set(current.map(g =>
-      (g.id_user ?? g.id ?? `${g.user_name}-${g.user_lastname}`)));
-    for (const [key, marker] of this.guardMarkers.entries()) {
-      if (!alive.has(key)) {
-        marker.remove();
-        this.guardMarkers.delete(key);
-      }
-    }
+  private extractPerimeter(country: any): LatLngObj[] | null {
+    let raw = country?.perimeter_points ?? country?.perimeterPoints ?? null;
+    if (!raw) return null;
+    if (typeof raw === 'string') { if (!raw.trim()) return null; try { raw = JSON.parse(raw); } catch { return null; } }
+    if (!Array.isArray(raw)) return null;
+    const norm = raw.map((p: any) => ({ lat: Number(p?.lat), lng: Number(p?.lng) }))
+                    .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+    return norm.length >= 3 ? norm : null;
   }
-
-  // ---------------- Leaflet / Mapa ----------------
 
   private initMap(mapLat: number, mapLng: number): void {
-    if (this.map) {
-      this.map.setView([mapLat, mapLng]);
-      return;
-    }
+    if (this.map) { this.map.setView([mapLat, mapLng]); return; }
 
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    this.setTileLayer(
-      prefersDark.matches
-        ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-    );
+    this.baseLayers = {
+      'Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, attribution: 'Tiles © Esri & partners' }),
+      'Calles':   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }),
+      'Oscuro':   L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '© Stadia Maps, © OpenMapTiles, © OpenStreetMap' })
+    };
 
-    this.map = L.map('map', {
-      zoomControl: true,
-      layers: [this.getTileLayer()!]
-    }).setView([mapLat, mapLng], 15);
+    this.map = L.map('map', { zoomControl: true, layers: [this.baseLayers['Satélite']] })
+                .setView([mapLat, mapLng], 15);
 
     this.map.setMinZoom(13);
-    setTimeout(() => this.map?.invalidateSize(true), 100);
+    this.layersControl = L.control.layers(this.baseLayers, {}, { collapsed: true }).addTo(this.map);
   }
 
-  public setTileLayer(url: string): void {
-    this.tileLayer = L.tileLayer(url, { attribution: '© OpenStreetMap contributors', maxZoom: 19 });
-  }
-  public getTileLayer(): L.TileLayer | null { return this.tileLayer; }
-
-  private drawPolygon(points: {lat:number; lng:number}[]): void {
+  private drawPolygonOutline(points: LatLngObj[]): void {
     if (!this.map) return;
-
-    if (this.perimeterPolygon) {
-      this.map.removeLayer(this.perimeterPolygon);
-      this.perimeterPolygon = null;
-    }
-
-    this.perimeterPolygon = L.polygon(points as any, { color: 'blue', weight: 2 }).addTo(this.map);
+    if (this.perimeterPolygon) { this.map.removeLayer(this.perimeterPolygon); this.perimeterPolygon = null; }
+    this.perimeterPolygon = L.polygon(points as any, {
+      color: '#10b981', weight: 3, opacity: 1, fill: false, fillOpacity: 0
+    }).addTo(this.map);
     const bounds = this.perimeterPolygon.getBounds();
-    this.map.fitBounds(bounds);
-    // this.map.setMaxBounds(bounds.pad(0.02)); // opcional
+    this.map.fitBounds(bounds, { padding: [50, 50] });
   }
 
-  private extractCenter(country: CountryInteface): {lat:number; lng:number} | null {
-    const lat = (country as any)?.latitude ?? (country as any)?.center_lat;
-    const lng = (country as any)?.longitude ?? (country as any)?.center_lng;
-    return (typeof lat === 'number' && typeof lng === 'number') ? { lat, lng } : null;
+  // ========================
+  //    Antipánico
+  // ========================
+  public onAntipanicClick(): void {
+    if (!this.antipanicState) this.activateAntipanic();
+    else this.desactivateAntipanic();
   }
-
-  private extractPerimeter(country: CountryInteface): {lat:number; lng:number}[] | null {
-    let raw: any = (country as any)?.perimeter_points ?? (country as any)?.perimeterPoints ?? null;
-    if (!raw) return null;
-    if (typeof raw === 'string') {
-      try { raw = JSON.parse(raw); } catch { return null; }
-    }
-    if (!Array.isArray(raw)) return null;
-
-    return raw.every((p: any) => typeof p?.lat === 'number' && typeof p?.lng === 'number')
-      ? raw
-      : null;
-  }
-
-  // ---------------- Antipánico (real + UI) ----------------
 
   async activateAntipanic() {
-    // UI inmediata
-    const box = document.querySelector('.box') as HTMLElement;
-    if (box) box.style.display = 'block';
-    this.antipanicState = true;
+    if (this.isSending) return;
+    this.isSending = true;
 
     try {
-      // Datos del owner para payload
-      const owner = await this._ownerStorage.getOwner();
+      const owner = await this.ownerStorage.getOwner().catch(() => null);
+      const id_owner = owner?.id ?? owner?.owner?.id ?? null;
+      const address = owner?.property?.address ?? '';
+      const propertyNumber = owner?.property?.propertyNumber ?? owner?.property?.number ?? '';
 
-      // Ubicación actual (fallback básico)
-      let latitude = -27.5615;
-      let longitude = -58.7521;
-      if (navigator.geolocation) {
-        try {
-          const pos = await new Promise<GeolocationPosition>((res, rej) =>
-            navigator.geolocation.getCurrentPosition(res, rej, {
-              enableHighAccuracy: true, timeout: 10000, maximumAge: 60000
-            }));
-          latitude = pos.coords.latitude;
-          longitude = pos.coords.longitude;
-        } catch { /* ignore, usamos fallback */ }
+      if (!this.id_country || !id_owner) {
+        this.alerts.presentAlert('Faltan datos del propietario o del country.');
+        this.isSending = false;
+        return;
       }
 
-      // Armar payload compatible con tu backend
-      const dto: any = {
-        id_owner: owner?.id,
-        address: owner?.property?.address || `${latitude}, ${longitude}`,
-        id_country: owner?.property?.id_country,
-        propertyNumber: owner?.property?.number,
-        latitude,
-        longitude
-      };
+      // ==== GEOLOCALIZACIÓN REAL ====
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
 
-      // Llamada real
-      this._antipanicService.activateAntipanic(dto).subscribe({
-        next: (resp) => {
-          this._alerts.showAlert('🚨 ALERTA ACTIVADA',
-            `Se envió la alerta desde <b>${owner?.property?.name}</b>
-             <br>(${latitude.toFixed(5)}, ${longitude.toFixed(5)})`);
-          // Si tu backend emite eventos, el WebSocketService ya los escucha
-        },
-        error: (err) => {
-          console.error(err);
-          this._alerts.showAlert('Error', 'No se pudo enviar la alerta de emergencia.');
-          this.antipanicState = false;
-          if (box) box.style.display = 'none';
+        const payload: AntipanicCreateDto = {
+          id_owner, address, id_country: this.id_country!, propertyNumber, latitude: lat, longitude: lng
+        };
+
+        try {
+          const resp = await firstValueFrom(this.antipanicSvc.activateAntipanic(payload));
+          this.antipanicId = this.pickAntipanicId(resp);
+
+          if (!this.demoMode) {
+            this.socketSvc.emitirEvento('owner-antipanico-activado', {
+              id_country: this.id_country, id_owner, antipanicId: this.antipanicId, lat, lng, ts: Date.now()
+            });
+          }
+
+          this.antipanicState = true;
+
+          // FIX: Verificar que el mapa existe antes de colocar el marcador
+          console.log('📍 Intentando colocar marcador en:', lat, lng);
+          console.log('🗺️ Mapa existe:', !!this.map);
+          
+          if (this.map) {
+            this.placeOwnerPointer(lat, lng);
+            this.map.setView([lat, lng], Math.max(this.map.getZoom(), 17), { animate: true });
+            console.log('✅ Marcador colocado y vista actualizada');
+          } else {
+            console.error('❌ El mapa no está inicializado');
+          }
+
+          this.alerts.presentAlert('Antipánico activado. Se notificó a administración y guardias.');
+        } catch (err) {
+          console.error('Error activando antipánico:', err);
+          this.alerts.presentAlert('No se pudo activar el antipánico.');
+        } finally {
+          this.isSending = false;
         }
+      }, (err) => {
+        console.error('Error geolocalización:', err);
+        this.alerts.presentAlert('No se pudo obtener ubicación del dispositivo.');
+        this.isSending = false;
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       });
 
-    } catch (e) {
-      console.error(e);
-      this._alerts.showAlert('Error', 'No se pudo iniciar la alerta.');
-      this.antipanicState = false;
-      if (box) box.style.display = 'none';
+    } catch (err) {
+      console.error('Error en activateAntipanic:', err);
+      this.alerts.presentAlert('No se pudo activar el antipánico.');
+      this.isSending = false;
     }
   }
 
   async desactivateAntipanic() {
-    const alert = await this.alertController.create({
+    if (!this.antipanicId) {
+      this.alerts.presentAlert('No hay alerta activa para cancelar.');
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
       header: 'Cancelar Antipánico',
-      message: '¿Está seguro de cancelarlo?',
+      message: '¿Seguro que querés cancelar el botón antipánico?',
       backdropDismiss: false,
       buttons: [
+        { text: 'No', role: 'cancel' },
         {
-          text: 'Autorizar',
+          text: 'Sí, cancelar',
           role: 'confirm',
-          handler: () => {
-            // Si tenés endpoint de desactivar, llamalo acá:
-            // this._antipanicService.desactivateAntipanic(id).subscribe(...)
-            this.antipanicState = false;
-            const box = document.querySelector('.box') as HTMLElement;
-            if (box) box.style.display = 'none';
-          },
-        },
-        { text: 'Cancelar', role: 'cancel', handler: () => { this.antipanicState = true; } }
+          handler: async () => {
+            await this.finishAntipanic();
+          }
+        }
       ],
     });
     await alert.present();
+  }
+
+  private async finishAntipanic() {
+    if (this.isSending || !this.antipanicId) return;
+    this.isSending = true;
+    try {
+      await firstValueFrom(this.antipanicSvc.desactivateAntipanic(this.antipanicId));
+
+      if (!this.demoMode) {
+        this.socketSvc.emitirEvento('owner-antipanico-cancelado', {
+          id_country: this.id_country, antipanicId: this.antipanicId, ts: Date.now()
+        });
+      }
+
+      this.antipanicState = false;
+      this.antipanicId = null;
+
+      // BORRAR MARKER DEL PROPIETARIO
+      if (this.ownerPointer) {
+        this.map?.removeLayer(this.ownerPointer);
+        this.ownerPointer = null;
+      }
+
+      this.alerts.presentAlert('Antipánico cancelado.');
+    } catch (err) {
+      console.error('Error cancelando antipánico:', err);
+      this.alerts.presentAlert('No se pudo cancelar.');
+    } finally {
+      this.isSending = false;
+    }
+  }
+
+  private placeOwnerPointer(lat: number, lng: number): void {
+    console.log('🎯 placeOwnerPointer llamado con:', { lat, lng, mapaExiste: !!this.map });
+    
+    if (!this.map) {
+      console.error('❌ No hay mapa en placeOwnerPointer');
+      return;
+    }
+
+    if (!this.ownerPointer) {
+      console.log('🆕 Creando nuevo marcador...');
+      this.ownerPointer = L.circleMarker([lat, lng], {
+        radius: 9,
+        color: '#2563eb',
+        weight: 3,
+        fillColor: '#3b82f6',
+        fillOpacity: 0.9
+      }).addTo(this.map);
+      this.ownerPointer.bindPopup('<b>Ubicación del propietario</b>', { closeButton: false }).openPopup();
+      console.log('✅ Marcador creado y agregado al mapa');
+    } else {
+      console.log('♻️ Actualizando marcador existente...');
+      this.ownerPointer.setLatLng([lat, lng]).openPopup();
+      console.log('✅ Marcador actualizado');
+    }
+  }
+
+  private setupSocketListeners(): void {
+    this.socketSvc.escucharEvento('notificacion-antipanico-finalizado', (payload: any) => {
+      if (!this.antipanicId || payload?.antipanicId === this.antipanicId) {
+        this.antipanicState = false;
+        this.antipanicId = null;
+
+        if (this.ownerPointer) {
+          this.map?.removeLayer(this.ownerPointer);
+          this.ownerPointer = null;
+        }
+
+        this.alerts.presentAlert('Antipánico finalizado por administración.');
+      }
+    });
+  }
+
+  private pickAntipanicId(resp: any): string | number | null {
+    if (!resp) return null;
+    console.log('🔍 Respuesta completa del backend:', resp);
+    
+    const candidates = [
+      resp?.antipanic?.id,
+      resp?.data?.id,
+      resp?.id,
+      resp?.antipanicId,
+      resp?.result?.id,
+      resp?.payload?.id
+    ];
+    
+    const id = candidates.find(v => v !== undefined && v !== null);
+    console.log('🆔 ID encontrado:', id, '| Candidatos:', candidates);
+    
+    return (typeof id === 'string' && /^\d+$/.test(id)) ? Number(id) : (id ?? null);
+  }
+
+  // ========================
+  //   Simulación Guardias
+  // ========================
+  private startGuardSimulation(perimeter: LatLngObj[]): void {
+    if (!this.map) return;
+    this.stopGuardSimulation();
+
+    this.perimeterPath = perimeter.map(p => L.latLng(p.lat, p.lng));
+    const first = this.perimeterPath[0];
+    const last = this.perimeterPath[this.perimeterPath.length - 1];
+    if (!last.equals(first)) this.perimeterPath.push(first);
+
+    this.edgeLengths = []; this.totalPerimeter = 0;
+    for (let i = 0; i < this.perimeterPath.length - 1; i++) {
+      const d = this.perimeterPath[i].distanceTo(this.perimeterPath[i + 1]);
+      this.edgeLengths.push(d); this.totalPerimeter += d;
+    }
+    if (this.totalPerimeter <= 0) return;
+
+    const N = 4, baseSpeed = 1.3;
+    for (let i = 0; i < N; i++) {
+      const offset = (i / N) * this.totalPerimeter;
+      const { edgeIdx, t, coord } = this.locateAlongPerimeter(offset);
+      const marker = L.circleMarker(coord, {
+        radius: 7, weight: 2, color: '#ff0000', fillColor: '#ff0000', fillOpacity: 0.85
+      }).bindPopup(`Vigilador: <b>Guardia ${i + 1}</b>`, { closeButton: false }).addTo(this.map!);
+      this.simGuards.push({ id: i + 1, marker, edgeIdx, t, speed: baseSpeed * (0.9 + Math.random()*0.25) });
+    }
+
+    this.simTimer = setInterval(() => this.tickGuards(0.2), 200);
+  }
+
+  private stopGuardSimulation(): void {
+    if (this.simTimer) { clearInterval(this.simTimer); this.simTimer = null; }
+    this.simGuards.forEach(g => g.marker.remove());
+    this.simGuards = []; this.perimeterPath = []; this.edgeLengths = []; this.totalPerimeter = 0;
+  }
+
+  private tickGuards(dt: number): void {
+    if (!this.map || !this.perimeterPath.length) return;
+    this.simGuards.forEach(g => {
+      let remaining = g.speed * dt;
+      while (remaining > 0) {
+        const Lm = this.edgeLengths[g.edgeIdx];
+        const distOnEdge = (1 - g.t) * Lm;
+        if (remaining < distOnEdge) { g.t += remaining / Lm; remaining = 0; }
+        else { remaining -= distOnEdge; g.edgeIdx = (g.edgeIdx + 1) % (this.perimeterPath.length - 1); g.t = 0; }
+      }
+      g.marker.setLatLng(this.interpolateOnEdge(g.edgeIdx, g.t));
+    });
+  }
+
+  private locateAlongPerimeter(offsetMeters: number) {
+    let acc = 0;
+    for (let i = 0; i < this.edgeLengths.length; i++) {
+      const Lm = this.edgeLengths[i];
+      if (acc + Lm >= offsetMeters) {
+        const t = (offsetMeters - acc) / Lm;
+        return { edgeIdx: i, t, coord: this.interpolateOnEdge(i, t) };
+      }
+      acc += Lm;
+    }
+    const lastIdx = this.edgeLengths.length - 1;
+    return { edgeIdx: lastIdx, t: 0.9999, coord: this.interpolateOnEdge(lastIdx, 0.9999) };
+  }
+
+  private interpolateOnEdge(edgeIdx: number, t: number): L.LatLng {
+    const a = this.perimeterPath[edgeIdx], b = this.perimeterPath[edgeIdx + 1];
+    return L.latLng(a.lat + (b.lat - a.lat) * t, a.lng + (b.lng - a.lng) * t);
   }
 }

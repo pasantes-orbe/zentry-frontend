@@ -1,45 +1,9 @@
 /* ====================================================== */
 /* TAB2.PAGE.SCSS (VISTA ANTIPÁNICO) */
 /* ====================================================== */
-:host {
-  .map-background {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  ion-fab {
-    margin-bottom: 16px;
-  }
-
-  .panic-button {
-    --background: var(--ion-color-danger);
-    --border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    animation: pulse-red 2s infinite;
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    border-radius: 50%;
-
-    ion-icon {
-      font-size: 60px;
-    }
-  }
-
-  @keyframes pulse-red {
-    0% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    }
-    70% {
-      transform: scale(1);
-      box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
-    }
-    100% {
-      transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-    }
-  }
+ion-content {
+  --background: transparent;
 }
+
+// Estilos del botón de pánico (ya están en country-map.component.scss)
+// Si querés sobrescribir algo, agregalo acá

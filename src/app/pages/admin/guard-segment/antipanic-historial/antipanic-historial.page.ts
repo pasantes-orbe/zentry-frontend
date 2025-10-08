@@ -71,9 +71,19 @@ export class AntipanicHistorialPage implements OnInit {
           // Se asegura de que los datos sean un array antes de intentar ordenarlos.
           if (Array.isArray(antipanics)) {
             // Se ordena de más reciente a más antiguo.
-            this.antipanics = antipanics.sort((a, b) => 
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
+            this.antipanics = antipanics
+              .map(a => ({
+              ...a,
+              // fuerzo number por si viene como string
+              id: typeof a.id === 'string' ? Number(a.id) : a.id,
+              // AntipanicEvent exige details: string | null
+              details: a.details ?? null
+              }) as AntipanicEvent)
+              .sort((a, b) => {
+              const ta = new Date(a.createdAt ?? '').getTime();
+              const tb = new Date(b.createdAt ?? '').getTime();
+              return tb - ta; // más recientes primero (ajustá si querés)
+              });
             console.log(this.antipanics);
           } else {
             this.antipanics = [];

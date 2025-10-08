@@ -1,22 +1,24 @@
-<ion-content>
-<div class="box">
-    <div class="circle1 ping">
+<ion-content [fullscreen]="true">
+  <!-- Pings mientras está activo (si los usás) -->
+  <div class="box" *ngIf="antipanicState">
+    <div class="circle1 ping"></div>
+    <div class="circle2 ping-d"></div>
+  </div>
 
-    </div>
-    <div class="circle2 ping-d">
+  <!-- Mapa -->
+  <div id="map" class="map-root"></div>
 
-    </div>
-</div>
-
-<div id="map"></div>
-
-<ion-button *ngIf="!antipanicState" (click)="activateAntipanic()" expand="block" size="large" color="danger" shape="round">
-    BOTON ANTIPANICO
-</ion-button>
-
-
-<ion-button *ngIf="antipanicState" (click)="desactivateAntipanic()" expand="block" size="large" color="danger" shape="round">
-    Cancelar Antipánico
-</ion-button>
+  <!-- FAB centrado abajo, igual a Tab2 -->
+  <ion-fab *ngIf="showPanicButton" slot="fixed" vertical="bottom" horizontal="center">
+    <ion-fab-button
+      class="panic-button"
+      [class.active]="antipanicState"
+      [disabled]="isSending"
+      (click)="onAntipanicClick()"
+    >
+      <!-- Anillo de pulso (solo cuando NO está activo) -->
+      <span class="pulse-ring" *ngIf="!antipanicState"></span>
+      <ion-icon name="alert"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
-
