@@ -1,3 +1,4 @@
+// src/app/services/auth/login.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -19,8 +20,8 @@ export class LoginService {
 
     try {
       const resp = await fetch(`${environment.URL}/api/auth/jwt`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain', Authorization: token },
+        method: 'GET',
+        headers: { 'Content-Type': 'text/plain', Authorization: `Bearer ${token}` },
       });
       return resp.status === 200;
     } catch {
@@ -35,12 +36,23 @@ export class LoginService {
 
     try {
       const resp = await fetch(`${environment.URL}/api/auth/jwt/${roleSearch}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain', Authorization: token },
+        method: 'GET', //Cualquier cosa cambiar a POST -> back -> auth.routes.ts
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
-      return resp.status === 200;
-    } catch {
-      return false;
-    }
-  }
+
+      // 1. Si no es 200 (ej. 401 por token inválido), denegamos.
+      if (resp.status !== 200) {
+        return false;
+      }
+       // 2. CORRECCIÓN CLAVE: Leemos el cuerpo JSON que es el booleano ('true' o 'false')
+      const isRoleValid = await resp.json(); 
+
+      // 3. Retornamos el valor del cuerpo. Esto detiene el acceso cruzado.
+      return isRoleValid === true; 
+
+    } catch {
+      // Falla si hay error de red o de parseo JSON.
+      return false;
+    }
+  }
 }

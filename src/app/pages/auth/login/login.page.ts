@@ -84,7 +84,7 @@ export class LoginPage implements OnInit {
   }
 
   async ngOnInit() {
-    this._webSocketService.conectar();
+    //this._webSocketService.conectar();
   }
 
   private async ionViewWillEnter() {
@@ -134,6 +134,10 @@ export class LoginPage implements OnInit {
         console.log('Owner guardado en storage correctamente');
       }
 
+      //(CORRECCIÓN CRÍTICA P-WS)
+      // Conectar WebSocket SOLO después de haber guardado el JWT.
+      await this._webSocketService.conectar(); 
+
       // 3. Obtener Rol (Protección contra TypeError)
       const roleName = data['user']?.role?.name; // Se añade '?' para protección.
       if (!roleName) throw { error: { msg: "El rol del usuario no está definido o es nulo." }};
@@ -155,7 +159,7 @@ export class LoginPage implements OnInit {
           this.setErrorMessage("Iniciando sesion...");
         } else {
           // Comentario: Caso vigilador sin país asignado: No redirige, solo muestra aviso.
-          this.setErrorMessage("Vigilador no tiene un país asignado. Contacte a un administrador.");
+          this.setErrorMessage("Vigilador no tiene un Countries asignado. Contacte a un administrador.");
         }
 
       } else {

@@ -23,15 +23,18 @@ export class OwnerGuard  implements RoleGuard {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     
+    console.log('🔒 ownerGuard ejecutándose...');  
+  
     return this._loginService.isRole(this.roleType).then(
       validJWT => {
         if(!validJWT){
+          console.log('❌ Acceso denegado (Rol incorrecto). Redirigiendo...');
           this._router.navigate(['/login']);
           return false;
+        } else {
+            console.log('✅ Acceso concedido (Rol correcto).');
+            return true;        
         }
-
-
-        return true;        
       }
     );
   }

@@ -19,31 +19,24 @@ export class SecurityGuard  implements RoleGuard {
     private _router: Router
   ){}
 
-  /*canActivate(
+  canActivate(
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
   
-  console.log('🔒 SecurityGuard ejecutándose...');
-  console.log('🔒 Retornando TRUE');/*
-  
-  // RETORNAR SIEMPRE TRUE:
-  
-    // COMENTAR TODA LA VALIDACIÓN TEMPORALMENTE:
-    /*
+  console.log('🔒 SecurityGuard ejecutándose...');  
+
     return this._loginService.isRole(this.roleType).then(
       validJWT => {
-
         if(!validJWT){
+          console.log('❌ Acceso denegado (Rol incorrecto). Redirigiendo...');
           this._router.navigate(['/login']);
           return false;
+        } else {
+            console.log('✅ Acceso concedido (Rol correcto).');
+            return true;        
         }
-
-        return true;        
+        
       }
     );
-    */
-    
-    // RETORNAR SIEMPRE TRUE PARA PERMITIR ACCESO:
-    //return true;
-  //}
+  }
 }

@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 
-// import { OwnerGuard } from './services/auth/guards/owner.guard';
-// import { AdminGuard } from './services/auth/guards/admin.guard';
-// import { SecurityGuard } from './services/auth/guards/security.guard';
+import { OwnerGuard } from '../guards/owner.guard';
+import { AdminGuard } from '../guards/admin.guard';
+import { SecurityGuard } from '../guards/security.guard';
 
 export const routes: Routes = [
   // ───────────────────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ export const routes: Routes = [
   // ───────────────────────────────────────────────────────────────────────────────
   {
     path: 'home',
-    // canMatch: [OwnerGuard],
+    canActivate: [OwnerGuard],
     loadComponent: () =>
       import('../tabs/tabs.page')
         .then(m => m.TabsPage),
@@ -73,49 +73,49 @@ export const routes: Routes = [
   // ───────────────────────────────────────────────────────────────────────────────
   {
     path: 'guards/home',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guards/home/home.page')
         .then(m => m.HomePage),
   },
   {
     path: 'guards/authorizations',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guards/authorizations/authorizations.page')
         .then(m => m.AuthorizationsPage),
   },
   {
     path: 'check-in-and-check-out',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guards/menu/registers/check-in-and-check-out/check-in-and-check-out.page')
         .then(m => m.CheckInAndCheckOutPage),
   },
   {
     path: 'view-events',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guards/events/view-events/view-events.page')
         .then(m => m.ViewEventsPage),
   },
   {
     path: 'checkin',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guards/checkin/checkin.page')
         .then(m => m.CheckinPage),
   },
   {
     path: 'checkout',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guards/checkout/checkout.page')
         .then(m => m.CheckoutPage),
   },
   {
     path: 'guards-schedule',
-    // canMatch: [SecurityGuard],
+    canActivate: [SecurityGuard],
     loadComponent: () =>
       import('../pages/guardsSchedule/guards-schedule/guards-schedule.page')
         .then(m => m.GuardsSchedulePage),
@@ -126,21 +126,21 @@ export const routes: Routes = [
   // ───────────────────────────────────────────────────────────────────────────────
   {
     path: 'admin/home',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/home/home.page')
         .then(m => m.HomePage),
   },
   {
     path: 'admin/add-country',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/add-country/add-country.page')
         .then(m => m.AddCountryPage),
   },
   {
     path: 'admin/country-dashboard/:id',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-dashboard/country-dashboard.page')
         .then(m => m.CountryDashboardPage),
@@ -149,14 +149,14 @@ export const routes: Routes = [
   // Amenities
   {
     path: 'admin/add-amenity',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-amenities/add-amenity/add-amenity.page')
         .then(m => m.AddAmenityPage),
   },
   {
     path: 'admin/view-all-amenities',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-amenities/view-all/view-all.page')
         .then(m => m.ViewAllPage),
@@ -165,21 +165,21 @@ export const routes: Routes = [
   // Owners
   {
     path: 'admin/add-country-owner',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-owners/add-country-owner/add-country-owner.page')
         .then(m => m.AddCountryOwnerPage),
   },
   {
     path: 'admin/assign-country-to-owner',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-owners/assign-country-to-owner/assign-country-to-owner.page')
         .then(m => m.AssignCountryToOwnerPage),
   },
   {
     path: 'admin/view-owners',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-owners/view/view.page')
         .then(m => m.ViewPage),
@@ -188,14 +188,14 @@ export const routes: Routes = [
   // Properties
   {
     path: 'admin/add-property',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-properties/add-property/add-property.page')
         .then(m => m.AddPropertyPage),
   },
   {
     path: 'admin/view-properties',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-properties/view/view.page')
         .then(m => m.ViewPage),
@@ -204,21 +204,21 @@ export const routes: Routes = [
   // Recurrents (plano)
   {
     path: 'admin/add-recurrent',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page')
         .then(m => m.AddRecurrentPage),
   },
   {
     path: 'admin/country-recurrents',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-recurrents/country-recurrents.page')
         .then(m => m.RecurrentsViewAllComponent),
   },
   {
     path: 'admin/edit-recurrent/:recurrentId',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page')
         .then(m => m.AddRecurrentPage),
@@ -227,21 +227,21 @@ export const routes: Routes = [
   // Recurrents (canónico con :id)
   {
     path: 'admin/country/:id/recurrents',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-recurrents/country-recurrents.page')
         .then(m => m.RecurrentsViewAllComponent),
   },
   {
     path: 'admin/country/:id/recurrents/add',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page')
         .then(m => m.AddRecurrentPage),
   },
   {
     path: 'admin/country/:id/recurrents/edit/:recurrentId',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-recurrents/add-recurrent/add-recurrent.page')
         .then(m => m.AddRecurrentPage),
@@ -250,49 +250,49 @@ export const routes: Routes = [
   // Otros (admin)
   {
     path: 'admin/events-historial',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/events-segment/events-historial/events-historial.page')
         .then(m => m.EventsHistorialPage),
   },
   {
     path: 'admin/add-guard',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/guard-segment/add-guard/add-guard.page')
         .then(m => m.AddGuardPage),
   },
   {
     path: 'admin/add-laboral-schedule',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/guard-segment/add-laboral-schedule/add-laboral-schedule.page')
         .then(m => m.AddLaboralSchedulePage),
   },
   {
     path: 'admin/all-guards',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/guard-segment/all-guards/all-guards.page')
         .then(m => m.AllGuardsPage),
   },
   {
     path: 'admin/antipanic-historial',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/guard-segment/antipanic-historial/antipanic-historial.page')
         .then(m => m.AntipanicHistorialPage),
   },
   {
     path: 'admin/checkin-out-historial',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/guard-segment/checkin-out-historial/checkin-out-historial.page')
         .then(m => m.CheckinOutHistorialPage),
   },
   {
     path: 'admin/password-requests',
-    // canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/password-requests/password-requests/password-requests.page')
         .then(m => m.PasswordRequestsPage),
@@ -333,7 +333,7 @@ export const routes: Routes = [
   },
   {
     path: 'map-guards',
-    // canMatch: [AdminGuard],
+    canMatch: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/map-guards/map-guards.page')
         .then(m => m.MapGuardsPage),
