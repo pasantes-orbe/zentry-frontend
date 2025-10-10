@@ -145,7 +145,6 @@ export const routes: Routes = [
       import('../pages/admin/country-dashboard/country-dashboard.page')
         .then(m => m.CountryDashboardPage),
   },
-
   // Amenities
   {
     path: 'admin/add-amenity',
@@ -333,7 +332,7 @@ export const routes: Routes = [
   },
   {
     path: 'map-guards',
-    canMatch: [AdminGuard],
+    canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/map-guards/map-guards.page')
         .then(m => m.MapGuardsPage),

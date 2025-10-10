@@ -12,9 +12,7 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
 import { ActivatedRoute } from '@angular/router';
 
 // Tipos
-import { CountryInteface } from 'src/app/interfaces/country-interface';
-
-// Flag demo
+import { CountryInteface } from 'src/app/interfaces/country-interface'; // Nota: La interfaz no se usa, pero se mantiene la importación
 import { environment } from 'src/environments/environment';
 
 // Fix Leaflet
@@ -40,6 +38,9 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
 
   private id_country: number | null = null;
 
+  // Almacena los marcadores de guardias en tiempo real (id_user -> marker)
+  private activeGuardMarkers: { [id_user: string]: L.CircleMarker } = {};
+
   // -------- Simulación de guardias (demo) --------
   private DEMO_ENABLED = !!(environment as any).DEMO_GUARDS;
   private simTimer: any = null;
@@ -48,16 +49,16 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
     id: number;
     name: string;
     marker: L.CircleMarker;
-    edgeIdx: number;     // índice de arista actual (entre punto i y i+1)
-    t: number;           // progreso dentro de la arista [0..1]
-    speed: number;       // m/s
+    edgeIdx: number; 
+    t: number;           
+    speed: number;       
   }> = [];
 
-  private perimeterPath: L.LatLng[] = [];     // puntos del polígono en LatLng
-  private edgeLengths: number[] = [];         // longitudes de cada arista (m)
-  private totalPerimeter: number = 0;         // perímetro total (m)
+  private perimeterPath: L.LatLng[] = [];     
+  private edgeLengths: number[] = [];         
+  private totalPerimeter: number = 0;         
 
-  // === NUEVO: capas base y control de capas ===
+  // === capas base y control de capas ===
   private baseLayers: { [k: string]: L.TileLayer } = {};
   private layersControl: L.Control.Layers | null = null;
 
@@ -68,14 +69,18 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Conectar sockets si los vas a usar acá
-    this.socketSvc.conectar();
+    // La conexión se mueve a ngAfterViewInit para asegurar que el ID del país esté listo antes del listener, 
+    // pero se mantiene aquí si se necesitara antes.
+    // **Dejar solo this.socketSvc.conectar() en ngOnInit (sin await) si no bloquea el flujo.**
+    // **Opción 1 (Recomendada): Mover conexión y listener a ngAfterViewInit.**
   }
 
   async ngAfterViewInit() {
+    // Conectar sockets *antes* de cargar datos y configurar el listener
+    // Usar await para evitar condición de carrera (ver nota 1)
+    await this.socketSvc.conectar().catch(err => console.error('Error al conectar sockets:', err)); 
+
     // Aceptar id por ruta o por query param con DOS nombres posibles:
-    // - id_country
-    // - countryId  ← (el que estás usando hoy)
     const idFromRoute = this.route.snapshot.paramMap.get('id_country');
     const idFromQueryA = this.route.snapshot.queryParamMap.get('id_country');
     const idFromQueryB = this.route.snapshot.queryParamMap.get('countryId');
@@ -84,24 +89,28 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
     this.id_country = idStr ? Number(idStr) : null;
 
     if (!this.id_country) {
-      console.warn('MapGuardsPage: no llegó id_country/countryId. Intento fallback: tomar el primer country.');
-      // Fallback: cargo el primer country disponible para que la pantalla no quede vacía
+      console.warn('MapGuardsPage: no llegó id_country/countryId. Intento fallback.');
       this.countries.getAll().subscribe({
         next: (list: any[]) => {
           if (Array.isArray(list) && list.length) {
             this.id_country = Number(list[0].id);
             this.loadCountry(this.id_country!);
+            // **IMPORTANTE:** El listener se configura aquí después de setear el ID
+            if (!this.DEMO_ENABLED) this.setupSocketListener();
           } else {
             console.warn('No hay countries para mostrar.');
           }
         },
         error: (e) => console.error('fallback getAll() falló', e)
       });
-      return;
+      
+    } else {
+      // Con id válido, cargo normalmente
+      this.loadCountry(this.id_country);
+      // **IMPORTANTE:** El listener se configura aquí después de setear el ID
+      if (!this.DEMO_ENABLED) this.setupSocketListener();
     }
-
-    // Con id válido, cargo normalmente
-    this.loadCountry(this.id_country);
+    
     setTimeout(() => this.map?.invalidateSize(true), 50);
   }
 
@@ -122,12 +131,13 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
         if (perimeter?.length >= 3) {
           this.drawPolygon(perimeter);
 
-          // Si está habilitada la demo: arrancar simulación
+          // Si la DEMO está activa Y NO hay datos reales, se arranca la simulación
           if (this.DEMO_ENABLED) {
             this.startGuardSimulation(perimeter);
+          } else {
+            console.log('DEMO_GUARDS está desactivado. Esperando datos en vivo de WebSocket...');
           }
         } else {
-          // Sin perímetro no simulo; igual queda el mapa centrado
           console.info('Sin perímetro: simulación desactivada.');
         }
       },
@@ -137,11 +147,110 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopGuardSimulation();
+    
+    // Si WebSocketService maneja un solo socket global, solo desconectamos.
+    // Si queremos ser más finos, deberíamos eliminar el listener específico:
+    // this.socketSvc.eliminarListener('get-actives-guards'); 
     this.socketSvc.desconectar();
+    
+    // Limpiar marcadores reales antes de destruir
+    Object.values(this.activeGuardMarkers).forEach(m => m.remove());
+    this.activeGuardMarkers = {};
+    
     if (this.map) this.map.remove();
   }
 
-  // ----------------- Helpers de datos -----------------
+  // ----------------- WebSocket / Real-Time -----------------
+
+  /** * Configura la suscripción al evento 'get-actives-guards' del backend.
+   * SOLO se llama si DEMO_ENABLED es FALSE.
+   */
+  private setupSocketListener(): void {
+      
+      // Escuchar el evento que trae el array de todos los guardias activos
+      this.socketSvc.escucharEvento('get-actives-guards', (guards: any[]) => {
+          if (!Array.isArray(guards)) {
+              console.error('El payload de get-actives-guards no es un array.', guards);
+              return;
+          }
+
+          // **id_country ya debe estar resuelto en este punto gracias a ngAfterViewInit**
+          if (this.id_country === null) return; 
+
+          console.log(`[Socket] Recibidos ${guards.length} guardias. Filtrando por país: ${this.id_country}`);
+
+          // 1. Filtrar por el país actual del administrador
+          const countryIdStr = String(this.id_country);
+          const filteredGuards = guards.filter(guard => 
+              guard.id_country && String(guard.id_country) === countryIdStr
+          );
+
+          // 2. Actualizar los marcadores en el mapa con los datos filtrados
+          this.updateRealGuardMarkers(filteredGuards);
+      });
+  }
+
+  /**
+   * Procesa la lista de guardias filtrados y actualiza los marcadores de Leaflet.
+   */
+  private updateRealGuardMarkers(guards: any[]): void {
+      if (!this.map) return;
+      
+      // Detener simulación si llegan datos reales. 
+      // Esta lógica se ejecuta fuera del chequeo DEMO_ENABLED en setupSocketListener
+      // porque esta función *siempre* se llama para datos reales (la simulación ya no corre).
+      if (this.simTimer && guards.length > 0) {
+          console.info('Datos reales de guardias recibidos. Deteniendo simulación DEMO.');
+          this.stopGuardSimulation();
+      }
+
+      const receivedIds = new Set<string>();
+
+      // 1. Crear/Mover marcadores de guardias recibidos
+      guards.forEach(g => {
+          const id_user = String(g.id_user); 
+          receivedIds.add(id_user);
+
+          const lat = Number(g.lat);
+          const lng = Number(g.lng);
+          if (isNaN(lat) || isNaN(lng)) return; 
+
+          const latLng = L.latLng(lat, lng);
+          const markerExists = !!this.activeGuardMarkers[id_user];
+
+          if (markerExists) {
+              this.activeGuardMarkers[id_user].setLatLng(latLng);
+
+          } else {
+              // Crear nuevo marcador: Azul brillante para real-time
+              const marker = L.circleMarker(latLng, {
+                  radius: 7, 
+                  weight: 2, 
+                  color: '#007bff', 
+                  fillColor: '#007bff', 
+                  fillOpacity: 0.85
+              })
+              .bindPopup(`Vigilador: <b>${g.user_name || 'Guardia'} ${g.user_lastname || ''} (ID: ${id_user})</b>`, { closeButton: false })
+              .addTo(this.map);
+
+              this.activeGuardMarkers[id_user] = marker;
+          }
+      });
+
+      // 2. Eliminar marcadores que ya no están en el listado recibido (desconectados o fuera del país)
+      Object.keys(this.activeGuardMarkers).forEach(id_user => {
+          if (!receivedIds.has(id_user)) {
+              const markerToRemove = this.activeGuardMarkers[id_user];
+              if (this.map && markerToRemove) {
+                  this.map.removeLayer(markerToRemove);
+              }
+              delete this.activeGuardMarkers[id_user];
+          }
+      });
+  }
+
+
+  // ----------------- Helpers de datos (Sin cambios) -----------------
 
   private extractCenter(country: any): { lat:number; lng:number } | null {
     const rawLat = country?.latitude ?? country?.center_lat;
@@ -178,16 +287,14 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
     return norm.length >= 3 ? norm : null;
   }
 
-  // ----------------- Mapa / Leaflet -----------------
+  // ----------------- Mapa / Leaflet (Sin cambios) -----------------
 
-  // === NUEVO: Satélite por defecto + selector de capas ===
   private initMap(mapLat: number, mapLng: number): void {
     if (this.map) {
       this.map.setView([mapLat, mapLng]);
       return;
     }
 
-    // Capas base
     this.baseLayers = {
       'Satélite': L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -203,7 +310,6 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
       )
     };
 
-    // Crear mapa con Satélite por defecto
     this.map = L.map('adminMap', {
       zoomControl: true,
       layers: [this.baseLayers['Satélite']],
@@ -212,12 +318,10 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
     this.map.setMinZoom(13);
     setTimeout(() => this.map?.invalidateSize(true), 100);
 
-    // Control de capas
     this.layersControl = L.control.layers(this.baseLayers, {}, { collapsed: true });
     this.layersControl.addTo(this.map);
   }
 
-  // Mantengo estos helpers para no tocar el resto de tu código (aunque ya no se usan aquí)
   public setTileLayer(url: string): void {
     this.tileLayer = L.tileLayer(url, {
       attribution: '© OpenStreetMap contributors',
@@ -240,35 +344,30 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
 
     const bounds = this.perimeterPolygon.getBounds();
     this.map.fitBounds(bounds);
-    // this.map.setMaxBounds(bounds.pad(0.02)); // opcional
   }
 
   // =======================
-  //   SIMULACIÓN GUARDIAS
+  //   SIMULACIÓN GUARDIAS (Sin cambios funcionales)
   // =======================
 
-  /** Arranca simulación de N guardias caminando alrededor del perímetro (sentido horario). */
   private startGuardSimulation(perimeter: {lat:number; lng:number}[]) {
     if (!this.map) return;
 
-    // reset por si venías de otro country
     this.stopGuardSimulation();
     this.simGuards = [];
     this.perimeterPath = [];
     this.edgeLengths = [];
     this.totalPerimeter = 0;
 
-    // 1) Normalizar path del perímetro como LatLng[], cerrando el polígono (último = primero)
     this.perimeterPath = perimeter.map(p => L.latLng(p.lat, p.lng));
     const first = this.perimeterPath[0];
     const last = this.perimeterPath[this.perimeterPath.length - 1];
     if (!last.equals(first)) this.perimeterPath.push(first);
 
-    // 2) Pre-calcular longitudes de aristas y perímetro total
     for (let i = 0; i < this.perimeterPath.length - 1; i++) {
       const a = this.perimeterPath[i];
       const b = this.perimeterPath[i + 1];
-      const d = a.distanceTo(b); // metros
+      const d = a.distanceTo(b); 
       this.edgeLengths.push(d);
       this.totalPerimeter += d;
     }
@@ -278,17 +377,15 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // 3) Crear N guardias espaciados alrededor del perímetro
-    const N = 4; // cantidad de guardias de demo
-    const baseSpeed = 1.3; // m/s (caminata humana)
+    const N = 4; 
+    const baseSpeed = 1.3; 
     for (let i = 0; i < N; i++) {
-      // offset inicial en metros a lo largo del perímetro
       const offset = (i / N) * this.totalPerimeter;
       const { edgeIdx, t, coord } = this.locateAlongPerimeter(offset);
 
       const marker = L.circleMarker(coord, {
         radius: 7, weight: 2, color: '#ff0000', fillColor: '#ff0000', fillOpacity: 0.75
-      }).bindPopup(`Vigilador: <b>Guardia ${i + 1}</b>`, { closeButton: false })
+      }).bindPopup(`Vigilador: <b>Guardia ${i + 1} (DEMO)</b>`, { closeButton: false }) 
         .addTo(this.map!);
 
       this.simGuards.push({
@@ -297,16 +394,14 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
         marker,
         edgeIdx,
         t,
-        speed: baseSpeed * this.rand(0.9, 1.15) // pequeña variación
+        speed: baseSpeed * this.rand(0.9, 1.15) 
       });
     }
 
-    // 4) Loop de animación (cada 200ms)
-    const dt = 0.2; // segundos por tick
+    const dt = 0.2; 
     this.simTimer = setInterval(() => this.tickGuards(dt), 200);
   }
 
-  /** Detiene y limpia la simulación. */
   private stopGuardSimulation() {
     if (this.simTimer) {
       clearInterval(this.simTimer);
@@ -319,60 +414,49 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
     this.totalPerimeter = 0;
   }
 
-  /** Avanza a los guardias dt segundos y actualiza sus marcadores. */
   private tickGuards(dt: number) {
     if (!this.map || !this.perimeterPath.length) return;
 
     this.simGuards.forEach(g => {
-      // distancia a avanzar en esta iteración
-      let remaining = g.speed * dt; // metros
+      let remaining = g.speed * dt; 
 
       while (remaining > 0) {
         const i = g.edgeIdx;
-        const a = this.perimeterPath[i];
-        const b = this.perimeterPath[i + 1];
-        const Lm = this.edgeLengths[i]; // longitud de la arista (m)
+        const Lm = this.edgeLengths[i]; 
 
-        // distancia restante en esta arista desde la posición actual
         const distOnEdge = (1 - g.t) * Lm;
 
         if (remaining < distOnEdge) {
-          // avanzamos dentro de la misma arista
           const advanceT = remaining / Lm;
           g.t += advanceT;
           remaining = 0;
         } else {
-          // consumimos lo que queda de la arista y pasamos a la siguiente
           remaining -= distOnEdge;
           g.edgeIdx = (g.edgeIdx + 1) % (this.perimeterPath.length - 1);
           g.t = 0;
         }
       }
 
-      // Interpolar posición final y actualizar marker
       const pos = this.interpolateOnEdge(g.edgeIdx, g.t);
       g.marker.setLatLng(pos);
     });
   }
 
-  /** Dado un offset (m) a lo largo del perímetro, devuelve arista, t y coordenada. */
   private locateAlongPerimeter(offsetMeters: number): { edgeIdx: number; t: number; coord: L.LatLng } {
     let acc = 0;
     for (let i = 0; i < this.edgeLengths.length; i++) {
       const Lm = this.edgeLengths[i];
       if (acc + Lm >= offsetMeters) {
-        const t = (offsetMeters - acc) / Lm; // [0..1]
+        const t = (offsetMeters - acc) / Lm; 
         const coord = this.interpolateOnEdge(i, t);
         return { edgeIdx: i, t, coord };
       }
       acc += Lm;
     }
-    // si por redondeo no entra, volver al final
     const lastIdx = this.edgeLengths.length - 1;
     return { edgeIdx: lastIdx, t: 0.9999, coord: this.interpolateOnEdge(lastIdx, 0.9999) };
   }
 
-  /** Interpola linealmente la posición entre el punto i e i+1 del perímetro. */
   private interpolateOnEdge(edgeIdx: number, t: number): L.LatLng {
     const a = this.perimeterPath[edgeIdx];
     const b = this.perimeterPath[edgeIdx + 1];

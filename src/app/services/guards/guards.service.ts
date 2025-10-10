@@ -1,3 +1,4 @@
+// src/app/services/guards/guards.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -19,10 +20,10 @@ export class GuardsService {
     return this._http.get<GuardInterface[]>(`${environment.URL}/api/users?role=vigilador`);
   }
 
-  public async getAllByCountryID(): Promise<Observable<GuardInterface[]>>{
-    const country = await this._countryStorageService.getCountry()
-    const countryID = country.id 
-    return this._http.get<GuardInterface[]>(`${environment.URL}/api/guards/schedule/all/${countryID}`);
+  public getAllByCountryID(countryId: string | null): Observable<any[]>{ 
+    //const country = await this._countryStorageService.getCountry()
+    //const countryID = country.id 
+    return this._http.get<GuardInterface[]>(`${environment.URL}/api/guards/schedule/all/${countryId}`);
   }
 
   async getAllByCountryIdSinceOwner(): Promise<Observable<any[]>>{

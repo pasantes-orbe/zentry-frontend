@@ -31,8 +31,8 @@
     <tbody>
       <tr *ngFor="let guard of guards | filterBy: searchKey ; let i = index">
         <td class="text-center">{{guard.guards[0].guard.user.lastname}} </td>
-        <td>{{guard.guards[0].guard.user.name}}</td>
-        <td>{{guard.guards[0].guard.user.email}}</td>
+        <td>{{guard.guards.guard.user.name}}</td>
+        <td>{{guard.guards.guard.user.email}}</td>
 
         <td>
           <ion-icon color="success" slot="icon-only" name="checkmark-outline"></ion-icon>
@@ -78,8 +78,8 @@
     <tbody>
       <tr *ngFor="let guard of guardsOut | filterBy: searchKey1; let i = index">
         <td class="text-center">{{guard.guards[0].guard.user.lastname}} </td>
-        <td>{{guard.guards[0].guard.user.name}}</td>
-        <td>{{guard.guards[0].guard.user.email}}</td>
+        <td>{{guard.guards.guard.user.name}}</td>
+        <td>{{guard.guards.guard.user.email}}</td>
         <td>
           <ion-icon color="danger" slot="icon-only" name="close-outline"></ion-icon>
         </td>
