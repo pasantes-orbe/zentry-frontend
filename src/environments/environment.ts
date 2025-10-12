@@ -8,7 +8,7 @@ export const environment = {
   // URL: "https://shock-app-backend-production-eeeb.up.railway.app"
   URL: "http://localhost:3000",
   // URL: "https://138.219.42.111"
-  DEMO_GUARDS: true // Cambiar a false para desactivar los guards de demo
+  DEMO_GUARDS: false // Cambiar a false para desactivar los guards de demo
 };
 
 

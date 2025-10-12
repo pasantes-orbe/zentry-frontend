@@ -47,6 +47,9 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
   // marker del propietario
   private ownerPointer: L.CircleMarker | null = null;
 
+  // NUEVO: Almacena los marcadores de guardias en tiempo real (id_user -> marker)
+  private activeGuardMarkers: { [id_user: string]: L.CircleMarker } = {};
+
   // Sim guardias
   private simTimer: any = null;
   private simGuards: Array<{ id: number; marker: L.CircleMarker; edgeIdx: number; t: number; speed: number; }> = [];
@@ -101,6 +104,10 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
 
   ngOnDestroy(): void {
     this.stopGuardSimulation();
+    // Limpiar marcadores de guardias reales al salir
+    Object.values(this.activeGuardMarkers).forEach(m => m.remove());
+    this.activeGuardMarkers = {};
+    
     if (!this.demoMode) this.socketSvc.desconectar();
     if (this.map) this.map.remove();
   }
@@ -124,7 +131,8 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
         const perimeter = this.extractPerimeter(country);
         if (perimeter?.length >= 3) {
           this.drawPolygonOutline(perimeter);
-          if (this.simulateGuards) this.startGuardSimulation(perimeter);
+          // Solo arranca simulación si no es demoMode O si simulateGuards es true
+          if (this.simulateGuards && this.demoMode) this.startGuardSimulation(perimeter);
         }
         setTimeout(() => this.map?.invalidateSize(true), 120);
         this.loading = false;
@@ -184,10 +192,105 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     this.map.fitBounds(bounds, { padding: [50, 50] });
   }
 
+  // ----------------- WebSocket / Real-Time (AGREGADO) -----------------
+
+  /**
+   * Extiende el listener de sockets para incluir la posición de guardias activos.
+   */
+  private setupSocketListeners(): void {
+    // Listener existente para el antipánico
+    this.socketSvc.escucharEvento('notificacion-antipanico-finalizado', (payload: any) => {
+      if (!this.antipanicId || payload?.antipanicId === this.antipanicId) {
+        this.antipanicState = false;
+        this.antipanicId = null;
+
+        if (this.ownerPointer) {
+          this.map?.removeLayer(this.ownerPointer);
+          this.ownerPointer = null;
+        }
+
+        this.alerts.presentAlert('Antipánico finalizado por administración.');
+      }
+    });
+
+    // NUEVO LISTENER: Recibir posiciones de guardias activos
+    this.socketSvc.escucharEvento('get-actives-guards', (guards: any[]) => {
+        if (!Array.isArray(guards) || this.demoMode) return;
+
+        // 1. Filtrar por el país del Propietario (this.id_country)
+        const countryIdStr = String(this.id_country);
+        const filteredGuards = guards.filter(guard => 
+            guard.id_country && String(guard.id_country) === countryIdStr
+        );
+
+        // 2. Actualizar los marcadores en el mapa
+        this.updateGuardMarkers(filteredGuards);
+    });
+  }
+
+  /**
+   * Crea, mueve o elimina los marcadores de guardias en el mapa.
+   */
+  private updateGuardMarkers(guards: any[]): void {
+    if (!this.map) return;
+
+    const receivedIds = new Set<string>();
+
+    // 1. Crear o mover marcadores existentes
+    guards.forEach(g => {
+        const id_user = String(g.id_user);
+        receivedIds.add(id_user);
+
+        const lat = Number(g.lat);
+        const lng = Number(g.lng);
+        if (isNaN(lat) || isNaN(lng)) return; 
+
+        const latLng = L.latLng(lat, lng);
+        const markerExists = !!this.activeGuardMarkers[id_user];
+
+        if (markerExists) {
+            // Mover marcador existente
+            this.activeGuardMarkers[id_user].setLatLng(latLng);
+
+        } else {
+            // Crear nuevo marcador (similar al Admin, diferente al Propietario)
+            const marker = L.circleMarker(latLng, {
+                radius: 6, // Un poco más pequeño que el del propietario (9)
+                weight: 2, 
+                color: '#10b981', // Verde/Esmeralda
+                fillColor: '#34d399', 
+                fillOpacity: 0.85
+            })
+            .bindPopup(`Vigilador: <b>${g.user_name || 'Guardia'} ${g.user_lastname || ''}</b>`, { closeButton: false })
+            .addTo(this.map);
+
+            this.activeGuardMarkers[id_user] = marker;
+        }
+    });
+
+    // 2. Eliminar marcadores que ya no están en la lista recibida
+    Object.keys(this.activeGuardMarkers).forEach(id_user => {
+        if (!receivedIds.has(id_user)) {
+            const markerToRemove = this.activeGuardMarkers[id_user];
+            if (this.map && markerToRemove) {
+                this.map.removeLayer(markerToRemove);
+            }
+            delete this.activeGuardMarkers[id_user];
+        }
+    });
+
+    // 3. Detener simulación si llegan datos reales
+    if (this.simulateGuards && this.simTimer && guards.length > 0) {
+        console.info('Datos reales de guardias recibidos. Deteniendo simulación.');
+        this.stopGuardSimulation();
+    }
+  }
+
   // ========================
   //    Antipánico
   // ========================
   public onAntipanicClick(): void {
+// ... (resto del código sin cambios) ...
     if (!this.antipanicState) this.activateAntipanic();
     else this.desactivateAntipanic();
   }
@@ -343,22 +446,6 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
       this.ownerPointer.setLatLng([lat, lng]).openPopup();
       console.log('✅ Marcador actualizado');
     }
-  }
-
-  private setupSocketListeners(): void {
-    this.socketSvc.escucharEvento('notificacion-antipanico-finalizado', (payload: any) => {
-      if (!this.antipanicId || payload?.antipanicId === this.antipanicId) {
-        this.antipanicState = false;
-        this.antipanicId = null;
-
-        if (this.ownerPointer) {
-          this.map?.removeLayer(this.ownerPointer);
-          this.ownerPointer = null;
-        }
-
-        this.alerts.presentAlert('Antipánico finalizado por administración.');
-      }
-    });
   }
 
   private pickAntipanicId(resp: any): string | number | null {
