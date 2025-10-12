@@ -1,194 +1,139 @@
-/* theme/variables.scss */
+/* =====================================================
+   Tokens semánticos + puente a Ionic
+   - Light en :root (única fuente de verdad)
+   - Dark solo override en body[data-theme="dark"]
+   ===================================================== */
 
-/* ===========================
-    BASE (TEMA CLARO / :root)
-    =========================== */
+/* Paleta Ionic (estable) */
 :root {
-  /* Paleta Ionic - Se mantiene el azul como primario */
   --ion-color-primary: #3B82F6;
-  --ion-color-primary-rgb: 59, 130, 246;
+  --ion-color-primary-rgb: 59,130,246;
   --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-contrast-rgb: 255,255,255;
   --ion-color-primary-shade: #3573d9;
   --ion-color-primary-tint: #4f8ff7;
 
-  /** secondary **/
   --ion-color-secondary: #6B7280;
-  --ion-color-secondary-rgb: 107, 114, 128;
+  --ion-color-secondary-rgb: 107,114,128;
   --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-contrast-rgb: 255,255,255;
   --ion-color-secondary-shade: #5f6570;
   --ion-color-secondary-tint: #7b818d;
 
-  /** tertiary **/
   --ion-color-tertiary: #10B981;
-  --ion-color-tertiary-rgb: 16, 185, 129;
-  --ion-color-tertiary-contrast: #ffffff;
-  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #0ea471;
-  --ion-color-tertiary-tint: #28c18e;
-
-  /** success **/
-  --ion-color-success: #22C55E;
-  --ion-color-success-rgb: 34, 197, 94;
-  --ion-color-success-contrast: #ffffff;
-  --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #1fae53;
-  --ion-color-success-tint: #39cb6f;
-
-  /** warning **/
-  --ion-color-warning: #F59E0B;
-  --ion-color-warning-rgb: 245, 158, 11;
-  --ion-color-warning-contrast: #000000;
-  --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #d88b0a;
-  --ion-color-warning-tint: #f6a823;
-
-  --ion-color-danger: #EF4444;
-  --ion-color-danger-rgb: 239, 68, 68;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #d23c3c;
-  --ion-color-danger-tint: #f05757;
-
-  --ion-color-dark: #222428;
-  --ion-color-dark-rgb: 34, 36, 40;
-  --ion-color-dark-contrast: #ffffff;
-  --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #1e2023;
-  --ion-color-dark-tint: #383a3e;
-
-  --ion-color-medium: #92949c;
-  --ion-color-medium-rgb: 146, 148, 156;
-  --ion-color-medium-contrast: #000000; /* MODIFICADO: Contraste para tema claro */
-  --ion-color-medium-contrast-rgb: 0,0,0;
-  --ion-color-medium-shade: #808289;
-  --ion-color-medium-tint: #9d9fa6;
-  
-  --ion-color-light: #f4f5f8;
-  --ion-color-light-rgb: 244, 245, 248;
-  --ion-color-light-contrast: #000000;
-  --ion-color-light-contrast-rgb: 0, 0, 0;
-  --ion-color-light-shade: #d7d8da;
-  --ion-color-light-tint: #f5f6f9;
-  
-  /* ========================================================== */
-  /* ========= INICIO DE MODIFICACIÓN: TEMA CLARO ========= */
-  /* ========================================================== */
-
-  /* Fondo principal de la app (el "body") */
-  --ion-background-color: #F9FAFB; /* Blanco Hueso */
-  --ion-background-color-rgb: 249, 250, 251;
-
-  /* Color principal del texto */
-  --ion-text-color: #1F2937; /* Gris Oxford */
-  --ion-text-color-rgb: 31, 41, 55;
-
-  /* Fondo de la barra de herramientas superior */
-  --ion-toolbar-background: #FFFFFF; /* Blanco Puro */
-
-  /* Fondo de componentes como items, inputs y modales */
-  --ion-item-background: #FFFFFF; /* Blanco Puro */
-
-  /* Fondo de las tarjetas */
-  --ion-card-background: #FFFFFF; /* Blanco Puro */
-
-  /* Color de los bordes y separadores */
-  --ion-border-color: #E5E7EB; /* Gris Pálido */
-
-  /* Semánticas Zentry (para consistencia) */
-  --zentry-color-background: var(--ion-background-color);
-  --zentry-color-component: var(--ion-item-background);
-  --zentry-color-border: var(--ion-border-color);
-  --zentry-color-text-primary: var(--ion-text-color);
-  --zentry-color-text-secondary: #4B5563; /* Gris Asfalto */
-
-  /* ======================================================== */
-  /* ========= FIN DE MODIFICACIÓN: TEMA CLARO ========= */
-  /* ======================================================== */
+  --ion-color-success:  #22C55E;
+  --ion-color-warning:  #F59E0B;
+  --ion-color-danger:   #EF4444;
 
   /* Tipografía */
   --font-heading: 'Poppins', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-body:    'Inter',   sans-serif;
   --ion-font-family: var(--font-body);
 
-  /* Sombras por defecto (claro) */
-  --ion-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  --ion-card-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  /* ========== LIGHT (defaults) ========== */
+  /* Semánticos */
+  --surface:   #ffffff;  /* componentes: card/item/modal */
+  --surface-2: #F9FAFB;  /* fondo app */
+  --border:    #E5E7EB;
+  --text:      #1F2937;
+  --text-muted:#4B5563;
+
+  /* Puente a Ionic */
+  --ion-background-color: var(--surface-2);
+  --ion-background-color-rgb: 249,250,251;
+  --ion-text-color: var(--text);
+  --ion-text-color-rgb: 31,41,55;
+  --ion-toolbar-background: var(--surface);
+  --ion-item-background:    var(--surface);
+  --ion-card-background:    var(--surface);
+  --ion-border-color:       var(--border);
+
+  /* Aliases usados en vistas */
+  --color-card:            var(--surface);
+  --color-border:          var(--border);
+  --color-text-secondary:  var(--text-muted);
+
+  /* Map bg token (Leaflet) */
+  --map-background: #E5E7EB;
+
+  /* Sombras */
+  --ion-box-shadow:     0 1px 3px rgba(0,0,0,.05), 0 1px 2px -1px rgba(0,0,0,.05);
+  --ion-card-box-shadow:0 4px 16px rgba(0,0,0,.08);
+
+  /* Steps (gradientes/controles) */
+  --ion-color-step-50:  #F9FAFB;
+  --ion-color-step-100: #F3F4F6;
+  --ion-color-step-150: #E5E7EB;
+  --ion-color-step-200: #D1D5DB;
+  --ion-color-step-250: #9CA3AF;
+  --ion-color-step-300: #6B7280;
+  --ion-color-step-350: #4B5563;
+  --ion-color-step-400: #374151;
+  --ion-color-step-450: #1F2937;
+  --ion-color-step-500: #111827;
 }
 
-/* =================================================================== */
-/* ============ TEMA OSCURO (SIN CAMBIOS, SE MANTIENE IGUAL) ========= */
-/* =================================================================== */
-html.dark-theme {
-  --ion-background-color: #111827;
-  --ion-background-color-rgb: 17, 24, 39;
-  --ion-text-color: #f9fafb;
-  --ion-text-color-rgb: 249, 250, 251;
+/* ========== DARK (override único) ========== */
+body[data-theme="dark"] {
+  /* Semánticos */
+  --surface:   #1F2937;
+  --surface-2: #111827;
+  --border:    #374151;
+  --text:      #F9FAFB;
+  --text-muted:#9CA3AF;
 
-  --ion-toolbar-background: #1f2937;
-  --ion-item-background: #1f2937;
-  --ion-card-background: #1f2937;
-  --ion-border-color: #374151;
+  /* Puente a Ionic */
+  --ion-background-color: var(--surface-2);
+  --ion-background-color-rgb: 17,24,39;
+  --ion-text-color: var(--text);
+  --ion-text-color-rgb: 249,250,251;
+  --ion-toolbar-background: var(--surface);
+  --ion-item-background:    var(--surface);
+  --ion-card-background:    var(--surface);
+  --ion-border-color:       var(--border);
 
-  /* Semánticas Zentry */
-  --zentry-color-background: #111827;
-  --zentry-color-component: #1f2937;
-  --zentry-color-border: #374151;
-  --zentry-color-text-primary: #f9fafb;
-  --zentry-color-text-secondary: #9ca3af;
+  /* Aliases */
+  --color-card:            var(--surface);
+  --color-border:          var(--border);
+  --color-text-secondary:  var(--text-muted);
 
-  /* Ajustes para tokens Ionic en oscuro */
-  --ion-color-medium: #9ca3af;
-  --ion-color-medium-rgb: 156, 163, 175;
+  /* Map bg */
+  --map-background: #0F172A;
+
+  /* Sombras */
+  --ion-box-shadow:      0 2px 8px rgba(0,0,0,.30);
+  --ion-card-box-shadow: 0 4px 16px rgba(0,0,0,.30);
+
+  /* Steps invertidos */
+  --ion-color-step-50:  #1F2937;
+  --ion-color-step-100: #374151;
+  --ion-color-step-150: #4B5563;
+  --ion-color-step-200: #6B7280;
+  --ion-color-step-250: #9CA3AF;
+  --ion-color-step-300: #D1D5DB;
+  --ion-color-step-350: #E5E7EB;
+  --ion-color-step-400: #F3F4F6;
+  --ion-color-step-450: #F9FAFB;
+  --ion-color-step-500: #FFFFFF;
+
+  /* Contraste en medium/light para oscuro */
+  --ion-color-medium: #9CA3AF;
+  --ion-color-medium-rgb: 156,163,175;
   --ion-color-medium-contrast: #ffffff;
-  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-contrast-rgb: 255,255,255;
 
   --ion-color-light: #374151;
-  --ion-color-light-rgb: 55, 65, 81;
+  --ion-color-light-rgb: 55,65,81;
   --ion-color-light-contrast: #ffffff;
-  --ion-color-light-contrast-rgb: 255, 255, 255;
-
-  /* Steps (inputs/sliders/etc.) */
-  --ion-color-step-50:  #1f2937;
-  --ion-color-step-100: #374151;
-  --ion-color-step-150: #4b5563;
-  --ion-color-step-200: #6b7280;
-  --ion-color-step-250: #9ca3af;
-  --ion-color-step-300: #d1d5db;
-  --ion-color-step-350: #e5e7eb;
-  --ion-color-step-400: #f3f4f6;
-  --ion-color-step-450: #f9fafb;
-  --ion-color-step-500: #ffffff;
-
-  /* Sombras en oscuro */
-  --ion-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --ion-card-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --ion-color-light-contrast-rgb: 255,255,255;
 }
 
-/* ===========================
-    UX: Transiciones acotadas
-    =========================== */
+/* Transiciones suaves */
 :root,
-html.dark-theme,
-body,
-ion-content,
-ion-toolbar,
-ion-item,
-ion-card,
-ion-list,
-ion-modal,
-ion-popover,
-ion-action-sheet,
-ion-toast {
+body[data-theme="dark"],
+ion-content, ion-toolbar, ion-item, ion-card, ion-list, ion-header, ion-footer, ion-searchbar {
   transition: background-color .2s ease, color .2s ease, border-color .2s ease;
 }
 
-/* Evitar transición en containers que pueden parpadear */
-ion-router-outlet,
-ion-nav,
-ion-tab-bar,
-ion-tabs {
-  transition: none !important;
-}
-
+/* Evitar transición en wrappers estructurales */
+ion-router-outlet, ion-nav, ion-tab-bar, ion-tabs { transition: none !important; }

@@ -1,13 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { AlertController } from '@ionic/angular';
 
-//Interfaces y Servicios
 import { CheckInOrOut } from '../../../interfaces/checkInOrOut-interface';
 import { CheckInService } from '../../../services/check-in/check-in.service';
 import { CheckoutService } from '../../../services/checkout/checkout.service';
+
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
@@ -20,85 +19,93 @@ import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
   templateUrl: './checkout.page.html',
   styleUrls: ['./checkout.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    IonicModule,
-    FormsModule,
-    FilterByPipe
-  ]
+  imports: [CommonModule, IonicModule, FormsModule, FilterByPipe]
 })
-// Se implementa OnDestroy para limpiar la suscripción al socket cuando el componente se destruye.
 export class CheckoutPage implements OnInit, OnDestroy {
-
-  // CORRECCIÓN 1: Se cambian las propiedades a 'public' para que sean accesibles desde la plantilla.
+  // Estado público para template
   public checkOutList: CheckInOrOut[] = [];
-  
-  // CORRECCIÓN 2: Se declara la propiedad 'searchKey' que faltaba para el buscador.
-  public searchKey: string = '';
-  
-  private socket: Socket;
-  private socketSubscription: Subscription;
+  public searchKey = '';
+  public isLoading = false;
+  public isProcessingId: number | null = null;
+
+  // Socket
+  private socket!: Socket;
+  private socketEventName = 'notificacion-nuevo-confirmedByOwner';
+  private subs: Subscription[] = [];
 
   constructor(
     private alertController: AlertController,
     private _checkInService: CheckInService,
     private _checkOutService: CheckoutService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    // La conexión al socket se realiza aquí, una sola vez.
-    this.socket = io(environment.URL);
+    // 1) Conecto socket una sola vez
+    this.socket = io(environment.URL, { transports: ['websocket'] });
+
+    // 2) Listeners de conexión/desconexión (opcional logging)
+    this.socket.on('connect', () => console.log('[socket] conectado', this.socket.id));
+    this.socket.on('disconnect', (reason) => console.log('[socket] desconectado:', reason));
+
+    // 3) Escucho actualizaciones del backend
     this.listenForUpdates();
   }
 
   ionViewWillEnter() {
-    // Se cargan los datos cada vez que se entra a la vista.
     this.loadCheckOutList();
   }
 
-  // Se encapsula la lógica de carga en un método para reutilizarla.
+  // Carga de pendientes de checkout
   loadCheckOutList() {
-    this._checkInService.getAllCheckoutFalse().subscribe(res => {
-      this.checkOutList = res;
+    this.isLoading = true;
+    const s = this._checkInService.getAllCheckoutFalse().subscribe({
+      next: (res) => {
+        this.checkOutList = res || [];
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.presentSimpleAlert('No se pudo cargar la lista de check-outs pendientes.');
+      }
     });
+    this.subs.push(s);
   }
 
-  // Se crea un método específico para escuchar los eventos del socket.
+  // Socket -> refrescar lista cuando el owner confirma
   listenForUpdates() {
-    this.socket.on('notificacion-nuevo-confirmedByOwner', (payload) => {
-      console.log('Notificación recibida:', payload);
-      // Cuando llega una notificación, se recarga la lista.
+    this.socket.on(this.socketEventName, (payload: any) => {
+      console.log('[socket]', this.socketEventName, payload);
       this.loadCheckOutList();
     });
   }
 
+  // Confirmar y ejecutar checkout
   public async checkOut(checkInData: CheckInOrOut, index: number) {
     const alert = await this.alertController.create({
       header: 'Confirmar Check Out',
-      message: `Persona: ${checkInData.guest_name}<br>DNI: ${checkInData.DNI}`,
+      message: `Persona: <b>${checkInData.guest_name}</b><br>DNI: <b>${checkInData.DNI}</b>`,
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Check Out',
-          // CORRECCIÓN 3: Se cambia el handler para usar async/await con try/catch.
-          // Esto es necesario si los métodos del servicio devuelven Promesas en lugar de Observables.
           handler: async (data) => {
             try {
-              // Se espera a que se cree el checkout.
-              await this._checkOutService.createCheckout(checkInData.id, data.observation);
-              
-              // Si lo anterior tuvo éxito, se espera a que se actualice el check-in.
+              this.isProcessingId = checkInData.id as unknown as number;
+
+              // 1) Crear checkout
+              await this._checkOutService.createCheckout(checkInData.id, data?.observation ?? '');
+
+              // 2) Marcar check-in como "checkout true"
               await this._checkInService.updateCheckOutTrue(checkInData.id);
-              
-              // Si todo tuvo éxito, se elimina el elemento de la lista local.
+
+              // 3) Remover local (optimista)
               this.checkOutList.splice(index, 1);
 
             } catch (error) {
-              console.error("Error en el proceso de check-out:", error);
-              // Aquí podrías mostrar una alerta de error al usuario.
+              console.error('Error en proceso de check-out:', error);
+              this.presentSimpleAlert('No se pudo completar el check-out. Intentalo nuevamente.');
+            } finally {
+              this.isProcessingId = null;
             }
           }
         }
@@ -107,17 +114,34 @@ export class CheckoutPage implements OnInit, OnDestroy {
         {
           type: 'textarea',
           name: 'observation',
-          placeholder: 'Añadir una observación:',
-        },
-      ],
+          placeholder: 'Añadir una observación (opcional)'
+        }
+      ]
     });
 
     await alert.present();
   }
 
-  // Se desconecta del socket cuando el componente se destruye para evitar fugas de memoria.
+  // Optimiza *ngFor
+  public trackById(_: number, item: CheckInOrOut) {
+    return item.id ?? item.DNI ?? item.guest_name;
+  }
+
+  private async presentSimpleAlert(message: string) {
+    const a = await this.alertController.create({ header: 'Atención', message, buttons: ['OK'] });
+    await a.present();
+  }
+
   ngOnDestroy() {
+    // Limpio suscripciones
+    this.subs.forEach(s => s.unsubscribe());
+    this.subs = [];
+
+    // Limpio listeners y socket
     if (this.socket) {
+      this.socket.off(this.socketEventName);
+      this.socket.off('connect');
+      this.socket.off('disconnect');
       this.socket.disconnect();
     }
   }

@@ -1,6 +1,3 @@
-<!-- ====================================================== -->
-<!-- GUARDS/CHECKIN.PAGE.HTML -->
-<!-- ====================================================== -->
 <ion-header mode="ios" [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -10,72 +7,135 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <h3 class="page-subtitle">REGISTRAR INGRESO</h3>
+<ion-content class="ion-padding surface-light">
+  <div class="container">
+    <ion-card class="form-card">
+      <ion-card-content>
 
-  <form [formGroup]="getForm()" (ngSubmit)="submitIncome()">
-    <ion-item>
-      <ion-label position="floating">Nombre<ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="incomeData.name" required formControlName="name" type="text"></ion-input>
-    </ion-item>
+        <div class="form-header">
+          <div class="avatar">
+            <ion-icon name="person-add-outline"></ion-icon>
+          </div>
+          <div class="title">REGISTRAR INGRESO</div>
+          <div class="subtitle">Completa los datos para el acceso</div>
+        </div>
 
-    <ion-item>
-      <ion-label position="floating">Apellido <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="incomeData.lastname" required formControlName="lastname" type="text"></ion-input>
-    </ion-item>
+        <form [formGroup]="getForm()" (ngSubmit)="submitIncome()" novalidate>
+          <!-- Nombre -->
+          <ion-item class="field">
+            <ion-label position="stacked">Nombre <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input formControlName="name" type="text" autocomplete="given-name"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+            Ingresá un nombre válido (mín. 3).
+          </ion-note>
 
-    <ion-item>
-      <ion-label position="floating">DNI <small>(Sólo números)</small> <ion-text color="danger">*</ion-text></ion-label>
-      <ion-input [(ngModel)]="incomeData.DNI" required formControlName="DNI" type="text"></ion-input>
-    </ion-item>
+          <!-- Apellido -->
+          <ion-item class="field">
+            <ion-label position="stacked">Apellido <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input formControlName="lastname" type="text" autocomplete="family-name"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="form.get('lastname')?.touched && form.get('lastname')?.invalid">
+            Ingresá un apellido válido (mín. 3).
+          </ion-note>
 
-    <ion-searchbar #searchBar [(ngModel)]="searchKey" [ngModelOptions]="{standalone: true}" animated debounce="500" placeholder="Buscar Propietario" mode="ios" (ionChange)="filtrarOwners($any($event).detail.value)"></ion-searchbar>
-    
-    <ion-list *ngIf="owners.length > 0">
-      <ion-radio-group (ionChange)="setOwner($event)" formControlName="ownerID">
-        <ion-item *ngFor="let owner of owners | filterBy: searchKey">
-          <ion-label>{{owner.user.name}} {{owner.user.lastname}} - {{owner.user.dni}}</ion-label>
-          <ion-radio [value]="owner.user.id"></ion-radio>
-        </ion-item>
-      </ion-radio-group>
-    </ion-list>
+          <!-- DNI -->
+          <ion-item class="field">
+            <ion-label position="stacked">DNI <small>(solo números)</small> <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input formControlName="DNI" inputmode="numeric" type="text" maxlength="8"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="form.get('DNI')?.touched && form.get('DNI')?.invalid">
+            DNI inválido (7–8 dígitos).
+          </ion-note>
 
-    <ion-item>
-      <ion-label class="ion-text-wrap mb-3" position="stacked">Fecha y hora de ingreso</ion-label>
-      <ion-datetime-button datetime="datetime"></ion-datetime-button>
-    </ion-item>
+          <!-- Buscar propietario (mismo look de input) -->
+          <div class="search-wrap field">
+            <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+            <ion-searchbar
+              #searchBar
+              [ngModel]="searchKey"
+              [ngModelOptions]="{standalone: true}"
+              animated
+              debounce="400"
+              placeholder="Buscar Propietario"
+              mode="ios"
+              (ionChange)="filtrarOwners($any($event).detail.value)">
+            </ion-searchbar>
+          </div>
 
-    <ion-modal [keepContentsMounted]="true">
-      <ng-template>
-        <ion-datetime [(ngModel)]="incomeData.date" presentation="date-time" formControlName="date" (ionChange)="getDate($event)" color="primary" [showDefaultTitle]="true" id="datetime">
-          <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
-        </ion-datetime>
-      </ng-template>
-    </ion-modal>
+          <!-- Lista propietarios -->
+          <ion-list class="owners-list" *ngIf="owners.length > 0">
+            <ion-radio-group formControlName="ownerID" (ionChange)="setOwner($event)">
+              <ion-item *ngFor="let owner of owners | filterBy: searchKey" class="owner-item">
+                <ion-label>
+                  <h3>{{ owner.user.name }} {{ owner.user.lastname }}</h3>
+                  <p>DNI: {{ owner.user.dni }}</p>
+                </ion-label>
+                <ion-radio [value]="owner.user.id"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+          <ion-note color="danger" *ngIf="form.get('ownerID')?.touched && form.get('ownerID')?.invalid">
+            Seleccioná un propietario.
+          </ion-note>
 
-    <ion-item>
-      <ion-label position="floating">Transporte</ion-label>
-      <ion-select #ionSelect (ionChange)="select($event)" placeholder="Seleccionar">
-        <ion-select-option value="Vehículo">Vehículo</ion-select-option>
-        <ion-select-option value="Motocicleta">Motocicleta</ion-select-option>
-        <ion-select-option value="Camión">Camión</ion-select-option>
-        <ion-select-option value="Bicicleta">Bicicleta</ion-select-option>
-        <ion-select-option value="A pie">A pie</ion-select-option>
-      </ion-select>
-    </ion-item>
+          <!-- Fecha / hora -->
+          <ion-item class="field">
+            <ion-label position="stacked">Fecha y hora de ingreso <ion-text color="danger">*</ion-text></ion-label>
+            <ion-datetime-button datetime="datetime"></ion-datetime-button>
+          </ion-item>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                id="datetime"
+                presentation="date-time"
+                formControlName="date"
+                (ionChange)="getDate($event)"
+                color="primary"
+                [showDefaultTitle]="true">
+                <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
+              </ion-datetime>
+            </ng-template>
+          </ion-modal>
+          <ion-note color="danger" *ngIf="form.get('date')?.touched && form.get('date')?.invalid">
+            Definí fecha y hora.
+          </ion-note>
 
-    <ion-item *ngIf="incomeData.transport && (incomeData.transport !== 'Bicicleta' && incomeData.transport !== 'A pie')">
-      <ion-label position="floating">Patente</ion-label>
-      <ion-input (ionChange)="changePatent($event)" required type="text"></ion-input>
-    </ion-item>
+          <!-- Transporte -->
+          <ion-item class="field">
+            <ion-label position="stacked">Transporte</ion-label>
+            <ion-select #ionSelect (ionChange)="select($event)" placeholder="Seleccionar" formControlName="transport">
+              <ion-select-option value="Vehículo">Vehículo</ion-select-option>
+              <ion-select-option value="Motocicleta">Motocicleta</ion-select-option>
+              <ion-select-option value="Camión">Camión</ion-select-option>
+              <ion-select-option value="Bicicleta">Bicicleta</ion-select-option>
+              <ion-select-option value="A pie">A pie</ion-select-option>
+            </ion-select>
+          </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Observaciones</ion-label>
-      <ion-textarea #textArea (ionChange)="setObservations($event)" rows="5"></ion-textarea>
-    </ion-item>
-    
-    <ion-button class="submit-button" size="large" expand="block" color="primary" type="submit" [disabled]="getForm().invalid">
-      Registrar Ingreso
-    </ion-button>
-  </form>
+          <!-- Patente (condicional) -->
+          <ion-item class="field" *ngIf="form.get('transport')?.value && !['Bicicleta','A pie'].includes(form.get('transport')?.value)">
+            <ion-label position="stacked">Patente <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input (ionChange)="changePatent($event)" formControlName="patent" type="text" maxlength="7"></ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="form.get('patent')?.touched && form.get('patent')?.errors">
+            {{ form.get('patent')?.errors?.['required'] ? 'Requerida' : 'Formato inválido (AAA999 o AA999AA)' }}
+          </ion-note>
+
+          <!-- Observaciones -->
+          <ion-item class="field">
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea #textArea (ionChange)="setObservations($event)" formControlName="observations" rows="4"></ion-textarea>
+          </ion-item>
+
+          <!-- Botón -->
+          <ion-button class="submit-button" size="large" expand="block" color="primary" type="submit" [disabled]="getForm().invalid">
+            <ion-icon slot="start" name="log-in-outline"></ion-icon>
+            Registrar Ingreso
+          </ion-button>
+        </form>
+
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>

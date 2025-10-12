@@ -7,32 +7,37 @@ export type RoleKey = 'owner' | 'guard' | 'admin';
 export class ThemeService {
   private key = (role: RoleKey) => `theme:${role}`;
 
-  /** Carga el tema guardado para el rol y lo aplica */
+  /** Carga tema persistido para el rol y lo aplica ANTES del render */
   init(role: RoleKey) {
     const saved = (localStorage.getItem(this.key(role)) as Theme) || 'light';
     this.apply(saved);
   }
 
-  /** Fija explícitamente el tema para el rol */
+  /** Setea tema explícito para el rol */
   set(role: RoleKey, theme: Theme) {
     localStorage.setItem(this.key(role), theme);
     this.apply(theme);
   }
 
-  /** Toggle rápido para el rol - MEJORADO */
+  /** Toggle dark/light para el rol */
   toggle(role: RoleKey) {
-    const currentTheme = (localStorage.getItem(this.key(role)) as Theme) || 'light';
-    const newTheme: Theme = currentTheme === 'dark' ? 'light' : 'dark';
-    this.set(role, newTheme);
+    const current = (localStorage.getItem(this.key(role)) as Theme) || 'light';
+    const next: Theme = current === 'dark' ? 'light' : 'dark';
+    this.set(role, next);
   }
 
-  /** Estado actual */
-  isDark() {
-    return document.documentElement.classList.contains('dark-theme');
+  /** Estado actual (true si dark) */
+  isDark(): boolean {
+    return document.body.getAttribute('data-theme') === 'dark';
   }
 
-  /** Aplica la clase en <html> */
+  /** Getter del tema actual */
+  current(): Theme {
+    return this.isDark() ? 'dark' : 'light';
+  }
+
+  /** Aplica data-theme en <body> - SINCRÓNICO para init temprano */
   private apply(theme: Theme) {
-    document.documentElement.classList.toggle('dark-theme', theme === 'dark');
+    document.body.setAttribute('data-theme', theme);
   }
 }

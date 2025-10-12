@@ -1,52 +1,213 @@
-/* ====================================================== */
-/* GUARDS/CHECKOUT.PAGE.SCSS */
-/* ====================================================== */
 :host {
+  .surface-light {
+    background: var(--surface);
+    min-height: 100%;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .list-card {
+    border-radius: 24px;
+    background: var(--surface-2);
+    box-shadow: var(--ion-card-box-shadow);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--surface-2);
+
+    .title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+  }
+
+  .searchbar {
+    --background: var(--surface);
+    --border-radius: 16px;
+    --color: var(--text);
+    --placeholder-color: var(--text-muted);
+    --icon-color: var(--text-muted);
+    margin: 20px 24px;
+    height: 48px;
+  }
+
+  .loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 24px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+
+    ion-spinner {
+      --color: var(--ion-color-primary);
+    }
+  }
+
+  .guest-list {
+    padding: 0 24px 24px;
+  }
+
+  .guest-card {
+    background: var(--surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: var(--ion-box-shadow);
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: var(--ion-color-primary);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .guest-info {
+    flex: 1;
+
+    .guest-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .guest-details {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .separator {
+        color: var(--color-text-secondary);
+        font-weight: 300;
+      }
+    }
+
+    .guest-owner {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+
+      strong {
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+
+  .checkout-button {
+    --border-radius: 12px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    height: 44px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: var(--ion-box-shadow);
+    transition: all 0.2s ease;
+
+    &:hover:not([disabled]) {
+      transform: translateY(-1px);
+    }
+
+    &:active:not([disabled]) {
+      transform: translateY(0);
+    }
+
+    &[disabled] {
+      opacity: 0.6;
+    }
+
+    ion-icon {
+      font-size: 1.2rem;
+      margin-inline-end: 8px;
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  .empty-list {
+    text-align: center;
+    padding: 80px 24px;
+    color: var(--text-muted);
+
+    ion-icon {
+      font-size: 5rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  }
+
   ion-toolbar {
     --background: var(--ion-toolbar-background);
+    --color: var(--ion-text-color);
+    --border-color: var(--ion-border-color);
   }
 
-  ion-card {
-    --background: var(--color-card);
-    padding: 8px;
-  }
-
-  ion-searchbar {
-    --background: var(--ion-background-color);
-    --border-radius: 8px;
-    margin-bottom: 1rem;
-    padding: 0;
-  }
-
-  .table-responsive-wrapper {
-    overflow-x: auto;
-  }
-
-  .styled-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    thead th {
-      font-family: var(--font-heading);
-      font-weight: 600;
-      color: var(--color-text-secondary);
-      text-align: left;
-      padding: 12px;
-      border-bottom: 2px solid var(--color-border);
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
-
-    tbody td {
-      padding: 12px;
-      border-bottom: 1px solid var(--color-border);
-      vertical-align: middle;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
+  .guest-card {
+    animation: slideInUp 0.3s ease-out backwards;
 
-    .action-cell {
-      text-align: center;
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.03}s;
+      }
     }
   }
 }

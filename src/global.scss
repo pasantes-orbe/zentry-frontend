@@ -1,455 +1,132 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
+/* Importar variables primero (prioridad de tokens) */
 @import './theme/variables.scss';
-/* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
 
-/* Basic CSS for apps built with Ionic */
+/* Core Ionic */
+@import "@ionic/angular/css/core.css";
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import '@ionic/angular/css/display.css';
-@import "leaflet/dist/leaflet.css";
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+@import "leaflet/dist/leaflet.css";
 
-/* ====================================================== */
-/* ================ ESTILOS UTILITARIOS ================ */
-/* ====================================================== */
-
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  flex-direction: column;
-}
-
-.top-button {
-    max-width: 500px;
-    margin: 20px auto;
-}
-
-.center {
-    margin: 0 auto;
-}
-
-.text-center {
-    text-align: center;
-}
-
-/* ====================================================== */
-/* ================= ANIMACIONES (SIN CAMBIOS) ====================== */
-/* ====================================================== */
-
-.ping {
-  -webkit-animation: ping 0.8s ease-in-out infinite both;
-          animation: ping 0.8s ease-in-out infinite both;
-}
-.ping-d {
-  -webkit-animation: ping 1.6s ease-in-out infinite both;
-          animation: ping 1.6s ease-in-out infinite both;
-}
-
-@-webkit-keyframes ping {
-    0% {
-      -webkit-transform: scale(0.2);
-              transform: scale(0.2);
-      opacity: 0.8;
-    }
-    80% {
-      -webkit-transform: scale(1.2);
-              transform: scale(1.2);
-      opacity: 0;
-    }
-    100% {
-      -webkit-transform: scale(2.2);
-              transform: scale(2.2);
-      opacity: 0;
-    }
-  }
-  @keyframes ping {
-    0% {
-      -webkit-transform: scale(0.2);
-              transform: scale(0.2);
-      opacity: 0.8;
-    }
-    80% {
-      -webkit-transform: scale(1.2);
-              transform: scale(1.2);
-      opacity: 0;
-    }
-    100% {
-      -webkit-transform: scale(2.2);
-              transform: scale(2.2);
-      opacity: 0;
-    }
-  }
-  
-  .slide-in-right {
-    -webkit-animation: slide-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-            animation: slide-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-  }
-
-@-webkit-keyframes slide-in-right {
-  0% {
-    -webkit-transform: translateX(1000px);
-            transform: translateX(1000px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateX(0);
-            transform: translateX(0);
-    opacity: 1;
-  }
-}
-@keyframes slide-in-right {
-  0% {
-    -webkit-transform: translateX(1000px);
-            transform: translateX(1000px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateX(0);
-            transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.slide-in-bck-center {
-  -webkit-animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-          animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-@-webkit-keyframes slide-in-bck-center {
-  0% {
-    -webkit-transform: translateZ(600px);
-            transform: translateZ(600px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-    opacity: 1;
-  }
-}
-@keyframes slide-in-bck-center {
-  0% {
-    -webkit-transform: translateZ(600px);
-            transform: translateZ(600px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-    opacity: 1;
-  }
-}
-
-.slide-in-blurred-bottom {
-  animation: slide-in-blurred-bottom 0.6s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
-}
-
-@keyframes slide-in-blurred-bottom {
-  0% {
-    transform: translateY(1000px) scaleY(2.5) scaleX(0.2);
-    transform-origin: 50% 100%;
-    filter: blur(40px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0) scaleY(1) scaleX(1);
-    transform-origin: 50% 50%;
-    filter: blur(0);
-    opacity: 1;
-  }
-}
-
-.puff-in-center {
-  -webkit-animation: puff-in-center .7s cubic-bezier(.47,0.000,.745,.715) both;
-  animation: puff-in-center .7s cubic-bezier(.47,0.000,.745,.715) both;
-}
-
-@-webkit-keyframes puff-in-center {
-  0% {
-    -webkit-transform: scale(2);
-    transform: scale(2);
-    -webkit-filter: blur(4px);
-    filter: blur(4px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    -webkit-filter: blur(0);
-    filter: blur(0);
-    opacity: 1;
-  }
-}
-@keyframes puff-in-center {
-  0% {
-    -webkit-transform: scale(2);
-    transform: scale(2);
-    -webkit-filter: blur(4px);
-    filter: blur(4px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    -webkit-filter: blur(0);
-    filter: blur(0);
-    opacity: 1;
-  }
-}
-
-.focus-in-contract-bck {
-  -webkit-animation: focus-in-contract-bck 1s cubic-bezier(.25,.46,.45,.94) both;
-  animation: focus-in-contract-bck 1s cubic-bezier(.25,.46,.45,.94) both;
-}
-
-@-webkit-keyframes focus-in-contract-bck {
-  0% {
-    letter-spacing: 1em;
-    -webkit-transform: translateZ(300px);
-    transform: translateZ(300px);
-    -webkit-filter: blur(12px);
-    filter: blur(12px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateZ(12px);
-    transform: translateZ(12px);
-    -webkit-filter: blur(0);
-    filter: blur(0);
-    opacity: 1;
-  }
-}
-@keyframes focus-in-contract-bck {
-  0% {
-    letter-spacing: 1em;
-    -webkit-transform: translateZ(300px);
-    transform: translateZ(300px);
-    -webkit-filter: blur(12px);
-    filter: blur(12px);
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateZ(12px);
-    transform: translateZ(12px);
-    -webkit-filter: blur(0);
-    filter: blur(0);
-    opacity: 1;
-  }
-}
-
-
-/* ====================================================== */
-/* ============== ESTILOS PARA OVERLAYS ================ */
-/* ====================================================== */
-
-/* Alerts */
-.alert-wrapper {
-  --background: var(--ion-item-background);
-}
-
-.alert-head,
-.alert-message {
-  color: var(--ion-text-color) !important;
-}
-
-.alert-radio-group .alert-radio-button {
-  --background: var(--ion-item-background);
-  --color: var(--ion-text-color);
-
-  .alert-radio-label {
-    color: var(--ion-text-color) !important;
-  }
-  .alert-radio-icon {
-    border-color: var(--ion-text-color);
-  }
-}
-
-.alert-radio-group .alert-radio-button.alert-radio-checked {
-  .alert-radio-icon {
-    border-color: var(--ion-color-primary);
-  }
-  .alert-radio-inner {
-    background: var(--ion-color-primary);
-  }
-}
-
-.alert-button-group .alert-button {
-  --color: var(--ion-text-color) !important;
-}
-
-.alert-button-group .alert-button.alert-button-role-cancel {
-  --color: var(--zentry-color-text-secondary) !important;
-}
-
-.alert-button.activated {
-  background: var(--ion-color-primary-tint);
-}
-
-/* Modals, Popovers, etc. */
-ion-modal,
-ion-popover,
-ion-action-sheet {
-  --background: rgba(0,0,0,0.4);
-  --color: var(--ion-text-color);
-}
-
-.modal-wrapper,
-.popover-content,
-.action-sheet-wrapper {
-  background-color: var(--ion-item-background);
-  color: var(--ion-text-color);
-}
-
-/* Toasts */
-ion-toast {
-  --background: var(--ion-item-background);
-  --color: var(--ion-text-color);
-  --border-color: var(--ion-border-color);
-}
-
-/* Loading */
-ion-loading {
-  --background: var(--ion-item-background);
-  --color: var(--ion-text-color);
-  --spinner-color: var(--ion-color-primary);
-}
-
-/* ====================================================== */
-/* =============== ESTILOS PARA LEAFLET ================ */
-/* ====================================================== */
-
-/* FIX: Se le da un color de fondo sólido al mapa para evitar la cuadrícula */
-.leaflet-container {
-  background-color: #DDDEE3 !important;
-}
-body.dark-theme .leaflet-container {
-  background-color: #111827 !important; /* Un gris oscuro para el fondo del mapa */
-}
-
-
-.leaflet-control-zoom a,
-.leaflet-control-layers-toggle,
-.leaflet-control a {
-  background-color: var(--ion-item-background) !important;
-  color: var(--ion-text-color) !important;
-  border-color: var(--ion-border-color) !important;
-}
-
-.leaflet-control-zoom a:hover,
-.leaflet-control a:hover {
-  background-color: var(--ion-color-primary) !important;
-  color: white !important;
-}
-
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip,
-.leaflet-tooltip {
-  background-color: var(--ion-item-background) !important;
-  color: var(--ion-text-color) !important;
-  border-color: var(--ion-border-color) !important;
-}
-
-
-/* ====================================================== */
-/* ==================== BRANDING ======================== */
-/* ====================================================== */
-
-/* 1. Aplicar la tipografía a toda la app */
+/* Tipografía base  */
 body {
   font-family: var(--font-body);
+  font-weight: 400;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
 }
 ion-title, .card-title, h1, h2, h3, h4 {
   font-family: var(--font-heading);
   font-weight: 600;
 }
 
-/* 2. Estilos base para componentes que se repiten */
+/* Toolbar */
 ion-toolbar {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-text-color);
   --border-width: 0 0 1px 0;
   --border-color: var(--ion-border-color);
-  box-shadow: none; /* Se quita la sombra por defecto de Ionic */
+  box-shadow: none;
 }
-ion-card, .action-card {
-  background: var(--ion-card-background);
-  box-shadow: var(--ion-card-box-shadow) !important;
+
+/* Cards coherentes */
+ion-card, .action-card, .dashboard-card {
+  background: var(--color-card);
+  box-shadow: var(--ion-card-box-shadow);
   border-radius: 12px;
   margin: 16px;
   padding: 16px;
-  border: 1px solid var(--ion-border-color);
+  border: 1px solid var(--color-border);
 }
+
+/* Items: no transparent, heredan del tema */
 ion-item {
-  --background: transparent;
+  --background: var(--ion-item-background);
   --border-color: var(--ion-border-color);
   --inner-border-width: 0;
 }
 
-/* 3. Estilos para el toggle de tema */
-ion-toggle {
-  --handle-background: var(--ion-card-background);
-  --handle-background-checked: var(--ion-card-background);
-}
-
-/* 4. Placeholder global */
+/* Inputs */
 ion-input, ion-textarea, ion-select, ion-searchbar {
-  --placeholder-color: var(--zentry-color-text-secondary);
+  --placeholder-color: var(--color-text-secondary);
   --placeholder-opacity: 1;
 }
 
-/* =============================================================== */
-/* ==================== REGLAS ESPECÍFICAS ======================= */
-/* =============================================================== */
-
-/* TEMA CLARO */
-body:not(.dark-theme) {
-  ion-toolbar {
-    --background: var(--ion-toolbar-background);
-  }
-  ion-content {
-    --background: var(--ion-background-color);
-  }
-  
-  /* FIX DEFINITIVO: Forzar inputs y items a tener fondo blanco en tema claro */
-  .action-card ion-item, .dashboard-card ion-item {
-      --background: #ffffff !important;
-      --color: var(--zentry-color-text-primary) !important;
-      border: 1px solid #D1D5DB;
-      border-radius: 8px;
-      margin-bottom: 12px;
-  }
+/* Items dentro de cards */
+.action-card ion-item, .dashboard-card ion-item {
+  --background: var(--ion-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  margin-bottom: 12px;
 }
 
-/* TEMA OSCURO */
-body.dark-theme {
-  ion-button[fill="clear"],
-  ion-button[fill="outline"] {
-    --color: var(--ion-color-primary-tint);
-  }
-
-  /* FIX DEFINITIVO: Forzar inputs en tema oscuro */
-   .action-card ion-item, .dashboard-card ion-item {
-      --background: #374151 !important;
-      --color: var(--zentry-color-text-primary) !important;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      border: 1px solid #4B5563;
-   }
+/* Botones outline/clear en dark */
+body[data-theme="dark"] ion-button[fill="clear"],
+body[data-theme="dark"] ion-button[fill="outline"] {
+  --color: var(--ion-color-primary-tint);
 }
 
+/* Overlays */
+.alert-wrapper { --background: var(--ion-item-background) !important; }
+.alert-head, .alert-message { color: var(--ion-text-color) !important; }
+
+.alert-radio-group .alert-radio-button {
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  .alert-radio-label { color: var(--ion-text-color) !important; }
+  .alert-radio-icon { border-color: var(--ion-text-color); }
+}
+.alert-radio-group .alert-radio-button.alert-radio-checked {
+  .alert-radio-icon { border-color: var(--ion-color-primary); }
+  .alert-radio-inner { background: var(--ion-color-primary); }
+}
+.alert-button-group .alert-button { --color: var(--ion-text-color) !important; }
+.alert-button-group .alert-button.alert-button-role-cancel { --color: var(--color-text-secondary) !important; }
+.alert-button.activated { background: var(--ion-color-primary-tint); }
+
+ion-modal, ion-popover, ion-action-sheet { --background: rgba(0,0,0,0.4); --color: var(--ion-text-color); }
+.modal-wrapper, .popover-content, .action-sheet-wrapper {
+  background-color: var(--ion-item-background) !important;
+  color: var(--ion-text-color) !important;
+}
+
+/* Toasts / Loading */
+ion-toast {
+  --background: var(--ion-item-background) !important;
+  --color: var(--ion-text-color) !important;
+  --border-color: var(--ion-border-color) !important;
+}
+ion-loading {
+  --background: var(--ion-item-background) !important;
+  --color: var(--ion-text-color) !important;
+  --spinner-color: var(--ion-color-primary) !important;
+}
+
+/* Leaflet */
+.leaflet-container { background-color: var(--map-background) !important; }
+.leaflet-control-zoom a, .leaflet-control-layers-toggle, .leaflet-control a {
+  background-color: var(--ion-item-background) !important;
+  color: var(--ion-text-color) !important;
+  border-color: var(--ion-border-color) !important;
+}
+.leaflet-control-zoom a:hover, .leaflet-control a:hover {
+  background-color: var(--ion-color-primary) !important;
+  color: #fff !important;
+}
+.leaflet-popup-content-wrapper, .leaflet-popup-tip, .leaflet-tooltip {
+  background-color: var(--ion-item-background) !important;
+  color: var(--ion-text-color) !important;
+  border-color: var(--ion-border-color) !important;
+}
+
+/* Utilitarios */
+.flex-center { display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; }
+.top-button { max-width: 500px; margin: 20px auto; }
+.center { margin: 0 auto; }
+.text-center { text-align: center; }

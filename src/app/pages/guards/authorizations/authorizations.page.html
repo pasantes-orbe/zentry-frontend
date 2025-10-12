@@ -1,6 +1,3 @@
-<!-- ====================================================== -->
-<!-- GUARDS/AUTHORIZATIONS.PAGE.HTML -->
-<!-- ====================================================== -->
 <ion-header mode="ios" [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -10,28 +7,60 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-searchbar placeholder="Buscar por nombre o DNI..."></ion-searchbar>
+<ion-content class="ion-padding surface-light">
+  <div class="container">
+    <ion-card class="list-card">
+      <div class="card-header">
+        <div>
+          <div class="title">Listado de autorizaciones</div>
+          <div class="subtitle">Búscá por nombre o DNI. Actualiza en tiempo real.</div>
+        </div>
+        <ion-button fill="outline" size="small" (click)="toggleRecurrents()">
+          {{ recurrentsState ? 'Ocultar recurrentes' : 'Ver recurrentes' }}
+        </ion-button>
+      </div>
 
-  <ion-card class="authorization-card">
-    <ion-card-header>
-      <ion-card-title>Juan Pérez</ion-card-title>
-      <ion-card-subtitle>DNI: 30.123.456</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Autorizado por: <strong>Familia Gomez (Lote 12A)</strong></p>
-      <p>Tipo: <strong>Visita Única</strong></p>
-    </ion-card-content>
-  </ion-card>
+      <!-- Buscador -->
+      <ion-searchbar
+        [(ngModel)]="searchKey"
+        animated
+        placeholder="Buscar por nombre o DNI..."
+        class="searchbar">
+      </ion-searchbar>
 
-  <ion-card class="authorization-card">
-    <ion-card-header>
-      <ion-card-title>María Lopez</ion-card-title>
-      <ion-card-subtitle>DNI: 32.456.789</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Autorizado por: <strong>Familia Rodriguez (Lote 25C)</strong></p>
-      <p>Tipo: <strong>Personal Recurrente</strong></p>
-    </ion-card-content>
-  </ion-card>
+      <!-- Loading -->
+      <div class="loading" *ngIf="isLoading">
+        <ion-spinner name="dots"></ion-spinner>
+        <span>Cargando autorizaciones...</span>
+      </div>
+
+      <!-- Lista -->
+      <ion-list class="auth-list" *ngIf="!isLoading">
+        <ion-item class="auth-item" lines="full" *ngFor="let a of authorizations | filterBy: searchKey">
+          <ion-avatar slot="start" class="avatar">
+            <span>{{ (a.guest_name || '—') | slice : 0 : 1 }}</span>
+          </ion-avatar>
+          <ion-label>
+            <div class="name-row">
+              <span class="name">{{ a.guest_name }}</span>
+              <ion-chip color="primary" outline class="type-chip">{{ a.type }}</ion-chip>
+            </div>
+            <div class="meta">
+              <span class="dni">DNI: <b>{{ a.DNI }}</b></span>
+              <span class="authby">Autorizado por: <b>{{ a.authorized_by }}</b></span>
+            </div>
+          </ion-label>
+        </ion-item>
+
+        <ion-item class="empty" *ngIf="authorizations.length === 0">
+          <ion-label>No hay autorizaciones disponibles.</ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Vista de recurrentes (opcional) -->
+      <div *ngIf="recurrentsState" class="recurrents-wrap">
+        <app-recurrents-view-all></app-recurrents-view-all>
+      </div>
+    </ion-card>
+  </div>
 </ion-content>

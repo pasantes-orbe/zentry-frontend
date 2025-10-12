@@ -2,15 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { NavbarGuardsComponent } from 'src/app/components/navbars/navbar-guards/navbar-guards.component';
 
 // Servicios
 import { AuthStorageService } from 'src/app/services/storage/auth-storage.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
-
-// ***** 1. IMPORTAR THEME SERVICE *****
 import { ThemeService } from 'src/app/services/theme/theme.service';
 
 @Component({
@@ -20,11 +17,14 @@ import { ThemeService } from 'src/app/services/theme/theme.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonicModule,
-    NavbarGuardsComponent
+    IonicModule
   ]
 })
 export class HomePage implements OnInit {
+
+  // Propiedad para almacenar el nombre del usuario dinámicamente.
+  public userName: string = 'Cargando...';
+  public userInitial: string = '';
 
   constructor(
     private router: Router,
@@ -32,16 +32,30 @@ export class HomePage implements OnInit {
     private _userStorage: UserStorageService,
     private _countryStorageService: CountryStorageService,
     private _webSocketService: WebSocketService,
-    // ***** 2. INYECTAR THEME SERVICE *****
     public theme: ThemeService
   ) {}
 
   ngOnInit() {
-    // ***** 3. INICIALIZAR EL TEMA PARA 'GUARD' *****
     this.theme.init('guard');
+    this.loadUserData();
+  }
+  
+  /**
+   * Carga los datos del usuario desde el almacenamiento de forma asíncrona.
+   * Utiliza la interfaz UserInterface con `name` y `lastname`.
+   */
+  async loadUserData() {
+    const user = await this._userStorage.getUser(); // Se añade await para resolver la promesa
+    if (user && user.lastname && user.name) {
+      // Formateamos el nombre como "Apellido, Nombre"
+      this.userName = `${user.lastname}, ${user.name}.`;
+      this.userInitial = user.lastname.charAt(0).toUpperCase();
+    } else {
+      this.userName = 'Usuario';
+      this.userInitial = 'U';
+    }
   }
 
-  // ***** 4. AÑADIR LA FUNCIÓN PARA MANEJAR EL CAMBIO *****
   onThemeToggle(ev: any) {
     const checked = ev?.detail?.checked ?? (ev?.target as HTMLInputElement)?.checked ?? false;
     this.theme.set('guard', checked ? 'dark' : 'light');
@@ -59,10 +73,6 @@ export class HomePage implements OnInit {
     this.router.navigate(['/checkout']);
   }
 
-  navigateToEvents() {
-    this.router.navigate(['/admin/events-historial']);
-  }
-
   logout() {
     console.log('Cerrando sesión del guardia...');
     this._authStorage.clearJWT();
@@ -73,3 +83,4 @@ export class HomePage implements OnInit {
     console.log('Sesión cerrada correctamente.');
   }
 }
+

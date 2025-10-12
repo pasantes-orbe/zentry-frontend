@@ -1,19 +1,33 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+// src/app/pages/guards/checkin/checkin.page.ts
 
-//Interfaces y Servicios
+import { Component, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  IonicModule,
+  IonSearchbar,
+  IonSelect,
+  IonTextarea,
+  SearchbarCustomEvent
+} from '@ionic/angular';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
+
+// Interfaces y servicios
 import { CheckinInterface } from './checkin.interface';
 import { UserStorageService } from '../../../services/storage/user-storage.service';
 import { OwnersService } from '../../../services/owners/owners.service';
 import { OwnerResponse } from '../../../interfaces/ownerResponse-interface';
 import { CheckInService } from '../../../services/check-in/check-in.service';
-import { IonSearchbar, IonSelect, IonTextarea, SearchbarCustomEvent } from '@ionic/angular';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 
-// Pipes
+// Pipe
 import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
 @Component({
@@ -29,27 +43,29 @@ import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
     FilterByPipe
   ]
 })
-export class CheckinPage implements OnInit {
+export class CheckinPage {
 
-  // CORRECCIÓN: Se cambian las propiedades a 'public' para que el HTML pueda acceder a ellas.
   public form: FormGroup;
   public incomeData: CheckinInterface;
-  public dateNow: String = new Date().toISOString();
-  public userID: any;
-  public owners: OwnerResponse[] = [];
-  public searchKey: string = '';
-  public term: string = '';
+  public dateNow: string = new Date().toISOString();
+  public userID!: string | number;
 
-  @ViewChild("textArea") public textArea: IonTextarea;
-  @ViewChild("searchBar") public searchBar: IonSearchbar;
-  @ViewChild("ionSelect") public ionSelect: IonSelect;
+  public owners: OwnerResponse[] = [];
+  public searchKey = '';
+  public term = '';
+  private ownersLoaded = false;
+  private ownersLoading = false;
+
+  @ViewChild('textArea') public textArea!: IonTextarea;
+  @ViewChild('searchBar') public searchBar!: IonSearchbar;
+  @ViewChild('ionSelect') public ionSelect!: IonSelect;
 
   constructor(
-    private _formBuilder: FormBuilder,
-    private _userStorageService: UserStorageService,
-    private _ownersService: OwnersService,
-    private _checkInService: CheckInService,
-    private _alertService: AlertService
+    private fb: FormBuilder,
+    private userStorage: UserStorageService,
+    private ownersService: OwnersService,
+    private checkInService: CheckInService,
+    private alert: AlertService
   ) {
     this.form = this.createForm();
     this.incomeData = {
@@ -57,122 +73,184 @@ export class CheckinPage implements OnInit {
       lastname: '',
       DNI: '',
       ownerID: '',
-      date: '',
+      date: this.dateNow,
       transport: '',
       patent: '',
       observations: ''
     };
-    this.incomeData.date = this.dateNow;
+
+    // Sync form -> incomeData
+    this.form.valueChanges.subscribe(v => {
+      this.incomeData = { ...this.incomeData, ...v };
+    });
   }
 
-  async ngOnInit() {
-    const user = await this._userStorageService.getUser();
-    if (user) {
-      this.userID = user.id;
+  async ionViewWillEnter() {
+    // No llamo a APIs acá (estás offline)
+    const user = await this.userStorage.getUser();
+    if (user) this.userID = user.id;
+
+    if (!this.form.get('date')?.value) {
+      this.form.get('date')?.setValue(this.dateNow);
     }
   }
 
-  ionViewWillEnter() {
-    this.ngOnInit();
+  // Carga perezosa de owners: solo primera vez que el usuario busca algo (>=3 chars)
+  private async loadOwnersOnce() {
+    if (this.ownersLoaded || this.ownersLoading) return;
+    this.ownersLoading = true;
+    try {
+      const owners$ = await this.ownersService.getAllByCountryID(); // Promise<Observable<OwnerResponse[]>>
+      owners$.subscribe({
+        next: data => {
+          this.owners = data || [];
+          this.ownersLoaded = true;
+          this.ownersLoading = false;
+        },
+        error: () => {
+          this.ownersLoading = false;
+          this.alert.presentAlert('No se pudieron cargar los propietarios.');
+        }
+      });
+    } catch {
+      this.ownersLoading = false;
+      // silencio: en estático puede no existir el back
+    }
   }
 
+  // === Métodos existentes (mismas firmas) ===
   select(e: any) {
-    this.incomeData.transport = e.detail.value;
+    const value = e?.detail?.value ?? '';
+    this.form.get('transport')?.setValue(value);
+    this.togglePatentValidator(value);
   }
 
   setObservations(e: any) {
-    this.incomeData.observations = e.detail.value;
+    const value = e?.detail?.value ?? '';
+    this.form.get('observations')?.setValue(value);
   }
+
   changePatent(e: any) {
-    this.incomeData.patent = e.detail.value;
+    const value = (e?.detail?.value ?? '').toUpperCase().replace(/\s+/g, '');
+    this.form.get('patent')?.setValue(value);
   }
 
   public setOwner(e: any) {
-    this.incomeData.ownerID = e.detail.value;
+    const value = e?.detail?.value ?? '';
+    this.form.get('ownerID')?.setValue(value);
   }
 
   public getIncomeData(): CheckinInterface {
     return this.incomeData;
   }
 
-  async filtrarOwners(event: any) { // CORRECCIÓN: Se cambia el tipo a 'any' para aceptar el evento del HTML.
-    const termino = event.detail.value;
-    if (termino && termino.length > 3) {
-      const ownersObservable = await this._ownersService.getAllByCountryID();
-      ownersObservable.subscribe(owners => {
-        this.owners = owners;
-      });
-    } else {
-      this.owners = [];
+  async filtrarOwners(event: string | SearchbarCustomEvent) {
+    const termino = typeof event === 'string' ? event : (event as any)?.detail?.value;
+    this.searchKey = (termino || '').trim();
+    if (!this.ownersLoaded && this.searchKey.length >= 3) {
+      this.loadOwnersOnce();
     }
   }
 
   submitIncome() {
+    // Revalidar patente condicional antes de enviar
+    const transport = this.form.get('transport')?.value;
+    this.togglePatentValidator(transport);
+    this.form.updateValueAndValidity();
+
     if (this.form.invalid) {
-      // CORRECCIÓN: Se une el mensaje en un solo argumento para la alerta.
-      this._alertService.presentAlert("Formulario Incompleto: Por favor, complete todos los campos requeridos.");
+      this.alert.presentAlert('Formulario incompleto o inválido. Revisá los campos marcados.');
+      this.form.markAllAsTouched();
       return;
     }
 
-    const checkinData = {
-      name: this.form.get('name')?.value,
-      lastname: this.form.get('lastname')?.value,
-      DNI: this.form.get('DNI')?.value,
-      ownerID: this.form.get('ownerID')?.value,
+    const v = this.form.getRawValue();
+    const payload = {
+      name: v.name,
+      lastname: v.lastname,
+      DNI: v.DNI,
+      ownerID: v.ownerID,
       guardID: this.userID,
-      date: this.form.get('date')?.value,
-      observations: this.incomeData.observations,
-      transport: this.incomeData.transport,
-      patent: this.incomeData.patent,
+      date: v.date,
+      observations: v.observations || '',
+      transport: v.transport || '',
+      patent: v.patent || ''
     };
 
-    // CORRECCIÓN: Se reemplaza '.subscribe' por '.then()' y '.catch()' para manejar la Promise.
-    this._checkInService.createCheckin(
-      checkinData.name, checkinData.lastname, checkinData.DNI,
-      checkinData.ownerID, checkinData.guardID, checkinData.date,
-      checkinData.observations, checkinData.transport, checkinData.patent
-    ).then(response => {
-      console.log("Check-in creado:", response);
-      // CORRECCIÓN: Se une el mensaje en un solo argumento para la alerta.
-      this._alertService.presentAlert("Éxito: El check-in se ha registrado correctamente.");
+    // En estático podés mockear el servicio; si no, esto fallará
+    this.checkInService.createCheckin(
+      payload.name, payload.lastname, payload.DNI,
+      payload.ownerID, payload.guardID, payload.date,
+      payload.observations, payload.transport, payload.patent
+    ).then(() => {
+      this.alert.presentAlert('Éxito: el check-in se registró correctamente.');
       this.resetForm();
     }).catch(err => {
-      console.error("Error al crear check-in:", err);
-      // CORRECCIÓN: Se une el mensaje en un solo argumento para la alerta.
-      this._alertService.presentAlert("Error: No se pudo registrar el check-in. Intente nuevamente.");
+      console.error('Error check-in:', err);
+      this.alert.presentAlert('Error: no se pudo registrar el check-in. Probá de nuevo.');
     });
   }
 
   resetForm() {
-    this.form.reset();
-    this.incomeData.observations = "";
-    this.incomeData.patent = "";
-    if (this.textArea) this.textArea.value = "";
-    if (this.searchBar) this.searchBar.value = "";
-    if (this.ionSelect) this.ionSelect.value = "";
+    this.form.reset({
+      name: '',
+      lastname: '',
+      DNI: '',
+      ownerID: '',
+      date: this.dateNow,
+      transport: '',
+      patent: '',
+      observations: ''
+    });
+    if (this.textArea) this.textArea.value = '';
+    if (this.searchBar) this.searchBar.value = '';
+    if (this.ionSelect) this.ionSelect.value = '';
+    this.searchKey = '';
   }
 
   private createForm(): FormGroup {
-    return this._formBuilder.group({
+    return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       lastname: ['', [Validators.required, Validators.minLength(3)]],
-      DNI: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(9), Validators.pattern("^[0-9]*$")]],
+      DNI: ['', [Validators.required, Validators.pattern(/^\d{7,8}$/)]],
       ownerID: ['', [Validators.required]],
       date: ['', [Validators.required]],
+      transport: [''],
+      patent: ['', [this.patentValidatorOptional.bind(this)]],
+      observations: ['']
     });
+  }
+
+  private patentValidatorOptional(control: AbstractControl): ValidationErrors | null {
+    const transport = this.form?.get('transport')?.value;
+    const val: string = (control.value || '').toString().toUpperCase();
+    const requiere = transport && !['Bicicleta', 'A pie'].includes(transport);
+
+    if (!requiere && !val) return null;     // no requerida
+    if (requiere && !val) return { required: true };
+
+    // AR: AAA999 o AA999AA
+    const ok = /^([A-Z]{3}\d{3}|[A-Z]{2}\d{3}[A-Z]{2})$/i.test(val);
+    return ok ? null : { pattern: true };
+  }
+
+  private togglePatentValidator(_: string) {
+    const ctrl = this.form.get('patent');
+    if (!ctrl) return;
+    ctrl.updateValueAndValidity({ emitEvent: false });
   }
 
   public getForm(): FormGroup {
     return this.form;
   }
 
-  getDate(event: any) {
-    const { value } = event.detail;
-    this.incomeData.date = value;
+  getDate(e: any) {
+    const value = e?.detail?.value ?? '';
+    this.form.get('date')?.setValue(value);
   }
 
-  getIncomeTime(event: any) {
-    const { value } = event.detail;
+  getIncomeTime(e: any) {
+    const { value } = e?.detail ?? {};
     console.log(value);
   }
 }
