@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, AlertController, Platform } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-
 import { Geolocation } from '@capacitor/geolocation';
 
 import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
@@ -15,19 +15,19 @@ import { WebSocketService } from 'src/app/services/websocket/web-socket.service'
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
-import { GuardsService } from 'src/app/services/guards/guards.service';
+import { GuardsService, AuthorizationInterface } from 'src/app/services/guards/guards.service';
 
-// Componentes opcionales que ya tenías (si no los usás, podés quitar import)
+// Componente opcional (si lo usás en tu template)
 import { RecurrentsViewAllComponent } from 'src/app/components/recurrentsViewAll/recurrents-view-all/recurrents-view-all.component';
 
-// ==== Tipos locales (adaptá si tu backend devuelve otro shape) ====
+
 interface AuthorizationItem {
   id: number | string;
   guest_name: string;
   DNI: string;
-  type: string;                // 'Visita Única' | 'Personal Recurrente' | etc.
-  authorized_by: string;       // Ej: "Familia Gomez (Lote 12A)"
-  created_at?: string;         // ISO
+  type: string;
+  authorized_by: string;
+  created_at?: string;
 }
 
 @Component({
@@ -45,23 +45,23 @@ interface AuthorizationItem {
 })
 export class AuthorizationsPage implements OnInit, OnDestroy {
 
-  // ======= Estado UI =======
+  // ======= Estado general =======
   public searchKey = '';
   public isLoading = false;
   public authorizations: AuthorizationItem[] = [];
   public recurrentsState = false;
 
-  // ======= Ubicación/usuario/país =======
+  // ======= Usuario / País =======
   private userID!: number | string;
   private user_name!: string;
   private user_lastname!: string;
   private countryID!: number | string;
 
-  // ======= Socket / interval =======
+  // ======= Socket / Interval =======
   private socket!: Socket;
   private positionTimerId: number | null = null;
 
-  // (Solo si usás un hijo con método actualizarListaCheckIn; si no, podés quitarlo)
+  // Si tenés un hijo que actualiza lista de ingresos
   @ViewChild('incomes') incomes: any;
 
   constructor(
@@ -74,27 +74,25 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     private guardsService: GuardsService
   ) {}
 
-  // ================== Lifecycle ==================
+  // ================== Ciclo de vida ==================
   async ngOnInit() {
     await this.initIdentity();
     this.initSocket();
     this.listenSocketEvents();
-    await this.loadAuthorizations();   // carga inicial
-    await this.startPositionLoop();    // comienza a enviar posición
+    await this.loadAuthorizations();
+    await this.startPositionLoop();
   }
 
   ionViewWillEnter() {
-    // refresco ligero al entrar
+    // Refresca cada vez que el guardia entra al tab
     this.loadAuthorizations();
   }
 
   ngOnDestroy() {
-    // parar interval
     if (this.positionTimerId !== null) {
       window.clearInterval(this.positionTimerId);
       this.positionTimerId = null;
     }
-    // limpiar socket
     if (this.socket) {
       this.socket.off('notificacion-nuevo-confirmedByOwner');
       this.socket.off('autorizacion-creada');
@@ -114,7 +112,7 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     }
     if (country) this.countryID = country.id;
 
-    // El servicio propio (si muestra alertas antipánico internas)
+    // Arranca escucha de alertas antipánico (si aplica)
     this.wsService.escucharNotificacionesAntipanico?.();
   }
 
@@ -123,37 +121,26 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
   }
 
   private listenSocketEvents() {
-    // Cuando se confirma un ingreso por propietario, podría afectar las autorizaciones visibles
-    this.socket.on('notificacion-nuevo-confirmedByOwner', async (_payload: any) => {
-      // Si tenés un hijo con este método, lo llamás; si no, solo refrescás lista
-      if (this.incomes?.actualizarListaCheckIn) {
-        this.incomes.actualizarListaCheckIn();
-      }
+    // Cuando un propietario confirma un ingreso → refrescar lista
+    this.socket.on('notificacion-nuevo-confirmedByOwner', async () => {
+      if (this.incomes?.actualizarListaCheckIn) this.incomes.actualizarListaCheckIn();
       await this.loadAuthorizations();
     });
 
-    // Evento genérico para cuando se crea una autorización
-    this.socket.on('autorizacion-creada', async (_payload: any) => {
+    // Cuando se crea una nueva autorización
+    this.socket.on('autorizacion-creada', async () => {
       await this.loadAuthorizations();
     });
   }
 
-  // ================== Data ==================
+  // ================== Carga de autorizaciones ==================
   async loadAuthorizations() {
     this.isLoading = true;
     try {
-      // Ajustá este método al que tengas en tu GuardsService:
-      // Ejemplos posibles:
-      // const res = await firstValueFrom(this.guardsService.getAuthorizationsByCountryId(this.countryID));
-      // const res = await firstValueFrom(this.guardsService.getPendingAuthorizations(this.countryID));
-      const res$ = (this.guardsService as any).getAuthorizationsByCountryId
-        ? (this.guardsService as any).getAuthorizationsByCountryId(this.countryID)
-        : (this.guardsService as any).getPendingAuthorizations(this.countryID);
-
-      const res = await new Promise<any[]>((resolve, reject) => {
-        res$?.subscribe({ next: resolve, error: reject });
-      });
-
+      // Llamada directa al método estable del servicio
+      const res = await firstValueFrom(
+        this.guardsService.getAuthorizationsByCountryId(this.countryID)
+      );
       this.authorizations = (res || []).map(this.mapToAuthorizationItem);
     } catch (err) {
       console.error('[Authorizations] load error', err);
@@ -163,52 +150,38 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     }
   }
 
-  private mapToAuthorizationItem = (raw: any): AuthorizationItem => {
-    // Normaliza los campos para la UI
-    const name = raw?.guest_name ?? `${raw?.guest?.name ?? ''} ${raw?.guest?.lastname ?? ''}`.trim();
-    const dni = raw?.DNI ?? raw?.guest?.dni ?? '';
+  // Mapeo a estructura de UI
+  private mapToAuthorizationItem = (raw: AuthorizationInterface): AuthorizationItem => {
+    const name = raw?.guest_name ?? `${(raw as any)?.guest?.name ?? ''} ${(raw as any)?.guest?.lastname ?? ''}`.trim();
+    const dni = raw?.DNI ?? (raw as any)?.guest?.dni ?? '—';
     const type = raw?.type ?? raw?.authorization_type ?? 'Visita';
-    const lot =
-      raw?.authorized_by?.lot ??
-      raw?.owner?.lot ??
-      raw?.lot ??
-      '';
+
+    const lot = raw?.lot ?? (raw.owner?.lot ?? '');
     const family =
-      raw?.authorized_by?.family_name ??
-      raw?.owner?.family_name ??
-      raw?.owner?.name ??
-      raw?.user?.name ??
-      'Propietario';
+      (raw.owner?.family_name ?? raw.owner?.name ?? 'Propietario');
 
     const authorizedLabel = lot ? `${family} (Lote ${lot})` : family;
 
     return {
-      id: raw?.id ?? raw?._id ?? `${name}-${dni}`,
+      id: raw.id ?? `${name}-${dni}`,
       guest_name: name || '—',
       DNI: dni || '—',
       type,
       authorized_by: authorizedLabel,
-      created_at: raw?.created_at ?? raw?.date
+      created_at: raw.created_at ?? raw.date
     };
   };
 
-  // ================== Geolocalización loop ==================
+  // ================== Geolocalización ==================
   private async startPositionLoop() {
-    try {
-      // permisos (Capacitor)
-      await Geolocation.requestPermissions();
-    } catch {
-      // Si falla permiso, seguimos intentando con navigator como fallback
-    }
+    try { await Geolocation.requestPermissions(); } catch {}
 
     const tick = async () => {
       try {
-        // Preferí Capacitor
         const coords = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
         const payload = this.buildPositionPayload(coords.coords.latitude, coords.coords.longitude);
         this.socket.emit('nueva-posicion-guardia', payload);
       } catch {
-        // Fallback a navigator si Capacitor falla
         navigator.geolocation.getCurrentPosition(
           (resp) => {
             const { latitude, longitude } = resp.coords;
@@ -221,12 +194,8 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
       }
     };
 
-    // primer envío inmediato
     tick();
-
-    // cada 3s (igual que tenías)
     this.positionTimerId = window.setInterval(tick, 3000);
-    // guardo id del interval si lo usás en otras vistas
     this.intervalStorage.saveInterval_id(String(this.positionTimerId));
   }
 
@@ -241,12 +210,12 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     };
   }
 
-  // ================== UI actions ==================
+  // ================== Acciones UI ==================
   public toggleRecurrents() {
     this.recurrentsState = !this.recurrentsState;
   }
 
-  // ================== Util ==================
+  // ================== Utilidades ==================
   private async presentSimple(message: string) {
     const a = await this.alertCtrl.create({ header: 'Atención', message, buttons: ['OK'] });
     await a.present();
