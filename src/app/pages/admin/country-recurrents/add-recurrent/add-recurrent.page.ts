@@ -1,3 +1,4 @@
+//src/app/pages/admin/country-recurrents/add-recurrent/add-recurrent.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -70,6 +71,7 @@ export class AddRecurrentPage implements OnInit {
       lastname: ['', [Validators.required, Validators.minLength(3)]],
       dni: ['', [Validators.required, Validators.min(1000000), Validators.max(100000000)]],
       property: ['', [Validators.required]],
+      roleRecurrent: ['Invitado Recurrente', [Validators.required]],
     });
   }
 
@@ -97,11 +99,16 @@ export class AddRecurrentPage implements OnInit {
     }
 
     const v = this.form.value;
+    const defaultDays = 'lunes,martes,miercoles,jueves,viernes,sabado,domingo';
+    const userRole: 'admin' | 'owner' = 'admin'; // ✅ acá es admin
+
     const payload = {
       id_property: v.property,
       guest_name: v.name,
       guest_lastname: v.lastname,
-      dni: v.dni
+      dni: v.dni,
+      roleRecurrent: v.roleRecurrent as string,
+      access_days: defaultDays,
     };
 
     try {
@@ -109,11 +116,19 @@ export class AddRecurrentPage implements OnInit {
         // EDITAR
         this._recurrentsService.updateRecurrent(this.recurrentId, payload).subscribe(() => {
           this._alertService.presentAlert('Éxito: Recurrente actualizado.');
-          this._router.navigate(['/admin/country-recurrents']);
+          this._router.navigate(['/admin/country-recurrents']); 
         });
       } else {
         // CREAR
-        await this._recurrentsService.addRecurrent(v.property, v.name, v.lastname, v.dni, 'admin');
+        await this._recurrentsService.addRecurrent(
+          v.property,
+          v.name, 
+          v.lastname, 
+          v.dni,
+          userRole, 
+          v.roleRecurrent,
+          defaultDays
+        ); 
         // addRecurrent ya hace navigate y alerts
       }
     } catch (err) {

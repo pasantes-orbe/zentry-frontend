@@ -1,4 +1,4 @@
-// --- Archivo: src/app/pages/incomes/new-income/new-income.page.ts (Corregido) ---
+// --- Archivo: src/app/pages/incomes/new-income/new-income.page.ts---
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -14,96 +14,110 @@ import moment from 'moment';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 
 @Component({
-  selector: 'app-new-income',
-  templateUrl: './new-income.page.html',
-  styleUrls: ['./new-income.page.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    IonicModule,
-    RouterModule,
-    ReactiveFormsModule
-  ]
+  selector: 'app-new-income',
+  templateUrl: './new-income.page.html',
+  styleUrls: ['./new-income.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    RouterModule,
+    ReactiveFormsModule
+  ]
 })
 export class NewIncomePage implements OnInit {
 
-  public form: FormGroup;
-  public incomeDate: any;
-  public incomeExit: any;
+  public form: FormGroup;
+  public incomeDate: any;
+  public incomeExit: any;
+  
+  // 🆕 Se define un valor por defecto para los días de acceso si no hay selector en el HTML
+  private defaultAccessDays: string = 'lunes,martes,miercoles,jueves,viernes,sabado,domingo'; 
 
-  constructor(
-    private _formBuilder: FormBuilder,
-    private _checkInService: CheckInService,
-    private _recurrentsService: RecurrentsService,
-    private _ownerStorage: OwnerStorageService,
-    private _router: Router,
-    private _alertService: AlertService
-  ) {
-    this.form = this.createForm();
-  }
+  constructor(
+    private _formBuilder: FormBuilder,
+    private _checkInService: CheckInService,
+    private _recurrentsService: RecurrentsService,
+    private _ownerStorage: OwnerStorageService,
+    private _router: Router,
+    private _alertService: AlertService
+  ) {
+    this.form = this.createForm();
+  }
 
-  ngOnInit() {
-    const now = new Date();
-    const nowFormatted = moment(now).format("YYYY-MM-DDTHH:mm:ss");
-    this.form.controls['date'].setValue(nowFormatted);
-  }
+  ngOnInit() {
+    const now = new Date();
+    const nowFormatted = moment(now).format("YYYY-MM-DDTHH:mm:ss");
+    this.form.controls['date'].setValue(nowFormatted);
+  }
 
-  createForm(): FormGroup {
-    return this._formBuilder.group({
-      name: ['', [Validators.required]],
-      lastname: ['', [Validators.required]],
-      DNI: ['', [Validators.required]],
-      isRecurrent: [true, [Validators.required]],
-      date: ['',],
-    });
-  }
+  createForm(): FormGroup {
+    return this._formBuilder.group({
+      name: ['', [Validators.required]],
+      lastname: ['', [Validators.required]],
+      DNI: ['', [Validators.required]],
+      isRecurrent: [true, [Validators.required]],
+      date: ['',],
+      rol: ['Invitado Recurrente', [Validators.required]], 
+      rolRecurrent: ['Invitado Recurrente', [Validators.required]],
+    });
+  }
 
-  async onSubmit() {
-    if (this.form.invalid) {
-      this._alertService.presentAlert('Formulario Inválido Por favor, complete todos los campos requeridos.');
-      return;
-    }
+  async onSubmit() {
+    if (this.form.invalid) {
+      this._alertService.presentAlert('Formulario Inválido. Por favor, complete todos los campos requeridos.');
+      return;
+    }
 
-    try {
-      const owner = await this._ownerStorage.getOwner();
-      const ownerID = owner.user.id;
-      const id_country = owner.property.id_country;
-      const formValues = this.form.value;
+    try {
+      const owner = await this._ownerStorage.getOwner();
+      const ownerID = owner.user.id;
+      const id_country = owner.property.id_country;
+      const formValues = this.form.value;
 
-      if (formValues.isRecurrent) {
-        const propertyID = owner.property.id;
-        await this._recurrentsService.addRecurrent(
-          propertyID,
-          formValues.name,
-          formValues.lastname,
-          formValues.DNI,
-          "owner"
-        );
-        this._alertService.presentAlert('Éxito El invitado recurrente ha sido guardado.');
+      if (formValues.isRecurrent) {
+        const propertyID = owner.property.id;
+        
+        // Se extrae el rol y se usa el valor por defecto para los días, 
+        // ya que este formulario de "New Income" no tiene un selector de días.
+        const recurrentRol = formValues.rol || 'Invitado Recurrente';
+        const accessDays = this.defaultAccessDays; 
+        
+        // 🔄 Se actualiza la llamada con los nuevos parámetros (Rol y Días de Acceso)
+        await this._recurrentsService.addRecurrent(
+          propertyID,
+          formValues.name,
+          formValues.lastname,
+          formValues.DNI,
+          'owner',
+          recurrentRol,
+          accessDays,
+        );
+        this._alertService.presentAlert('Éxito. El invitado recurrente ha sido guardado y autorizado para el ingreso.');
 
-      } else {
-        await this._checkInService.createCheckInFromOwner(
-          formValues.name,
-          formValues.lastname,
-          formValues.DNI,
-          formValues.date,
-          ownerID,
-          id_country
-        );
-        this._alertService.presentAlert('Éxito La autorización de ingreso ha sido creada.');
-      }
+      } else {
+        await this._checkInService.createCheckInFromOwner(
+          formValues.name,
+          formValues.lastname,
+          formValues.DNI,
+          formValues.date,
+          ownerID,
+          id_country
+        );
+        this._alertService.presentAlert('Éxito. La autorización de ingreso ha sido creada.');
+      }
 
-      this.form.reset();
-      this._router.navigate(['/tabs/tab1']);
+      this.form.reset();
+      this._router.navigate(['/tabs/tab1']);
 
-    } catch (error) {
-      console.error("Error al procesar el formulario:", error);
-      this._alertService.presentAlert('Error No se pudo completar la operación. Intente nuevamente.');
-    }
-  }
+    } catch (error) {
+      console.error("Error al procesar el formulario:", error);
+      this._alertService.presentAlert('Error. No se pudo completar la operación. Intente nuevamente.');
+    }
+  }
 
-  getDateIncome(event: any) {
-    const { value } = event.detail;
-    this.incomeDate = value;
-  }
+  getDateIncome(event: any) {
+    const { value } = event.detail;
+    this.incomeDate = value;
+  }
 }

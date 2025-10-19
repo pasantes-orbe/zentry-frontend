@@ -1,9 +1,12 @@
+// src/app/interfaces/recurrents-interface.ts
 export interface RecurrentsInterface {
     id:             number;
     status:         boolean;
     guest_name:     string;
     guest_lastname: string;
     dni:            number;
+    roleRecurrent:           string;
+    access_days:    string;
     property:       Property;
 }
 

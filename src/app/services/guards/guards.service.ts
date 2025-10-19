@@ -59,14 +59,10 @@ export class GuardsService {
   }
 
   // ============================================================
-  // ✅ NUEVO — endpoint estable para la página de Autorizaciones
+  // ✅ NUEVO — endpoint estable para la página de Autorizaciones de vista vigilador, trae los datos de vista propietario
   // ============================================================
-  /**
-   * Devuelve las autorizaciones pendientes (o todas) del country indicado.
-   * Si tu backend usa otra ruta (por ej. /api/authorizations/all/ o /api/guards/:id/authorizations),
-   * cambiá únicamente la URL de abajo.
-   */
   public getAuthorizationsByCountryId(countryId: string | number): Observable<AuthorizationInterface[]> {
-    return this._http.get<AuthorizationInterface[]>(`${environment.URL}/api/authorizations/pending/${countryId}`);
+    //return this._http.get<AuthorizationInterface[]>(`${environment.URL}/api/authorizations/pending/${countryId}`);
+    return this._http.get<AuthorizationInterface[]>(`${environment.URL}/api/checkin/confirmed/${countryId}`);
   }
 }

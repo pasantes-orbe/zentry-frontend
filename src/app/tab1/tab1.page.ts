@@ -1,8 +1,9 @@
-//src/app/tab1/tab1.page.ts
+// src/app/tab1/tab1.page.ts
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 // Ionic standalone
 import {
@@ -22,6 +23,9 @@ import { OwnersService } from '../services/owners/owners.service';
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
 import { AlertService } from '../services/helpers/alert.service';
 import { ReservationsService } from '../services/amenities/reservations.service';
+import { CheckInService } from '../services/check-in/check-in.service';
+import { RecurrentsService } from '../services/recurrents/recurrents.service';
+import { RecurrentsInterface } from '../interfaces/recurrents-interface';
 
 // Componentes
 import { ReservationsComponent } from '../components/reservations/reservations.component';
@@ -45,15 +49,16 @@ export class Tab1Page implements OnInit {
   private userID: any;
   protected owner: OwnerResponse | null = null;
 
-  // Form
+  // Form (Visita Rápida)
   public guestName = '';
+  public guestLastname = '';
   public guestDNI = '';
 
   // Modals
   public isReservationModalOpen = false;
   public isRecurrentModalOpen = false;
 
-  // Reserva de amenity (mantengo el mapa de nombres → ID que vino del remoto)
+  // Reserva de amenity
   public selectedAmenity: string = '';
   public selectedDate: string = '';
   public selectedTime: string = '';
@@ -67,10 +72,11 @@ export class Tab1Page implements OnInit {
   };
   public amenities = Object.keys(this.amenityIdMap);
 
-  // Recurrentes
+  // Recurrentes (Formulario de Gestión)
   public recurrentName = '';
+  public recurrentLastname = '';
   public recurrentDNI = '';
-  public recurrentRole = '';
+  public roleRecurrent = '';
   public selectedDays: string[] = [];
   public weekDays = [
     { value: 'lunes', label: 'Lunes' },
@@ -82,12 +88,9 @@ export class Tab1Page implements OnInit {
     { value: 'domingo', label: 'Domingo' }
   ];
 
-  public registeredRecurrents = [
-    { id: 1, name: 'María Gómez', dni: '12345678', role: 'Empleada doméstica', days: ['lunes','miercoles','viernes'] },
-    { id: 2, name: 'Carlos Ruiz', dni: '87654321', role: 'Jardinero', days: ['martes'] },
-    { id: 3, name: 'Ana Torres', dni: '11223344', role: 'Niñera', days: ['lunes','martes','miercoles','jueves','viernes'] }
-  ];
-
+  // Lista de recurrentes. Usa la interfaz real y se carga del backend.
+  public registeredRecurrents: RecurrentsInterface[] = [];  
+  
   @ViewChild('reservationsComponent') reservationsComponent!: ReservationsComponent;
 
   constructor(
@@ -95,25 +98,62 @@ export class Tab1Page implements OnInit {
     private _ownerStorageService: OwnerStorageService,
     private _ownersService: OwnersService,
     private alerts: AlertService,
-    public theme: ThemeService, // para usar directo en template
+    public theme: ThemeService,
     private _reservationsService: ReservationsService,
-    private router: Router
+    private _checkInService: CheckInService,
+    private _recurrentsService: RecurrentsService,
   ) {
-    this.setLoading(true);
+    this.setLoading(true); // Uso correcto de setLoading
   }
 
-  async ngOnInit() {
-    // Inicializa el tema para propietario (ajustá el rol si corresponde otra página)
-    this.theme.init('owner');
+  // normaliza el shape del owner (se mantiene)
+  private normalizeOwner(owner: OwnerResponse | null): OwnerResponse | null {
+    if (!owner) { return null; }
+    const normalized: any = { ...(owner as any) };
+    if (normalized.id_user) {
+        normalized.user = {
+            id: normalized.id_user,
+            ...(normalized.user || {})
+        };
+        delete normalized.id_user; 
+    }
+    const properties = Array.isArray(normalized.properties) ? normalized.properties : [];
+    const property = normalized.property ?? properties[0] ?? null;
+    if (property) {
+      normalized.property = {
+        ...property,
+        id_country:
+          property?.id_country !== undefined && property?.id_country !== null
+            ? Number(property.id_country)
+            : property?.id_country ?? null
+      };
+    }
+    if (Array.isArray(properties)) {
+      normalized.properties = properties.map((p: any) => ({
+        ...p,
+        id_country:
+          p?.id_country !== undefined && p?.id_country !== null
+            ? Number(p.id_country)
+            : p?.id_country ?? null
+      }));
+    }
+    return normalized as OwnerResponse;
+  }
 
+  // ngOnInit (se mantiene)
+  async ngOnInit() {
+    this.theme.init('owner');
     try {
       const user = await this._userStorageService.getUser();
       if (user) {
         this.userID = user.id;
         this._ownersService.getByID(this.userID).subscribe({
           next: (owner) => {
-            this.owner = owner;
-            this._ownerStorageService.saveOwner(owner);
+            const normalizedOwner = this.normalizeOwner(owner);
+            this.owner = normalizedOwner;
+            if (normalizedOwner) {
+              void this._ownerStorageService.saveOwner(normalizedOwner);
+            }
             this.setLoading(false);
           },
           error: (error) => {
@@ -132,6 +172,33 @@ export class Tab1Page implements OnInit {
     }
   }
 
+  // ensureOwnerContext (se mantiene)
+  private async ensureOwnerContext() {
+    try {
+      if (this.owner?.user?.id && (this.owner as any)?.property?.id_country) {
+        return;
+      }
+      const stored = await this._ownerStorageService.getOwner();
+      if (stored) {
+        this.owner = this.normalizeOwner(stored);
+        if (this.owner?.user?.id && (this.owner as any)?.property?.id_country) {
+          return;
+        }
+      }
+      const user = await this._userStorageService.getUser();
+      if (!user?.id) { throw new Error('Sin sesión de usuario'); }
+
+      const owner = await firstValueFrom(this._ownersService.getByID(user.id));
+      this.owner = this.normalizeOwner(owner);
+      if (this.owner) {
+        void this._ownerStorageService.saveOwner(this.owner);
+      }
+    } catch (error) {
+      console.error('No se pudo cargar el owner:', error);
+      this.owner = null;
+    }
+  }
+
   onThemeToggle(ev: any) {
     const checked = ev?.detail?.checked ?? (ev?.target as HTMLInputElement)?.checked ?? false;
     this.theme.set('owner', checked ? 'dark' : 'light');
@@ -143,17 +210,54 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  public authorizeQuickVisit() {
-    if (!this.guestName.trim() || !this.guestDNI.trim()) {
-      this.alerts.showAlert('Error', 'Nombre y DNI son obligatorios');
+  // authorizeQuickVisit (se mantiene)
+  public async authorizeQuickVisit() {
+    if (!this.guestName.trim() || !this.guestLastname.trim() || !this.guestDNI.trim()) {
+      await this.alerts.showAlert('Error', 'Nombre, Apellido y DNI son obligatorios');
       return;
     }
-    this.alerts.showAlert(
-      'Visita Autorizada',
-      `Visita autorizada para:<br><strong>${this.guestName}</strong><br>DNI: ${this.guestDNI}`
-    );
-    this.guestName = '';
-    this.guestDNI = '';
+
+    if (isNaN(Number(this.guestDNI))) {
+      await this.alerts.showAlert('Error', 'El DNI debe ser numérico.');
+      return;
+    }
+
+    try {
+      await this.ensureOwnerContext();
+
+      if (!this.owner?.user?.id || !(this.owner as any)?.property?.id_country) {
+        await this.alerts.showAlert('Error', 'No se pudo cargar tu perfil de propietario. Reingresá.');
+        return;
+      }
+
+      const id_owner = this.owner.user.id;
+      const id_country = (this.owner as any).property.id_country;
+      const income_date = new Date().toISOString();
+
+      await this._checkInService.createCheckInFromOwner(
+        this.guestName.trim(),
+        this.guestLastname.trim(),
+        this.guestDNI.trim(),
+        income_date,
+        id_owner,
+        id_country
+      );
+
+      await this.alerts.showAlert(
+        'Visita Autorizada',
+        `Visita autorizada para:<br><strong>${this.guestName} ${this.guestLastname}</strong><br>DNI: ${this.guestDNI}`
+      );
+
+      this.guestName = '';
+      this.guestLastname = '';
+      this.guestDNI = '';
+    } catch (error: any) {
+      console.error('Error al autorizar visita rápida:', error);
+      let message = 'Ocurrió un error inesperado al autorizar la visita.';
+      if (error?.error?.msg) { message = error.error.msg; }
+      else if (error?.statusText) { message = `Error de red o conexión: ${error.statusText}`; }
+      await this.alerts.showAlert('Error de Autorización', message);
+    }
   }
 
   public onNotificationClick() {
@@ -170,6 +274,7 @@ export class Tab1Page implements OnInit {
     this.alerts.showAlert('Notificaciones', message);
   }
 
+  // --- LÓGICA DE RESERVACION (se mantiene) ---
   public reserveAmenity() {
     this.isReservationModalOpen = true;
   }
@@ -191,7 +296,6 @@ export class Tab1Page implements OnInit {
       return;
     }
 
-    // Combinar fecha + hora de forma robusta
     const dateObj = new Date(this.selectedDate);
     const [hours, minutes] = this.selectedTime.split(':').map(Number);
     dateObj.setHours(hours, minutes, 0, 0);
@@ -227,29 +331,112 @@ export class Tab1Page implements OnInit {
     this.selectedDate = '';
     this.selectedTime = '';
   }
+  
+  // --- LÓGICA DE RECURRENTES (CORREGIDA) ---
+  
+  private async loadRecurrents() {
+    await this.ensureOwnerContext();
 
-  public manageRecurrent() { this.isRecurrentModalOpen = true; }
-
-  public addRecurrent() {
-    if (!this.recurrentName.trim() || !this.recurrentDNI.trim() || !this.recurrentRole.trim() || this.selectedDays.length === 0) {
-      this.alerts.showAlert('Error', 'Por favor complete todos los campos');
-      return;
+    const ownerId = this.owner?.user?.id;
+    if (!ownerId) {
+        console.error('No se pudo obtener el ID del propietario para cargar recurrentes.');
+        this.registeredRecurrents = [];
+        return;
     }
-    const newRecurrent = {
-      id: this.registeredRecurrents.length + 1,
-      name: this.recurrentName,
-      dni: this.recurrentDNI,
-      role: this.recurrentRole,
-      days: [...this.selectedDays]
-    };
-    this.registeredRecurrents.push(newRecurrent);
-    this.alerts.showAlert('Recurrente Agregado', `${this.recurrentName} ha sido agregado exitosamente`);
-    this.clearRecurrentForm();
+    
+    this._recurrentsService.getRecurrentsByOwner(ownerId).subscribe({
+        next: (data) => {
+            this.registeredRecurrents = data; 
+        },
+        error: (err) => {
+            console.error('Error al cargar recurrentes:', err);
+            this.alerts.showAlert('Error', 'No se pudo cargar la lista de invitados recurrentes.');
+            this.registeredRecurrents = [];
+        }
+    });
   }
 
-  public removeRecurrent(id: number) {
-    this.registeredRecurrents = this.registeredRecurrents.filter(r => r.id !== id);
-    this.alerts.showAlert('Recurrente Eliminado', 'El recurrente ha sido eliminado exitosamente');
+  public manageRecurrent() { 
+    // Cargar la lista del backend antes de abrir
+    void this.loadRecurrents(); 
+    this.isRecurrentModalOpen = true; 
+  }
+
+  public async addRecurrent() { 
+    // 1. Validar campos requeridos para la API (Name, Lastname, DNI)
+    if (!this.recurrentName.trim() || !this.recurrentLastname.trim() || !this.recurrentDNI.trim()
+      || !this.roleRecurrent.trim() || this.selectedDays.length === 0) 
+    {
+      await this.alerts.showAlert('Error', 'Nombre, Apellido y DNI son obligatorios');
+      return;
+    }
+
+    // 2. Asegurar el contexto para obtener el ID de la Propiedad (id_property)
+    await this.ensureOwnerContext();
+    const id_property = (this.owner as any)?.property?.id; 
+
+    if (!id_property) {
+      await this.alerts.showAlert('Error', 'No se pudo obtener la propiedad del propietario. Reingresá.');
+      return;
+    }
+    const daysString = this.selectedDays.join(',');
+
+    try {
+      await this._recurrentsService.addRecurrent(
+            id_property,
+            this.recurrentName.trim(),
+            this.recurrentLastname.trim(),
+            this.recurrentDNI.trim(),
+            'owner',                      // userRole: 'owner' | 'admin'
+            this.roleRecurrent.trim(),    // roleRecurrent: string
+            daysString                    // access_days: string
+        );
+      /* 3. Llamar al servicio para persistir en el backend
+      await this.recurrentsService.addRecurrent(
+        id_property,
+        this.recurrentName.trim(),
+        this.recurrentLastname.trim(), 
+        this.recurrentDNI.trim(),
+        'owner'
+      ));
+      */
+      // 4. Recargar la lista del backend
+      void this.loadRecurrents();
+      
+      // 5. Limpiar el formulario
+      this.clearRecurrentForm();
+        this.recurrentName = '';
+        this.recurrentLastname = '';
+        this.recurrentDNI = '';
+        this.roleRecurrent = ''; 
+        this.selectedDays = [];  
+    } catch (error) {
+      console.error('Fallo al agregar recurrente:', error);
+      this.alerts.showAlert('Error de Registro', 'No se pudo completar el registro del recurrente. Verifique los datos.');
+    }
+  }
+
+
+  public async removeRecurrent(id: number) {
+    try {
+      await this.alerts.setLoading();
+      
+      // 1. Llamar al servicio para eliminar
+      const result = await firstValueFrom(this._recurrentsService.deleteRecurrent(id));
+
+      // 2. Si es exitoso, recargar la lista
+      if (result) {
+        await this.loadRecurrents(); 
+        this.alerts.showAlert('Recurrente Eliminado', 'El recurrente ha sido eliminado exitosamente del sistema.');
+      } else {
+        this.alerts.showAlert('Error', 'No se pudo eliminar el recurrente. Intente de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error al eliminar recurrente:', error);
+      this.alerts.showAlert('Error', 'Ocurrió un error inesperado al intentar eliminar.');
+    } finally {
+      await this.alerts.removeLoading();
+    }
   }
 
   public closeRecurrentModal() {
@@ -259,28 +446,48 @@ export class Tab1Page implements OnInit {
 
   private clearRecurrentForm() {
     this.recurrentName = '';
+    this.recurrentLastname = '';
     this.recurrentDNI = '';
-    this.recurrentRole = '';
+    this.roleRecurrent = '';
     this.selectedDays = [];
   }
-
+  
   public onDayChange(day: string, event: any) {
     if (event.detail.checked) this.selectedDays.push(day);
     else this.selectedDays = this.selectedDays.filter(d => d !== day);
   }
 
-  public getFormattedDays(days: string[]): string {
-    return days.map(day => this.weekDays.find(d => d.value === day)?.label ?? day).join(', ');
+  public getFormattedDays(days: string | string[] | null | undefined): string {
+
+    if (!days) return 'No especificado';
+    
+    // 1. Convertir el string de días del backend a un array
+    //const dayValues = days.split(',');
+    const dayValues = Array.isArray(days) ? days : String(days).split(',');
+
+
+    /* 2. Mapear los valores ('lunes') a sus etiquetas ('Lunes')
+    return dayValues.map(dayValue => {
+        // Buscar la etiqueta ('Lunes') que corresponde al valor ('lunes')
+        const foundDay = this.weekDays.find(d => d.value === dayValue.trim());
+        return foundDay ? foundDay.label : dayValue;
+    }).join(', ');
+    */
+      return dayValues
+    .map(d => d.trim())
+    .filter(Boolean)
+    .map(value => this.weekDays.find(w => w.value === value)?.label ?? value)
+    .join(', ');
   }
 
-  protected doRefresh(event: any) {
-    setTimeout(() => event.target.complete(), 1000);
+  protected async doRefresh(event: any) {
+    // Recargar Owner y Recurrentes al hacer pull-to-refresh
+    await this.ensureOwnerContext(); 
+    await this.loadRecurrents();
+    event.target.complete();
   }
 
-  private getData() {
-    setTimeout(() => this.setLoading(false), 3000);
-  }
-
+  // Funciones de control de carga
   public isLoading(): boolean { return this.loading; }
   public setLoading(loading: boolean): void { this.loading = loading; }
 }

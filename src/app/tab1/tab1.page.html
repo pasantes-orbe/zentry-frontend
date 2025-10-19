@@ -49,6 +49,13 @@
           </ion-item>
           <ion-item lines="none">
             <ion-input 
+              placeholder="Apellido del Invitado"
+              [(ngModel)]="guestLastname"
+              clearInput="true">
+            </ion-input>
+          </ion-item>  
+          <ion-item lines="none">
+            <ion-input 
               placeholder="DNI"
               [(ngModel)]="guestDNI"
               clearInput="true">
@@ -58,11 +65,11 @@
             expand="block" 
             color="primary"
             (click)="authorizeQuickVisit()"
-            [disabled]="!guestName.trim() || !guestDNI.trim()">
+            [disabled]="!guestName.trim() || !guestLastname.trim() || !guestDNI.trim()">
             Autorizar
           </ion-button>
         </div>
-
+      
         <div class="action-card notifications-card">
           <h3 class="card-title">Notificaciones Recientes</h3>
           <ion-list>
@@ -137,83 +144,94 @@
     </ng-template>
   </ion-modal>
 
-  <!-- Modal para Gestionar Recurrentes -->
-  <ion-modal [isOpen]="isRecurrentModalOpen" (didDismiss)="closeRecurrentModal()">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Gestionar Recurrentes</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeRecurrentModal()">
-              <ion-icon name="close"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      
-      <ion-content>
-        <!-- Formulario para agregar recurrente -->
-        <div style="padding: 20px;">
-          <h4>Agregar Nuevo Recurrente</h4>
-          
-          <ion-item>
-            <ion-input 
-              placeholder="Nombre completo" 
-              [(ngModel)]="recurrentName">
-            </ion-input>
-          </ion-item>
-          
-          <ion-item>
-            <ion-input 
-              placeholder="DNI" 
-              [(ngModel)]="recurrentDNI">
-            </ion-input>
-          </ion-item>
-          
-          <ion-item>
-            <ion-input 
-              placeholder="Rol (ej: Empleada doméstica)" 
-              [(ngModel)]="recurrentRole">
-            </ion-input>
-          </ion-item>
-          
-          <div style="margin: 20px 0;">
-            <h5>Días de acceso:</h5>
-            <div *ngFor="let day of weekDays">
-              <ion-checkbox 
-                [checked]="selectedDays.includes(day.value)"
-                (ionChange)="onDayChange(day.value, $event)">
-              </ion-checkbox>
-              <span style="margin-left: 10px;">{{day.label}}</span>
-            </div>
-          </div>
-          
-          <ion-button expand="block" (click)="addRecurrent()">
-            Agregar Recurrente
+<!-- Modal para Gestionar Recurrentes -->
+<ion-modal [isOpen]="isRecurrentModalOpen" (didDismiss)="closeRecurrentModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Gestionar Recurrentes</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeRecurrentModal()">
+            <ion-icon name="close"></ion-icon>
           </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <!-- Formulario para agregar recurrente -->
+      <div style="padding: 20px;">
+        <h4>Agregar Nuevo Recurrente</h4>
+
+        <!-- Nombre -->
+        <ion-item>
+          <ion-input
+            placeholder="Nombre"
+            [(ngModel)]="recurrentName">
+          </ion-input>
+        </ion-item>
+
+        <!-- Apellido -->
+        <ion-item>
+          <ion-input
+            placeholder="Apellido"
+            [(ngModel)]="recurrentLastname">
+          </ion-input>
+        </ion-item>
+
+        <!-- DNI -->
+        <ion-item>
+          <ion-input
+            placeholder="DNI"
+            inputmode="numeric"
+            [(ngModel)]="recurrentDNI">
+          </ion-input>
+        </ion-item>
+
+        <!-- Rol -->
+        <ion-item>
+          <ion-input
+            placeholder="Rol (ej: Empleada doméstica)"
+            [(ngModel)]="roleRecurrent">
+          </ion-input>
+        </ion-item>
+
+        <div style="margin: 20px 0;">
+          <h5>Días de acceso:</h5>
+          <div *ngFor="let day of weekDays">
+            <ion-checkbox
+              [checked]="selectedDays.includes(day.value)"
+              (ionChange)="onDayChange(day.value, $event)">
+            </ion-checkbox>
+            <span style="margin-left: 10px;">{{day.label}}</span>
+          </div>
         </div>
-        
-        <!-- Lista de recurrentes registrados -->
-        <div style="padding: 20px;">
-          <h4>Recurrentes Registrados</h4>
-          <ion-list>
-            <ion-item *ngFor="let recurrent of registeredRecurrents">
-              <div>
-                <h5>{{recurrent.name}}</h5>
-                <p>{{recurrent.role}} - DNI: {{recurrent.dni}}</p>
-                <p><small>Días: {{getFormattedDays(recurrent.days)}}</small></p>
-              </div>
-              <ion-button 
-                slot="end" 
-                fill="clear" 
-                color="danger"
-                (click)="removeRecurrent(recurrent.id)">
-                <ion-icon name="trash"></ion-icon>
-              </ion-button>
-            </ion-item>
-          </ion-list>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
-</ion-content>
+
+        <ion-button expand="block" (click)="addRecurrent()">
+          AGREGAR RECURRENTE
+        </ion-button>
+      </div>
+
+      <!-- Lista de recurrentes registrados -->
+      <div style="padding: 20px;">
+        <h4>Recurrentes Registrados</h4>
+        <ion-list>
+          <ion-item *ngFor="let recurrent of registeredRecurrents">
+            <div>
+              <h5>{{ recurrent.guest_name }} {{ recurrent.guest_lastname }}</h5>
+              <p>{{ recurrent.roleRecurrent }} - DNI: {{ recurrent.dni }}</p>
+              <p><small>Días: {{ getFormattedDays(recurrent.access_days) }}</small></p>
+            </div>
+            <ion-button
+              slot="end"
+              fill="clear"
+              color="danger"
+              (click)="removeRecurrent(recurrent.id)">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
