@@ -59,7 +59,7 @@
 
       <!-- Vista de recurrentes (opcional) -->
       <div *ngIf="recurrentsState" class="recurrents-wrap">
-        <app-recurrents-view-all></app-recurrents-view-all>
+        <app-recurrents-view-all [role]="'guard'" [readOnly]="true"></app-recurrents-view-all>
       </div>
     </ion-card>
   </div>

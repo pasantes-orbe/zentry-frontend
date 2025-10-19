@@ -25,14 +25,9 @@
     animation: fadeIn 1.5s ease-in-out;
   }
 
-  /*
-  * CORRECCIÓN: Tamaño del logo con !important.
-  * Se usa !important para forzar esta regla sobre cualquier otra que pueda
-  * estar afectando a la imagen.
-  */
   .app-logo {
-    height: 150px !important;
-    width: 150px !important;
+    height: 150px;
+    width: 150px;
   }
 
   /* Contenedor para el spinner, lo posiciona en la parte inferior */

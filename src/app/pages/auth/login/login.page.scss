@@ -30,7 +30,7 @@ ion-content {
   background-size: cover;
   background-position: center;
   position: relative;
-  color: #ffffff;
+  color: #ffffff; // OK: texto sobre imagen oscura fija
 
   // Superposición oscura para mejorar la legibilidad del texto
   &::before {

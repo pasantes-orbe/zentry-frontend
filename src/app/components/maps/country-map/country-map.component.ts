@@ -82,8 +82,11 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     }
 
     if (!this.demoMode) {
-      this.socketSvc.conectar();
+      await this.socketSvc.conectar();
+      // Esperar a que el socket esté conectado
+      await new Promise(resolve => setTimeout(resolve, 500));
       this.setupSocketListeners();
+      console.log('[CountryMap] Socket conectado y listeners configurados');
     }
   }
 

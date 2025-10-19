@@ -64,17 +64,27 @@
           </div>
 
           <!-- Lista propietarios -->
-          <ion-list class="owners-list" *ngIf="owners.length > 0">
-            <ion-radio-group formControlName="ownerID" (ionChange)="setOwner($event)">
-              <ion-item *ngFor="let owner of owners | filterBy: searchKey" class="owner-item">
+          <ion-list *ngIf="owners?.length">
+            <ion-radio-group formControlName="ownerID">
+              <ion-item *ngFor="let o of owners; trackBy: trackOwner">
                 <ion-label>
-                  <h3>{{ owner.user.name }} {{ owner.user.lastname }}</h3>
-                  <p>DNI: {{ owner.user.dni }}</p>
+                  <h3>
+                    {{ ($any(o).OwnerUser?.name ?? $any(o).name) }}
+                    {{ ($any(o).OwnerUser?.lastname ?? $any(o).lastname) }}
+                  </h3>
+                  <p>DNI: {{ ($any(o).OwnerUser?.dni ?? $any(o).dni) }}</p>
                 </ion-label>
-                <ion-radio [value]="owner.user.id"></ion-radio>
+
+                <ion-radio slot="end"
+                          [value]="($any(o).OwnerUser?.id ?? $any(o).id) + ''">
+                </ion-radio>
               </ion-item>
             </ion-radio-group>
           </ion-list>
+
+
+
+
           <ion-note color="danger" *ngIf="form.get('ownerID')?.touched && form.get('ownerID')?.invalid">
             Seleccioná un propietario.
           </ion-note>

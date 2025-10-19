@@ -59,7 +59,7 @@ export class CheckinPage {
   @ViewChild('textArea') public textArea!: IonTextarea;
   @ViewChild('searchBar') public searchBar!: IonSearchbar;
   @ViewChild('ionSelect') public ionSelect!: IonSelect;
-
+  trackOwner = (_: number, o: any) => (o?.OwnerUser?.id ?? o?.id);
   constructor(
     private fb: FormBuilder,
     private userStorage: UserStorageService,
@@ -103,6 +103,7 @@ export class CheckinPage {
       const owners$ = await this.ownersService.getAllByCountryID(); // Promise<Observable<OwnerResponse[]>>
       owners$.subscribe({
         next: data => {
+          console.log('💡 Owners recibidos en el front:', data); // <-- ESTA LÍNEA IMPLEMENTALA
           this.owners = data || [];
           this.ownersLoaded = true;
           this.ownersLoading = false;
