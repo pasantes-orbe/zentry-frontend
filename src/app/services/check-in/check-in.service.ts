@@ -125,10 +125,15 @@ updateCheckInTrue(id:any){
   })
 }
 
-updateCheckOutTrue(id:any){
-  this._http.patch(`${environment.URL}/api/checkin/checkout/${id}`, {}).subscribe(res => {
-    this._socketService.notificarNuevoConfirmedByOwner(res['update'])
-  })
+async updateCheckOutTrue(id: any): Promise<any> {
+  try {
+    const response: any = await this._http.patch(`${environment.URL}/api/checkin/checkout/${id}`, {}).toPromise();
+    this._socketService.notificarNuevoConfirmedByOwner(response['update']);
+    return response;
+  } catch (error) {
+    console.error('[CheckInService] Error al actualizar checkout:', error);
+    throw error;
+  }
 }
 
 

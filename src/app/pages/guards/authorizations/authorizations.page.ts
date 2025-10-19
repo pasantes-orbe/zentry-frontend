@@ -2,11 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, AlertController, Platform } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
-
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { Geolocation } from '@capacitor/geolocation';
 
 import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 
@@ -14,12 +11,10 @@ import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
-import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
-import { GuardsService, AuthorizationInterface } from 'src/app/services/guards/guards.service';
+import { GuardsService } from 'src/app/services/guards/guards.service';
 
-// Componente opcional (si lo usás en tu template)
+// Componentes opcionales
 import { RecurrentsViewAllComponent } from 'src/app/components/recurrentsViewAll/recurrents-view-all/recurrents-view-all.component';
-
 
 interface AuthorizationItem {
   id: number | string;
@@ -44,24 +39,18 @@ interface AuthorizationItem {
   ]
 })
 export class AuthorizationsPage implements OnInit, OnDestroy {
-
-  // ======= Estado general =======
   public searchKey = '';
   public isLoading = false;
   public authorizations: AuthorizationItem[] = [];
   public recurrentsState = false;
 
-  // ======= Usuario / País =======
   private userID!: number | string;
   private user_name!: string;
   private user_lastname!: string;
-  private countryID!: number | string;
+  public countryID!: number | string; // Público para pasarlo al componente hijo
 
-  // ======= Socket / Interval =======
   private socket!: Socket;
-  private positionTimerId: number | null = null;
 
-  // Si tenés un hijo que actualiza lista de ingresos
   @ViewChild('incomes') incomes: any;
 
   constructor(
@@ -70,29 +59,21 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     private wsService: WebSocketService,
     private userStorage: UserStorageService,
     private countryStorage: CountryStorageService,
-    private intervalStorage: IntervalStorageService,
     private guardsService: GuardsService
   ) {}
 
-  // ================== Ciclo de vida ==================
   async ngOnInit() {
     await this.initIdentity();
     this.initSocket();
     this.listenSocketEvents();
     await this.loadAuthorizations();
-    await this.startPositionLoop();
   }
 
   ionViewWillEnter() {
-    // Refresca cada vez que el guardia entra al tab
     this.loadAuthorizations();
   }
 
   ngOnDestroy() {
-    if (this.positionTimerId !== null) {
-      window.clearInterval(this.positionTimerId);
-      this.positionTimerId = null;
-    }
     if (this.socket) {
       this.socket.off('notificacion-nuevo-confirmedByOwner');
       this.socket.off('autorizacion-creada');
@@ -100,19 +81,26 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     }
   }
 
-  // ================== Init helpers ==================
+  // ================== Init ==================
   private async initIdentity() {
     const user = await this.userStorage.getUser();
     const country = await this.countryStorage.getCountry();
+
+    console.log('[AuthorizationsPage] User from storage:', user);
+    console.log('[AuthorizationsPage] Country from storage:', country);
 
     if (user) {
       this.userID = user.id;
       this.user_name = user.name;
       this.user_lastname = user.lastname;
     }
-    if (country) this.countryID = country.id;
+    if (country) {
+      this.countryID = country.id;
+      console.log('[AuthorizationsPage] Country ID set to:', this.countryID);
+    } else {
+      console.warn('[AuthorizationsPage] ⚠️ No country found in storage!');
+    }
 
-    // Arranca escucha de alertas antipánico (si aplica)
     this.wsService.escucharNotificacionesAntipanico?.();
   }
 
@@ -121,101 +109,89 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
   }
 
   private listenSocketEvents() {
-    // Cuando un propietario confirma un ingreso → refrescar lista
     this.socket.on('notificacion-nuevo-confirmedByOwner', async () => {
       if (this.incomes?.actualizarListaCheckIn) this.incomes.actualizarListaCheckIn();
       await this.loadAuthorizations();
     });
 
-    // Cuando se crea una nueva autorización
     this.socket.on('autorizacion-creada', async () => {
       await this.loadAuthorizations();
     });
   }
 
-  // ================== Carga de autorizaciones ==================
+  // ================== Data ==================
   async loadAuthorizations() {
+    console.log('[AuthorizationsPage] 🔄 loadAuthorizations() called');
+    
+    if (!this.countryID) {
+      console.error('[AuthorizationsPage] ❌ No countryID available. Cannot load authorizations.');
+      this.presentSimple('No se pudo obtener el ID del country. Verifica tu sesión.');
+      this.isLoading = false;
+      return;
+    }
+
     this.isLoading = true;
     try {
-      // Llamada directa al método estable del servicio
-      const res = await firstValueFrom(
-        this.guardsService.getAuthorizationsByCountryId(this.countryID)
-      );
-      this.authorizations = (res || []).map(this.mapToAuthorizationItem);
+      console.log('[AuthorizationsPage] Fetching data for countryID:', this.countryID);
+      
+      const [auths, recurrents] = await Promise.all([
+        this.guardsService.getConfirmedAuthorizations(this.countryID).toPromise(),
+        this.guardsService.getRecurrentsByCountry(this.countryID).toPromise()
+      ]);
+
+      console.log('[AuthorizationsPage] ✅ Confirmed authorizations:', auths);
+      console.log('[AuthorizationsPage] ✅ Recurrents:', recurrents);
+
+      const merged = [
+        ...(auths || []),
+        ...(recurrents || []).map((r: any) => ({
+          ...r,
+          type: 'Recurrente'
+        }))
+      ];
+
+      console.log('[AuthorizationsPage] Merged data (before mapping):', merged);
+      this.authorizations = merged.map(this.mapToAuthorizationItem);
+      console.log('[AuthorizationsPage] Final authorizations:', this.authorizations);
     } catch (err) {
-      console.error('[Authorizations] load error', err);
-      this.presentSimple('No se pudieron cargar las autorizaciones.');
+      console.error('[AuthorizationsPage] ❌ Load error:', err);
+      this.presentSimple('No se pudieron cargar las autorizaciones. Revisa la consola para más detalles.');
     } finally {
       this.isLoading = false;
     }
   }
 
-  // Mapeo a estructura de UI
-  private mapToAuthorizationItem = (raw: AuthorizationInterface): AuthorizationItem => {
-    const name = raw?.guest_name ?? `${(raw as any)?.guest?.name ?? ''} ${(raw as any)?.guest?.lastname ?? ''}`.trim();
-    const dni = raw?.DNI ?? (raw as any)?.guest?.dni ?? '—';
-    const type = raw?.type ?? raw?.authorization_type ?? 'Visita';
+  private mapToAuthorizationItem = (raw: any): AuthorizationItem => {
+    const name =
+      raw?.guest_name ??
+      `${raw?.guest_name ?? ''} ${raw?.guest_lastname ?? ''}`.trim() ??
+      `${raw?.guest?.name ?? ''} ${raw?.guest?.lastname ?? ''}`.trim();
 
-    const lot = raw?.lot ?? (raw.owner?.lot ?? '');
+    const dni = raw?.DNI ?? raw?.guest?.dni ?? raw?.dni ?? '';
+
+    const lot = raw?.owner?.property?.number ?? raw?.lot ?? raw?.owner?.lot ?? '';
     const family =
-      (raw.owner?.family_name ?? raw.owner?.name ?? 'Propietario');
+      raw?.owner?.family_name ??
+      raw?.owner?.name ??
+      raw?.user?.name ??
+      'Propietario';
 
     const authorizedLabel = lot ? `${family} (Lote ${lot})` : family;
 
     return {
-      id: raw.id ?? `${name}-${dni}`,
+      id: raw?.id ?? raw?._id ?? `${name}-${dni}`,
       guest_name: name || '—',
       DNI: dni || '—',
-      type,
+      type: raw?.type ?? 'Visita',
       authorized_by: authorizedLabel,
-      created_at: raw.created_at ?? raw.date
+      created_at: raw?.income_date ?? raw?.created_at ?? raw?.date
     };
   };
 
-  // ================== Geolocalización ==================
-  private async startPositionLoop() {
-    try { await Geolocation.requestPermissions(); } catch {}
-
-    const tick = async () => {
-      try {
-        const coords = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
-        const payload = this.buildPositionPayload(coords.coords.latitude, coords.coords.longitude);
-        this.socket.emit('nueva-posicion-guardia', payload);
-      } catch {
-        navigator.geolocation.getCurrentPosition(
-          (resp) => {
-            const { latitude, longitude } = resp.coords;
-            const payload = this.buildPositionPayload(latitude, longitude);
-            this.socket.emit('nueva-posicion-guardia', payload);
-          },
-          (err) => console.warn('[geo] navigator error', err),
-          { enableHighAccuracy: true, maximumAge: 2000, timeout: 5000 }
-        );
-      }
-    };
-
-    tick();
-    this.positionTimerId = window.setInterval(tick, 3000);
-    this.intervalStorage.saveInterval_id(String(this.positionTimerId));
-  }
-
-  private buildPositionPayload(lat: number, lng: number) {
-    return {
-      lat,
-      lng,
-      id_user: this.userID,
-      id_country: this.countryID,
-      user_name: this.user_name,
-      user_lastname: this.user_lastname
-    };
-  }
-
-  // ================== Acciones UI ==================
   public toggleRecurrents() {
     this.recurrentsState = !this.recurrentsState;
   }
 
-  // ================== Utilidades ==================
   private async presentSimple(message: string) {
     const a = await this.alertCtrl.create({ header: 'Atención', message, buttons: ['OK'] });
     await a.present();

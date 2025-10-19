@@ -10,18 +10,16 @@ ion-avatar {
 }
 
 ion-item.noti {
-  --background:#ebebeb;
-  --color: #fff;
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
   padding-bottom: 2%;
-  --border-color: #fbad32;
-
+  --border-color: var(--ion-color-warning);
 }
-
 
 ion-list{
   padding-bottom: 0PX;
   margin-bottom: 0px;
   margin-left: 10px;
   margin-right: 10px;
-  background-color: #ebebeb;
-} 
+  background-color: var(--ion-background-color);
+}

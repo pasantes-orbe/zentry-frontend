@@ -11,7 +11,7 @@
       margin-left: 16px;
     }
     .notification-button {
-      --color: var(--zentry-color-text-secondary);
+      --color: var(--color-text-secondary);
       font-size: 1.4rem;
     }
     ion-avatar {
@@ -35,11 +35,11 @@
   }
 
   .card-title {
-    color: var(--ion-text-color); /* Usar variable */
+    color: var(--ion-text-color);
   }
 
   .secondary-action-card p {
-    color: var(--zentry-color-text-secondary); /* Usar variable */
+    color: var(--color-text-secondary);
   }
   
   .quick-auth-card {
@@ -49,31 +49,16 @@
     }
   }
 
-  /* ====================================================== */
-  /* ========= FIX v4: REGLAS FORZADAS CON !important ========= */
-  /* ====================================================== */
-
   .quick-auth-card ion-item {
     --inner-padding-end: 0px;
     --inner-padding-start: 0px;
     --padding-start: 0;
     --padding-end: 0;
+    --background: var(--ion-item-background);
+    --color: var(--ion-text-color);
     margin-bottom: 12px;
     border-radius: 8px;
-  }
-
-  /* TEMA OSCURO */
-  :host-context(body.dark-theme) .quick-auth-card ion-item {
-    --background: #374151 !important;
-    --color: #F9FAFB !important;
-    border: 1px solid #4B5563;
-  }
-
-  /* TEMA CLARO */
-  :host-context(body:not(.dark-theme)) .quick-auth-card ion-item {
-    --background: #FFFFFF !important;
-    --color: #1F2937 !important;
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--color-border);
   }
 
   .notifications-card {
@@ -94,7 +79,7 @@
       }
       p {
         font-size: 0.9rem;
-        color: var(--zentry-color-text-secondary);
+        color: var(--color-text-secondary);
       }
       &.success ion-icon {
         color: var(--ion-color-success);
@@ -124,12 +109,12 @@
         --color: var(--ion-text-color);
         
         ion-label {
-          color: var(--ion-text-color) !important;
+          color: var(--ion-text-color);
         }
         
         ion-input, ion-select, ion-datetime {
           --color: var(--ion-text-color);
-          --placeholder-color: var(--zentry-color-text-secondary);
+          --placeholder-color: var(--color-text-secondary);
         }
         
         ion-radio {

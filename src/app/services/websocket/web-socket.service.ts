@@ -195,4 +195,13 @@ export class WebSocketService {
     this.emitirEvento('notificar-antipanico', data);
     console.log('Evento notificar-antipanico enviado:', data);
   }
+
+  /**
+   * Enviar ubicación del guardia al backend
+   * @param locationData - Datos de ubicación { id_user, id_country, lat, lng, user_name, user_lastname }
+   */
+  public enviarUbicacionGuardia(locationData: any): void {
+    this.emitirEvento('update-guard-location', locationData);
+    console.log('[WebSocket] Ubicación del guardia enviada:', locationData);
+  }
 }

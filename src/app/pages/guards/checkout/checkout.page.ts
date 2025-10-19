@@ -92,7 +92,7 @@ export class CheckoutPage implements OnInit, OnDestroy {
             try {
               this.isProcessingId = checkInData.id as unknown as number;
 
-              // 1) Crear checkout
+              // 1) Crear checkout (pasamos el string directamente)
               await this._checkOutService.createCheckout(checkInData.id, data?.observation ?? '');
 
               // 2) Marcar check-in como "checkout true"

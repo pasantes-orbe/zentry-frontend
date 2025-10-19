@@ -1,6 +1,6 @@
 ion-item{
     margin-bottom: 15px;
-    --background: none!important;
+    --background: transparent;
     
     ion-label{
         margin-bottom: 10px;
@@ -11,7 +11,7 @@ ion-item{
     ion-select,
     ion-textarea{
         width: 100%;
-        border: 1px solid #d4d4d4;
+        border: 1px solid var(--color-border);
         padding: 10px 20px;
         border-radius: 4px;
     }
@@ -23,6 +23,6 @@ ion-button.paddingbutton {
 }
 
 ion-row.borderBottom{
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--color-border);
 }
 
