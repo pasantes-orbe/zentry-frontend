@@ -100,8 +100,6 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     } else {
       console.warn('[AuthorizationsPage] ⚠️ No country found in storage!');
     }
-
-    this.wsService.escucharNotificacionesAntipanico?.();
   }
 
   private initSocket() {

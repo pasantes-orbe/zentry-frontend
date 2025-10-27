@@ -1,0 +1,84 @@
+<div class="antipanic-overlay">
+  <div class="antipanic-container">
+    <!-- Icono de alerta pulsante -->
+    <div class="alert-icon-wrapper">
+      <ion-icon name="warning" class="alert-icon"></ion-icon>
+    </div>
+
+    <!-- Título -->
+    <h1 class="alert-title">🚨 ALERTA ANTIPÁNICO ACTIVADA</h1>
+
+    <!-- Información del propietario -->
+    <div class="owner-info" *ngIf="!showDetailsForm">
+      <div class="info-row">
+        <ion-icon name="person" class="info-icon"></ion-icon>
+        <div class="info-content">
+          <span class="info-label">Propietario:</span>
+          <span class="info-value">{{ antipanicData?.ownerName }} {{ antipanicData?.ownerLastName }}</span>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <ion-icon name="location" class="info-icon"></ion-icon>
+        <div class="info-content">
+          <span class="info-label">Dirección:</span>
+          <span class="info-value">{{ antipanicData?.address }}</span>
+        </div>
+      </div>
+
+      <div class="info-row" *ngIf="antipanicData?.propertyNumber">
+        <ion-icon name="home" class="info-icon"></ion-icon>
+        <div class="info-content">
+          <span class="info-label">Lote/Propiedad:</span>
+          <span class="info-value">{{ antipanicData?.propertyNumber }}</span>
+        </div>
+      </div>
+
+      <div class="info-row" *ngIf="antipanicData?.latitude && antipanicData?.longitude">
+        <ion-icon name="navigate" class="info-icon"></ion-icon>
+        <div class="info-content">
+          <span class="info-label">Coordenadas:</span>
+          <span class="info-value">{{ antipanicData?.latitude }}, {{ antipanicData?.longitude }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de detalles -->
+    <div class="details-form" *ngIf="showDetailsForm">
+      <h2 class="form-title">Detalles de la Situación</h2>
+      <ion-textarea
+        [(ngModel)]="details"
+        placeholder="Describe lo que encontraste al llegar..."
+        rows="5"
+        class="details-input"
+        [autofocus]="true">
+      </ion-textarea>
+    </div>
+
+    <!-- Botones -->
+    <div class="action-buttons">
+      <ion-button 
+        *ngIf="!showDetailsForm"
+        expand="block" 
+        color="danger" 
+        size="large"
+        (click)="acknowledgeAlert()"
+        class="primary-button">
+        <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+        ALERTA NOTIFICADA
+      </ion-button>
+
+      <ion-button 
+        *ngIf="showDetailsForm"
+        expand="block" 
+        color="success" 
+        size="large"
+        (click)="finishAlert()"
+        [disabled]="!details.trim()"
+        class="primary-button">
+        <ion-icon name="checkmark-done" slot="start"></ion-icon>
+        FINALIZAR ALERTA
+      </ion-button>
+    </div>
+  </div>
+</div>

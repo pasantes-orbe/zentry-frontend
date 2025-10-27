@@ -53,4 +53,107 @@
       font-weight: 600;
     }
   }
+
+  // ==========================================
+  // RESPONSIVE DESIGN
+  // ==========================================
+
+  // Por defecto: Mostrar solo MÓVIL
+  .mobile-view {
+    display: block;
+  }
+
+  .desktop-view {
+    display: none;
+  }
+
+  // DESKTOP (pantallas > 768px): Mostrar solo TABLA
+  @media (min-width: 768px) {
+    .mobile-view {
+      display: none;
+    }
+    
+    .desktop-view {
+      display: block;
+    }
+  }
+
+  // ==========================================
+  // ESTILOS PARA CARDS (MÓVIL)
+  // ==========================================
+
+  .event-card {
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    ion-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      ion-icon {
+        font-size: 1.4rem;
+      }
+    }
+    
+    ion-card-subtitle {
+      font-size: 0.85rem;
+      margin-top: 4px;
+      color: var(--ion-color-medium);
+    }
+    
+    .event-info {
+      margin-bottom: 16px;
+      
+      .info-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        
+        &:first-child {
+          justify-content: center;
+          margin-bottom: 16px;
+        }
+        
+        ion-icon {
+          font-size: 1.3rem;
+          flex-shrink: 0;
+        }
+        
+        span {
+          font-size: 0.9rem;
+          line-height: 1.4;
+          
+          strong {
+            color: var(--ion-color-dark);
+          }
+        }
+        
+        ion-badge {
+          font-size: 0.85rem;
+          padding: 6px 12px;
+        }
+      }
+    }
+    
+    .event-actions {
+      border-top: 1px solid var(--ion-color-light);
+      padding-top: 12px;
+      
+      ion-button {
+        margin-bottom: 8px;
+        --border-radius: 8px;
+      }
+      
+      .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
+    }
+  }
 }

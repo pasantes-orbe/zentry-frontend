@@ -141,6 +141,71 @@
         </div>
       </div>
 
+      <!-- SECCIÓN: HORARIO DE TRABAJO -->
+      <div class="form-section">
+        <h2 class="section-title">Horario de Trabajo</h2>
+        
+        <div class="form-group">
+          <label class="form-label">Días de trabajo</label>
+          <div class="days-grid" [formGroup]="getWorkDaysGroup()">
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="monday" slot="start"></ion-checkbox>
+              <ion-label>Lunes</ion-label>
+            </ion-item>
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="tuesday" slot="start"></ion-checkbox>
+              <ion-label>Martes</ion-label>
+            </ion-item>
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="wednesday" slot="start"></ion-checkbox>
+              <ion-label>Miércoles</ion-label>
+            </ion-item>
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="thursday" slot="start"></ion-checkbox>
+              <ion-label>Jueves</ion-label>
+            </ion-item>
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="friday" slot="start"></ion-checkbox>
+              <ion-label>Viernes</ion-label>
+            </ion-item>
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="saturday" slot="start"></ion-checkbox>
+              <ion-label>Sábado</ion-label>
+            </ion-item>
+            <ion-item class="day-item">
+              <ion-checkbox formControlName="sunday" slot="start"></ion-checkbox>
+              <ion-label>Domingo</ion-label>
+            </ion-item>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label class="form-label">Hora de entrada <span class="required">*</span></label>
+            <ion-item class="form-item">
+              <ion-icon name="time-outline" slot="start" color="medium"></ion-icon>
+              <ion-input 
+                formControlName="startTime" 
+                type="time"
+                class="form-input">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="form-group half">
+            <label class="form-label">Hora de salida <span class="required">*</span></label>
+            <ion-item class="form-item">
+              <ion-icon name="time-outline" slot="start" color="medium"></ion-icon>
+              <ion-input 
+                formControlName="endTime" 
+                type="time"
+                class="form-input">
+              </ion-input>
+            </ion-item>
+          </div>
+        </div>
+      </div>
+
       <!-- SECCIÓN: FOTO DE PERFIL -->
       <div class="form-section">
         <h2 class="section-title">Foto de Perfil</h2>

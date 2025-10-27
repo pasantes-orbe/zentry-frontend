@@ -69,27 +69,27 @@
 
         .active & {
           background: var(--primary-color);
-          color: white;
+          color: var(--ion-color-primary-contrast);
           border-color: var(--primary-color);
         }
 
         .completed & {
           background: var(--success-color);
-          color: white;
+          color: var(--ion-color-success-contrast);
           border-color: var(--success-color);
         }
       }
 
       &.active .step-number {
         background: var(--primary-color);
-        color: white;
+        color: var(--ion-color-primary-contrast);
         border-color: var(--primary-color);
         transform: scale(1.1);
       }
 
       &.completed .step-number {
         background: var(--success-color);
-        color: white;
+        color: var(--ion-color-success-contrast);
         border-color: var(--success-color);
       }
 
@@ -163,7 +163,7 @@
   // Tooltips personalizados del mapa
   :global(.custom-tooltip) {
     background: var(--primary-color) !important;
-    color: white !important;
+    color: var(--ion-color-primary-contrast) !important;
     border: none !important;
     border-radius: 6px !important;
     font-weight: 600 !important;
@@ -221,7 +221,7 @@
       .confirm-button {
         flex: 1;
         --background: var(--success-color);
-        --color: white;
+        --color: var(--ion-color-success-contrast);
         font-weight: 600;
       }
     }
@@ -235,7 +235,7 @@
 
   .primary-button {
     --background: var(--primary-color);
-    --color: white;
+    --color: var(--ion-color-primary-contrast);
     --border-radius: var(--radius-sm);
     --box-shadow: var(--shadow);
     font-weight: 600;
@@ -385,7 +385,7 @@
     // Botón de envío
     .submit-button {
       --background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
-      --color: white;
+      --color: var(--ion-color-primary-contrast);
       --border-radius: var(--radius-sm);
       --box-shadow: var(--shadow-lg);
       font-weight: 700;
@@ -402,12 +402,12 @@
 
       &[disabled] {
         --background: var(--text-muted);
-        --color: white;
+        --color: var(--ion-color-light-contrast);
         opacity: 0.6;
       }
 
       ion-spinner {
-        --color: white;
+        --color: var(--ion-color-primary-contrast);
         margin-right: 8px;
       }
     }

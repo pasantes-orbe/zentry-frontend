@@ -94,16 +94,18 @@ export class EditGuardPage implements OnInit {
   }
 
   async editSchedule(id, start: Date, exit: Date, week_day) {
-    this.scheduleService.editSchedule(id, start, exit, week_day).subscribe(
-      async res => {
-        console.log(res);
+    console.log('Editando horario:', { id, start, exit, week_day });
+    this.scheduleService.editSchedule(id, start, exit, week_day).subscribe({
+      next: async res => {
+        console.log('Horario editado exitosamente:', res);
         await this.correctlyToast();
+        this.ionViewWillEnter(); // Recargar los horarios
       },
-      async error => {
-        console.log(error);
+      error: async error => {
+        console.error('Error al editar horario:', error);
         await this.errorToast();
       }
-    )
+    });
   }
 
   public sortByWeekDay(a, b) {
@@ -122,13 +124,27 @@ export class EditGuardPage implements OnInit {
   }
 
   async newHourOnSchedule(start, exit, week_day) {
-    const id_country = await (await this._countryStorage.getCountry()).id;
-    this.scheduleService.newHourOnSchedule(this.guard_id, id_country, week_day, start, exit).subscribe(
-      res => {
-        console.log(res);
-        this.correctlyToast();
-      }
-    )
+    try {
+      const country = await this._countryStorage.getCountry();
+      const id_country = country.id;
+      console.log('Agregando nuevo horario:', { start, exit, week_day, id_country });
+      
+      this.scheduleService.newHourOnSchedule(this.guard_id, id_country, week_day, start, exit).subscribe({
+        next: async res => {
+          console.log('Horario agregado exitosamente:', res);
+          await this.correctlyToast();
+          this.newScheduleHour = []; // Limpiar el formulario
+          this.ionViewWillEnter(); // Recargar los horarios
+        },
+        error: async error => {
+          console.error('Error al agregar horario:', error);
+          await this.errorToast();
+        }
+      });
+    } catch (error) {
+      console.error('Error al obtener country:', error);
+      await this.errorToast();
+    }
   }
 
   cancel() {

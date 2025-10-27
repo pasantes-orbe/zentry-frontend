@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController } from '@ionic/angular';
 import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { io, Socket } from 'socket.io-client';
 import moment from 'moment';
 import { UserStorageService } from '../storage/user-storage.service';
+import { AntipanicAlertComponent } from 'src/app/components/antipanic-alert/antipanic-alert.component';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class AlertService {
     private _loadingCtrl: LoadingController,
     private _http: HttpClient,
     private _userStorage: UserStorageService,
+    private modalCtrl: ModalController
     ) { 
       this.socket = io(environment.URL)
     }
@@ -66,24 +68,18 @@ export class AlertService {
   }
 
   async presentAlertPanic(e: any){
-    const alert = await this.alertController.create({
-      header: 'Alerta Antipánico activada',
-      message: `El Propietario ${e.ownerName} - ${e.ownerLastName } <br>
-        Activo la alarma de la dirección ${e.address} <br>`,
-      backdropDismiss: false,
-      buttons: [ 
-        {
-          text: 'Alerta Notificada',
-          role: 'confirm',
-          handler: () => {
-            this.presentAlertFinishAntipanic(e)
-          },
-        },
-      ],
-    });
-    await alert.present();
-    return alert;
-  }
+    const modal = await this.modalCtrl.create({
+      component: AntipanicAlertComponent,
+      componentProps: {
+        antipanicData: e
+      },
+      backdropDismiss: false,
+      cssClass: 'antipanic-modal'
+    });
+    
+    await modal.present();
+    return modal;
+  }
 
   async presentAlertFinishAntipanic(e: any){
     const alert = await this.alertController.create({

@@ -3,3 +3,164 @@
 ion-icon{
     font-size: 1.8em;
 }
+
+// ==========================================
+// 📱 RESPONSIVE DESIGN
+// ==========================================
+
+// Por defecto: Mostrar solo MÓVIL
+.mobile-view {
+  display: block;
+}
+
+.desktop-view {
+  display: none;
+}
+
+// 💻 DESKTOP (pantallas > 768px): Mostrar solo TABLA
+@media (min-width: 768px) {
+  .mobile-view {
+    display: none;
+  }
+  
+  .desktop-view {
+    display: block;
+  }
+}
+
+// ==========================================
+// 📱 ESTILOS PARA CARDS (MÓVIL)
+// ==========================================
+
+.guard-card {
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  
+  ion-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: var(--ion-text-color);
+  }
+  
+  ion-card-subtitle {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    color: var(--ion-color-medium);
+  }
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  .guard-info {
+    margin-bottom: 12px;
+    
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--ion-text-color);
+      
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  .guard-actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    border-top: 1px solid var(--ion-color-light);
+    padding-top: 12px;
+    margin-top: 8px;
+    
+    ion-button {
+      flex: 1;
+      margin: 0;
+      
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  &.inactive {
+    opacity: 0.85;
+    border-left: 3px solid var(--ion-color-danger);
+  }
+}
+
+// ==========================================
+// 💻 ESTILOS PARA TABLA (DESKTOP)
+// ==========================================
+
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  table {
+    width: 100%;
+    min-width: 700px;
+    color: var(--ion-text-color);
+    
+    th {
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 12px 8px;
+      white-space: nowrap;
+      color: var(--ion-text-color);
+    }
+    
+    td {
+      padding: 12px 8px;
+      vertical-align: middle;
+      color: var(--ion-text-color);
+      
+      ion-icon {
+        cursor: pointer;
+        transition: transform 0.2s;
+        
+        &:hover {
+          transform: scale(1.2);
+        }
+      }
+      
+      ion-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+      }
+    }
+  }
+}
+
+// ==========================================
+// 🎨 MEJORAS GENERALES
+// ==========================================
+
+h3 {
+  margin: 16px 0;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.top-button {
+  margin: 16px 0;
+}
+
+ion-searchbar {
+  --background: var(--ion-color-light);
+  --border-radius: 12px;
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--ion-color-medium);
+  margin-bottom: 16px;
+}

@@ -139,3 +139,20 @@ ion-avatar img {
 .top-button { max-width: 500px; margin: 20px auto; }
 .center { margin: 0 auto; }
 .text-center { text-align: center; }
+
+/* Modal Antipánico - Pantalla completa sin backdrop */
+.antipanic-modal {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+  
+  ion-backdrop {
+    display: none !important;
+  }
+  
+  .modal-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}

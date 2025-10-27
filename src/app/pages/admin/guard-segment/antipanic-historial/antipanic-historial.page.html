@@ -4,38 +4,75 @@
 
   <ion-searchbar mode="ios" animated debounce="500" [(ngModel)]="searchKey"
     placeholder="Buscar por fecha, prop N°, propietario"></ion-searchbar>
-  <div class="table-responsive container">
-    <table class="table text-center">
-      <thead>
-        <tr>
-          <th scope="col">Fecha</th>
-          <th scope="col">Hora</th>
-          <th scope="col">Prop N°</th>
-          <th scope="col">Propietario</th>
-          <th scope="col">Guardia</th>
-          <th scope="col">Detalles</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let antipanic of antipanics| filterBy: searchKey ; let i = index">
-          <td> {{antipanic.createdAt | date}} </td>
-          <td> {{antipanic.createdAt | date:'shortTime'}} </td>
-          <td class="text-center">{{antipanic.propertyNumber}}</td>
-          <td>{{antipanic.owner.name}} </td>
-          <td *ngIf="antipanic.guard" class="text-center"> {{antipanic.guard.name}} </td>
-          <td *ngIf="!antipanic.guard" class="text-center"> Nadie atendió </td>
-          <td class="text-center">
-            <ion-button (click)="showDetails(antipanic.details)" shape="round">
-              Detalles
-            </ion-button>
-          </td>
 
-          <!-- ESTO TRATABA DE SI FUE CANCELADO O NO
-         <td *ngIf="i % 2 != 0"><ion-badge color="success">SI</ion-badge></td>
-        <td *ngIf="i % 2 == 0"><ion-badge color="danger">NO</ion-badge></td>
-       -->
-        </tr>
-      </tbody>
-    </table>
+  <!-- 📱 Vista MÓVIL: Cards -->
+  <div class="mobile-view">
+    <ion-card *ngFor="let antipanic of antipanics | filterBy: searchKey" class="antipanic-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="alert-circle" color="danger"></ion-icon>
+          Propiedad N° {{ antipanic.propertyNumber }}
+        </ion-card-title>
+        <ion-card-subtitle>
+          {{ antipanic.createdAt | date:'dd/MM/yyyy' }} - {{ antipanic.createdAt | date:'shortTime' }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <div class="antipanic-info">
+          <div class="info-row">
+            <ion-icon name="person" color="primary"></ion-icon>
+            <span><strong>Propietario:</strong> {{ antipanic.owner.name }}</span>
+          </div>
+          
+          <div class="info-row">
+            <ion-icon name="shield-checkmark" [color]="antipanic.guard ? 'success' : 'medium'"></ion-icon>
+            <span><strong>Guardia:</strong> {{ antipanic.guard ? antipanic.guard.name : 'Nadie atendió' }}</span>
+          </div>
+        </div>
+        
+        <ion-button expand="block" (click)="showDetails(antipanic.details)" class="details-btn">
+          <ion-icon slot="start" name="information-circle"></ion-icon>
+          Ver Detalles
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-text color="medium" class="ion-text-center" *ngIf="(antipanics | filterBy: searchKey).length === 0">
+      <p>No hay registros de antipánico</p>
+    </ion-text>
+  </div>
+
+  <!-- 💻 Vista DESKTOP: Tabla -->
+  <div class="desktop-view">
+    <div class="table-container">
+      <table class="table text-center">
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Hora</th>
+            <th scope="col">Prop N°</th>
+            <th scope="col">Propietario</th>
+            <th scope="col">Guardia</th>
+            <th scope="col">Detalles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let antipanic of antipanics| filterBy: searchKey ; let i = index">
+            <td> {{antipanic.createdAt | date}} </td>
+            <td> {{antipanic.createdAt | date:'shortTime'}} </td>
+            <td class="text-center">{{antipanic.propertyNumber}}</td>
+            <td>{{antipanic.owner.name}} </td>
+            <td *ngIf="antipanic.guard" class="text-center"> {{antipanic.guard.name}} </td>
+            <td *ngIf="!antipanic.guard" class="text-center"> Nadie atendió </td>
+            <td class="text-center">
+              <ion-button (click)="showDetails(antipanic.details)" shape="round" size="small">
+                Detalles
+              </ion-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </ion-content>
