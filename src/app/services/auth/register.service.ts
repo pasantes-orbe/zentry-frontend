@@ -147,5 +147,74 @@ export class RegisterService {
     this._http.post(`${environment.URL}/api/${rol}/assign`, formData)
       .subscribe(res => console.log(res));
   }
+
+  // Nuevo método que permite ejecutar un callback después de crear el usuario
+  public registerWithCallback(
+    name: string,
+    lastName: string,
+    dni: any,
+    email: any,
+    password: any,
+    phone: any,
+    birthdate: any,
+    avatar: File,
+    rol: any,
+    onSuccess?: (userId: number) => Promise<void>
+  ) {
+    this._rols.filtrarPorRol(rol).subscribe(async (data) => {
+      this.id = data[0].id;
+      const formData = new FormData();
+      formData.append('avatar', avatar);
+      formData.append('name', name);
+      formData.append('lastname', lastName);
+      formData.append('dni', dni);
+      formData.append('phone', phone);
+      formData.append('birthday', birthdate);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('role_id', this.id);
+
+      this._http.post(`${environment.URL}/api/users`, formData)
+        .subscribe(
+          async (res) => {
+            const userId = res['user']['id'];
+            
+            // Ejecutar el callback si existe (para crear horarios, etc.)
+            if (onSuccess) {
+              await onSuccess(userId);
+            }
+
+            await this._alertService.removeLoading();
+            this._alertService.showAlert("¡Listo!", `El usuario ${rol} fue creado con éxito`);
+
+            if (rol === 'propietario') {
+              this.asignarCountry(userId, 'owners');
+              await this.goToDashboardWithSpinner();
+            } else if (rol == 'vigilador') {
+              this._guardStorageService.saveGuard(userId);
+              this.asignarCountry(userId, 'guards');
+              await this.goToDashboardWithSpinner();
+            } else {
+              await this.goToDashboardWithSpinner();
+            }
+          },
+          async (err: any) => {
+            await this._alertService.removeLoading();
+            console.log(err.error?.errors?.[0]?.["msg"]);
+            console.log(err);
+
+            if (err['status'] == 0) {
+              await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
+            } else if (err.error?.errors?.[0]?.["msg"] != '' || err.error?.errors?.[0]?.["msg"] != undefined || err.error?.errors?.[0]?.["msg"] != null) {
+              await this._alertService.showAlert("Oops ha ocurrido un error!", `${err.error.errors[0]["msg"]}`);
+              this._router.navigate(['/admin/home']);
+            } else {
+              this._router.navigate(['/admin/home']);
+              await this._alertService.showAlert("¡Ooops!", ` Ha ocurrido un error `);
+            }
+          }
+        );
+    });
+  }
   
 }

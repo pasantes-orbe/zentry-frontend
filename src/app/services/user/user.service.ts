@@ -83,7 +83,13 @@ export class UserService {
     }
 
     deleteUserById(id){
-      return this._htpp.patch(`${environment.URL}/api/users/delete-user/${id}`, {})
+      // Usar el endpoint correcto que ahora existe en el backend
+      return this._htpp.delete(`${environment.URL}/api/users/${id}`)
+    }
+
+    // Método alternativo: desactivar usuario en lugar de eliminarlo
+    deactivateUserById(id){
+      return this._htpp.patch(`${environment.URL}/api/users/deactivate/${id}`, { isActive: false })
     }
 
 }

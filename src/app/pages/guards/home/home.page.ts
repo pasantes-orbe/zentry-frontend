@@ -51,6 +51,9 @@ export class HomePage implements OnInit, OnDestroy {
     // Esperar 1 segundo para asegurar conexión
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    // Escuchar notificaciones de antipánico
+    this._webSocketService.escucharNotificacionesAntipanico();
+    
     await this.startLocationTracking();
   }
 

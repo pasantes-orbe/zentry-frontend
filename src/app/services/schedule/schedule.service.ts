@@ -46,20 +46,49 @@ export class ScheduleService {
     // Aseguramos que countryID se use como string para FormData
     console.log("CountryID a usar:", countryID);
 
+    // Convertir las horas a formato timestamp completo
+    // PostgreSQL espera formato: 'YYYY-MM-DD HH:MM:SS' o 'HH:MM:SS' sin fecha
+    // Usamos una fecha ficticia para crear el timestamp
+    const formatTime = (time: string) => {
+      // Si ya tiene formato HH:MM, agregar :00 para los segundos
+      if (time.match(/^\d{2}:\d{2}$/)) {
+        return `1970-01-01 ${time}:00`;
+      }
+      // Si ya tiene formato HH:MM:SS, agregar fecha
+      if (time.match(/^\d{2}:\d{2}:\d{2}$/)) {
+        return `1970-01-01 ${time}`;
+      }
+      return time;
+    };
 
-    const formData = new FormData();
-    formData.append('id_country', countryID); // Usar directamente countryID (que ya es string)
-    formData.append('id_user', guardID);
-    formData.append('week_day', day);
-    formData.append('start', start);
-    formData.append('exit', exit);
+    const startFormatted = formatTime(start);
+    const exitFormatted = formatTime(exit);
 
+    const formData = new FormData();
+    formData.append('id_country', countryID);
+    formData.append('id_user', guardID);
+    formData.append('week_day', day);
+    formData.append('start', startFormatted);
+    formData.append('exit', exitFormatted);
 
-    this._http.post(`${environment.URL}/api/guards/schedule`, formData).subscribe(
-      res =>{
-        console.log(res)
-      }
-    )
+    console.log('=== DEBUG: Enviando al backend ===');
+    console.log('URL:', `${environment.URL}/api/guards/schedule`);
+    console.log('FormData contents:');
+    console.log('  id_country:', countryID);
+    console.log('  id_user:', guardID);
+    console.log('  week_day:', day);
+    console.log('  start:', start, '→', startFormatted);
+    console.log('  exit:', exit, '→', exitFormatted);
+
+    this._http.post(`${environment.URL}/api/guards/schedule`, formData).subscribe(
+      res =>{
+        console.log('✅ Respuesta exitosa del backend:', res)
+      },
+      err => {
+        console.error('❌ Error del backend:', err);
+        console.error('Error details:', err.error);
+      }
+    )
 
 
   }

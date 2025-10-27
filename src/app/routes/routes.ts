@@ -68,6 +68,23 @@ export const routes: Routes = [
     ],
   },
 
+  // Redirect alternativo para tabs (compatibilidad)
+  {
+    path: 'tabs/tab1',
+    redirectTo: 'home/tab1',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tabs/tab2',
+    redirectTo: 'home/tab2',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tabs/tab3',
+    redirectTo: 'home/tab3',
+    pathMatch: 'full',
+  },
+
   // ───────────────────────────────────────────────────────────────────────────────
   // GUARDS
   // ───────────────────────────────────────────────────────────────────────────────
@@ -148,6 +165,13 @@ export const routes: Routes = [
   // Amenities
   {
     path: 'admin/add-amenity',
+    canActivate: [AdminGuard],
+    loadComponent: () =>
+      import('../pages/admin/country-amenities/add-amenity/add-amenity.page')
+        .then(m => m.AddAmenityPage),
+  },
+  {
+    path: 'admin/nuevo-lugar-de-reserva',
     canActivate: [AdminGuard],
     loadComponent: () =>
       import('../pages/admin/country-amenities/add-amenity/add-amenity.page')
@@ -262,6 +286,13 @@ export const routes: Routes = [
         .then(m => m.AddGuardPage),
   },
   {
+    path: 'admin/nuevo-vigilador',
+    canActivate: [AdminGuard],
+    loadComponent: () =>
+      import('../pages/admin/guard-segment/add-guard/add-guard.page')
+        .then(m => m.AddGuardPage),
+  },
+  {
     path: 'admin/add-laboral-schedule',
     canActivate: [AdminGuard],
     loadComponent: () =>
@@ -314,6 +345,12 @@ export const routes: Routes = [
   },
   {
     path: 'new-income',
+    loadComponent: () =>
+      import('../pages/incomes/new-income/new-income.page')
+        .then(m => m.NewIncomePage),
+  },
+  {
+    path: 'nueva-autorizacion',
     loadComponent: () =>
       import('../pages/incomes/new-income/new-income.page')
         .then(m => m.NewIncomePage),

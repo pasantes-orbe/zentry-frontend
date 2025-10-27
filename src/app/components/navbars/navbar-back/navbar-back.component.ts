@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-navbar-back',
@@ -15,10 +16,24 @@ import { IonicModule } from '@ionic/angular';
 export class NavbarBackComponent implements OnInit {
 
     @Input('title') title: string = '';
+    @Input('defaultHref') defaultHref: string = '/admin/country-dashboard';
 
-    constructor() { }
+    constructor(
+        private location: Location,
+        private router: Router
+    ) { }
 
     ngOnInit() { }
+
+    public goBack(): void {
+        // Intentar volver atrás en el historial
+        if (window.history.length > 1) {
+            this.location.back();
+        } else {
+            // Si no hay historial, ir al defaultHref
+            this.router.navigate([this.defaultHref]);
+        }
+    }
 
     public getTitle(): string {
         return this.title;

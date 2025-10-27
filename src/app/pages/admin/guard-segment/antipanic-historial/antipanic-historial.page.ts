@@ -4,7 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
 //Servicios
-import { AntipanicService } from 'src/app/services/antipanic/antipanic.service';
+import { AntipanicService, Antipanic } from 'src/app/services/antipanic/antipanic.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
@@ -13,14 +13,6 @@ import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navb
 
 // Pipes
 import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
-
-// Es una buena práctica definir una interfaz para la forma de tus datos.
-interface AntipanicEvent {
-  id: number;
-  details: string | null;
-  createdAt: string; // O Date, dependiendo de lo que devuelva tu API
-  // Añade aquí otras propiedades que pueda tener un evento antipánico.
-}
 
 @Component({
   selector: 'app-antipanic-historial',
@@ -38,7 +30,7 @@ interface AntipanicEvent {
 export class AntipanicHistorialPage implements OnInit {
 
   // CORRECCIÓN 1: Se cambia 'protected' a 'public' y se inicializa con un tipo.
-  public antipanics: AntipanicEvent[] = [];
+  public antipanics: Antipanic[] = [];
 
   // CORRECCIÓN 2: Se declara la propiedad 'searchKey' que faltaba para el buscador.
   public searchKey: string = '';
@@ -71,20 +63,12 @@ export class AntipanicHistorialPage implements OnInit {
           // Se asegura de que los datos sean un array antes de intentar ordenarlos.
           if (Array.isArray(antipanics)) {
             // Se ordena de más reciente a más antiguo.
-            this.antipanics = antipanics
-              .map(a => ({
-              ...a,
-              // fuerzo number por si viene como string
-              id: typeof a.id === 'string' ? Number(a.id) : a.id,
-              // AntipanicEvent exige details: string | null
-              details: a.details ?? null
-              }) as AntipanicEvent)
-              .sort((a, b) => {
+            this.antipanics = antipanics.sort((a, b) => {
               const ta = new Date(a.createdAt ?? '').getTime();
               const tb = new Date(b.createdAt ?? '').getTime();
-              return tb - ta; // más recientes primero (ajustá si querés)
-              });
-            console.log(this.antipanics);
+              return tb - ta; // más recientes primero
+            });
+            console.log('Eventos antipánico cargados:', this.antipanics);
           } else {
             this.antipanics = [];
           }

@@ -1,1 +1,117 @@
 @use "/src/theme/tables.scss";
+
+// ==========================================
+// 📱 RESPONSIVE DESIGN
+// ==========================================
+
+// Por defecto: Mostrar solo MÓVIL
+.mobile-view {
+  display: block;
+}
+
+.desktop-view {
+  display: none;
+}
+
+// 💻 DESKTOP (pantallas > 768px): Mostrar solo TABLA
+@media (min-width: 768px) {
+  .mobile-view {
+    display: none;
+  }
+  
+  .desktop-view {
+    display: block;
+  }
+}
+
+// ==========================================
+// 📱 ESTILOS PARA CARDS (MÓVIL)
+// ==========================================
+
+.schedule-card {
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  
+  ion-card-content {
+    padding: 12px;
+  }
+  
+  .guard-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ion-color-light);
+    
+    ion-icon {
+      font-size: 1.8rem;
+    }
+    
+    strong {
+      font-size: 1rem;
+      color: var(--ion-color-dark);
+    }
+  }
+  
+  .schedule-time {
+    display: flex;
+    justify-content: space-around;
+    gap: 16px;
+    
+    .time-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      padding: 8px;
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      
+      ion-icon {
+        font-size: 1.5rem;
+      }
+      
+      span {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+      }
+    }
+  }
+}
+
+// ==========================================
+// 💻 ESTILOS PARA TABLA (DESKTOP)
+// ==========================================
+
+.desktop-view {
+  table {
+    width: 100%;
+    
+    th {
+      font-weight: 600;
+      padding: 12px 8px;
+      background-color: var(--ion-color-light);
+    }
+    
+    td {
+      padding: 10px 8px;
+    }
+  }
+}
+
+// ==========================================
+// 🎨 MEJORAS GENERALES
+// ==========================================
+
+ion-accordion-group {
+  margin-top: 16px;
+}
+
+ion-accordion {
+  margin-bottom: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+}

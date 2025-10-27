@@ -205,6 +205,9 @@ export class CountryDashboardPage implements OnInit {
   goToAddGuard() {
     this.router.navigate(['/admin/add-guard'], { queryParams: { countryId: this.country?.id } });
   }
+  goToPasswordRequests() {
+    this.router.navigate(['/admin/password-requests'], { queryParams: { countryId: this.country?.id } });
+  }
 
   // Eventos / Amenities
   goToAmenities() {

@@ -11,6 +11,7 @@ import { OwnerStorageService } from 'src/app/services/storage/owner-interface-st
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { CountriesService } from 'src/app/services/countries/countries.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -70,6 +71,7 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     private countrySvc: CountriesService,
     private alerts: AlertService,
     private alertCtrl: AlertController,
+    private userStorage: UserStorageService,
   ) {}
 
   async ngOnInit() {
@@ -303,8 +305,12 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     this.isSending = true;
 
     try {
+      // 🔧 CORRECCIÓN: Obtener id_owner del usuario logueado (JWT) en lugar del storage
+      const user = await this.userStorage.getUser().catch(() => null);
+      const id_owner = user?.id ?? null;
+      
+      // Obtener datos de la propiedad del storage (solo para address y propertyNumber)
       const owner = await this.ownerStorage.getOwner().catch(() => null);
-      const id_owner = owner?.id ?? owner?.owner?.id ?? null;
       const address = owner?.property?.address ?? '';
       const propertyNumber = owner?.property?.propertyNumber ?? owner?.property?.number ?? '';
 
@@ -313,6 +319,8 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
         this.isSending = false;
         return;
       }
+
+      console.log('🔧 [ANTIPANIC] Usando id_owner del usuario logueado:', id_owner);
 
       // ==== GEOLOCALIZACIÓN REAL ====
       navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -328,8 +336,11 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
           this.antipanicId = this.pickAntipanicId(resp);
 
           if (!this.demoMode) {
-            this.socketSvc.emitirEvento('owner-antipanico-activado', {
-              id_country: this.id_country, id_owner, antipanicId: this.antipanicId, lat, lng, ts: Date.now()
+            // El socket espera { res: response, ownerName, ownerLastName }
+            this.socketSvc.notificarAntipanico({
+              res: resp,
+              ownerName: user?.name || '',
+              ownerLastName: user?.lastname || ''
             });
           }
 

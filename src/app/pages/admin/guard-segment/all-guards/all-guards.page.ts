@@ -9,6 +9,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 //Servicios
 import { GuardsService } from '../../../../services/guards/guards.service';
 import { UserService } from 'src/app/services/user/user.service';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 //Interfaces
 import { GuardInterface } from '../../../../interfaces/guard-interface';
@@ -68,6 +69,9 @@ export class AllGuardsPage implements OnInit {
   public searchKey: string = '';
   public searchKey1: string = '';
   private countryId: string | null = null; // Para almacenar el ID del country
+  
+  // Set de IDs de guardias activos (enviando ubicación)
+  private activeGuardIds = new Set<number>();
 
 
   constructor(
@@ -75,21 +79,31 @@ export class AllGuardsPage implements OnInit {
     private modalCtrl: ModalController,
     private _userService: UserService,
     private alertCtrl: AlertController,
-    private route: ActivatedRoute // Inyectamos ActivatedRoute para obtener parámetros de la URL
-
+    private route: ActivatedRoute, // Inyectamos ActivatedRoute para obtener parámetros de la URL
+    private socketSvc: WebSocketService // WebSocket para detectar guardias activos
   ) { }
 
-  ngOnInit() {
-    //this.loadGuards();
-        this.route.queryParams.subscribe(params => {
-        this.countryId = params['countryId'];
-        if (this.countryId) {
-            this.loadGuards();
-        } else {
-            console.error("No se encontró el countryId en los parámetros de la URL.");
-        }
-    });
-  }
+  async ngOnInit() {
+    // Conectar WebSocket
+    await this.socketSvc.conectar();
+    
+    // Escuchar guardias activos
+    this.socketSvc.escucharEvento('get-actives-guards', (activeGuards: any[]) => {
+      console.log('[AllGuards] Guardias activos recibidos:', activeGuards);
+      // Actualizar set de IDs activos
+      this.activeGuardIds.clear();
+      activeGuards.forEach((g: any) => this.activeGuardIds.add(Number(g.id_user)));
+    });
+    
+    this.route.queryParams.subscribe(params => {
+      this.countryId = params['countryId'];
+      if (this.countryId) {
+        this.loadGuards();
+      } else {
+        console.error("No se encontró el countryId en los parámetros de la URL.");
+      }
+    });
+  }
 
   ionViewWillEnter() {
     if (this.countryId) {
@@ -105,11 +119,16 @@ export class AllGuardsPage implements OnInit {
       }
 
     // [INICIO DE CÓDIGO REAL - CONSUMO DE API]
-    this._guardsService.getAllByCountryID(this.countryId).subscribe({
-            // rawGuards será el array de { guard, working } según el contrato del backend.
-            next: (rawGuards: any[]) => {
-                
-                if (!Array.isArray(rawGuards)) {
+     this._guardsService.getAllByCountryID(this.countryId).subscribe({
+            // rawGuards será el array de { guard, working } según el contrato del backend.
+            next: (rawGuards: any[]) => {
+                console.log('=== DEBUG: Respuesta completa del backend ===');
+                console.log('rawGuards:', rawGuards);
+                console.log('Tipo:', typeof rawGuards);
+                console.log('Es array?:', Array.isArray(rawGuards));
+                console.log('Longitud:', rawGuards?.length);
+                
+                if (!Array.isArray(rawGuards)) {
                     // Si el backend por algún motivo no devuelve un array directamente, manejamos el error.
                     console.error("La API no devolvió un array válido de horarios de vigiladores.");
                     this.guards = [];
@@ -203,24 +222,32 @@ export class AllGuardsPage implements OnInit {
       ];*/
       // [FIN CÓDIGO MOCK COMENTADO]
 
-      // Filtrar guardias activos. Utilizamos la data real (rawGuards) y optional chaining (?. )
-      // La estructura esperada es: item.guard.user.isActive
-      //const activeGuards = mockGuardsData.filter(guard => guard.guard.user.isActive !== false);
-      const activeGuards = rawGuards.filter(guard => guard.guard?.user?.isActive !== false);
+       // Filtrar guardias activos. Utilizamos la data real (rawGuards) y optional chaining (?. )
+      // La estructura esperada es: item.guard.user.isActive
+      //const activeGuards = mockGuardsData.filter(guard => guard.guard.user.isActive !== false);
+      const activeGuards = rawGuards.filter(guard => guard.guard?.user?.isActive !== false);
+      
+      console.log('=== DEBUG: Después del filtro de activos ===');
+      console.log('activeGuards:', activeGuards);
+      console.log('Cantidad de guardias activos:', activeGuards.length);
+      
+      // Agrupar horarios por guardia
+      const guardsGroupedByUser = this.groupGuardsByUser(activeGuards);
+      
+      console.log('=== DEBUG: Después de agrupar ===');
+      console.log('guardsGroupedByUser:', guardsGroupedByUser);
+      console.log('Cantidad agrupados:', guardsGroupedByUser.length);
+      
+      // Separar los que están trabajando de los que no
+      const { working, notWorking } = this.separateWorkingGuards(guardsGroupedByUser);
 
-      
-      // Agrupar horarios por guardia
-      const guardsGroupedByUser = this.groupGuardsByUser(activeGuards);
-      
-      // Separar los que están trabajando de los que no
-      const { working, notWorking } = this.separateWorkingGuards(guardsGroupedByUser);
+      this.guards = working;
+      this.guardsOut = notWorking;
 
-      this.guards = working;
-      this.guardsOut = notWorking;
-
-      //console.log('Guardias con horario de trabajo (DEMO):', this.guards);
-      //console.log('Guardias sin horario de trabajo (DEMO):', this.guardsOut);
-      console.log('Guardias cargados desde la API:', this.guards.length + this.guardsOut.length);
+      console.log('=== DEBUG: Resultado final ===');
+      console.log('Guardias trabajando:', this.guards);
+      console.log('Guardias fuera de servicio:', this.guardsOut);
+      console.log('Total guardias cargados:', this.guards.length + this.guardsOut.length);
 
           },
           error: (err) => {
@@ -279,16 +306,102 @@ private groupGuardsByUser(guards: any[]): any[] {
     const working = [];
     const notWorking = [];
 
+    // Obtener día y hora actual
+    const now = new Date();
+    const currentDay = now.getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // Minutos desde medianoche
+
+    console.log('=== DEBUG: Verificando horarios ===');
+    console.log('Día actual:', currentDay, '(0=Dom, 1=Lun, ..., 6=Sáb)');
+    console.log('Hora actual:', `${now.getHours()}:${now.getMinutes()}`, `(${currentTime} minutos)`);
+
     for (const userGroup of groupedGuards) {
-      const hasWorkingSchedule = userGroup.schedules.some(schedule => schedule.working);
+      const hasSchedules = userGroup.schedules && userGroup.schedules.length > 0;
       
-      if (hasWorkingSchedule) {
+      console.log(`\n--- Evaluando: ${userGroup.guard.user.name} ---`);
+      console.log('Tiene horarios?', hasSchedules);
+      if (hasSchedules) {
+        console.log('Cantidad de horarios:', userGroup.schedules.length);
+        console.log('Primer horario completo:', JSON.stringify(userGroup.schedules[0], null, 2));
+      }
+      
+      if (!hasSchedules) {
+        notWorking.push(userGroup);
+        continue;
+      }
+
+      // Verificar si está trabajando AHORA
+      const isWorkingNow = userGroup.schedules.some(schedule => {
+        // Los datos están dentro de schedule.guard
+        const guardData = schedule.guard;
+        const scheduleDay = parseInt(guardData.week_day); // 1=Lunes, 7=Domingo
+        
+        // Convertir week_day del backend (1-7) a formato JavaScript (0-6)
+        // Backend: 1=Lun, 2=Mar, ..., 7=Dom
+        // JS: 0=Dom, 1=Lun, ..., 6=Sáb
+        const scheduleDayJS = scheduleDay === 7 ? 0 : scheduleDay;
+
+        if (scheduleDayJS !== currentDay) {
+          return false; // No es el día correcto
+        }
+
+        // Parsear horas de inicio y fin (formato ISO: "1970-01-01T20:00:00.000Z")
+        const startTime = this.parseTimeToMinutes(guardData.start);
+        const endTime = this.parseTimeToMinutes(guardData.exit);
+
+        console.log(`  Día ${scheduleDay}, ${guardData.start} - ${guardData.exit} (${startTime}-${endTime} min)`);
+
+        // Verificar si la hora actual está dentro del rango
+        // Si endTime < startTime, el horario cruza medianoche (ej: 17:00 a 01:00)
+        if (endTime < startTime) {
+          // Horario que cruza medianoche
+          const isInRange = currentTime >= startTime || currentTime <= endTime;
+          console.log(`  Cruza medianoche: ${isInRange ? '✅' : '❌'}`);
+          return isInRange;
+        } else {
+          // Horario normal
+          const isInRange = currentTime >= startTime && currentTime <= endTime;
+          console.log(`  Horario normal: ${isInRange ? '✅' : '❌'}`);
+          return isInRange;
+        }
+      });
+
+      if (isWorkingNow) {
+        console.log(`  ✅ ${userGroup.guard.user.name} está trabajando AHORA`);
         working.push(userGroup);
       } else {
+        console.log(`  ❌ ${userGroup.guard.user.name} NO está trabajando ahora`);
         notWorking.push(userGroup);
       }
     }
     return { working, notWorking };
+  }
+
+  // Helper para convertir hora en formato ISO, "HH:MM:SS" o timestamp a minutos desde medianoche
+  private parseTimeToMinutes(timeString: string): number {
+    if (!timeString) return 0;
+    
+    // Si es formato ISO (contiene 'T'), crear objeto Date y extraer hora LOCAL
+    if (timeString.includes('T')) {
+      const date = new Date(timeString);
+      // Usar getHours() para obtener la hora en la zona horaria local del navegador
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      return hours * 60 + minutes;
+    }
+    
+    // Extraer solo la parte de la hora si es un timestamp completo
+    // Formato: "1970-01-01 08:00:00" o "08:00:00"
+    let timePart = timeString;
+    if (timeString.includes(' ')) {
+      timePart = timeString.split(' ')[1]; // Tomar la parte después del espacio
+    }
+    
+    const parts = timePart.split(':');
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    
+    return hours * 60 + minutes;
   }
 
   handleRefresh(event) {
@@ -311,24 +424,31 @@ private groupGuardsByUser(guards: any[]): any[] {
           text: 'Confirmar',
           cssClass: 'red',
           handler: () => {
-            // Para la demo, solo filtrar el guardia localmente
-            this.guards = this.guards.filter(guard => guard.guard.user.id !== userId);
-            this.guardsOut = this.guardsOut.filter(guard => guard.guard.user.id !== userId);
-            console.log('Guardia eliminado de la demo:', userId);
-            
-            // Código original comentado
-            /*
             this._userService.deleteUserById(userId).subscribe({
               next: res => {
-                console.log(res);
+                console.log('Guardia eliminado exitosamente:', res);
                 this.loadGuards(); 
               },
-              error: err => console.error("Error al eliminar el guardia:", err)
+              error: err => {
+                console.error("Error al eliminar el guardia:", err);
+                const errorMsg = err.status === 404 
+                  ? 'El endpoint de eliminación no está disponible en el backend. Contacte al administrador del sistema.'
+                  : `Error ${err.status}: ${err.message || 'No se pudo eliminar el guardia.'}`;
+                this.showErrorAlert(errorMsg);
+              }
             });
-            */
           },
         }
       ],
+    });
+    await alert.present();
+  }
+
+  private async showErrorAlert(message: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message: message,
+      buttons: ['OK']
     });
     await alert.present();
   }
@@ -368,6 +488,30 @@ private groupGuardsByUser(guards: any[]): any[] {
 
   public getTotalGuardsCount(): number {
     return this.guards.length + this.guardsOut.length;
+  }
+
+  /**
+   * Verifica si un guardia está activo (enviando ubicación)
+   */
+  public isGuardActive(guard: any): boolean {
+    const userId = guard?.guard?.user?.id;
+    return userId ? this.activeGuardIds.has(Number(userId)) : false;
+  }
+
+  /**
+   * Obtiene el texto del badge de estado
+   */
+  public getGuardStatusText(guard: any): string {
+    const isActive = this.isGuardActive(guard);
+    return isActive ? '🟢 Activo' : '⚪ Inactivo';
+  }
+
+  /**
+   * Obtiene el color del badge de estado
+   */
+  public getGuardStatusColor(guard: any): string {
+    const isActive = this.isGuardActive(guard);
+    return isActive ? 'success' : 'medium';
   }
 
   // Getter para guardias filtrados

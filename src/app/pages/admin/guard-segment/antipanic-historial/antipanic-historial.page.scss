@@ -1,0 +1,126 @@
+// ==========================================
+// 📱 RESPONSIVE DESIGN
+// ==========================================
+
+// Por defecto: Mostrar solo MÓVIL
+.mobile-view {
+  display: block;
+}
+
+.desktop-view {
+  display: none;
+}
+
+// 💻 DESKTOP (pantallas > 768px): Mostrar solo TABLA
+@media (min-width: 768px) {
+  .mobile-view {
+    display: none;
+  }
+  
+  .desktop-view {
+    display: block;
+  }
+}
+
+// ==========================================
+// 📱 ESTILOS PARA CARDS (MÓVIL)
+// ==========================================
+
+.antipanic-card {
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--ion-color-danger);
+  
+  ion-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    ion-icon {
+      font-size: 1.4rem;
+    }
+  }
+  
+  ion-card-subtitle {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    color: var(--ion-color-medium);
+  }
+  
+  .antipanic-info {
+    margin-bottom: 16px;
+    
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      
+      ion-icon {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+      }
+      
+      span {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        
+        strong {
+          color: var(--ion-color-dark);
+        }
+      }
+    }
+  }
+  
+  .details-btn {
+    margin-top: 8px;
+    --border-radius: 8px;
+  }
+}
+
+// ==========================================
+// 💻 ESTILOS PARA TABLA (DESKTOP)
+// ==========================================
+
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  table {
+    width: 100%;
+    min-width: 700px;
+    
+    th {
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 12px 8px;
+      white-space: nowrap;
+      background-color: var(--ion-color-light);
+    }
+    
+    td {
+      padding: 12px 8px;
+      vertical-align: middle;
+      
+      ion-button {
+        --padding-start: 16px;
+        --padding-end: 16px;
+      }
+    }
+  }
+}
+
+// ==========================================
+// 🎨 MEJORAS GENERALES
+// ==========================================
+
+ion-searchbar {
+  --background: var(--ion-color-light);
+  --border-radius: 12px;
+  margin-bottom: 16px;
+}

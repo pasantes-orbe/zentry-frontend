@@ -26,7 +26,21 @@ export interface Antipanic {
   updatedAt?: string;
   status?: 'active' | 'finished' | 'cancelled';
   details?: string;
-  // agregá campos extras si tu API los devuelve
+  // Relaciones pobladas por el backend
+  owner?: {
+    id: number | string;
+    name: string;
+    lastname?: string;
+    email?: string;
+    phone?: string;
+  };
+  guard?: {
+    id: number | string;
+    name: string;
+    lastname?: string;
+    email?: string;
+  };
+  id_guard?: number | string;
 }
 
 export interface AntipanicStatus {
