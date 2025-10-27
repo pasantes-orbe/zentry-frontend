@@ -1,4 +1,4 @@
-//src/app/services/storage/user-storage.service.ts
+// src/app/services/storage/user-storage.service.ts
 import { Injectable } from '@angular/core';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { Storage } from '@ionic/storage-angular';
@@ -23,9 +23,20 @@ export class UserStorageService {
     }
   }
 
+  private async ensureReady(): Promise<void> {
+    let tries = 0;
+    while (!this._storage && tries < 5) {
+      await this.init();
+      tries++;
+      if (!this._storage) await new Promise(r => setTimeout(r, 50));
+    }
+    if (!this._storage) throw new Error('Storage no inicializado');
+  }
+
   public async saveUser(user: UserInterface): Promise<void> {
     try {
-      await this._storage?.set('user', user);
+      await this.ensureReady();
+      await this._storage!.set('user', user);
       console.log('Usuario guardado correctamente.');
     } catch (error) {
       console.error('Error al guardar el usuario:', error);
@@ -34,25 +45,9 @@ export class UserStorageService {
 
   public async getUser(): Promise<UserInterface | null> {
     try {
-      const user = await this._storage?.get('user');
+      await this.ensureReady();
+      const user = await this._storage!.get('user');
       console.log('Usuario obtenido:', user);
-
-      //INYECCION. CODIGO TEMPORAL
-      //let user = await this._storage?.get('user'); // 1. Intenta obtener el usuario. 
-      //if (!user) {
-      //const adminUser: UserInterface = {
-      //    id: 1, 
-      //    email: 'admin@prueba.com', // Usa el email registrado
-      //    name: 'Administrador',
-      //    lastname: 'Jefe',
-      //    roles: [{ id: 1, name: 'administrador' }] 
-      //  };
-      //  console.warn("ALERTA: Sesión forzada de Administrador para pruebas.");
-      //  await this.saveUser(adminUser); // Guarda la sesión en el storage
-      //  user = adminUser; // Usa este objeto para el retorno
-      //}
-
-      console.log('Usuario obtenido:', user);
       return user || null;
     } catch (error) {
       console.error('Error al obtener el usuario:', error);
@@ -62,7 +57,8 @@ export class UserStorageService {
 
   public async hasUser(): Promise<boolean> {
     try {
-      const user = await this._storage?.get('user');
+      await this.ensureReady();
+      const user = await this._storage!.get('user');
       return !!user;
     } catch (error) {
       console.error('Error al verificar si existe un usuario:', error);
@@ -72,7 +68,8 @@ export class UserStorageService {
 
   public async clearUser(): Promise<void> {
     try {
-      await this._storage?.remove('user');
+      await this.ensureReady();
+      await this._storage!.remove('user');
       console.log('Usuario eliminado correctamente.');
     } catch (error) {
       console.error('Error al eliminar el usuario:', error);

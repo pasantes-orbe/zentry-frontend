@@ -14,8 +14,14 @@
     </ion-item>
     <ion-item *ngFor="let guest of guests | filterBy:searchKey; let i = index">
       <ion-label>
-        <h2>{{guest.fullname}} </h2>
-        <p>{{guest.dni}}</p>
+        <h2>
+          {{ (guest.fullname)
+            || (guest.guest_name + ' ' + guest.guest_lastname)
+            || (guest.nombre + ' ' + guest.apellido)
+            || (guest.name + ' ' + guest.lastname)
+          }}
+        </h2>
+        <p>{{ guest.dni || guest.idNumber || guest.documento || 'DNI no provisto' }}</p>
       </ion-label>
     </ion-item>
   </ion-list>

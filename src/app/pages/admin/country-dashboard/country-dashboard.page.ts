@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 // Servicios + tipos
 import { CountriesService } from '../../../services/countries/countries.service';
@@ -12,6 +13,7 @@ import { CountryInteface } from '../../../interfaces/country-interface';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { NotificationInterface } from 'src/app/interfaces/notification-interface';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 
 // Componentes
 import { NavbarAdminComponent } from 'src/app/components/navbars/navbar-admin/navbar-admin.component';
@@ -31,7 +33,7 @@ import { NotificationsPopoverComponent } from 'src/app/components/notifications-
   templateUrl: './country-dashboard.page.html',
   styleUrls: ['./country-dashboard.page.scss']
 })
-export class CountryDashboardPage implements OnInit {
+export class CountryDashboardPage implements OnInit, OnDestroy {
   @ViewChild(NavbarAdminComponent) navbar?: NavbarAdminComponent;
 
   // Estado
@@ -42,7 +44,9 @@ export class CountryDashboardPage implements OnInit {
   // Notificaciones
   notifications: NotificationInterface[] = [];
   unreadCount = 0;
-  private userIdForNotifications: number = 1; // fallback
+  userIdForNotifications: number | null = null;
+  private newNotifSub?: Subscription;
+  private notifRefreshSub?: Subscription;
 
   // Mock por defecto para poder entrar al dashboard sin data real
   private readonly MOCK_COUNTRY: CountryInteface = {
@@ -65,26 +69,38 @@ export class CountryDashboardPage implements OnInit {
     private countryStorage: CountryStorageService,
     public theme: ThemeService,
     private notificationsSvc: NotificationsService,
-    private userStorage: UserStorageService
+    private userStorage: UserStorageService,
+    private wsService: WebSocketService,
+    private popoverController: PopoverController
   ) {}
 
   async ngOnInit(): Promise<void> {
     // Tema por rol
     this.theme.init('admin');
 
-    // Intentamos tomar el id de usuario real para notificaciones
     try {
-      const user = await this.userStorage.getUser().catch(() => null as any);
-      if (user?.id) this.userIdForNotifications = Number(user.id);
-    } catch {}
+      const user = await this.userStorage.getUser().catch(() => null);
+      if (user?.id) {
+        this.userIdForNotifications = Number(user.id);
+      }
+    } catch (e) {
+      console.error('Error obteniendo ID de usuario para notificaciones', e);
+    }
 
-    // Carga de country por ?id=... o desde storage/mock
-    const idParam = this.route.snapshot.queryParamMap.get('id');
+    this.wsService.conectar().catch(err => console.error('❌ Error al conectar el WebSocket en dashboard:', err));
+    this.subscribeToNewNotifications();
+    // Refrescar contador/lista cuando se marquen como leídas desde el popover
+    if (!this.notifRefreshSub) {
+      this.notifRefreshSub = this.notificationsSvc.refresh$.subscribe(() => this.loadNotifications());
+    }
+
+    // Carga de country por parámetro o query
+    const idParam = this.route.snapshot.paramMap.get('id') ?? this.route.snapshot.queryParamMap.get('id');
     if (idParam) {
       this.countriesSvc.getByID(+idParam).subscribe({
         next: (c) => {
           this.country = c as CountryInteface;
-          this.countryStorage.saveCountry(this.country); // cache
+          this.countryStorage.saveCountry(this.country);
           this.loading = false;
           this.loadNotifications();
         },
@@ -99,6 +115,19 @@ export class CountryDashboardPage implements OnInit {
 
     await this.loadFromStorageOrMock();
     this.loadNotifications();
+  }
+
+  private subscribeToNewNotifications(): void {
+    if (this.newNotifSub) {
+      return;
+    }
+
+    this.newNotifSub = this.wsService.newNotification$.subscribe((newNotification: NotificationInterface) => {
+      console.log('Admin Dashboard: Nueva notificación recibida por WebSocket.', newNotification);
+      // Recargar la lista completa al recibir un evento para asegurar la sincronía
+      this.loadNotifications();
+      void this.notificationsSvc.presentToast('Nueva Reserva Pendiente', newNotification.content ?? 'Revisa la bandeja de reservas.');
+    });
   }
 
   private async loadFromStorageOrMock() {
@@ -118,12 +147,30 @@ export class CountryDashboardPage implements OnInit {
   }
 
   // ==========================
-  // Notificaciones
+  // Notificaciones (Refresca lista y contador)
   // ==========================
   private loadNotifications(): void {
-    this.notificationsSvc.getAllByUser(this.userIdForNotifications).subscribe({
+    // Cargar notificaciones del usuario autenticado (sin filtros por país/rol en el frontend)
+    const uid = this.userIdForNotifications ?? undefined;
+    this.notificationsSvc.getAllByUser(uid).subscribe({
       next: (list: any[]) => {
-        this.notifications = (list || []) as NotificationInterface[];
+        const arr = Array.isArray(list) ? list : [];
+        if (arr.length === 0) {
+          // Fallback a endpoint genérico si el backend guarda notifs de admin en un id fijo
+          this.notificationsSvc.getAllByUser(undefined).subscribe({
+            next: (all: any[]) => {
+              this.notifications = (Array.isArray(all) ? all : []) as NotificationInterface[];
+              this.unreadCount = this.notifications.filter(n => !n.read).length;
+            },
+            error: (err2) => {
+              console.error('Error cargando notificaciones (fallback):', err2);
+              this.notifications = [];
+              this.unreadCount = 0;
+            }
+          });
+          return;
+        }
+        this.notifications = arr as NotificationInterface[];
         this.unreadCount = this.notifications.filter(n => !n.read).length;
       },
       error: (err) => {
@@ -132,6 +179,33 @@ export class CountryDashboardPage implements OnInit {
         this.unreadCount = 0;
       }
     });
+  }
+
+  // ==========================
+  // Popover de Notificaciones (Se mantiene por si decides volver a usarlo así)
+  // ==========================
+  async openNotificationsPopover(ev: any) {
+    // Validación básica de datos cargados
+    if (this.loading || !this.notifications || !this.userIdForNotifications) {
+      console.warn('No se puede abrir el popover: datos no cargados o falta ID de usuario.');
+      return;
+    }
+
+    const pop = await this.popoverController.create({
+      component: NotificationsPopoverComponent,
+      event: ev,
+      translucent: true,
+      componentProps: { 
+        notifications: this.notifications,
+        userId: this.userIdForNotifications
+      }
+    });
+
+    pop.onDidDismiss().then(() => {
+      this.loadNotifications();
+    });
+
+    return pop.present();
   }
 
   // ==========================
@@ -168,7 +242,6 @@ export class CountryDashboardPage implements OnInit {
       this.router.navigate(['/login'], { replaceUrl: true });
     }
   }
-
   // Propiedades / Dueños
   goToViewProperties() {
     this.router.navigate(['/admin/view-properties'], { queryParams: { countryId: this.country?.id } });
@@ -212,5 +285,16 @@ export class CountryDashboardPage implements OnInit {
   }
   goToEventsHistorial() {
     this.router.navigate(['/admin/events-historial'], { queryParams: { countryId: this.country?.id } });
+  }
+
+  ngOnDestroy(): void {
+    if (this.newNotifSub) {
+      this.newNotifSub.unsubscribe();
+      this.newNotifSub = undefined;
+    }
+    if (this.notifRefreshSub) {
+      this.notifRefreshSub.unsubscribe();
+      this.notifRefreshSub = undefined;
+    }
   }
 }

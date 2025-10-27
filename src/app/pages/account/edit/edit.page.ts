@@ -27,7 +27,7 @@ export class EditPage implements OnInit {
   public readonly: boolean;
   private formBuilder: FormBuilder;
   private form: FormGroup;
-  public user;
+  public user: any;
   public name;
   public lastname;
   public phone;
@@ -81,6 +81,27 @@ export class EditPage implements OnInit {
       this.form.get('phone').value)
 
     this.form.markAsPristine()
+  }
+  
+  // Subir avatar del usuario
+  async onAvatarChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file || !this.user?.id) return;
+
+    this._userService.uploadAvatar(Number(this.user.id), file).subscribe({
+      next: async (res: any) => {
+        // Backend puede devolver { avatar: string } o { user: { avatar } }
+        const avatarUrl = res?.avatar || res?.user?.avatar || '';
+        if (avatarUrl) {
+          this.user = { ...this.user, avatar: avatarUrl };
+          await this._userStorage.saveUser(this.user);
+        }
+      },
+      error: (err) => {
+        console.error('Error subiendo avatar:', err);
+      }
+    });
   }
   getDate(event) {
 

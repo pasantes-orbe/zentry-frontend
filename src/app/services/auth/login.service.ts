@@ -13,6 +13,22 @@ export class LoginService {
     return this.http.post<{ token: string; role?: string }>(`${environment.URL}/api/auth/login`, data);
   }
 
+  /** Cambiar contraseña del usuario autenticado */
+  public changePassword(currentPassword: string, newPassword: string) {
+    return this.http.post<{ ok?: boolean; msg?: string }>(
+      `${environment.URL}/api/auth/change-password`,
+      { currentPassword, newPassword }
+    );
+  }
+
+  /** Restablecer contraseña mediante token (flujo por email) */
+  public resetPasswordWithToken(token: string, newPassword: string) {
+    return this.http.post<{ ok?: boolean; msg?: string }>(
+      `${environment.URL}/api/auth/reset-password`,
+      { token, newPassword }
+    );
+  }
+
   /** Valida JWT contra backend. Devuelve true/false; jamás fuerza sesión. */
   public async validJWT(): Promise<boolean> {
     const token = await this._authStorage.getJWT();

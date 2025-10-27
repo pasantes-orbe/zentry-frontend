@@ -28,6 +28,24 @@ export class OwnersService {
     return this._http.get<OwnerResponse[]>(`${environment.URL}/api/owners`);
   }
 
+  public async unassignOwnerFromProperty(user_id: number, property_id: number): Promise<void> {
+    const token = await this._auth.getJWT();
+    const httpOptions = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }),
+      body: {
+        id_user: Math.floor(Number(user_id)),
+        id_property: Math.floor(Number(property_id))
+      }
+    };
+
+    await lastValueFrom(
+      this._http.request('DELETE', `${environment.URL}/api/owners`, httpOptions)
+    );
+  }
+
   /**
    * Propietarios por country actual (intenta dos endpoints conocidos).
    * 1) /api/owners/country/get_by_id/:id

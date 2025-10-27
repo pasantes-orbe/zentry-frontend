@@ -54,12 +54,6 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.loadCountries();
     this.loadNotifications();
-
-    try {
-      this.notifSub = this.notificationsService.onNewNotification()?.subscribe(() => {
-        this.unreadCount++;
-      }) as Subscription;
-    } catch {}
   }
 
   ngOnDestroy(): void {
@@ -122,7 +116,7 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     console.log('🔍 Cargando notificaciones para usuario ID:', this.user.id);
-    this.notificationsService.getAllByUser(this.user.id).subscribe({
+    this.notificationsService.getAllByUser().subscribe({
       next: (list: any[]) => {
         this.unreadCount = (list || []).filter(n => !n.read).length;
         console.log('✅ Notificaciones cargadas:', list?.length || 0, 'No leídas:', this.unreadCount);

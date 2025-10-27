@@ -108,12 +108,15 @@ export class AddCountryPage implements AfterViewInit, OnDestroy {
 
     const centerIcon = L.icon({
       iconUrl: 'assets/marker.png',
-      shadowUrl: 'assets/logos/marker-shadow.png',
-      iconSize: [35, 35],
-      shadowSize: [50, 64],
-      iconAnchor: [17, 35],
-      shadowAnchor: [4, 62],
-      popupAnchor: [0, -35]
+      //shadowUrl: 'assets/logos/marker-shadow.png',
+      //iconSize: [35, 35],
+      iconSize: [40,40],
+      //shadowSize: [50, 64],
+      //iconAnchor: [17, 35],
+      iconAnchor: [20, 40],
+      //shadowAnchor: [4, 62],
+      //popupAnchor: [0, -35],
+      popupAnchor: [0, -40],
     });
 
     this.marker = L.marker([this.lat, this.lng], {

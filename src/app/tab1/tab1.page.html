@@ -17,14 +17,22 @@
         </ion-toggle>
       </ion-item>
 
-      <ion-button fill="clear" class="notification-button" (click)="onNotificationClick()">
-        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      <ion-button id="owner-tab1-notifications-trigger" class="notifications-button" fill="clear">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <ion-badge *ngIf="unreadCount > 0" class="notif-badge">{{ unreadCount }}</ion-badge>
       </ion-button>
       <ion-avatar>
-        <img src="https://placehold.co/64x64/374151/FFFF?text=U" />
+        <img [src]="getAvatarUrl()" />
       </ion-avatar>
     </ion-buttons>
   </ion-toolbar>
+  <!-- Popover de notificaciones (igual a Admin) -->
+  <ion-popover trigger="owner-tab1-notifications-trigger" triggerAction="click" [dismissOnSelect]="false" class="notifications-popover">
+    <ng-template>
+      <app-notifications-popover [userId]="userID" [navigateOnClick]="false"></app-notifications-popover>
+    </ng-template>
+  </ion-popover>
+
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -64,7 +72,8 @@
           <ion-button 
             expand="block" 
             color="primary"
-            (click)="authorizeQuickVisit()"
+            (click)="authorizeQuickVisit()
+            "
             [disabled]="!guestName.trim() || !guestLastname.trim() || !guestDNI.trim()">
             Autorizar
           </ion-button>
@@ -107,12 +116,13 @@
         </ion-toolbar>
       </ion-header>
       
-      <ion-content>
-        <ion-list>
+      <ion-content class="ion-padding">
+        <!-- Lista cuando amenities$ ya tiene datos -->
+        <ion-list *ngIf="amenities$ | async as amenities">
           <ion-item>
-            <ion-select placeholder="Seleccionar Amenity" [(ngModel)]="selectedAmenity">
-              <ion-select-option *ngFor="let amenity of amenities" [value]="amenity">
-                {{amenity}}
+            <ion-select placeholder="Seleccionar Amenity" [(ngModel)]="selectedAmenityId">
+              <ion-select-option *ngFor="let amenity of amenities" [value]="amenity.id">
+                {{amenity.name}}
               </ion-select-option>
             </ion-select>
           </ion-item>
@@ -133,10 +143,73 @@
             </ion-input>
           </ion-item>
         </ion-list>
+
+        <!-- ▼▼▼ BLOQUE AGREGADO ANTES DEL BOTÓN "Confirmar Reserva" ▼▼▼ -->
+        <div style="height: 1px; background: #eee; margin: 20px 0;"></div>
+
+        <h4>Invitados de la Reserva ({{ guests.length }})</h4>
+        
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="4">
+              <ion-input 
+                placeholder="Nombre"
+                [(ngModel)]="guestNameReservation"
+                clearInput="true">
+              </ion-input>
+            </ion-col>
+            <ion-col size="12" size-md="4">
+              <ion-input 
+                placeholder="Apellido"
+                [(ngModel)]="guestLastnameReservation"
+                clearInput="true">
+              </ion-input>
+            </ion-col>
+            <ion-col size="12" size-md="2">
+              <ion-input 
+                placeholder="DNI"
+                inputmode="numeric"
+                [(ngModel)]="guestDNIReservation"
+                clearInput="true">
+              </ion-input>
+            </ion-col>
+            <ion-col size="12" size-md="2">
+              <ion-button 
+                expand="block" 
+                size="small"
+                color="secondary" 
+                (click)="addGuestToReservation()"
+                [disabled]="!guestNameReservation || !guestLastnameReservation || !guestDNIReservation">
+                <ion-icon name="person-add" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-list *ngIf="guests.length > 0" lines="full">
+          <ion-list-header>
+            <ion-label>Invitados agregados</ion-label>
+          </ion-list-header>
+          <ion-item *ngFor="let guest of guests; let i = index">
+            <ion-label>
+              {{ guest.name }} {{ guest.lastname }}
+              <p>DNI: {{ guest.dni }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="clear"
+              color="danger"
+              (click)="removeGuestFromReservation(i)">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+        <!-- ▲▲▲ FIN DEL BLOQUE AGREGADO ▲▲▲ -->
         
         <ion-button 
           expand="block" 
           (click)="confirmReservation()" 
+          [disabled]="!selectedAmenityId || !selectedDate || !selectedTime"
           style="margin: 20px;">
           Confirmar Reserva
         </ion-button>
@@ -144,94 +217,95 @@
     </ng-template>
   </ion-modal>
 
-<!-- Modal para Gestionar Recurrentes -->
-<ion-modal [isOpen]="isRecurrentModalOpen" (didDismiss)="closeRecurrentModal()">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Gestionar Recurrentes</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeRecurrentModal()">
-            <ion-icon name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+  <!-- Modal para Gestionar Recurrentes -->
+  <ion-modal [isOpen]="isRecurrentModalOpen" (didDismiss)="closeRecurrentModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Gestionar Recurrentes</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeRecurrentModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
 
-    <ion-content>
-      <!-- Formulario para agregar recurrente -->
-      <div style="padding: 20px;">
-        <h4>Agregar Nuevo Recurrente</h4>
+      <ion-content>
+        <!-- Formulario para agregar recurrente -->
+        <div style="padding: 20px;">
+          <h4>Agregar Nuevo Recurrente</h4>
 
-        <!-- Nombre -->
-        <ion-item>
-          <ion-input
-            placeholder="Nombre"
-            [(ngModel)]="recurrentName">
-          </ion-input>
-        </ion-item>
+          <!-- Nombre -->
+          <ion-item>
+            <ion-input
+              placeholder="Nombre"
+              [(ngModel)]="recurrentName">
+            </ion-input>
+          </ion-item>
 
-        <!-- Apellido -->
-        <ion-item>
-          <ion-input
-            placeholder="Apellido"
-            [(ngModel)]="recurrentLastname">
-          </ion-input>
-        </ion-item>
+          <!-- Apellido -->
+          <ion-item>
+            <ion-input
+              placeholder="Apellido"
+              [(ngModel)]="recurrentLastname">
+            </ion-input>
+          </ion-item>
 
-        <!-- DNI -->
-        <ion-item>
-          <ion-input
-            placeholder="DNI"
-            inputmode="numeric"
-            [(ngModel)]="recurrentDNI">
-          </ion-input>
-        </ion-item>
+          <!-- DNI -->
+          <ion-item>
+            <ion-input
+              placeholder="DNI"
+              inputmode="numeric"
+              [(ngModel)]="recurrentDNI">
+            </ion-input>
+          </ion-item>
 
-        <!-- Rol -->
-        <ion-item>
-          <ion-input
-            placeholder="Rol (ej: Empleada doméstica)"
-            [(ngModel)]="roleRecurrent">
-          </ion-input>
-        </ion-item>
+          <!-- Rol -->
+          <ion-item>
+            <ion-input
+              placeholder="Rol (ej: Empleada doméstica)"
+              [(ngModel)]="roleRecurrent">
+            </ion-input>
+          </ion-item>
 
-        <div style="margin: 20px 0;">
-          <h5>Días de acceso:</h5>
-          <div *ngFor="let day of weekDays">
-            <ion-checkbox
-              [checked]="selectedDays.includes(day.value)"
-              (ionChange)="onDayChange(day.value, $event)">
-            </ion-checkbox>
-            <span style="margin-left: 10px;">{{day.label}}</span>
+          <div style="margin: 20px 0;">
+            <h5>Días de acceso:</h5>
+            <div *ngFor="let day of weekDays">
+              <ion-checkbox
+                [checked]="selectedDays.includes(day.value)"
+                (ionChange)="onDayChange(day.value, $event)">
+              </ion-checkbox>
+              <span style="margin-left: 10px;">{{day.label}}</span>
+            </div>
           </div>
+
+          <ion-button expand="block" (click)="addRecurrent()">
+            AGREGAR RECURRENTE
+          </ion-button>
         </div>
 
-        <ion-button expand="block" (click)="addRecurrent()">
-          AGREGAR RECURRENTE
-        </ion-button>
-      </div>
-
-      <!-- Lista de recurrentes registrados -->
-      <div style="padding: 20px;">
-        <h4>Recurrentes Registrados</h4>
-        <ion-list>
-          <ion-item *ngFor="let recurrent of registeredRecurrents">
-            <div>
-              <h5>{{ recurrent.guest_name }} {{ recurrent.guest_lastname }}</h5>
-              <p>{{ recurrent.roleRecurrent }} - DNI: {{ recurrent.dni }}</p>
-              <p><small>Días: {{ getFormattedDays(recurrent.access_days) }}</small></p>
-            </div>
-            <ion-button
-              slot="end"
-              fill="clear"
-              color="danger"
-              (click)="removeRecurrent(recurrent.id)">
-              <ion-icon name="trash"></ion-icon>
-            </ion-button>
-          </ion-item>
-        </ion-list>
-      </div>
-    </ion-content>
-  </ng-template>
-</ion-modal>
+        <!-- Lista de recurrentes registrados -->
+        <div style="padding: 20px;">
+          <h4>Recurrentes Registrados</h4>
+          <ion-list>
+            <ion-item *ngFor="let recurrent of registeredRecurrents">
+              <div>
+                <h5>{{ recurrent.guest_name }} {{ recurrent.guest_lastname }}</h5>
+                <p>{{ recurrent.roleRecurrent }} - DNI: {{ recurrent.dni }}</p>
+                <p><small>Días: {{ getFormattedDays(recurrent.access_days) }}</small></p>
+              </div>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="danger"
+                (click)="removeRecurrent(recurrent.id)">
+                <ion-icon name="trash"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

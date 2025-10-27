@@ -11,4 +11,5 @@ export interface NotificationInterface {
     reservation?: ReservationsInterface;
     createdAt?: Date;
     updatedAt?: Date;
+    type?: string;
 }

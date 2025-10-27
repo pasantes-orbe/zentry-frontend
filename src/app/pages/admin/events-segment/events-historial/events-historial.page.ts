@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { LoadingController, ModalController, ToastController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
 
 //Servicios
 import { ReservationsService } from 'src/app/services/amenities/reservations.service';
@@ -48,7 +49,8 @@ export class EventsHistorialPage implements OnInit {
     private modalCtrl: ModalController,
     private _reservationsService: ReservationsService,
     private loadingCtrl: LoadingController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -67,6 +69,16 @@ export class EventsHistorialPage implements OnInit {
       reservationsObservable.subscribe(reservations => {
         this.reservations = reservations;
         this.loading = false; // Oculta el spinner
+
+        // Deep-link: si viene openReservationId en query params, abrir el modal
+        const qpId = this.route.snapshot.queryParamMap.get('openReservationId');
+        const targetId = qpId ? Number(qpId) : null;
+        if (targetId && Array.isArray(this.reservations)) {
+          const idx = this.reservations.findIndex(r => Number((r as any).id) === targetId);
+          if (idx >= 0) {
+            this.openModal(this.reservations[idx], idx);
+          }
+        }
       });
     } catch (error) {
       console.error("Error al cargar las reservaciones:", error);

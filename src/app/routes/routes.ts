@@ -26,6 +26,12 @@ export const routes: Routes = [
         .then(m => m.SplashScreenPage),
   },
   {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('../pages/auth/reset-password/reset-password.page')
+        .then(m => m.ResetPasswordPage),
+  },
+  {
     path: 'politica-de-privacidad',
     loadComponent: () =>
       import('../pages/politica-de-privacidad/politica-de-privacidad.page')

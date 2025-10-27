@@ -24,13 +24,15 @@ public owner: OwnerResponse;
     });
   }
 
-  public async getOwner(): Promise<OwnerResponse>{
+ public async getOwner(): Promise<OwnerResponse | null>{ // 
     const { value } = await Preferences.get({ key: 'OWNER' });
-//VER SI ACA NO ES EL PROBLEMA SINO COMENTARLO NOMAS o borrarlo 
+
     if (value) {
-        return JSON.parse(value);
-        } else {
-      return null; // Devuelve 'null' de forma segura si no hay datos.
+        // Aseguramos que se devuelva el objeto parseado
+        return JSON.parse(value) as OwnerResponse;
+        } else {
+      // Devuelve 'null' de forma segura si no hay datos.
+      return null; 
     }   
   }
 

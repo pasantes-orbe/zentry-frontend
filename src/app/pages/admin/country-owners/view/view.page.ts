@@ -9,7 +9,9 @@ import { NavbarBackComponent } from 'src/app/components/navbars/navbar-back/navb
 
 // Servicios
 import { OwnersService } from 'src/app/services/owners/owners.service';
+import { UserService } from 'src/app/services/user/user.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-view',
@@ -42,7 +44,8 @@ export class ViewPage implements OnInit {
     private ownersSvc: OwnersService,
     private countryStorage: CountryStorageService,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private userSvc: UserService
   ) {}
 
   async ngOnInit() {
@@ -153,7 +156,7 @@ export class ViewPage implements OnInit {
         dni: user?.dni ?? '',
         email: user?.email ?? '',
         phone: user?.phone ?? '',
-        avatar: user?.avatar ?? '',
+        avatar: this.normalizeAvatarUrl(user?.avatar ?? ''),
         isActive: typeof user?.isActive === 'boolean' ? user.isActive : true
       },
       property: {
@@ -165,21 +168,69 @@ export class ViewPage implements OnInit {
     };
   };
 
+  private normalizeAvatarUrl(a: any): string {
+    if (!a || typeof a !== 'string' || a.length === 0) return '';
+    if (/^https?:\/\//i.test(a)) return a;
+    if (a.startsWith('/')) return `${environment.URL}${a}`;
+    return `${environment.URL}/${a}`;
+  }
+
   // ================================
   // NAVEGACIÓN / ACCIONES
   // ================================
   public editUser(userId: number, _index: number) {
-    this.router.navigate(['/admin/editar-propietario', userId]);
+    this.router.navigate(['/edit-owner', userId]);
   }
 
-  // Placeholder (no hay endpoint de borrar propietario)
-  public async deleteOwner(_ownerId: number, _index: number) {
-    const t = await this.toastCtrl.create({
-      message: 'Eliminar propietario aún no está disponible en el backend.',
-      duration: 1500,
-      color: 'medium'
+  public async deleteOwner(userId: number, index: number) {
+    if (!userId) {
+      const t = await this.toastCtrl.create({
+        message: 'No se pudo eliminar: identificador de usuario inválido.',
+        duration: 1800,
+        color: 'warning'
+      });
+      await t.present();
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar propietario',
+      message: 'Esta acción eliminará al usuario definitivamente. ¿Deseas continuar?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.userSvc.deleteUserById(userId).toPromise();
+              // Remover todas las apariciones de ese userId
+              this.owners = this.owners.filter((o: any) => Number(o?.user?.id) !== Number(userId));
+              const t = await this.toastCtrl.create({
+                message: 'Usuario eliminado correctamente.',
+                duration: 1500,
+                color: 'success'
+              });
+              await t.present();
+            } catch (err: any) {
+              const status = err?.status;
+              const msg = (status === 401 || status === 403)
+                ? 'No autorizado para eliminar.'
+                : status === 404
+                  ? 'Usuario no encontrado.'
+                  : 'Error al eliminar usuario.';
+              const t = await this.toastCtrl.create({
+                message: msg,
+                duration: 2200,
+                color: 'danger'
+              });
+              await t.present();
+            }
+          }
+        }
+      ]
     });
-    await t.present();
+    await alert.present();
   }
 
   // ================================
@@ -239,6 +290,8 @@ export class ViewPage implements OnInit {
   }
 
   public getOwnerAvatar(owner: any): string {
-    return owner?.user?.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg';
+    const a = owner?.user?.avatar;
+    const url = this.normalizeAvatarUrl(a);
+    return url || 'https://ionicframework.com/docs/img/demos/avatar.svg';
   }
 }

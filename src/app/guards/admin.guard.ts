@@ -26,17 +26,16 @@ export class AdminGuard  implements RoleGuard {
       console.log('🔒 adminGuard ejecutándose...');  
 
       return this._loginService.isRole(this.roleType).then(
-        validJWT => {
-          if(!validJWT){
-            console.log('❌ Acceso denegado (Rol incorrecto). Redirigiendo...');
-            this._router.navigate(['/login']);
+        validRole => {
+          if(!validRole){
+            console.log('❌ Acceso denegado (Rol incorrecto). Bloqueando navegación.');
+            // No redireccionar aquí para evitar flicker en flujos no-admin
             return false;
           } else {
-              console.log('✅ Acceso concedido (Rol correcto).');
-              return true;
-                      
+            console.log('✅ Acceso concedido (Rol correcto).');
+            return true;
+          }
         }
-      }
       );
   }
   

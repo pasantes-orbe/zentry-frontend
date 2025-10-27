@@ -7,7 +7,7 @@
 <ion-content [fullscreen]="true">
   <div class="profile-header">
     <ion-avatar>
-      <img [src]="'https://placehold.co/128x128/374151/FFFF?text=' + getAvatarInitial()" />
+      <img [src]="getAvatarUrl()" />
     </ion-avatar>
     <h2 class="profile-name">{{ getOwnerName() }}</h2>
     <p class="profile-info">{{ getPropertyInfo() }}</p>
@@ -66,6 +66,75 @@
     message="¿Estás seguro que deseas cerrar tu sesión?"
     [buttons]="logoutAlertButtons">
   </ion-alert>
+
+  <ion-modal cssClass="full-profile-modal" [isOpen]="isFullProfileModalOpen" (didDismiss)="closeFullProfileModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Perfil completo</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeFullProfileModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <div class="full-profile">
+          <div class="full-profile__header">
+            <ion-avatar class="full-profile__avatar">
+              <img [src]="getAvatarUrl()" />
+            </ion-avatar>
+            <div class="full-profile__names">
+              <h2>{{ getOwnerName() }}</h2>
+              <p>{{ editEmail }}</p>
+            </div>
+          </div>
+
+          <div class="full-profile__grid">
+            <div class="full-profile__item">
+              <label>ID Usuario</label>
+              <span>{{ owner?.user?.id || '—' }}</span>
+            </div>
+            <div class="full-profile__item">
+              <label>Nombre: </label>
+              <span>{{ editName || '—' }}</span>
+            </div>
+            <div class="full-profile__item">
+              <label>Email: </label>
+              <span>{{ editEmail || '—' }}</span>
+            </div>
+            <div class="full-profile__item">
+              <label>Teléfono: </label>
+              <span>{{ editPhone || '—' }}</span>
+            </div>
+            <div class="full-profile__item">
+              <label>Estado: </label>
+              <span>Activo</span>
+            </div>
+            <div class="full-profile__item">
+              <label>Tipo: </label>
+              <span>Propietario</span>
+            </div>
+          </div>
+
+          <div class="full-profile__props">
+            <h3>Propiedades</h3>
+            <ion-list>
+              <ion-item *ngFor="let p of properties" lines="full">
+                <ion-label>
+                  <h4>{{ p.name || ('Propiedad N° ' + p.number) }}</h4>
+                  <p>N° {{ p.number }} · {{ p.address }}</p>
+                </ion-label>
+              </ion-item>
+              <div *ngIf="properties.length === 0" class="empty-props">No hay propiedades registradas.</div>
+            </ion-list>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
     <ion-modal [isOpen]="isEditProfileModalOpen" (didDismiss)="closeEditProfileModal()">
     <ng-template>
@@ -210,13 +279,6 @@
             style="margin-top: 20px;">
             Cambiar Contraseña
           </ion-button>
-          
-          <div style="margin-top: 30px; padding: 20px; background: #111111; border-radius: 8px;">
-            <h5>Opciones de Seguridad Adicionales</h5>
-            <p>🛡️ <strong>Autenticación en 2 Pasos:</strong> Próximamente disponible</p>
-            <p>📋 <strong>Historial de Accesos:</strong> Revise su actividad reciente</p>
-            <p>🔐 <strong>Sesiones Activas:</strong> Gestione sus dispositivos conectados</p>
-          </div>
         </div>
       </ion-content>
     </ng-template>

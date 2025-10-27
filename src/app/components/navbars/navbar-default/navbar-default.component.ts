@@ -1,5 +1,5 @@
 //src/app/components/navbars/navbar-default/navbar-default.component.ts
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { 
@@ -17,6 +17,9 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { NavigationService } from 'src/app/helpers/navigation.service';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { Subscription } from 'rxjs';
+import { NotificationsPopoverComponent } from 'src/app/components/notifications-popover/notifications-popover';
 
 // Definición de interfaz para notificaciones
 interface Notification {
@@ -35,10 +38,11 @@ interface Notification {
   imports: [
     CommonModule,
     RouterModule,
-    IonicModule
+    IonicModule,
+    NotificationsPopoverComponent
   ]
 })
-export class NavbarDefaultComponent implements OnInit {
+export class NavbarDefaultComponent implements OnInit, OnDestroy {
   // Inyección de dependencias con inject()
   public _notificationsService = inject(NotificationsService);
   public _userStorage = inject(UserStorageService);
@@ -50,9 +54,12 @@ export class NavbarDefaultComponent implements OnInit {
   @Input() titulo: string;
   
   public numberNotifications: number = 0;
+  public unreadCount: number = 0;
   public user: UserInterface;
   public dropdownState: boolean = false;
   public notifications: Notification[] = [];
+  private wsSub?: Subscription;
+  private refreshSub?: Subscription;
 
   constructor() {
     // Añadir íconos de Ionicons
@@ -73,21 +80,55 @@ export class NavbarDefaultComponent implements OnInit {
       this.user = await this._userStorage.getUser();
       
       if (this.user) {
-        // Obtener notificaciones del usuario
-        this._notificationsService.getAllByUser(this.user.id)
-          .subscribe({
-            next: (notifications: Notification[]) => {
-              this.notifications = notifications;
-              this.numberNotifications = notifications.filter(n => !n.is_read).length;
-            },
-            error: (error) => {
-              console.error('Error al obtener notificaciones', error);
-            }
-          });
+        this.loadNotifications(this.user.id);
+
+        // Refrescar cuando se marquen como leídas desde otros componentes
+        this.refreshSub = this._notificationsService.refresh$.subscribe(() => {
+          this.loadNotifications(this.user.id);
+        });
+
+        // Refrescar cuando llegue una nueva notificación por WebSocket
+        const ws = inject(WebSocketService);
+        ws.conectar?.();
+        this.wsSub = ws.newNotification$.subscribe((n: any) => {
+          // Si el payload indica usuario destino, refrescar solo si corresponde
+          if (!n || typeof n !== 'object' || n.id_user == null || Number(n.id_user) === Number(this.user.id)) {
+            this.loadNotifications(this.user.id);
+          }
+        });
       }
     } catch (error) {
       console.error('Error al obtener el usuario', error);
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.wsSub) { this.wsSub.unsubscribe(); this.wsSub = undefined; }
+    if (this.refreshSub) { this.refreshSub.unsubscribe(); this.refreshSub = undefined; }
+  }
+
+  private loadNotifications(userId: number) {
+    this._notificationsService.getAllByUser(userId)
+      .subscribe({
+        next: (list: any[]) => {
+          const all = Array.isArray(list) ? (list as any[]) as Notification[] : [];
+          // Preferir solo estado de reserva; si no hay, mostrar todas para no ocultar mensajes
+          const onlyStatus = all.filter((n: any) => (n.type ?? n?.['type']) === 'reservation_status');
+          this.notifications = onlyStatus.length > 0 ? onlyStatus : all;
+          this.numberNotifications = this.notifications.filter((n: any) => {
+            if (typeof n.read === 'boolean') return !n.read;
+            if (typeof n.is_read === 'boolean') return !n.is_read;
+            return false;
+          }).length;
+          this.unreadCount = this.numberNotifications;
+        },
+        error: (error) => {
+          console.error('Error al obtener notificaciones', error);
+          this.notifications = [];
+          this.numberNotifications = 0;
+          this.unreadCount = 0;
+        }
+      });
   }
 
   // Método para navegar
@@ -106,6 +147,27 @@ export class NavbarDefaultComponent implements OnInit {
     this.dropdownState = !this.dropdownState;
   }
 
+  // Marcar como leída al hacer click
+  public markAsRead(notification: Notification, index: number): void {
+    if (!notification?.id) return;
+    const alreadyRead = typeof notification.read === 'boolean' ? notification.read : notification.is_read === true;
+    if (alreadyRead) return;
+    this._notificationsService.markAsRead([notification.id]).subscribe({
+      next: () => {
+        // actualizar local
+        (this.notifications[index] as any).read = true;
+        (this.notifications[index] as any).is_read = true;
+        this.numberNotifications = this.notifications.filter((n: any) => {
+          if (typeof n.read === 'boolean') return !n.read;
+          if (typeof n.is_read === 'boolean') return !n.is_read;
+          return false;
+        }).length;
+        this._notificationsService.emitRefresh();
+      },
+      error: (err) => console.error('Error al marcar leída', err)
+    });
+  }
+
   // Eliminar notificación
   public deleteNotification(notification: Notification, index: number): void {
     this._notificationsService.deleteNotification(notification.id)
@@ -113,8 +175,12 @@ export class NavbarDefaultComponent implements OnInit {
         next: () => {
           // Eliminar notificación del arreglo
           this.notifications.splice(index, 1);
-          // Actualizar contador de notificaciones no leídas
-          this.numberNotifications = this.notifications.filter(n => !n.is_read).length;
+          // Actualizar contador de no leídas soportando read/is_read
+          this.numberNotifications = this.notifications.filter((n: any) => {
+            if (typeof n.read === 'boolean') return !n.read;
+            if (typeof n.is_read === 'boolean') return !n.is_read;
+            return false;
+          }).length;
         },
         error: (error) => {
           console.error('Error al eliminar notificación', error);

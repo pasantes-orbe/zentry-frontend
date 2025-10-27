@@ -39,3 +39,9 @@ export interface UserInterface {
     avatar:   null;
     role_id:  number;
 }
+// Define la interfaz Guest para tipado
+export interface Guest {
+  name: string;
+  lastname: string;
+  dni: string;
+}

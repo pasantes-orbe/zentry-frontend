@@ -1,9 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserInterface } from 'src/app/interfaces/user-interface';
 import { environment } from 'src/environments/environment';
 import { UserStorageService } from '../storage/user-storage.service';
 import { ToastController } from '@ionic/angular';
+import { AuthStorageService } from '../storage/auth-storage.service';
+import { from, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,8 @@ export class UserService {
   constructor(
     private _htpp :HttpClient,
     private _userStorage: UserStorageService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private _auth: AuthStorageService
   ) { }
 
     getUserByID(id){
@@ -82,8 +85,20 @@ export class UserService {
       await toast.present();
     }
 
-    deleteUserById(id){
-      return this._htpp.patch(`${environment.URL}/api/users/delete-user/${id}`, {})
+    // Subir avatar del usuario (multipart/form-data)
+    uploadAvatar(id: number, file: File){
+      const formData = new FormData();
+      formData.append('avatar', file);
+      return this._htpp.patch<any>(`${environment.URL}/api/users/avatar/${id}`, formData);
+    }
+
+    deleteUserById(id: number){
+      return from(this._auth.getJWT()).pipe(
+        switchMap(token => {
+          const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+          return this._htpp.delete(`${environment.URL}/api/users/${id}`, { headers });
+        })
+      );
     }
 
 }

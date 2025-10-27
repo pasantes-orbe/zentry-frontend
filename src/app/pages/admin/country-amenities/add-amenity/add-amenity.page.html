@@ -1,7 +1,8 @@
+<!-- src/app/pages/admin/country-amenities/add-amenity/add-amenity.page.html -->
 <app-navbar-back title="Nuevo Lugar de Reserva"></app-navbar-back>
 <ion-content>
   <ion-grid class="ion-padding">
-    <form form [formGroup]="getForm()" (keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
+    <form [formGroup]="form" (keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
       <ion-row class="ion-justify-content-center">
         <ion-col size="12">
           <ion-item counter="true">
@@ -21,14 +22,13 @@
       </ion-row>
 
       <ion-row>
-        <ion-card button>
+        <ion-card>
           <img [src]="newImg" alt="">
-          <ion-input type="file" formControlName="amenitieAvatar" (change)="onFileChange($event)"
-            placeholder="Awesome Input"></ion-input>
+          <input type="file" (change)="onFileChange($event)" accept="image/*" />
         </ion-card>
       </ion-row>
 
-      <ion-button type="submit" [disabled]="getForm().invalid" expand="block" shape="round">
+      <ion-button type="submit" [disabled]="form.invalid" expand="block" shape="round">
         <ion-icon slot="start" name="add"></ion-icon>
         Añadir Lugar de Reserva
       </ion-button>

@@ -57,4 +57,118 @@
       color: var(--ion-text-color); /* Usar variable */
     }
   }
+ /* Modal: Perfil completo */
+.full-profile-modal::part(content) {
+  display: flex;
+  align-items: center;   /* Centra verticalmente */
+  justify-content: center; /* Centra horizontalmente */
 }
+
+.full-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+}
+
+.full-profile__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .full-profile__avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--ion-border-color);
+  }
+
+  .full-profile__names {
+    h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--ion-text-color);
+    }
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--zentry-color-text-secondary);
+    }
+  }
+}
+
+.full-profile__grid,
+.full-profile__props {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.full-profile-modal .full-profile__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  @media (min-width: 560px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .full-profile__item {
+    background: var(--ion-card-background);
+    border: 1px solid var(--ion-border-color);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Separación entre etiqueta y dato */
+    text-align: center;
+
+    label {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--zentry-color-text-secondary);
+    }
+    span {
+      color: var(--ion-text-color);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.full-profile__props {
+  h3 {
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  ion-item {
+    --background: var(--ion-card-background);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border: 1px solid var(--ion-border-color);
+
+    h4 { margin: 0 0 4px 0; }
+    p { margin: 0; color: var(--zentry-color-text-secondary); }
+  }
+
+  .empty-props {
+    text-align: center;
+    color: var(--zentry-color-text-secondary);
+    padding: 8px 0;
+  }
+}
+} 

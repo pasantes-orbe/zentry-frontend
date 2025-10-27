@@ -10,6 +10,7 @@ import { OwnersService } from 'src/app/services/owners/owners.service';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+import { environment } from 'src/environments/environment';
 
 import { Owner_CountryInterface } from 'src/app/interfaces/owner_country-interface';
 import { Property_OwnerInterface } from 'src/app/interfaces/property_owner-interface';
@@ -65,7 +66,9 @@ export class AssignCountryToOwnerPage implements OnInit {
     return Number.isFinite(n) && n > 0 ? n : null;
   }
   public ownerAvatar(o: any): string {
-    return this.getUser(o)?.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg';
+    const a = this.getUser(o)?.avatar;
+    const url = this.normalizeAvatarUrl(a);
+    return url || 'https://ionicframework.com/docs/img/demos/avatar.svg';
   }
   public ownerName(o: any): string {
     return this.getUser(o)?.name ?? '';
@@ -75,6 +78,13 @@ export class AssignCountryToOwnerPage implements OnInit {
   }
   public ownerDni(o: any): string {
     return String(this.getUser(o)?.dni ?? 'S/N');
+  }
+
+  private normalizeAvatarUrl(a: any): string {
+    if (!a || typeof a !== 'string' || a.length === 0) return '';
+    if (/^https?:\/\//i.test(a)) return a;
+    if (a.startsWith('/')) return `${environment.URL}${a}`;
+    return `${environment.URL}/${a}`;
   }
 
   // Helpers PROPERTY: soporta property o plano

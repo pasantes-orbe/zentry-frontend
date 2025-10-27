@@ -1,23 +1,18 @@
+// src/app/pages/admin/country-amenities/view-all/view-all.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 //Servicios
 import { AmenitieService } from '../../../../services/amenities/amenitie.service';
+import { AlertService } from 'src/app/services/helpers/alert.service'; 
 
 //Componentes
 import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navbar-back.component";
 
-// Interface para amenities
-interface Amenity {
-  id: number;
-  name: string;
-  address: string;
-  avatar: string;
-  isActive: boolean;
-}
+import { AmenitieInterface } from 'src/app/interfaces/amenitie-interface';
 
 //Pipes
 import { FilterByPipe } from '../../../../pipes/filter-by.pipe';
@@ -38,10 +33,15 @@ import { FilterByPipe } from '../../../../pipes/filter-by.pipe';
 })
 export class ViewAllPage implements OnInit {
 
-  public amenities: Amenity[] = [];
+  public amenities: AmenitieInterface[] = [];
   public searchKey: string = '';
 
-  constructor(private _amenitiesService: AmenitieService) { }
+  constructor(
+    private _amenitiesService: AmenitieService,
+    private _router: Router, 
+    private _alertService: AlertService, 
+    private _alertController: AlertController 
+  ) { }
 
   ngOnInit() {
     this.loadAmenities();
@@ -53,7 +53,7 @@ export class ViewAllPage implements OnInit {
 
   private async loadAmenities() {
     try {
-      // DATOS MOCK PARA LA DEMO
+      /*/ DATOS MOCK PARA LA DEMO
       this.amenities = [
         {
           id: 1,
@@ -100,23 +100,29 @@ export class ViewAllPage implements OnInit {
       ];
 
       console.log('Amenities cargadas para demo:', this.amenities);
-
-      // Código original comentado para mantener estructura
-      /*
-      const amenitiesObservable = await this._amenitiesService.getAll();
-      amenitiesObservable.subscribe(amenities => {
-        this.amenities = amenities;
-        console.log(amenities);
-      });
       */
-    } catch (error) {
-      console.error("Error al cargar los amenities:", error);
-      // En caso de error, mantener datos mock
-    }
-  }
+    
+      
+      
+      const amenitiesObservable = await this._amenitiesService.getAll();
+      amenitiesObservable.subscribe({
+        next: (amenities: AmenitieInterface[]) => {
+          this.amenities = amenities;
+          console.log('Amenities reales cargadas:', amenities);
+        },
+        error: (err) => {
+          console.error("Error al cargar los amenities:", err);
+          // Usar AlertService genérico para notificar error
+          this._alertService.showAlert("Error", "No se pudieron cargar los lugares de reserva.");
+        }
+      });
+    } catch (error) {
+      console.error("Error al iniciar la carga de amenities:", error);
+    }
+  }
 
   // Getter para amenities filtradas
-  public get filteredAmenities(): Amenity[] {
+  public get filteredAmenities(): AmenitieInterface[] {
     if (!this.searchKey || this.searchKey.trim() === '') {
       return this.amenities;
     }
@@ -136,15 +142,55 @@ export class ViewAllPage implements OnInit {
     }, 1000);
   }
 
+  /**
+   * ELIMINACIÓN REAL: Usa el AlertController para confirmar y el AmenitieService para ejecutar.
+   */
+  public async deleteAmenity(amenity: AmenitieInterface) {
+    const alert = await this._alertController.create({
+      header: 'Confirmar Eliminación',
+      message: `¿Está seguro de eliminar <strong>${amenity.name}</strong>? Esta acción es irreversible.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          cssClass: 'danger',
+          handler: async () => {
+            await this._alertService.setLoading("Eliminando...");
+            this._amenitiesService.deleteAmenity(amenity.id).subscribe({
+              next: (res) => {
+                this._alertService.removeLoading();
+                this._alertService.showAlert('Éxito', 'Lugar de reserva eliminado correctamente.');
+                this.loadAmenities(); // Recargar la lista
+              },
+              error: (err) => {
+                this._alertService.removeLoading();
+                console.error('Error al eliminar amenity:', err);
+                this._alertService.showAlert('Error', `No se pudo eliminar el amenity: ${err.error.msg || 'Error de servidor.'}`);
+              }
+            });
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  /**
+   * Navegación para Edición.
+   */
+  public navigateToEditAmenity(amenityId: number) {
+    // Navega a una ruta que debe manejar la carga de datos del amenity (ej: AddAmenityPage en modo edición)
+    this._router.navigate(['/admin/editar-lugar-de-reserva', amenityId]);
+  }
+
   // Método para obtener imagen con fallback
-  public getAmenityImage(amenity: Amenity): string {
-    return amenity.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png';
+  public getAmenityImage(amenity: AmenitieInterface): string {
+    return amenity.image || 'https://ionicframework.com/docs/img/demos/card-media.png';
   }
 
-  // Método para contar amenities activas
-  public getActiveAmenitiesCount(): number {
-    return this.amenities.filter(amenity => amenity.isActive).length;
-  }
 
   // Método para navegación (si es necesario)
   public navigateToAmenity(amenityId: number) {
@@ -152,15 +198,14 @@ export class ViewAllPage implements OnInit {
     // Implementar navegación si es necesaria
   }
 
-  public getAmenities(): Amenity[] {
+  public getAmenities(): AmenitieInterface[] {
     return this.amenities;
   }
 
-  public setAmenities(amenities: Amenity[]): void {
+  public setAmenities(amenities: AmenitieInterface[]): void {
     this.amenities = amenities;
   }
 }
-
 
 /*import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';

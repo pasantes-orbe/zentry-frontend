@@ -34,6 +34,7 @@ export class AddRecurrentPage implements OnInit {
   public properties: PropertyInterface[] = [];
   public selectedValue: any;
   private recurrentId?: number; // si viene => modo edición
+  private currentStatus?: boolean; // status actual para PATCH
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -61,6 +62,9 @@ export class AddRecurrentPage implements OnInit {
           dni: (rec as any).dni,
           property: (rec as any).id_property ?? ''
         });
+        this.currentStatus = (rec as any).status as boolean | undefined;
+        // Pre-cargar propiedades del country para que el buscador esté "habilitado" al editar
+        this.loadPropertiesByCountry();
       });
     }
   }
@@ -78,17 +82,49 @@ export class AddRecurrentPage implements OnInit {
   // Búsqueda de propiedades por término
   public async getProperties(event: any): Promise<void> {
     const termino = event?.detail?.value;
-    if (termino && termino.length > 2) {
+    if (termino && termino.length > 0) {
       try {
         const obs = await this._propertiesService.getBySearchTerm(termino);
-        obs.subscribe((properties) => { this.properties = properties || []; });
+        obs.subscribe((properties) => {
+          const list = Array.isArray(properties) ? properties : [];
+          this.properties = this.normalizeProperties(list);
+        });
       } catch (error) {
         console.error('Error al buscar propiedades:', error);
         this.properties = [];
       }
     } else {
+      // Si no hay término, mostrar listado por country (útil en edición)
+      this.loadPropertiesByCountry();
+    }
+  }
+
+  // Carga propiedades del country actual para habilitar selección sin necesidad de escribir
+  private async loadPropertiesByCountry(): Promise<void> {
+    try {
+      const obs = await this._propertiesService.getByCountry();
+      obs.subscribe((list) => {
+        const arr = Array.isArray(list) ? list : [];
+        this.properties = this.normalizeProperties(arr);
+      });
+    } catch (err) {
+      console.error('Error pre-cargando propiedades del country:', err);
       this.properties = [];
     }
+  }
+
+  private normalizeProperties(list: any[]): PropertyInterface[] {
+    return list
+      .map((p: any) => p?.property ?? p)
+      .filter((p: any) => p && (p.id != null))
+      .map((p: any) => ({
+        id: Number(p.id),
+        name: String(p.name ?? ''),
+        number: Number(p.number ?? 0),
+        address: String(p.address ?? ''),
+        avatar: String(p.avatar ?? ''),
+        idCountry: Number(p.id_country ?? p.idCountry ?? 0)
+      }) as PropertyInterface);
   }
 
   // Alta o edición según exista recurrentId
@@ -114,7 +150,8 @@ export class AddRecurrentPage implements OnInit {
     try {
       if (this.recurrentId) {
         // EDITAR
-        this._recurrentsService.updateRecurrent(this.recurrentId, payload).subscribe(() => {
+        const updatePayload = { status: this.currentStatus, ...payload };
+        this._recurrentsService.updateRecurrent(this.recurrentId, updatePayload).subscribe(() => {
           this._alertService.presentAlert('Éxito: Recurrente actualizado.');
           this._router.navigate(['/admin/country-recurrents']); 
         });

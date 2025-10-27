@@ -1,94 +1,119 @@
-<!-- src/app/components/reservations/reservations.component.html-->
-<ion-card *ngIf="!isLoading()">
-  <div class="table-responsive container padding-top">
-  
-  <h5>Reserva de Eventos</h5>
-  
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Estado</th>
-        <th scope="col">Reserva</th>
-        <th scope="col">Fecha</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let reservation of reservations; let i = index">
-        
-        <th *ngIf="reservation.status === 'pendiente' " scope="row"><ion-badge color="warning">{{reservation.status}}</ion-badge></th>
-        <th *ngIf="reservation.status === 'rechazado' " scope="row"><ion-badge color="danger">{{reservation.status}}</ion-badge></th>
-        <th *ngIf="reservation.status === 'aprobado' " scope="row"><ion-badge color="success">{{reservation.status}}</ion-badge></th>
-        <td>{{reservation.amenity.name}}</td>
-        <td>{{reservation.date | date: 'dd/MM/yyyy hh:mm'}} </td>
-      
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  
+<!-- src/app/components/reservations/reservations.component.html -->
+
+<!-- CARD DE LISTADO (cuando NO está cargando) -->
+<ion-card *ngIf="!isLoading(); else loading">
+  <!-- Nos suscribimos al observable con async y lo aliasamos a 'reservations' -->
+  <div class="table-responsive container padding-top" *ngIf="reservations$ | async as reservations">
+    <h5>Reserva de Eventos</h5>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Estado</th>
+          <th scope="col">Reserva</th>
+          <th scope="col">Fecha</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let reservation of reservations; index as i">
+          <td>
+            <ng-container [ngSwitch]="reservation?.status">
+              <ion-badge *ngSwitchCase="'pendiente'" color="warning">{{ reservation.status }}</ion-badge>
+              <ion-badge *ngSwitchCase="'rechazado'" color="danger">{{ reservation.status }}</ion-badge>
+              <ion-badge *ngSwitchCase="'aprobado'" color="success">{{ reservation.status }}</ion-badge>
+              <ion-badge *ngSwitchDefault color="medium">{{ reservation?.status || '—' }}</ion-badge>
+            </ng-container>
+          </td>
+          <td>{{ reservation?.amenity?.name || '—' }}</td>
+          <td>{{ reservation?.date | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+
+        <!-- Fila vacía cuando no hay datos -->
+        <tr *ngIf="!reservations || reservations.length === 0">
+          <td colspan="3" class="text-center">No hay reservas.</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  
+
   <div class="buttons text-center mt-2 mb-2">
-    <ion-button fill="clear" >
+    <ion-button fill="clear">
       <ion-icon slot="end" name="search-outline"></ion-icon>
       Ver Todos
     </ion-button>
-    
+
     <ion-button (click)="Navigation.navigate('/reservar')" shape="round">
       <ion-icon slot="end" name="add"></ion-icon>
       Agregar
     </ion-button>
-    
   </div>
-    
-  </ion-card>
+</ion-card>
 
 <!-- 
   SKELETON TEXT WHEN LOADING DATA
- -->
-<ion-card *ngIf="isLoading()">
-  <div class="table-responsive container">
-  
-    <h5>
-      <ion-skeleton-text animated style="width: 50%; height: 20px;"></ion-skeleton-text>
-    </h5>
-  
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text></th>
-        <th scope="col"><ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text></th>
-        <th scope="col"><ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text></th>
-        
-      </tr>
-    </thead>
-    <tbody class="text-center" >
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 100px; height: 15px; margin: 0 auto; "></ion-skeleton-text></th>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text> </td>
-        <td><ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text></td>
-      </tr>
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 100px; height: 15px; margin: 0 auto; "></ion-skeleton-text></th>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text> </td>
-        <td><ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text></td>
-      </tr>
-      <tr>
-        <th scope="row"><ion-skeleton-text animated style="width: 100px; height: 15px; margin: 0 auto; "></ion-skeleton-text></th>
-        <td> <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text> </td>
-        <td><ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text></td>
-      </tr>
-      
-    </tbody>
-  </table>
-  
-  
-  
-  </div>
-  
-  
-</ion-card>
+-->
+<ng-template #loading>
+  <ion-card>
+    <div class="table-responsive container">
+      <h5>
+        <ion-skeleton-text animated style="width: 50%; height: 20px;"></ion-skeleton-text>
+      </h5>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">
+              <ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text>
+            </th>
+            <th scope="col">
+              <ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text>
+            </th>
+            <th scope="col">
+              <ion-skeleton-text animated style="width: 100%; height: 10px;"></ion-skeleton-text>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody class="text-center">
+          <tr>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px; margin: 0 auto;"></ion-skeleton-text>
+            </td>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text>
+            </td>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px; margin: 0 auto;"></ion-skeleton-text>
+            </td>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text>
+            </td>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px; margin: 0 auto;"></ion-skeleton-text>
+            </td>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text>
+            </td>
+            <td>
+              <ion-skeleton-text animated style="width: 100px; height: 15px;"></ion-skeleton-text>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ion-card>
+</ng-template>
 
 
 

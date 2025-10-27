@@ -1,20 +1,23 @@
 // src/app/tab1/tab1.page.ts
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 // Ionic standalone
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton,
   IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
   IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox,
-  IonToggle, IonRefresher, IonRefresherContent
+  IonToggle, IonRefresher, IonRefresherContent, IonLabel, IonListHeader,
+  IonBadge, IonPopover,
 } from '@ionic/angular/standalone';
 
 // Theme
 import { ThemeService } from '../services/theme/theme.service';
+import { environment } from 'src/environments/environment';
 
 // Servicios
 import { UserStorageService } from '../services/storage/user-storage.service';
@@ -26,9 +29,17 @@ import { ReservationsService } from '../services/amenities/reservations.service'
 import { CheckInService } from '../services/check-in/check-in.service';
 import { RecurrentsService } from '../services/recurrents/recurrents.service';
 import { RecurrentsInterface } from '../interfaces/recurrents-interface';
+import { WebSocketService } from '../services/websocket/web-socket.service';
+import { AmenitieService } from '../services/amenities/amenitie.service';
+import { AmenitieInterface } from '../interfaces/amenitie-interface';
+import { Guest } from '../interfaces/reservations-interface';
+import { NotificationsService } from '../services/notifications/notifications.service';
+import { NotificationsPopoverComponent } from '../components/notifications-popover/notifications-popover';
+import { UserService } from '../services/user/user.service';
 
 // Componentes
 import { ReservationsComponent } from '../components/reservations/reservations.component';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab1',
@@ -40,14 +51,17 @@ import { ReservationsComponent } from '../components/reservations/reservations.c
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton,
     IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
     IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox,
-    IonToggle, IonRefresher, IonRefresherContent
+    IonToggle, IonRefresher, IonRefresherContent, IonLabel, IonListHeader,
+    IonBadge, IonPopover,
+    NotificationsPopoverComponent,
   ]
 })
-export class Tab1Page implements OnInit {
+export class Tab1Page implements OnInit, OnDestroy {
 
   private loading = true;
-  private userID: any;
+  public userID: any;
   protected owner: OwnerResponse | null = null;
+  public unreadCount: number = 0;
 
   // Form (Visita Rápida)
   public guestName = '';
@@ -59,19 +73,21 @@ export class Tab1Page implements OnInit {
   public isRecurrentModalOpen = false;
 
   // Reserva de amenity
-  public selectedAmenity: string = '';
+  // FIX: Renombrado a selectedAmenityId para coincidir con el template y tipo numérico
+  public selectedAmenityId: number | null = null;
   public selectedDate: string = '';
   public selectedTime: string = '';
 
-  private amenityIdMap: { [key: string]: number } = {
-    'Cancha de Fútbol': 1,
-    'SUM': 2,
-    'Cancha de Básquet': 3,
-    'Campo de Golf': 4,
-    'Quincho/Piscina': 5,
-  };
-  public amenities = Object.keys(this.amenityIdMap);
+  public amenities$: Observable<AmenitieInterface[]> | undefined;
 
+  //Invitados
+  guestNameReservation: string = '';
+  guestLastnameReservation: string = '';
+  guestDNIReservation: string = '';
+  
+  // Array para almacenar los invitados de la reserva
+  guests: Guest[] = []; // Inicializar guests como un array vacío
+  
   // Recurrentes (Formulario de Gestión)
   public recurrentName = '';
   public recurrentLastname = '';
@@ -89,9 +105,20 @@ export class Tab1Page implements OnInit {
   ];
 
   // Lista de recurrentes. Usa la interfaz real y se carga del backend.
-  public registeredRecurrents: RecurrentsInterface[] = [];  
-  
+  public registeredRecurrents: RecurrentsInterface[] = [];
+
+  // Referencia al componente de reservas
   @ViewChild('reservationsComponent') reservationsComponent!: ReservationsComponent;
+
+  // 1. Observable reactivo para las reservas del owner
+  public ownerReservations$: Observable<any[]> | undefined;
+  details: null;
+
+  // Subscriptions para notificaciones
+  private wsSub?: Subscription;
+  private refreshSub?: Subscription;
+
+  private notificationsSubscription: Subscription;
 
   constructor(
     private _userStorageService: UserStorageService,
@@ -102,20 +129,26 @@ export class Tab1Page implements OnInit {
     private _reservationsService: ReservationsService,
     private _checkInService: CheckInService,
     private _recurrentsService: RecurrentsService,
+    private _webSocketService: WebSocketService,
+    private _amenitiesService: AmenitieService,
+    private _notificationsService: NotificationsService,
+    private _userService: UserService,
   ) {
-    this.setLoading(true); // Uso correcto de setLoading
+    this.setLoading(true);
+    // 2. Conectar al WebSocket al iniciar
+    void this._webSocketService.conectar();
   }
 
-  // normaliza el shape del owner (se mantiene)
+  // Normaliza el shape del owner
   private normalizeOwner(owner: OwnerResponse | null): OwnerResponse | null {
     if (!owner) { return null; }
     const normalized: any = { ...(owner as any) };
     if (normalized.id_user) {
-        normalized.user = {
-            id: normalized.id_user,
-            ...(normalized.user || {})
-        };
-        delete normalized.id_user; 
+      normalized.user = {
+        id: normalized.id_user,
+        ...(normalized.user || {})
+      };
+      delete normalized.id_user;
     }
     const properties = Array.isArray(normalized.properties) ? normalized.properties : [];
     const property = normalized.property ?? properties[0] ?? null;
@@ -140,19 +173,35 @@ export class Tab1Page implements OnInit {
     return normalized as OwnerResponse;
   }
 
-  // ngOnInit (se mantiene)
+  // ngOnInit
   async ngOnInit() {
     this.theme.init('owner');
     try {
       const user = await this._userStorageService.getUser();
       if (user) {
         this.userID = user.id;
+        this.initNotifications(this.userID);
+
         this._ownersService.getByID(this.userID).subscribe({
           next: (owner) => {
             const normalizedOwner = this.normalizeOwner(owner);
             this.owner = normalizedOwner;
             if (normalizedOwner) {
               void this._ownerStorageService.saveOwner(normalizedOwner);
+              // Cargar lista de reservas al obtener el Owner
+              this.loadOwnerReservations();
+              this.loadReservationsAndAmenities(); // Cargar amenities
+              // Refrescar datos del usuario (incluido avatar) desde /api/users/:id
+              try {
+                if (this.userID) {
+                  this._userService.getUserByID(this.userID).subscribe((u: any) => {
+                    const avatar = u?.avatar;
+                    if (avatar && (this as any).owner?.user) {
+                      (this as any).owner.user.avatar = avatar;
+                    }
+                  });
+                }
+              } catch {}
             }
             this.setLoading(false);
           },
@@ -172,7 +221,58 @@ export class Tab1Page implements OnInit {
     }
   }
 
-  // ensureOwnerContext (se mantiene)
+  ngOnDestroy(): void {
+    this.wsSub?.unsubscribe();
+    this.wsSub = undefined;
+    this.refreshSub?.unsubscribe();
+    this.refreshSub = undefined;
+  }
+
+  private initNotifications(userId: number): void {
+    // Cargar lista para contar no leídas
+    this._notificationsService.getAllByUser(userId).subscribe({
+      next: (list: any[]) => {
+        const arr = Array.isArray(list) ? list : [];
+        this.unreadCount = arr.filter((n: any) => (typeof n.read === 'boolean' ? !n.read : !n.is_read)).length;
+      },
+      error: () => { this.unreadCount = 0; }
+    });
+
+    // Refrescar badge cuando se marquen como leídas
+    this.refreshSub = this._notificationsService.refresh$.subscribe(() => {
+      this._notificationsService.getAllByUser(userId).subscribe({
+        next: (list: any[]) => {
+          const arr = Array.isArray(list) ? list : [];
+          this.unreadCount = arr.filter((n: any) => (typeof n.read === 'boolean' ? !n.read : !n.is_read)).length;
+        },
+        error: () => { this.unreadCount = 0; }
+      });
+    });
+
+    // Escuchar notificaciones en vivo
+    this.wsSub = this._webSocketService.newNotification$.subscribe((payload: any) => {
+      if (!payload || typeof payload !== 'object' || payload.id_user == null || Number(payload.id_user) === Number(userId)) {
+        this._notificationsService.getAllByUser(userId).subscribe({
+          next: (list: any[]) => {
+            const arr = Array.isArray(list) ? list : [];
+            this.unreadCount = arr.filter((n: any) => (typeof n.read === 'boolean' ? !n.read : !n.is_read)).length;
+          },
+          error: () => { this.unreadCount = 0; }
+        });
+      }
+    });
+  }
+
+  // 3. Método para cargar y mantener la reactividad de reservas
+  public loadOwnerReservations() {
+    // 3a. Obtener el Observable reactivo del servicio
+    this.ownerReservations$ = this._reservationsService.getReservationsByOwner();
+
+    // 3b. Forzar la primera carga (solo la primera vez o en refresh)
+    void this._reservationsService.loadOwnerReservations();
+  }
+
+  // Asegura contexto del Owner
   private async ensureOwnerContext() {
     try {
       if (this.owner?.user?.id && (this.owner as any)?.property?.id_country) {
@@ -205,12 +305,14 @@ export class Tab1Page implements OnInit {
   }
 
   async ionViewWillEnter() {
-    if (this.reservationsComponent) {
-      // await this.reservationsComponent.ngOnInit();
-    }
+    // 4. Recargar el contexto y las reservas cada vez que se entra a la vista
+    await this.ensureOwnerContext();
+    void this.loadRecurrents(); // Recargar recurrentes
+    this.loadOwnerReservations(); // Recargar reservas
+    this.loadReservationsAndAmenities(); // Cargar amenities
   }
 
-  // authorizeQuickVisit (se mantiene)
+  // --- LÓGICA DE VISITA RÁPIDA ---
   public async authorizeQuickVisit() {
     if (!this.guestName.trim() || !this.guestLastname.trim() || !this.guestDNI.trim()) {
       await this.alerts.showAlert('Error', 'Nombre, Apellido y DNI son obligatorios');
@@ -274,27 +376,25 @@ export class Tab1Page implements OnInit {
     this.alerts.showAlert('Notificaciones', message);
   }
 
-  // --- LÓGICA DE RESERVACION (se mantiene) ---
+  // --- LÓGICA DE RESERVACIÓN ---
   public reserveAmenity() {
     this.isReservationModalOpen = true;
+    this.loadReservationsAndAmenities();
   }
 
+  // confirmReservation usando firstValueFrom y actualización reactiva interna
   public async confirmReservation() {
-    if (!this.selectedAmenity || !this.selectedDate || !this.selectedTime) {
+    if (this.selectedAmenityId === null || !this.selectedDate || !this.selectedTime) {
       this.alerts.showAlert('Error', 'Por favor complete todos los campos.');
       return;
     }
 
-    const id_amenity = this.amenityIdMap[this.selectedAmenity];
-    if (!id_amenity) {
-      this.alerts.showAlert('Error', 'Amenity no válido.');
-      return;
-    }
-
-    if (!this.userID) {
-      this.alerts.showAlert('Error', 'No se pudo obtener el ID del usuario.');
-      return;
-    }
+await this.ensureOwnerContext();
+  const id_property = (this.owner as any)?.property?.id;
+  if (!id_property) {
+    this.alerts.showAlert('Error', 'No se pudo obtener la propiedad del propietario. Reingresá.');
+    return;
+  }
 
     const dateObj = new Date(this.selectedDate);
     const [hours, minutes] = this.selectedTime.split(':').map(Number);
@@ -302,15 +402,31 @@ export class Tab1Page implements OnInit {
     const combinedDateTime = dateObj.toISOString();
 
     const reservationData = {
-      id_amenity: id_amenity,
-      id_user: this.userID,
-      date: combinedDateTime
+      id_amenity: Number (this.selectedAmenityId),
+      date: combinedDateTime,
+      id_property,
+      details: this.details ?? null,
+      guests: this.guests.map(g => ({
+      guest_name: g.name,
+        guest_lastname: g.lastname,
+        DNI: g.dni
+      })) 
     };
 
     try {
-      await this._reservationsService.createReservation(reservationData);
+      // Obtener el nombre del amenity para el mensaje de confirmación
+      let amenityName = 'Amenity Desconocido';
+      const amenities = await firstValueFrom(this.amenities$ as Observable<AmenitieInterface[]>);
+      const selectedAmenity = amenities.find(a => a.id === this.selectedAmenityId);
+      if(selectedAmenity) {
+        amenityName = selectedAmenity.name;
+      }
+      
+      // Esperar la respuesta del POST; la lista se actualiza vía el servicio (loadOwnerReservations)
+      await firstValueFrom(this._reservationsService.createReservation(reservationData));
+
       this.alerts.showAlert('Reserva Confirmada', `
-        <strong>Amenity:</strong> ${this.selectedAmenity}<br>
+        <strong>Amenity:</strong> ${amenityName}<br>
         <strong>Fecha y Hora:</strong> ${new Date(combinedDateTime).toLocaleString()}
       `);
       this.closeReservationModal();
@@ -325,108 +441,115 @@ export class Tab1Page implements OnInit {
     }
   }
 
+  addGuestToReservation() {
+  if (this.guestNameReservation && this.guestLastnameReservation && this.guestDNIReservation) {
+    this.guests.push({
+      name: this.guestNameReservation,
+      lastname: this.guestLastnameReservation,
+      dni: this.guestDNIReservation
+    });
+    // Limpiar inputs
+    this.guestNameReservation = '';
+    this.guestLastnameReservation = '';
+    this.guestDNIReservation = '';
+  }
+}
+
+removeGuestFromReservation(index: number) {
+  this.guests.splice(index, 1);
+}
+
+  loadReservationsAndAmenities() {
+    this.amenities$ = this._amenitiesService.getAllByOwner();
+  }
+
   public closeReservationModal() {
     this.isReservationModalOpen = false;
-    this.selectedAmenity = '';
+    this.selectedAmenityId = null; // FIX: Resetear a null
     this.selectedDate = '';
     this.selectedTime = '';
   }
-  
-  // --- LÓGICA DE RECURRENTES (CORREGIDA) ---
-  
+
+  // --- LÓGICA DE RECURRENTES ---
   private async loadRecurrents() {
     await this.ensureOwnerContext();
 
     const ownerId = this.owner?.user?.id;
     if (!ownerId) {
-        console.error('No se pudo obtener el ID del propietario para cargar recurrentes.');
-        this.registeredRecurrents = [];
-        return;
+      console.error('No se pudo obtener el ID del propietario para cargar recurrentes.');
+      this.registeredRecurrents = [];
+      return;
     }
-    
+
     this._recurrentsService.getRecurrentsByOwner(ownerId).subscribe({
-        next: (data) => {
-            this.registeredRecurrents = data; 
-        },
-        error: (err) => {
-            console.error('Error al cargar recurrentes:', err);
-            this.alerts.showAlert('Error', 'No se pudo cargar la lista de invitados recurrentes.');
-            this.registeredRecurrents = [];
-        }
+      next: (data) => {
+        this.registeredRecurrents = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar recurrentes:', err);
+        this.alerts.showAlert('Error', 'No se pudo cargar la lista de invitados recurrentes.');
+        this.registeredRecurrents = [];
+      }
     });
   }
 
-  public manageRecurrent() { 
+  public manageRecurrent() {
     // Cargar la lista del backend antes de abrir
-    void this.loadRecurrents(); 
-    this.isRecurrentModalOpen = true; 
+    void this.loadRecurrents();
+    this.isRecurrentModalOpen = true;
   }
 
-  public async addRecurrent() { 
-    // 1. Validar campos requeridos para la API (Name, Lastname, DNI)
+  public async addRecurrent() {
+    // 1. Validar campos requeridos para la API
     if (!this.recurrentName.trim() || !this.recurrentLastname.trim() || !this.recurrentDNI.trim()
-      || !this.roleRecurrent.trim() || this.selectedDays.length === 0) 
-    {
+      || !this.roleRecurrent.trim() || this.selectedDays.length === 0) {
       await this.alerts.showAlert('Error', 'Nombre, Apellido y DNI son obligatorios');
       return;
     }
 
-    // 2. Asegurar el contexto para obtener el ID de la Propiedad (id_property)
+    // 2. Asegurar el contexto para obtener id_property
     await this.ensureOwnerContext();
-    const id_property = (this.owner as any)?.property?.id; 
+    const id_property = (this.owner as any)?.property?.id;
 
     if (!id_property) {
       await this.alerts.showAlert('Error', 'No se pudo obtener la propiedad del propietario. Reingresá.');
       return;
     }
+
     const daysString = this.selectedDays.join(',');
 
     try {
       await this._recurrentsService.addRecurrent(
-            id_property,
-            this.recurrentName.trim(),
-            this.recurrentLastname.trim(),
-            this.recurrentDNI.trim(),
-            'owner',                      // userRole: 'owner' | 'admin'
-            this.roleRecurrent.trim(),    // roleRecurrent: string
-            daysString                    // access_days: string
-        );
-      /* 3. Llamar al servicio para persistir en el backend
-      await this.recurrentsService.addRecurrent(
         id_property,
         this.recurrentName.trim(),
-        this.recurrentLastname.trim(), 
+        this.recurrentLastname.trim(),
         this.recurrentDNI.trim(),
-        'owner'
-      ));
-      */
+        'owner',                   // userRole
+        this.roleRecurrent.trim(), // roleRecurrent
+        daysString                 // access_days
+      );
+
       // 4. Recargar la lista del backend
       void this.loadRecurrents();
-      
+
       // 5. Limpiar el formulario
       this.clearRecurrentForm();
-        this.recurrentName = '';
-        this.recurrentLastname = '';
-        this.recurrentDNI = '';
-        this.roleRecurrent = ''; 
-        this.selectedDays = [];  
     } catch (error) {
       console.error('Fallo al agregar recurrente:', error);
       this.alerts.showAlert('Error de Registro', 'No se pudo completar el registro del recurrente. Verifique los datos.');
     }
   }
 
-
   public async removeRecurrent(id: number) {
     try {
       await this.alerts.setLoading();
-      
+
       // 1. Llamar al servicio para eliminar
       const result = await firstValueFrom(this._recurrentsService.deleteRecurrent(id));
 
       // 2. Si es exitoso, recargar la lista
       if (result) {
-        await this.loadRecurrents(); 
+        await this.loadRecurrents();
         this.alerts.showAlert('Recurrente Eliminado', 'El recurrente ha sido eliminado exitosamente del sistema.');
       } else {
         this.alerts.showAlert('Error', 'No se pudo eliminar el recurrente. Intente de nuevo.');
@@ -451,43 +574,55 @@ export class Tab1Page implements OnInit {
     this.roleRecurrent = '';
     this.selectedDays = [];
   }
-  
+
   public onDayChange(day: string, event: any) {
     if (event.detail.checked) this.selectedDays.push(day);
     else this.selectedDays = this.selectedDays.filter(d => d !== day);
   }
 
   public getFormattedDays(days: string | string[] | null | undefined): string {
-
     if (!days) return 'No especificado';
-    
-    // 1. Convertir el string de días del backend a un array
-    //const dayValues = days.split(',');
+
     const dayValues = Array.isArray(days) ? days : String(days).split(',');
 
-
-    /* 2. Mapear los valores ('lunes') a sus etiquetas ('Lunes')
-    return dayValues.map(dayValue => {
-        // Buscar la etiqueta ('Lunes') que corresponde al valor ('lunes')
-        const foundDay = this.weekDays.find(d => d.value === dayValue.trim());
-        return foundDay ? foundDay.label : dayValue;
-    }).join(', ');
-    */
-      return dayValues
-    .map(d => d.trim())
-    .filter(Boolean)
-    .map(value => this.weekDays.find(w => w.value === value)?.label ?? value)
-    .join(', ');
+    return dayValues
+      .map(d => d.trim())
+      .filter(Boolean)
+      .map(value => this.weekDays.find(w => w.value === value)?.label ?? value)
+      .join(', ');
   }
 
   protected async doRefresh(event: any) {
     // Recargar Owner y Recurrentes al hacer pull-to-refresh
-    await this.ensureOwnerContext(); 
+    await this.ensureOwnerContext();
     await this.loadRecurrents();
+    // Forzar recarga de reservas
+    void this._reservationsService.loadOwnerReservations();
+    this.loadReservationsAndAmenities(); // Recargar amenities
     event.target.complete();
   }
 
   // Funciones de control de carga
   public isLoading(): boolean { return this.loading; }
   public setLoading(loading: boolean): void { this.loading = loading; }
+
+  // Avatar helpers (mostrar foto real del propietario en el header)
+  public getAvatarInitial(): string {
+    const n = this.owner?.user?.name ?? '';
+    return n ? n.charAt(0).toUpperCase() : 'U';
+  }
+
+  public getAvatarUrl(): string {
+    const avatar = (this as any)?.owner?.user?.avatar;
+    const url = this.normalizeAvatarUrl(avatar);
+    if (url) return url;
+    return `https://placehold.co/64x64/374151/FFFF?text=${this.getAvatarInitial()}`;
+  }
+  
+  private normalizeAvatarUrl(a: any): string {
+    if (!a || typeof a !== 'string' || a.length === 0) return '';
+    if (/^https?:\/\//i.test(a)) return a;
+    if (a.startsWith('/')) return `${environment.URL}${a}`;
+    return `${environment.URL}/${a}`;
+  }
 }

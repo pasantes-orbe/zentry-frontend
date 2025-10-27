@@ -1,10 +1,12 @@
+// src/app/services/websocket/web-socket.service.ts
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AlertController } from '@ionic/angular';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AlertService } from '../helpers/alert.service';
 import { environment } from 'src/environments/environment';
 import { AuthStorageService } from '../storage/auth-storage.service';
+import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
+import { NotificationInterface } from 'src/app/interfaces/notification-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -12,64 +14,123 @@ import { AuthStorageService } from '../storage/auth-storage.service';
 export class WebSocketService {
 
   private socket: Socket | null = null;
-  private connectionStatus: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private connectionStatus = new BehaviorSubject<boolean>(false);
+
+  //Subject y Observable para actualizaciones de reserva
+  private reservationUpdateSubject = new Subject<ReservationsInterface>();
+  public reservationUpdate$ = this.reservationUpdateSubject.asObservable();
+
+  //Subject y Observable para nuevas notificaciones
+  private newNotificationSubject = new Subject<NotificationInterface>();
+  public newNotification$ = this.newNotificationSubject.asObservable();
+  
+  private listenersRegistered = false;
 
   constructor(
-    private alertController: AlertController,
     private alerts: AlertService,
-    private _authStorage: AuthStorageService
+    private authStorage: AuthStorageService
   ) {}
 
   /**
    * Conectar al servidor WebSocket
-   * Se hace asíncrono para esperar el JWT antes de conectar (CORRECCIÓN P-WS).
    */
-  public async conectar(): Promise<void> { // CORRECCIÓN: Se añade 'async'
+  public async conectar(): Promise<void> { 
     try { 
-
         // Si ya existe y está conectado, salimos.
         if (this.socket && this.socket.connected) {
-            console.log('El socket ya está conectado. No se reconecta.');
+            console.log('El socket ya está conectado.');
             return;
         }
 
         // 1. Recuperar el JWT
-        const token = await this._authStorage.getJWT();
+        const token = await this.authStorage.getJWT();
 
         if (!token) {
-            console.warn("JWT no encontrado. Conexión WebSocket no iniciada. Por favor, inicie sesión.");
+            console.warn("JWT no encontrado. Conexión WebSocket no iniciada.");
             this.connectionStatus.next(false);
             return;
         }
 
-        // 2. Conectar pasando el JWT en el handshake (CORRECCIÓN P-WS)
+        // 2. Conectar pasando el JWT en el handshake
         this.socket = io(environment.URL, {
           auth: { 
             token: token 
           }
         });
 
-
       this.socket.on('connect', () => {
-        console.log('Conectado al servidor WebSocket. ID:', this.socket?.id); // Se añade acceso seguro a .id
+        console.log('Conectado al servidor WebSocket. ID:', this.socket?.id);
         this.connectionStatus.next(true);
+        this.registerCoreListeners();
       });
 
       this.socket.on('disconnect', () => {
         console.log('Desconectado del servidor WebSocket.');
         this.connectionStatus.next(false);
+        this.listenersRegistered = false;
       });
 
       this.socket.on('connect_error', (err) => {
-        console.error('Error de conexión WebSocket (Auth/Transporte):', err.message); // CORRECCIÓN: Mensaje más detallado
-        this.connectionStatus.next(false); // CORRECCIÓN: Se actualiza el estado de conexión
+        console.error('Error de conexión WebSocket (Auth/Transporte):', err.message); 
+        this.connectionStatus.next(false); 
       });
 
     } catch (error) {
       console.error('Error al conectar al servidor WebSocket:', error);
     }
   }
+  
+  private registerCoreListeners(): void {
+    if (!this.socket || this.listenersRegistered) {
+      return;
+    }
 
+    this.listenersRegistered = true;
+    this.registerReservationUpdates();
+    this.registerNotificationUpdates();
+    this.escucharNotificacionesCheckin();
+    this.escucharNotificacionesAntipanico();
+  }
+
+  // Método para escuchar el evento 'Nueva notificacion entrante' del backend
+  private registerNotificationUpdates(): void {
+    if (!this.socket) {
+        console.warn('Socket no inicializado para escuchar nuevas notificaciones.');
+        return;
+    }
+    const eventName = 'new-notification';
+    
+    this.socket.off('new-notification');
+    this.socket.on('new-notification', (payload: NotificationInterface) => {
+        console.log('WebSocket: Nueva notificación de reserva recibida:', payload);
+        this.newNotificationSubject.next(payload);
+
+        /* Agregaar: Mostrar la notificación como Toast (Mejora UX)
+        const title = payload.title || 'Nueva Notificación';
+        const message = payload.content || 'Contenido desconocido';
+        this.alerts.presentToast(title, message, 'success'); 
+        */
+    });
+    console.log('Escuchando evento:', eventName);
+  }
+
+  // Método para escuchar el evento 'reservation-status-updated' del backend
+  private registerReservationUpdates(): void {
+      if (!this.socket) {
+          console.warn('Socket no inicializado para escuchar actualizaciones de reserva.');
+          return;
+      }
+      this.socket.off('reservation-status-updated');
+      this.socket.on('reservation-status-updated', (payload: ReservationsInterface) => {
+          console.log('WebSocket: Actualización de reserva recibida:', payload);
+          this.reservationUpdateSubject.next(payload);
+      });
+      console.log('Escuchando evento: reservation-status-updated');
+  }
+
+  // ... (otros métodos como desconectar, getConnectionStatus, emitirEvento, escucharEvento, eliminarListener, etc.)
+  // Se mantienen los otros métodos de tu archivo, solo se muestra aquí lo relevante para las notificaciones principales.
+  
   /**
    * Desconectar del servidor WebSocket
    */
@@ -78,6 +139,7 @@ export class WebSocketService {
       if (this.socket) {
         this.socket.disconnect();
         this.socket = null;
+        this.listenersRegistered = false;
         console.log('Conexión WebSocket cerrada.');
         this.connectionStatus.next(false);
       }
@@ -101,7 +163,7 @@ export class WebSocketService {
    */
   public emitirEvento(evento: string, data: any): void {
     try {
-      if (this.socket && this.socket.connected) { // CORRECCIÓN P-WS: Se valida que el socket esté activo y conectado.
+      if (this.socket && this.socket.connected) {
         this.socket.emit(evento, data);
         console.log(`Evento emitido: ${evento}`, data);
       } else {
@@ -123,7 +185,7 @@ export class WebSocketService {
         this.socket.on(evento, callback);
         console.log(`Escuchando evento: ${evento}`);
       } else {
-        console.warn('No se puede escuchar el evento. El socket no está inicializado.'); // CORRECCIÓN: Mensaje más preciso
+        console.warn('No se puede escuchar el evento. El socket no está inicializado.'); 
       }
     } catch (error) {
       console.error(`Error al escuchar el evento ${evento}:`, error);
@@ -140,7 +202,7 @@ export class WebSocketService {
         this.socket.off(evento);
         console.log(`Listener eliminado para el evento: ${evento}`);
       } else {
-        console.warn('No se puede eliminar el listener. El socket no está inicializado.'); // CORRECCIÓN: Mensaje más preciso
+        console.warn('No se puede eliminar el listener. El socket no está inicializado.');
       }
     } catch (error) {
       console.error(`Error al eliminar el listener del evento ${evento}:`, error);
@@ -158,9 +220,9 @@ export class WebSocketService {
   }
 
   public notificarCheckIn(data: any): void {
-    this.emitirEvento('notificar-check-in', data);
-    console.log('Evento notificar-check-in enviado:', data);
-  }
+    this.emitirEvento('notificar-check-in', data);
+    console.log('Evento notificar-check-in enviado:', data);
+  }
 
   /**
    * Escuchar notificaciones de antipánico
@@ -186,7 +248,6 @@ export class WebSocketService {
     console.log('Evento notificar-nuevo-confirmedByOwner enviado:', data);
   }
 
-
   /**
    * Notificar un evento de antipánico
    * @param data - Datos del evento
@@ -196,12 +257,12 @@ export class WebSocketService {
     console.log('Evento notificar-antipanico enviado:', data);
   }
 
-  /**
-   * Enviar ubicación del guardia al backend
-   * @param locationData - Datos de ubicación { id_user, id_country, lat, lng, user_name, user_lastname }
-   */
-  public enviarUbicacionGuardia(locationData: any): void {
-    this.emitirEvento('update-guard-location', locationData);
-    console.log('[WebSocket] Ubicación del guardia enviada:', locationData);
-  }
+  /**
+   * Enviar ubicación del guardia al backend
+   * @param locationData - Datos de ubicación { id_user, id_country, lat, lng, user_name, user_lastname }
+   */
+  public enviarUbicacionGuardia(locationData: any): void {
+    this.emitirEvento('update-guard-location', locationData);
+    console.log('[WebSocket] Ubicación del guardia enviada:', locationData);
+  }
 }

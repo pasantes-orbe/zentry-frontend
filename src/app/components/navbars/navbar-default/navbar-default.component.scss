@@ -1,7 +1,6 @@
 ion-avatar{
-    --border-radius: 0px;
      height: 55px;
-     width: 77px;
+     width: 55px;
     // height: 44px;
    // width: 62px;
 
@@ -24,4 +23,18 @@ ion-item.noti {
     margin-right: 10px;
     background-color: var(--ion-background-color);
   } 
+
+/* Notificaciones (propietario) */
+.notifications-button {
+  position: relative;
+}
+.notifications-button ion-icon {
+  font-size: 22px;
+}
+.notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  transform: scale(0.85);
+}
 

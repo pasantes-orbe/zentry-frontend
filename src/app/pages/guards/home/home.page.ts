@@ -166,6 +166,10 @@ export class HomePage implements OnInit, OnDestroy {
   navigateToAuthorizations() {
     this.router.navigate(['/guards/authorizations']);
   }
+  
+  navigateToEvents() {
+    this.router.navigate(['/view-events']);
+  }
 
   navigateToCheckout() {
     this.router.navigate(['/checkout']);

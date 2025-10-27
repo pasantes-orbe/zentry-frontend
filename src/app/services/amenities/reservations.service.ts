@@ -1,110 +1,213 @@
-//reservations.service.ts
+// src/app/services/amenities/reservations.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { Observable } from 'rxjs';
-import { AmenitieInterface } from 'src/app/interfaces/amenitie-interface';
+import {
+  Observable,
+  BehaviorSubject,
+  firstValueFrom,
+  of,
+  from,
+  switchMap,
+  map,
+  tap,
+  catchError,
+  throwError,
+} from 'rxjs';
 import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
 import { environment } from 'src/environments/environment';
 import { AlertService } from '../helpers/alert.service';
 import { CountryStorageService } from '../storage/country-storage.service';
 import { OwnerStorageService } from '../storage/owner-interface-storage.service';
 import { UserStorageService } from '../storage/user-storage.service';
+import { WebSocketService } from '../websocket/web-socket.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReservationsService {
+  private ownerReservationsSubject = new BehaviorSubject<ReservationsInterface[]>([]);
+  public ownerReservations$: Observable<ReservationsInterface[]> =
+    this.ownerReservationsSubject.asObservable();
 
-  constructor(private _userStorageService: UserStorageService, private _countryStorageService: CountryStorageService, private _http: HttpClient, private _alertService: AlertService, private _router: Router, private _ownerStorageService: OwnerStorageService) {
-
+  constructor(
+    private _userStorageService: UserStorageService,
+    private _countryStorageService: CountryStorageService,
+    private _http: HttpClient,
+    private _alertService: AlertService,
+    private _router: Router,
+    private _ownerStorageService: OwnerStorageService,
+    private _webSocketService: WebSocketService
+  ) {
+    this.subscribeToWebSocketUpdates();
   }
 
-  public async createReservation(reservationData: any) {
-  const user = await this._userStorageService.getUser();
-  const userID = user.id;
+  // Helpers: resuelven el ID de usuario de forma robusta
+private async resolveCurrentUserId(): Promise<number | null> {
+  try {
+    const owner = await this._ownerStorageService.getOwner();
+    const fromOwner =
+      (owner as any)?.user?.id ??
+      (owner as any)?.id ??
+      (owner as any)?.ownerId ??
+      (owner as any)?.user_id ??
+      null;
 
-  // Los datos ya vienen en un solo objeto, solo agregamos el id del usuario
-  const payload = {
-    ...reservationData,
-    id_user: userID
-  };
+    if (fromOwner) return Number(fromOwner);
 
-  await this._alertService.setLoading();
-
-  this._http.post(`${environment.URL}/api/reservations`, payload).subscribe(async (res) => {
-    console.log(res);
-    await this._alertService.removeLoading();
-    this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
-    var getUrl = window.location;
-    window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab3`
-  },
-    async (err) => {
-    console.log("asdfasdf", err['error']);
-    await this._alertService.removeLoading();
-    this._alertService.showAlert("¡Ooops!", `${err['error']}`);
-  })
+    const u = await this._userStorageService.getUser();
+    return u?.id ?? null;
+  } catch {
+    return null;
+  }
 }
-  //public async createReservation(id_amenity, date, details, guests){
+// helper para obtener el ID del país
+private resolveCurrentCountryId$(): Observable<number> {
+  return from(this._countryStorageService.getCountry()).pipe(
+    switchMap(country => {
+      const countryID = country?.id ?? null;
+      if (countryID != null) {
+        return of(countryID);
+      } else {
+        return throwError(() => new Error('No se pudo obtener el ID del país.'));
+      }
+    })
+  );
+}
 
-  //  const user = await this._userStorageService.getUser()
-  //  const userID = user.id
-  //  const formData = new FormData();
-  //  formData.append('id_user', userID.toString());
-  //  formData.append('id_amenity', id_amenity);
-  //  formData.append('date', date);
-  //  formData.append('details', details);
+private resolveCurrentUserId$(): Observable<number> {
+  return from(this.resolveCurrentUserId()).pipe(
+    switchMap(id => id != null
+      ? of(id)
+      : throwError(() => new Error('No se pudo obtener el ID del usuario.')))
+  );
+}
 
-  //  await this._alertService.setLoading();
+private subscribeToWebSocketUpdates() {
+  this._webSocketService.reservationUpdate$.subscribe(async (updatedReservation) => {
+    const currentUserId = await this.resolveCurrentUserId();
+    if (!currentUserId) return;
+    if (currentUserId !== updatedReservation.user.id) return;
 
-  //  this._http.post(`${environment.URL}/api/reservations`, formData).subscribe(async (res) => {
-  //    console.log(res);
-  //    console.log(res['id']);
-  //    console.log("ESTO ES LO QUE SE ENVIA", guests);
-  //    const id_reservation = res['id']
+    const current = this.ownerReservationsSubject.getValue();
+    const idx = current.findIndex(r => r.id === updatedReservation.id);
+    if (idx !== -1) {
+      const next = [...current];
+      next[idx] = updatedReservation;
+      this.ownerReservationsSubject.next(next);
+    } else {
+      void this.loadOwnerReservations();
+    }
+  });
+}
 
+private async fetchReservationsByOwner(): Promise<ReservationsInterface[]> {
+  try {
+    const userID = await this.resolveCurrentUserId();
+    if (!userID) throw new Error('Owner ID not found for fetching reservations');
+    return await firstValueFrom(this.getAllByUser(userID));
+  } catch (error) {
+    console.error('Error fetching reservations for owner:', error);
+    return [];
+  }
+}
 
-  //    console.log(guests);
-
-      
-  //    this._http.post(`${environment.URL}/api/invitation/${id_reservation}`,{
-
-  //      guests: guests
-  //    }).subscribe(async res =>{
-
-  //      console.log(res);
-
-  //      await this._alertService.removeLoading();
-  //      this._alertService.showAlert("¡Listo!", "La reserva del lugar fue exitosa");
-  //      var getUrl = window.location;
-  //      var baseUrl = getUrl.protocol + "//" + getUrl.host;
-  //      window.location.href = `${getUrl.protocol + "//" + getUrl.host}/home/tabs/tab3`
-  //    }
-  //    )
-//},
-
-public async getAllByUser(): Promise<Observable<ReservationsInterface[]>> {
-    const owner = await this._ownerStorageService.getOwner()
-    const userID = owner.user.id
-    return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/get_by_user/${userID}`);
+  public async loadOwnerReservations(): Promise<void> {
+    const reservations = await this.fetchReservationsByOwner();
+    this.ownerReservationsSubject.next(reservations);
   }
 
-  public async getAllByCountry(): Promise<Observable<ReservationsInterface[]>> {
-    const country = await this._countryStorageService.getCountry()
-    const countryID = country.id
-    return this._http.get<ReservationsInterface[]>(`${environment.URL}/api/reservations/country/get_by_id/${countryID}`)
+  public createReservation(reservationData: any): Observable<any> {
+    return from(this._userStorageService.getUser()).pipe(
+      switchMap(user => {
+        const userID = user?.id;
+        if (!userID) {
+          throw new Error('No se pudo obtener el ID del usuario.');
+        }
+
+        // Enviar como multipart/form-data para que el backend parsee guests (string) y campos asociados
+        const formData = new FormData();
+        formData.append('id_user', String(userID));
+        formData.append('id_amenity', String(reservationData.id_amenity ?? ''));
+        formData.append('date', String(reservationData.date ?? ''));
+        if (reservationData.details != null) formData.append('details', String(reservationData.details));
+
+        // guests debe ir como JSON string según contrato del backend
+        const guests = Array.isArray(reservationData.guests) ? reservationData.guests : [];
+        if (guests.length > 0) {
+          formData.append('guests', JSON.stringify(guests));
+        }
+
+        return this._http.post(`${environment.URL}/api/reservations`, formData).pipe(
+          tap(async () => {
+            console.log('Reserva creada.');
+            await this.loadOwnerReservations();
+            await this._alertService.removeLoading();
+          }),
+          map(res => res),
+          catchError(async err => {
+            console.error('Error al crear reserva (HTTP):', err);
+            await this._alertService.removeLoading();
+            this._alertService.showAlert(
+              '¡Ooops!',
+              `${err?.error?.msg || 'Error al crear la reserva.'}`
+            );
+            return throwError(() => err);
+          })
+        );
+      }),
+      catchError(async err => {
+        console.error('Error de flujo (ID o Storage):', err);
+        if (err.message === 'No se pudo obtener el ID del usuario.') {
+          this._alertService.showAlert('Error', err.message);
+        }
+        await this._alertService.removeLoading();
+        return throwError(() => err);
+      })
+    );
   }
 
-  public getAllByCountryAndStatus(id_country, status) {
-    return this._http.get<any[]>(`${environment.URL}/api/reservations/${id_country}?status=${status} `)
+  public getReservationsByOwner(): Observable<ReservationsInterface[]> {
+    return this.ownerReservations$;
   }
 
-  public updateStatus(status: boolean, reservationID: number) {
-    return this._http.patch(`${environment.URL}/api/reservations/${reservationID}/${status}`, {});
+  public getAllByUser(userID: number): Observable<ReservationsInterface[]> {
+    return this._http.get<ReservationsInterface[]>(
+      `${environment.URL}/api/reservations/get_by_user/${userID}`
+    );
   }
 
-  public reservationGuests(id_reservation) {
-    return this._http.get<any[]>(`${environment.URL}/api/invitation/${id_reservation}`)
+public getAllByCountry(): Observable<ReservationsInterface[]> {
+  return this.resolveCurrentCountryId$().pipe(
+    switchMap(countryID => {
+      // 🚀 Endpoint correcto para el Admin
+      const url = `${environment.URL}/api/reservations/country/get_by_id/${countryID}`;
+      return this._http.get<ReservationsInterface[]>(url);
+    }),
+    catchError((err) => {
+      console.error('Error al cargar reservas por país para Admin:', err);
+      return of([]);
+    })
+  );
+}
+
+  public getAllByCountryAndStatus(id_country: number, status: string) {
+    return this._http.get<any[]>(
+      `${environment.URL}/api/reservations/${id_country}?status=${status}`
+    );
+  }
+
+  public updateStatus(status: boolean, reservationID: number) {
+    // Algunos endpoints pueden responder 200 sin cuerpo, lo que rompe el parser JSON por defecto.
+    // Pedimos 'text' como respuesta para evitar errores de parseo aunque el servidor no devuelva JSON.
+    return this._http.patch(
+      `${environment.URL}/api/reservations/${reservationID}/${status}`,
+      {},
+      { responseType: 'text' as 'json' }
+    );
+  }
+
+  public reservationGuests(id_reservation: number) {
+    return this._http.get<any[]>(`${environment.URL}/api/invitation/${id_reservation}`);
   }
 }

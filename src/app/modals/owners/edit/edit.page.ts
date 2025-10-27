@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { checkmarkCircleOutline } from 'ionicons/icons';
 import { UserService } from 'src/app/services/user/user.service';
 
 // Componentes
-import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonDatetimeButton, IonModal, IonDatetime, IonIcon, ModalController, ToastController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonDatetimeButton, IonModal, IonDatetime, IonIcon, ModalController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-edit',
@@ -36,7 +36,7 @@ import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, Ion
 })
 export class EditPage implements OnInit {
 
-  @Input("id_owner") id_owner;
+  @Input("id_owner") id_owner: number;
 
   private readonly: boolean;
   private formBuilder: FormBuilder;
@@ -48,12 +48,25 @@ export class EditPage implements OnInit {
   public email;
   public birthday;
 
-  constructor(protected _formBuilder: FormBuilder, private _userService: UserService, private modalCtrl: ModalController, private toastController: ToastController) {
+  constructor(
+    protected _formBuilder: FormBuilder,
+    private _userService: UserService,
+    private _route: ActivatedRoute,
+    private _router: Router,
+    @Optional() private modalCtrl: ModalController,
+  ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
 
   async ngOnInit() {
+    // Si viene por ruta: /edit-owner/:id, tomar el parámetro
+    if (!this.id_owner) {
+      const idParam = this._route.snapshot.paramMap.get('id');
+      if (idParam) {
+        this.id_owner = Number(idParam);
+      }
+    }
     this._userService.getUserByID(this.id_owner).subscribe(
       res => {
         this.user = res
@@ -86,7 +99,10 @@ export class EditPage implements OnInit {
   }
 
   cancel() {
-    return this.modalCtrl.dismiss(null, 'cancel');
+    if (this.modalCtrl) {
+      return this.modalCtrl.dismiss(null, 'cancel');
+    }
+    this._router.navigate(['/admin/view-owners']);
   }
 
   updateOwner() {

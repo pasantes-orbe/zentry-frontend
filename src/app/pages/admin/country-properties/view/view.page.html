@@ -57,11 +57,9 @@
             <ng-container *ngIf="prop?.owners?.length; else noOwners">
               <div class="owner-chips">
                 <ng-container *ngFor="let owner of prop.owners | slice:0:4">
-                  <img
-                    class="chip-avatar"
-                    [src]="getOwnerAvatar(owner)"
-                    [alt]="(owner?.user?.name || '') + ' ' + (owner?.user?.lastname || '')"
-                  />
+                  <ion-avatar class="chip-avatar" title="Avatar propietario">
+                    <img [src]="getOwnerAvatar(owner)" [alt]="(owner?.user?.name || '') + ' ' + (owner?.user?.lastname || '')" />
+                  </ion-avatar>
                 </ng-container>
                 <span class="more" *ngIf="prop.owners.length > 4">+{{ prop.owners.length - 4 }}</span>
               </div>

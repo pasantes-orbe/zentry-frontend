@@ -1,3 +1,4 @@
+<!--src/app/pages/admin/country-dashboard/country-dashboards.page.html-->
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start" class="header-brand">
@@ -25,7 +26,7 @@
 <!-- Popover de notificaciones -->
 <ion-popover trigger="notifications-trigger" triggerAction="click" [dismissOnSelect]="false" class="notifications-popover">
   <ng-template>
-    <app-notifications-popover [notifications]="notifications"></app-notifications-popover>
+    <app-notifications-popover [userId]="userIdForNotifications"></app-notifications-popover>
   </ng-template>
 </ion-popover>
 

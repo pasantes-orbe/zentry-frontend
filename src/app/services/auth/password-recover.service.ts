@@ -34,7 +34,7 @@ export class PasswordRecoverService {
     const token = await this._authStorageService.getJWT()
     const httpOptions = {
       headers: new HttpHeaders({
-        'Authorization': token,
+        'Authorization': `Bearer ${token}`,
       }),
     }
     return this.http.patch(`${environment.URL}/api/users/change-password/${id}`,

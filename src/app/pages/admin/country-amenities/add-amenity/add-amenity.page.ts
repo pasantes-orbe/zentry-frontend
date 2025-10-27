@@ -23,14 +23,10 @@ import { NavbarBackComponent } from "src/app/components/navbars/navbar-back/navb
     NavbarBackComponent
   ]
 })
-
-
 export class AddAmenityPage implements OnInit {
 
-  public newImg: any = 'https://ionicframework.com/docs/img/demos/card-media.png';
-  private formBuilder: FormBuilder;
-  private form: FormGroup;
-  private errorMessage: any;
+  public newImg: string | ArrayBuffer | null = 'https://ionicframework.com/docs/img/demos/card-media.png';
+  public form: FormGroup;
 
   constructor(
     protected _formBuilder: FormBuilder,
@@ -39,44 +35,69 @@ export class AddAmenityPage implements OnInit {
     private _amenitie: AmenitieService,
     private photoService: PhotoService,
   ) {
-    this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
 
   ngOnInit(): void { }
 
-  saveAmenitie() {
-    this._amenitie.addAmenitiy(this.getForm().get('name').value,
-      this.getForm().get('address').value,
-      this.getForm().get('fileSource').value,);
+  async saveAmenitie(): Promise<void> {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const name = this.form.get('name')?.value as string;
+    const address = this.form.get('address')?.value as string;
+    const avatar = this.form.get('avatar')?.value as File | null;
+
+    if (!(avatar instanceof File)) {
+      // Esto es redundante gracias al form.invalid, pero asegura que se marque el error.
+      this.form.get('avatar')?.setErrors({ required: true });
+      this.form.get('avatar')?.markAsTouched();
+      this._alertService.showAlert("¡Ooops!", "Por favor selecciona una foto para el lugar de reserva.");
+      return;
+    }
+
+    await this._amenitie.addAmenitiy(name, address, avatar);
   }
 
   private createForm(): FormGroup {
-    return this.formBuilder.group({
+    return this._formBuilder.group({
       name: ['', [Validators.required]],
       address: ['', [Validators.required]],
-      amenitieAvatar: new FormControl('', [Validators.required]),
-      fileSource: new FormControl('', [Validators.required]),
+      avatar: new FormControl<File | null>(null, [Validators.required])
     });
   }
-  onFileChange(event) {
-    console.log("ESTO ES LO QUE SE ENCUENTRA AL CAMBUIAR", event.target.files[0]);
-    const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = e => this.newImg = reader.result;
-    reader.readAsDataURL(file);
-
-    if (event.target.files.length > 0) {
-
-
-      const file = event.target.files[0];
-      this.form.patchValue({
-        fileSource: file
-      });
+  
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input?.files?.length) {
+      return;
     }
-  }
-  public getForm(): FormGroup {
-    return this.form;
-  }
+
+    const file = input.files.item(0);
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.newImg = reader.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Asignamos el objeto File al control 'avatar'
+    const avatarControl = this.form.get('avatar');
+    avatarControl?.setValue(file);
+    avatarControl?.markAsDirty();
+    avatarControl?.markAsTouched();
+    avatarControl?.updateValueAndValidity();
+
+    // Esto permite seleccionar el mismo archivo si el usuario cambia de opinión
+    input.value = '';
+  }
+
+  public getForm(): FormGroup {
+    return this.form;
+  }
 }

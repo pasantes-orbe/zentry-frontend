@@ -1,4 +1,5 @@
 import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -22,10 +23,12 @@ import { environment } from 'src/environments/environment';
 // Servicios
 import { UserStorageService } from '../services/storage/user-storage.service';
 import { OwnersService } from '../services/owners/owners.service';
+import { UserService } from '../services/user/user.service';
 import { OwnerStorageService } from '../services/storage/owner-interface-storage.service';
 import { AlertService } from '../services/helpers/alert.service';
 import { PropertiesService } from '../services/properties/properties.service';
 import { AuthStorageService } from '../services/storage/auth-storage.service';
+import { LoginService } from '../services/auth/login.service';
 
 // Componentes
 import { IncomesComponent } from '../components/incomes/incomes.component';
@@ -48,6 +51,7 @@ export class Tab3Page implements OnInit, OnDestroy {
   private userID: string = '';
   protected owner!: OwnerResponse;
   private socket?: Socket;
+  private userAvatar: string | null = null;
 
   public recurrentsState = false;
 
@@ -57,6 +61,7 @@ export class Tab3Page implements OnInit, OnDestroy {
   public isPropertiesModalOpen = false;
   public isSecurityModalOpen = false;
   public isEditProfileModalOpen = false;
+  public isFullProfileModalOpen = false;
 
   // Edición perfil
   public editName: string = '';
@@ -114,7 +119,10 @@ export class Tab3Page implements OnInit, OnDestroy {
     private alerts: AlertService,
     private router: Router,
     private _propertiesService: PropertiesService,
-    private authStorage: AuthStorageService
+    private authStorage: AuthStorageService,
+    private _userService: UserService,
+    private _loginService: LoginService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.socket = io(environment.URL);
   }
@@ -131,6 +139,27 @@ export class Tab3Page implements OnInit, OnDestroy {
         this.loadEditData();
       });
 
+      this._userService.getUserByID(this.userID).subscribe((u) => {
+        // Refrescar datos principales para header (nombre/apellido/avatar)
+        try {
+          if (u) {
+            const name = u?.name ?? this.owner?.user?.name ?? '';
+            const lastname = u?.lastname ?? this.owner?.user?.lastname ?? '';
+            this.editName = `${name ?? ''} ${lastname ?? ''}`.trim();
+            this.editEmail = u?.email ?? this.editEmail;
+            this.editPhone = u?.phone ?? this.editPhone;
+            // Si existe estructura owner.user, sincronizar avatar si viene
+            if ((this as any).owner && (this as any).owner.user) {
+              (this as any).owner.user.avatar = u?.avatar ?? (this as any).owner.user.avatar;
+              (this as any).owner.user.name = name;
+              (this as any).owner.user.lastname = lastname;
+            }
+            this.userAvatar = u?.avatar ?? this.userAvatar;
+            try { this.cdr.detectChanges(); } catch {}
+          }
+        } catch {}
+      });
+
       this.nuevoPropietarioConectado();
       this.escucharNotificacionesCheckin();
       this.loadOwnerProperties();
@@ -139,18 +168,32 @@ export class Tab3Page implements OnInit, OnDestroy {
 
   ionViewWillEnter() {
     this.incomesComponent?.ngOnInit();
+    // Refrescar datos del usuario (incluido avatar) al entrar a la vista
+    try {
+      if (this.userID) {
+        this._userService.getUserByID(this.userID).subscribe((u: any) => {
+          const avatar = u?.avatar;
+          if (avatar && (this as any).owner?.user) {
+            (this as any).owner.user.avatar = avatar;
+          }
+          const name = u?.name ?? (this as any)?.owner?.user?.name ?? '';
+          const lastname = u?.lastname ?? (this as any)?.owner?.user?.lastname ?? '';
+          this.editName = `${name ?? ''} ${lastname ?? ''}`.trim();
+          this.editEmail = u?.email ?? this.editEmail;
+          this.editPhone = u?.phone ?? this.editPhone;
+          try { this.cdr.detectChanges(); } catch {}
+        });
+      }
+    } catch {}
   }
 
   // ------- Datos -------
   private loadEditData() {
     if (this.owner && this.owner.user) {
-      this.editName = this.owner.user.name || '';
-      this.editEmail = this.owner.user.email || '';
-      this.editPhone = this.owner.user.phone || '';
-    } else {
-      this.editName = 'Propietario';
-      this.editEmail = 'email@ejemplo.com';
-      this.editPhone = '+54 11 1234-5678';
+      // Solo asignar si existen; no sobreescribir con placeholders
+      this.editName = this.owner.user.name || this.editName;
+      this.editEmail = this.owner.user.email || this.editEmail;
+      this.editPhone = this.owner.user.phone || this.editPhone;
     }
   }
 
@@ -220,16 +263,12 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   private viewFullProfile() {
-    const ownerInfo = this.owner || null;
     this.isActionSheetOpen = false;
-    this.alerts.showAlert('Perfil Completo', `
-      <strong>ID Usuario:</strong> ${ownerInfo?.user?.id || 'No disponible'}<br>
-      <strong>Nombre:</strong> ${this.editName}<br>
-      <strong>Email:</strong> ${this.editEmail}<br>
-      <strong>Teléfono:</strong> ${this.editPhone}<br>
-      <strong>Estado:</strong> Activo<br>
-      <strong>Tipo:</strong> Propietario
-    `);
+    this.isFullProfileModalOpen = true;
+  }
+
+  public closeFullProfileModal() {
+    this.isFullProfileModalOpen = false;
   }
 
   // ------- Propiedades -------
@@ -259,9 +298,18 @@ export class Tab3Page implements OnInit, OnDestroy {
       this.alerts.showAlert('Error', 'La contraseña debe tener al menos 6 caracteres');
       return;
     }
-    // Llamada a backend aquí si aplica
-    this.alerts.showAlert('Contraseña Actualizada', 'Su contraseña ha sido cambiada exitosamente');
-    this.closeSecurityModal();
+
+    this._loginService.changePassword(this.currentPassword, this.newPassword).subscribe({
+      next: (resp: any) => {
+        const msg = resp?.msg || 'Su contraseña ha sido cambiada exitosamente';
+        this.alerts.showAlert('Contraseña Actualizada', msg);
+        this.closeSecurityModal();
+      },
+      error: (err) => {
+        const msg = err?.error?.msg || 'No se pudo cambiar la contraseña. Intente nuevamente.';
+        this.alerts.showAlert('Error', msg);
+      }
+    });
   }
 
   public closeSecurityModal() {
@@ -319,11 +367,29 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   public getAvatarInitial(): string {
-    if (this.owner?.user?.name) return this.owner.user.name.charAt(0).toUpperCase();
-    return 'U';
+    const n = this.owner?.user?.name ?? this.editName ?? '';
+    return n ? n.charAt(0).toUpperCase() : 'U';
+  }
+
+  public getAvatarUrl(): string {
+    const avatar = (this as any)?.owner?.user?.avatar || this.userAvatar;
+    const url = this.normalizeAvatarUrl(avatar);
+    if (url) return url;
+    return `https://placehold.co/128x128/374151/FFFF?text=${this.getAvatarInitial()}`;
+  }
+
+  private normalizeAvatarUrl(a: any): string {
+    if (!a || typeof a !== 'string' || a.length === 0) return '';
+    if (/^https?:\/\//i.test(a)) return a;
+    if (a.startsWith('/')) return `${environment.URL}${a}`;
+    return `${environment.URL}/${a}`;
   }
 
   public getOwnerName(): string {
+    const name = (this as any)?.owner?.user?.name ?? '';
+    const lastname = (this as any)?.owner?.user?.lastname ?? '';
+    const full = `${name} ${lastname}`.trim();
+    if (full) return full;
     return this.editName || 'Propietario';
   }
 

@@ -17,7 +17,7 @@
     </ion-item>
 
     <ion-item *ngFor="let notification of notifications" [class.unread]="!notification.read"
-      (click)="markAsRead(notification)">
+      (click)="openNotification(notification)">
       <ion-icon name="notifications-outline" slot="start" [color]="notification.read ? 'medium' : 'primary'"></ion-icon>
       <ion-label>
         <h3>{{ notification.title }}</h3>

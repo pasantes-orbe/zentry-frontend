@@ -105,6 +105,7 @@ export class RecurrentsViewAllComponent implements OnInit {
   // ← NUEVO: eliminar (hard delete). Si preferís soft, usá patchStatus(id,false)
   public eliminar(recurrent: RecurrentsInterface, i: number): void {
     if (!recurrent?.id) return;
+    // Backend ahora expone DELETE /api/recurrents/:id → eliminamos físicamente
     this.recurrentsSvc.deleteRecurrent(Number(recurrent.id)).subscribe({
       next: () => { this.recurrents.splice(i, 1); },
       error: (err) => console.error('deleteRecurrent error', err)

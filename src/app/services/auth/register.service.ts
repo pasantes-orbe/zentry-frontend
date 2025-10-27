@@ -85,6 +85,17 @@ export class RegisterService {
             await this._alertService.removeLoading();
             this._alertService.showAlert("¡Listo!", `El usuario ${rol} fue creado con éxito`);
 
+            // Si el backend aún no guardó el avatar en el create, intentamos subirlo inmediatamente
+            try {
+              const createdUserId = res && res['user'] && res['user']['id'];
+              const createdUserAvatar = res && res['user'] && res['user']['avatar'];
+              if (createdUserId && !createdUserAvatar && avatar instanceof File) {
+                await this.uploadAvatarAfterRegister(createdUserId, avatar);
+              }
+            } catch (e) {
+              console.warn('No se pudo subir el avatar post-registro (se puede subir luego desde edición de perfil):', e);
+            }
+
             if (rol === 'propietario') {
               this.asignarCountry(res['user']['id'], 'owners');
 
@@ -134,6 +145,17 @@ export class RegisterService {
             }
           }
         );
+    });
+  }
+
+  // Intento de subida de avatar inmediatamente post-registro, por si el endpoint de create no lo procesó
+  private async uploadAvatarAfterRegister(userId: number, file: File): Promise<void> {
+    const fd = new FormData();
+    fd.append('avatar', file);
+    await new Promise<void>((resolve, reject) => {
+      this._http.patch(`${environment.URL}/api/users/avatar/${userId}`, fd)
+        .pipe(first())
+        .subscribe({ next: () => resolve(), error: (e) => reject(e) });
     });
   }
 

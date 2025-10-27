@@ -2,7 +2,7 @@
 
 <ion-content class="ion-padding">
 
-  <form form [formGroup]="getForm()" (keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
+  <form [formGroup]="getForm()" (keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
     <ion-item>
       <ion-label position="floating">Seleccionar Lugar</ion-label>
       <ion-select formControlName="amenitieID" placeholder="Seleccionar">
@@ -25,13 +25,13 @@
       <ion-row class="borderBottom" *ngFor="let guest of guests; let i = index">
         <ion-col size="6">
           <ion-item>
-            <ion-input [(ngModel)]="guests[i].name" [ngModelOptions]="{standalone: true}" type="text"
+            <ion-input [(ngModel)]="guests[i].nombre" [ngModelOptions]="{standalone: true}" type="text"
               placeholder="Nombre"></ion-input>
           </ion-item>
         </ion-col>
         <ion-col size="6">
           <ion-item>
-            <ion-input [(ngModel)]="guests[i].lastname" [ngModelOptions]="{standalone: true}" type="text"
+            <ion-input [(ngModel)]="guests[i].apellido" [ngModelOptions]="{standalone: true}" type="text"
               placeholder="Apellido"></ion-input>
           </ion-item>
         </ion-col>
