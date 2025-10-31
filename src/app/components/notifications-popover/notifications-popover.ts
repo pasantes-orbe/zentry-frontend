@@ -79,7 +79,10 @@ export class NotificationsPopoverComponent implements OnInit {
 
         if (notification?.reservation_id) {
           const qp: any = { openReservationId: notification.reservation_id };
-          this.router.navigate(['/admin/events-historial'], { queryParams: qp }).then(() => this.close());
+          // Detectar si es guardia o admin por la URL actual
+          const isGuard = this.router.url.includes('/guards');
+          const route = isGuard ? '/view-events' : '/admin/events-historial';
+          this.router.navigate([route], { queryParams: qp }).then(() => this.close());
           return;
         }
 

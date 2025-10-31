@@ -9,14 +9,13 @@ import { MenuController } from '@ionic/angular';
 // Interfaces
 import { UserInterface } from 'src/app/interfaces/user-interface';
 
-// Servicios - COMENTAR LOS QUE REQUIEREN SERVIDOR:
+// Servicios
 import { NavigationService } from 'src/app/helpers/navigation.service';
-// import { NotificationsService } from 'src/app/services/notifications/notifications.service';
-// import { PushService } from 'src/app/services/pushNotifications/push.service';
-// import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
-// import { IntervalStorageService } from 'src/app/services/storage/interval-storage.service';
-// import { UserStorageService } from 'src/app/services/storage/user-storage.service';
-// import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { NotificationsService } from 'src/app/services/notifications/notifications.service';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
+import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-navbar-guards',
@@ -33,40 +32,42 @@ export class NavbarGuardsComponent implements OnInit {
     protected user: UserInterface;
     protected notifications: any[] = [];
     protected id_user: any;
-    public countryName: string = "ZENTRY"; // VALOR TEMPORAL
+    public countryName: string = "ZENTRY";
     public dropdownState: boolean = false;
+    public unreadCount: number = 0;
+    private wsSub?: Subscription;
+    private refreshSub?: Subscription;
 
     constructor(
         public router: Router,
-        // COMENTAR SERVICIOS QUE REQUIEREN SERVIDOR:
-        // protected _userStorage: UserStorageService,
+        protected _userStorage: UserStorageService,
         private menu: MenuController,
-        // private _socketService: WebSocketService,
-        // protected _countryStorage: CountryStorageService,
-        // protected _intervalStorageService: IntervalStorageService,
-        // private _pushService: PushService,
-        // private _notificationService: NotificationsService
+        private _socketService: WebSocketService,
+        protected _countryStorage: CountryStorageService,
+        private _notificationService: NotificationsService
     ) { }
 
     async ngOnInit() {
-        // COMENTAR TODO LO QUE REQUIERE SERVIDOR:
-        /*
         const country = await this._countryStorage.getCountry();
         this.countryName = country.name;
 
         this.setUser(await this._userStorage.getUser());
-
         this.id_user = (await this._userStorage.getUser()).id;
 
-        this._notificationService.getAllByUser(this.id_user).subscribe(
-            res => {
-                this.notifications = res.slice((res.length - 5), (res.length));
-                this.notifications = this.notifications.reverse();
-            }
-        );
+        // Cargar notificaciones iniciales
+        this.loadNotifications(this.id_user);
 
-        const timerID = await this._intervalStorageService.getInterval_id();
-        */
+        // Suscribirse a nuevas notificaciones por WebSocket
+        this.wsSub = this._socketService.newNotification$.subscribe((n: any) => {
+            if (!n || typeof n !== 'object' || n.id_user == null || Number(n.id_user) === Number(this.id_user)) {
+                this.loadNotifications(this.id_user);
+            }
+        });
+
+        // Refrescar cuando se marquen como leídas
+        this.refreshSub = this._notificationService.refresh$.subscribe(() => {
+            this.loadNotifications(this.id_user);
+        });
     }
 
     ionViewWillEnter() {
@@ -76,7 +77,7 @@ export class NavbarGuardsComponent implements OnInit {
     async signOut() {
         // SIMPLIFICAR PARA SOLO REDIRIGIR:
         this.router.navigate(['/login']);
-        
+
         // COMENTAR TODO LO DEMÁS:
         /*
         const user = this.getUser();
@@ -128,15 +129,52 @@ export class NavbarGuardsComponent implements OnInit {
         this.notifications.splice(i, 1);
     }
 
+    public openNotification(notification: any) {
+        // Cerrar el dropdown
+        this.dropdownState = false;
+
+        // Marcar como leída si no lo está
+        if (!notification.read && notification.id) {
+            this._notificationService.markAsRead([notification.id]).subscribe({
+                next: () => {
+                    notification.read = true;
+                    this._notificationService.emitRefresh();
+                },
+                error: (err) => console.error('Error al marcar como leída:', err)
+            });
+        }
+
+        // Navegar al evento si tiene reservation_id
+        if (notification?.reservation_id) {
+            this.router.navigate(['/view-events'], { 
+                queryParams: { openReservationId: notification.reservation_id } 
+            });
+        }
+    }
+
     public updateNotifications() {
-        // COMENTAR:
-        /*
-        this._notificationService.getAllByUser(this.id_user).subscribe(
-            res => {
-                console.log(res);
-                this.notifications = res;
+        this.loadNotifications(this.id_user);
+    }
+
+    private loadNotifications(userId: number) {
+        this._notificationService.getAllByUser(userId).subscribe({
+            next: (res) => {
+                const all = Array.isArray(res) ? res : [];
+                // Mostrar solo las últimas 5 notificaciones
+                this.notifications = all.slice(Math.max(all.length - 5, 0)).reverse();
+                // Contar no leídas
+                this.unreadCount = all.filter((n: any) => !n.read && !n.is_read).length;
+            },
+            error: (err) => {
+                console.error('Error al cargar notificaciones:', err);
+                this.notifications = [];
+                this.unreadCount = 0;
             }
-        );
-        */
+        });
+    }
+
+    ngOnDestroy() {
+        if (this.wsSub) this.wsSub.unsubscribe();
+        if (this.refreshSub) this.refreshSub.unsubscribe();
     }
 }

@@ -9,6 +9,8 @@ import { UserStorageService } from 'src/app/services/storage/user-storage.servic
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { ThemeService } from 'src/app/services/theme/theme.service';
+import { NotificationsService } from 'src/app/services/notifications/notifications.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -26,6 +28,12 @@ export class HomePage implements OnInit, OnDestroy {
   public userName: string = 'Cargando...';
   public userInitial: string = '';
 
+  // Notificaciones
+  public notifications: any[] = [];
+  public unreadCount: number = 0;
+  private wsSub?: Subscription;
+  private refreshSub?: Subscription;
+
   // Tracking GPS
   private locationWatchId: number | null = null;
   private locationInterval: any = null;
@@ -38,7 +46,8 @@ export class HomePage implements OnInit, OnDestroy {
     private _userStorage: UserStorageService,
     private _countryStorageService: CountryStorageService,
     private _webSocketService: WebSocketService,
-    public theme: ThemeService
+    public theme: ThemeService,
+    private _notificationsService: NotificationsService
   ) {}
 
   async ngOnInit() {
@@ -54,11 +63,30 @@ export class HomePage implements OnInit, OnDestroy {
     // Escuchar notificaciones de antipánico
     this._webSocketService.escucharNotificacionesAntipanico();
     
+    // Cargar notificaciones
+    if (this.userId) {
+      this.loadNotifications(this.userId);
+      
+      // Suscribirse a nuevas notificaciones por WebSocket
+      this.wsSub = this._webSocketService.newNotification$.subscribe((n: any) => {
+        if (!n || typeof n !== 'object' || n.id_user == null || Number(n.id_user) === Number(this.userId)) {
+          this.loadNotifications(this.userId!);
+        }
+      });
+
+      // Refrescar cuando se marquen como leídas
+      this.refreshSub = this._notificationsService.refresh$.subscribe(() => {
+        this.loadNotifications(this.userId!);
+      });
+    }
+    
     await this.startLocationTracking();
   }
 
   ngOnDestroy() {
     this.stopLocationTracking();
+    if (this.wsSub) this.wsSub.unsubscribe();
+    if (this.refreshSub) this.refreshSub.unsubscribe();
   }
   
   /**
@@ -187,6 +215,49 @@ export class HomePage implements OnInit, OnDestroy {
     this._webSocketService.desconectar();
     this.router.navigate(['/login']);
     console.log('Sesión cerrada correctamente.');
+  }
+
+  /**
+   * Carga las notificaciones del usuario
+   */
+  private loadNotifications(userId: number) {
+    this._notificationsService.getAllByUser(userId).subscribe({
+      next: (res) => {
+        const all = Array.isArray(res) ? res : [];
+        // Mostrar solo las últimas 5 notificaciones
+        this.notifications = all.slice(Math.max(all.length - 5, 0)).reverse();
+        // Contar no leídas
+        this.unreadCount = all.filter((n: any) => !n.read && !n.is_read).length;
+      },
+      error: (err) => {
+        console.error('Error al cargar notificaciones:', err);
+        this.notifications = [];
+        this.unreadCount = 0;
+      }
+    });
+  }
+
+  /**
+   * Abre una notificación y navega al evento
+   */
+  public openNotification(notification: any) {
+    // Marcar como leída si no lo está
+    if (!notification.read && notification.id) {
+      this._notificationsService.markAsRead([notification.id]).subscribe({
+        next: () => {
+          notification.read = true;
+          this._notificationsService.emitRefresh();
+        },
+        error: (err) => console.error('Error al marcar como leída:', err)
+      });
+    }
+
+    // Navegar al evento si tiene reservation_id
+    if (notification?.reservation_id) {
+      this.router.navigate(['/view-events'], { 
+        queryParams: { openReservationId: notification.reservation_id } 
+      });
+    }
   }
 }
 

@@ -48,18 +48,21 @@
   
       <ion-button (click)="dropdown()" slot="end" fill="clear">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        <ion-badge *ngIf="unreadCount > 0" color="danger" style="position: absolute; top: 8px; right: 8px;">
+          {{unreadCount}}
+        </ion-badge>
       </ion-button>
 
     </ion-toolbar>
 
     
     <ion-list *ngIf="dropdownState">
-      <ion-item class="noti"  *ngFor="let noti of notifications; let i = index">
+      <ion-item class="noti" *ngFor="let noti of notifications; let i = index" (click)="openNotification(noti)">
         <ion-label>
           <h3> {{noti.title}} </h3>
           <p class="ion-text-wrap" >{{noti.content}}</p>
         </ion-label>
-        <ion-icon (click)="deleteNotification(noti, i)" class="ion-padding-start" name="trash-outline"></ion-icon>
+        <ion-icon (click)="deleteNotification(noti, i); $event.stopPropagation()" class="ion-padding-start" name="trash-outline"></ion-icon>
       </ion-item>    
     
       <ion-item class="noti" *ngIf="notifications.length == 0">

@@ -6,8 +6,11 @@
     </ion-buttons>
     
     <ion-buttons slot="end">
-      <ion-button fill="clear" class="notification-button">
+      <ion-button fill="clear" class="notification-button" id="notifications-trigger">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        <ion-badge *ngIf="unreadCount > 0" color="danger" style="position: absolute; top: 8px; right: 8px;">
+          {{unreadCount}}
+        </ion-badge>
       </ion-button>
       
       <!-- El avatar ahora funciona como disparador del popover -->
@@ -19,6 +22,28 @@
 </ion-header>
 
 <ion-content class="guards-content">
+  <!-- Popover para notificaciones -->
+  <ion-popover trigger="notifications-trigger" triggerAction="click" [dismissOnSelect]="false" side="bottom" alignment="end" class="notifications-popover">
+    <ng-template>
+      <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>Notificaciones</ion-label>
+        </ion-list-header>
+        <ion-item *ngFor="let noti of notifications" button="true" (click)="openNotification(noti)">
+          <ion-label class="ion-text-wrap">
+            <h3>{{ noti.title }}</h3>
+            <p>{{ noti.content }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item *ngIf="notifications.length === 0">
+          <ion-label class="ion-text-wrap">
+            <p>No hay notificaciones</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </ion-popover>
+
   <!-- Popover para el menú de usuario -->
   <ion-popover trigger="user-popover-trigger" triggerAction="click" [dismissOnSelect]="true" side="bottom" alignment="end" class="user-popover">
     <ng-template>

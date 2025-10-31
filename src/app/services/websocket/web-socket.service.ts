@@ -7,103 +7,113 @@ import { environment } from 'src/environments/environment';
 import { AuthStorageService } from '../storage/auth-storage.service';
 import { ReservationsInterface } from 'src/app/interfaces/reservations-interface';
 import { NotificationInterface } from 'src/app/interfaces/notification-interface';
+import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'
 })
 export class WebSocketService {
 
-  private socket: Socket | null = null;
-  private connectionStatus = new BehaviorSubject<boolean>(false);
+  private socket: Socket | null = null;
+  private connectionStatus = new BehaviorSubject<boolean>(false);
 
-  //Subject y Observable para actualizaciones de reserva
-  private reservationUpdateSubject = new Subject<ReservationsInterface>();
-  public reservationUpdate$ = this.reservationUpdateSubject.asObservable();
+  //Subject y Observable para actualizaciones de reserva
+  private reservationUpdateSubject = new Subject<ReservationsInterface>();
+  public reservationUpdate$ = this.reservationUpdateSubject.asObservable();
 
-  //Subject y Observable para nuevas notificaciones
-  private newNotificationSubject = new Subject<NotificationInterface>();
-  public newNotification$ = this.newNotificationSubject.asObservable();
-  
-  private listenersRegistered = false;
+  //Subject y Observable para nuevas notificaciones
+  private newNotificationSubject = new Subject<NotificationInterface>();
+  public newNotification$ = this.newNotificationSubject.asObservable();
+  
+  private listenersRegistered = false;
 
-  constructor(
-    private alerts: AlertService,
-    private authStorage: AuthStorageService
-  ) {}
+  constructor(
+    private alerts: AlertService,
+    private authStorage: AuthStorageService,
+    private router: Router
+  ) {}
 
-  /**
-   * Conectar al servidor WebSocket
-   */
-  public async conectar(): Promise<void> { 
-    try { 
-        // Si ya existe y está conectado, salimos.
-        if (this.socket && this.socket.connected) {
-            console.log('El socket ya está conectado.');
-            return;
-        }
+  /**
+  * Conectar al servidor WebSocket
+  */
+  public async conectar(): Promise<void> { 
+    try { 
+      // Si ya existe y está conectado, salimos.
+      if (this.socket && this.socket.connected) {
+        console.log('El socket ya está conectado.');
+        return;
+      }
 
-        // 1. Recuperar el JWT
-        const token = await this.authStorage.getJWT();
+      // 1. Recuperar el JWT
+      const token = await this.authStorage.getJWT();
 
-        if (!token) {
-            console.warn("JWT no encontrado. Conexión WebSocket no iniciada.");
-            this.connectionStatus.next(false);
-            return;
-        }
+      if (!token) {
+        console.warn("JWT no encontrado. Conexión WebSocket no iniciada.");
+        this.connectionStatus.next(false);
+        return;
+      }
 
-        // 2. Conectar pasando el JWT en el handshake
-        this.socket = io(environment.URL, {
-          auth: { 
-            token: token 
-          }
-        });
+      // 2. Conectar pasando el JWT en el handshake
+      this.socket = io(environment.URL, {
+        auth: { 
+          token: token 
+        }
+      });
 
-      this.socket.on('connect', () => {
-        console.log('Conectado al servidor WebSocket. ID:', this.socket?.id);
-        this.connectionStatus.next(true);
-        this.registerCoreListeners();
-      });
+      this.socket.on('connect', () => {
+        console.log('Conectado al servidor WebSocket. ID:', this.socket?.id);
+        this.connectionStatus.next(true);
+        this.registerCoreListeners();
+      });
 
-      this.socket.on('disconnect', () => {
-        console.log('Desconectado del servidor WebSocket.');
-        this.connectionStatus.next(false);
-        this.listenersRegistered = false;
-      });
+      this.socket.on('disconnect', () => {
+        console.log('Desconectado del servidor WebSocket.');
+        this.connectionStatus.next(false);
+        this.listenersRegistered = false;
+      });
 
-      this.socket.on('connect_error', (err) => {
-        console.error('Error de conexión WebSocket (Auth/Transporte):', err.message); 
-        this.connectionStatus.next(false); 
-      });
+      this.socket.on('connect_error', (err) => {
+        console.error('Error de conexión WebSocket (Auth/Transporte):', err.message); 
+        this.connectionStatus.next(false); 
+      });
 
-    } catch (error) {
-      console.error('Error al conectar al servidor WebSocket:', error);
-    }
-  }
-  
-  private registerCoreListeners(): void {
-    if (!this.socket || this.listenersRegistered) {
-      return;
-    }
+    } catch (error) {
+      console.error('Error al conectar al servidor WebSocket:', error);
+    }
+  }
+  
+  private registerCoreListeners(): void {
+    if (!this.socket || this.listenersRegistered) {
+      return;
+    }
 
-    this.listenersRegistered = true;
-    this.registerReservationUpdates();
-    this.registerNotificationUpdates();
-    this.escucharNotificacionesCheckin();
-    this.escucharNotificacionesAntipanico();
-  }
+    this.listenersRegistered = true;
+    this.registerReservationUpdates();
+    this.registerNotificationUpdates();
+    this.escucharNotificacionesCheckin();
+    
+    // Solo escuchar antipánico si NO estamos en rutas de admin
+    const currentUrl = this.router.url;
+    const isAdminRoute = currentUrl.includes('/admin');
+    if (!isAdminRoute) {
+      this.escucharNotificacionesAntipanico();
+      console.log('[WebSocket] Listener de antipánico registrado (ruta de guardia)');
+    } else {
+      console.log('[WebSocket] Listener de antipánico NO registrado (ruta de admin)');
+    }
+  }
 
-  // Método para escuchar el evento 'Nueva notificacion entrante' del backend
-  private registerNotificationUpdates(): void {
-    if (!this.socket) {
-        console.warn('Socket no inicializado para escuchar nuevas notificaciones.');
-        return;
-    }
+  // Método para escuchar el evento 'Nueva notificacion entrante' del backend
+  private registerNotificationUpdates(): void {
+    if (!this.socket) {
+      console.warn('Socket no inicializado para escuchar nuevas notificaciones.');
+      return;
+    }
     const eventName = 'new-notification';
-    
     this.socket.off('new-notification');
-    this.socket.on('new-notification', (payload: NotificationInterface) => {
-        console.log('WebSocket: Nueva notificación de reserva recibida:', payload);
-        this.newNotificationSubject.next(payload);
+    this.socket.on('new-notification', (payload: NotificationInterface) => {
+      console.log('WebSocket: Nueva notificación de reserva recibida:', payload);
+      this.newNotificationSubject.next(payload);
 
         /* Agregaar: Mostrar la notificación como Toast (Mejora UX)
         const title = payload.title || 'Nueva Notificación';
