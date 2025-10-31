@@ -40,6 +40,7 @@
             <ion-avatar class="prop-avatar">
               <img [src]="getPropImg(prop)" alt="Foto propiedad" />
             </ion-avatar>
+            <span class="status-dot" [ngClass]="(prop?.property?.isActive === false) ? 'inactive' : 'active'" title="{{ (prop?.property?.isActive === false) ? 'Inactiva' : 'Activa' }}"></span>
           </div>
 
           <!-- Nº -->

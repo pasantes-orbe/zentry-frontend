@@ -425,10 +425,7 @@ await this.ensureOwnerContext();
       // Esperar la respuesta del POST; la lista se actualiza vía el servicio (loadOwnerReservations)
       await firstValueFrom(this._reservationsService.createReservation(reservationData));
 
-      this.alerts.showAlert('Reserva Confirmada', `
-        <strong>Amenity:</strong> ${amenityName}<br>
-        <strong>Fecha y Hora:</strong> ${new Date(combinedDateTime).toLocaleString()}
-      `);
+      this.alerts.showAlert('Pedido de Reserva enviada al Administrador');
       this.closeReservationModal();
     } catch (error: any) {
       console.error('Error al crear la reserva:', error);

@@ -77,9 +77,23 @@ export class NotificationsPopoverComponent implements OnInit {
           return;
         }
 
+        const isReservationLike = (
+          t.includes('reservation') ||
+          title.includes('reserva') ||
+          content.includes('reserva') ||
+          title.includes('reservation') ||
+          content.includes('reservation')
+        );
+
         if (notification?.reservation_id) {
           const qp: any = { openReservationId: notification.reservation_id };
           this.router.navigate(['/admin/events-historial'], { queryParams: qp }).then(() => this.close());
+          return;
+        }
+
+        // Fallback: si luce como notificación de reserva pero no trae ID, navegar igual al historial
+        if (isReservationLike) {
+          this.router.navigate(['/admin/events-historial']).then(() => this.close());
           return;
         }
 

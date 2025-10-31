@@ -9,6 +9,8 @@ import { CheckInOrOut } from '../../interfaces/checkInOrOut-interface';
 import { Observable, firstValueFrom } from 'rxjs';
 import { WebSocketService } from '../websocket/web-socket.service';
 import { CountryStorageService } from '../storage/country-storage.service';
+import { UserStorageService } from '../storage/user-storage.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +22,9 @@ export class CheckInService {
     private _alertService: AlertService,
     private _router: Router,
     private _socketService: WebSocketService,
-    private _countryStorageService: CountryStorageService
+    private _countryStorageService: CountryStorageService,
+    private _userStorageService: UserStorageService,
+    private _notificationsService: NotificationsService
   ) { }
 
   // =========================
@@ -110,6 +114,19 @@ export class CheckInService {
       const res: any = await firstValueFrom(this._http.post(`${environment.URL}/api/checkin`, body));
       console.log(res);
       this._socketService.notificarCheckIn(res['checkIn']);
+      try {
+        const guardUser = await this._userStorageService.getUser();
+        const timeStr = new Date(body.income_date || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const title = 'Vigilador';
+        const content = `Ingreso de visitante (${guest_name} ${guest_lastname}, ${timeStr}) autorizado por vigilador (${guardUser?.name || ''} ${guardUser?.lastname || ''})`;
+        const payload: any = {
+          id_user: Number(body.id_owner ?? 0),
+          title,
+          content,
+          read: false
+        };
+        await firstValueFrom(this._notificationsService.createNotification(payload as any));
+      } catch {}
       await this._alertService.removeLoading();
       await this._alertService.showAlert('¡Listo!', 'El Check-in fue enviado con exito al propietario');
       await this._router.navigate(['/vigiladores/home']);

@@ -22,7 +22,9 @@ import {
   IonItem,
   IonLabel,
   IonInput,
-  IonIcon
+  IonIcon,
+  IonToggle,
+  IonAvatar
 } from '@ionic/angular/standalone';
 
 // Íconos
@@ -52,7 +54,9 @@ import { add, close, save } from 'ionicons/icons';
     IonItem,
     IonLabel,
     IonInput,
-    IonIcon
+    IonIcon,
+    IonToggle,
+    IonAvatar
   ]
 })
 export class PropertyPage implements OnInit {
@@ -61,6 +65,8 @@ export class PropertyPage implements OnInit {
 
   propertyForm: FormGroup;
   isEditMode = false;
+  selectedAvatarFile: File | null = null;
+  avatarPreviewUrl: string = '';
 
   constructor(
     private modalCtrl: ModalController,
@@ -75,6 +81,7 @@ export class PropertyPage implements OnInit {
     // Comprueba si se pasaron datos para determinar si es modo edición o creación
     this.isEditMode = !!this.property;
     this.buildForm();
+    this.avatarPreviewUrl = (this.property?.avatar) || '';
   }
 
   // Construye el formulario reactivo
@@ -82,7 +89,8 @@ export class PropertyPage implements OnInit {
     this.propertyForm = this.formBuilder.group({
       propertyName: [this.property?.name || '', [Validators.required, Validators.maxLength(50)]],
       propertyAddress: [this.property?.address || '', [Validators.required, Validators.maxLength(50)]],
-      propertyNumber: [this.property?.number || '', [Validators.required, Validators.pattern('^[0-9]+$')]]
+      propertyNumber: [this.property?.number || '', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      isActive: [typeof this.property?.isActive === 'boolean' ? this.property.isActive : true]
     });
   }
 
@@ -109,7 +117,23 @@ export class PropertyPage implements OnInit {
     }
 
     // Devuelve los datos del formulario al componente que abrió el modal
-    const formData = this.propertyForm.value;
+    const formData = this.propertyForm.value as any;
+    formData.avatarFile = this.selectedAvatarFile || null;
+    formData.avatarPreviewUrl = this.avatarPreviewUrl || '';
     this.modalCtrl.dismiss(formData, 'submit');
+  }
+
+  // Manejar cambio de avatar y previsualizar
+  onPropertyAvatarChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0] || null;
+    this.selectedAvatarFile = file;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.avatarPreviewUrl = String(reader.result || '');
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }

@@ -126,7 +126,6 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
       console.log('Admin Dashboard: Nueva notificación recibida por WebSocket.', newNotification);
       // Recargar la lista completa al recibir un evento para asegurar la sincronía
       this.loadNotifications();
-      void this.notificationsSvc.presentToast('Nueva Reserva Pendiente', newNotification.content ?? 'Revisa la bandeja de reservas.');
     });
   }
 

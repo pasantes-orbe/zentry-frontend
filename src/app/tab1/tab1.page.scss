@@ -88,6 +88,36 @@
     }
   }
 
+  /* ============================= */
+  /* NOTIFICACIONES (home/tab1)    */
+  /* ============================= */
+  ion-popover.notifications-popover {
+    /* Igual que Admin */
+    --width: 340px;
+    --box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    --border-radius: 8px;
+    /* Altura mayor para evitar cortes */
+    --max-height: 65vh;
+  }
+
+  /* Asegurar scroll interno del listado */
+  ion-popover.notifications-popover .notifications-popover-content {
+    --padding-top: 0;
+  }
+
+  ion-popover.notifications-popover .notifications-list {
+    max-height: 60vh;
+    overflow: auto;
+  }
+
+  /* Evitar truncado del texto: mostrar completo */
+  ion-popover.notifications-popover .notifications-list ion-label p {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
+  }
+
   /* ==================================================== */
   /* ESTILOS PARA MODALES (USANDO VARIABLES) */
   /* ==================================================== */

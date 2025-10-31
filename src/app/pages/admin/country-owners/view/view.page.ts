@@ -37,6 +37,7 @@ export class ViewPage implements OnInit {
 
   // Contexto
   private countryId?: number;
+  public dashboardHref: string = '/admin/home';
 
   constructor(
     private router: Router,
@@ -59,6 +60,13 @@ export class ViewPage implements OnInit {
         const c = await this.countryStorage.getCountry();
         if (c?.id) this.countryId = Number(c.id);
       } catch { /* no-op */ }
+    }
+
+    // 3) Definir destino de regreso al dashboard
+    if (this.countryId) {
+      this.dashboardHref = `/admin/country-dashboard/${this.countryId}`;
+    } else {
+      this.dashboardHref = '/admin/home';
     }
 
     this.loadOwners();
@@ -130,8 +138,13 @@ export class ViewPage implements OnInit {
 
   private assignOwners(rawData: any) {
     const arr = Array.isArray(rawData) ? rawData : [];
-    this.owners = arr.map(this.normalizeOwner);
+    this.owners = arr
+      .map(this.normalizeOwner)
+      // Filtrar entradas sin usuario válido (evita "fantasmas" tras hard-delete antiguos)
+      .filter((o: any) => Number(o?.user?.id) > 0);
     this.loading = false;
+    // Enriquecer avatares desde /api/users/:id para asegurar URL actualizada (Cloudinary)
+    this.enrichOwnerAvatars();
   }
 
   // Normalizador defensivo para que el HTML no rompa si cambia el shape
@@ -148,7 +161,7 @@ export class ViewPage implements OnInit {
       {};
 
     return {
-      id: raw?.id ?? user?.id ?? null,
+      id: user?.id ?? null,
       user: {
         id: user?.id ?? null,
         name: user?.name ?? '',
@@ -175,6 +188,34 @@ export class ViewPage implements OnInit {
     return `${environment.URL}/${a}`;
   }
 
+  // Trae y sincroniza el avatar actual desde /api/users/:id para cada owner
+  private enrichOwnerAvatars(): void {
+    try {
+      // Evitar llamadas duplicadas por usuario
+      const seen = new Set<number>();
+      (this.owners || []).forEach((o: any, idx: number) => {
+        const uid = Number(o?.user?.id);
+        if (!uid || seen.has(uid)) return; seen.add(uid);
+        this.userSvc.getUserByID(uid).subscribe((u: any) => {
+          const url = this.normalizeAvatarUrl(u?.avatar || '');
+          if (!url) return;
+          // Actualizar todas las ocurrencias de ese uid en la lista
+          const updated = this.owners.map((row: any) => this.normalizeOwnerAvatar(row, uid, url));
+          this.owners = [...updated];
+        });
+      });
+    } catch {}
+  }
+
+  // Reemplaza el avatar en el item cuyo user.id coincida
+  private normalizeOwnerAvatar(row: any, uid: number, url: string): any {
+    if (!row || !row.user) return row;
+    if (Number(row.user.id) === uid) {
+      return { ...row, user: { ...row.user, avatar: url } };
+    }
+    return row;
+  }
+
   // ================================
   // NAVEGACIÓN / ACCIONES
   // ================================
@@ -185,7 +226,7 @@ export class ViewPage implements OnInit {
   public async deleteOwner(userId: number, index: number) {
     if (!userId) {
       const t = await this.toastCtrl.create({
-        message: 'No se pudo eliminar: identificador de usuario inválido.',
+        message: 'No se pudo inhabilitar: identificador de usuario inválido.',
         duration: 1800,
         color: 'warning'
       });
@@ -194,20 +235,18 @@ export class ViewPage implements OnInit {
     }
 
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar propietario',
-      message: 'Esta acción eliminará al usuario definitivamente. ¿Deseas continuar?',
+      header: 'Inhabilitar propietario',
+      message: 'Esta acción inhabilitará al usuario. ¿Deseas continuar?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Eliminar',
+          text: 'Inhabilitar',
           role: 'destructive',
           handler: async () => {
             try {
-              await this.userSvc.deleteUserById(userId).toPromise();
-              // Remover todas las apariciones de ese userId
-              this.owners = this.owners.filter((o: any) => Number(o?.user?.id) !== Number(userId));
+              await this.userSvc.updateUserStatus(userId, false).toPromise();
               const t = await this.toastCtrl.create({
-                message: 'Usuario eliminado correctamente.',
+                message: 'Propietario inhabilitado correctamente.',
                 duration: 1500,
                 color: 'success'
               });
@@ -215,10 +254,10 @@ export class ViewPage implements OnInit {
             } catch (err: any) {
               const status = err?.status;
               const msg = (status === 401 || status === 403)
-                ? 'No autorizado para eliminar.'
+                ? 'No autorizado para inhabilitar.'
                 : status === 404
                   ? 'Usuario no encontrado.'
-                  : 'Error al eliminar usuario.';
+                  : 'Error al inhabilitar usuario.';
               const t = await this.toastCtrl.create({
                 message: msg,
                 duration: 2200,
@@ -246,10 +285,14 @@ export class ViewPage implements OnInit {
   }
 
   get filteredAndSortedOwners() {
-    let filtered = this.sortedOwners;
+    // Mostrar activos primero y luego inhabilitados; aplicar búsqueda al conjunto
+    let list = (this.owners || [])
+      .map(this.normalizeOwner)
+      .filter((o: any) => Number(o?.user?.id) > 0);
+
     const term = (this.searchKey || '').toLowerCase().trim();
     if (term) {
-      filtered = filtered.filter((o: any) => {
+      list = list.filter((o: any) => {
         const u = o.user || {};
         const p = o.property || {};
         return (
@@ -262,8 +305,18 @@ export class ViewPage implements OnInit {
         );
       });
     }
-    return filtered;
-    }
+
+    return [...list].sort((a: any, b: any) => {
+      // Activos primero
+      const aInactive = a?.user?.isActive === false ? 1 : 0;
+      const bInactive = b?.user?.isActive === false ? 1 : 0;
+      if (aInactive !== bInactive) return aInactive - bInactive;
+      // Luego ordenar por apellido y nombre
+      const lnA = (a.user?.lastname || '').localeCompare(b.user?.lastname || '');
+      if (lnA !== 0) return lnA;
+      return (a.user?.name || '').localeCompare(b.user?.name || '');
+    });
+  }
 
   public getTotalOwnersCount(): number {
     return this.owners.length;

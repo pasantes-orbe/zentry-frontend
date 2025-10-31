@@ -4,7 +4,7 @@
   <ion-header>
     <ion-toolbar>
       <ion-buttons slot="end">
-        <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+        <ion-button color="medium" (click)="cancel()">Cancelar</ion-button>
       </ion-buttons>
       <ion-title> Editar Propiedad </ion-title>
     </ion-toolbar>
@@ -12,9 +12,25 @@
 
 <ion-grid>
   <form [formGroup]="getForm()" (keyup.enter)="editProperty()" (ngSubmit)="editProperty()">
+  <!-- Preview de imagen de la propiedad (no se pierde al editar/deshabilitar) -->
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="12" class="ion-text-center">
+      <ion-avatar class="prop-preview">
+        <img [src]="avatarPreviewUrl || property?.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'" alt="Foto propiedad" />
+      </ion-avatar>
+    </ion-col>
+  </ion-row>
+
+  <!-- Selector de imagen -->
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="12" class="ion-text-center">
+      <input type="file" accept="image/*" (change)="onPropertyAvatarChange($event)" />
+    </ion-col>
+  </ion-row>
+
   <ion-row class="ion-justify-content-center ion-padding-bottom">
   <ion-col size="12">
-    <ion-item counter="true">
+    <ion-item counter="true" class="form-item">
       <ion-label position="floating">Nombre de la Propiedad</ion-label>
       <ion-input formControlName="propertyName" maxlength="50" type="text"></ion-input>
     </ion-item>
@@ -23,7 +39,7 @@
 
   <ion-row class="ion-justify-content-center ion-padding-bottom">
     <ion-col size="12">
-    <ion-item  counter="true">
+    <ion-item  counter="true" class="form-item">
       <ion-label position="floating">Dirección de la Propiedad</ion-label>
       <ion-input formControlName="propertyAddress" maxlength="50" ></ion-input>
     </ion-item>
@@ -32,13 +48,24 @@
 
   <ion-row class="ion-justify-content-center ion-padding-bottom">
     <ion-col size="12">
-    <ion-item>
+    <ion-item class="form-item">
       <ion-label>Numero de Propiedad</ion-label>
       <ion-input formControlName="propertyNumber" type="number" ></ion-input>
     </ion-item>
   </ion-col>
   </ion-row>
 
+  <ion-row class="ion-justify-content-center ion-padding-bottom">
+    <ion-col size="12">
+      <ion-item class="form-item">
+        <ion-label>Estado</ion-label>
+        <ion-toggle formControlName="isActive">
+          <span slot="start">Inactiva</span>
+          <span slot="end">Activa</span>
+        </ion-toggle>
+      </ion-item>
+    </ion-col>
+  </ion-row>
 
   <ion-button type="submit" expand="block" shape="round">
     <ion-icon slot="start" name="add"></ion-icon>

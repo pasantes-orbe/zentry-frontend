@@ -90,13 +90,14 @@ export class EditPage implements OnInit {
     if (!file || !this.user?.id) return;
 
     this._userService.uploadAvatar(Number(this.user.id), file).subscribe({
-      next: async (res: any) => {
-        // Backend puede devolver { avatar: string } o { user: { avatar } }
-        const avatarUrl = res?.avatar || res?.user?.avatar || '';
-        if (avatarUrl) {
-          this.user = { ...this.user, avatar: avatarUrl };
-          await this._userStorage.saveUser(this.user);
-        }
+      next: async () => {
+        // Tras subir, refrescar el usuario para obtener la URL final (Cloudinary/CDN)
+        this._userService.getUserByID(Number(this.user.id)).subscribe(async (fresh: any) => {
+          if (fresh) {
+            this.user = { ...this.user, ...fresh };
+            await this._userStorage.saveUser(this.user);
+          }
+        });
       },
       error: (err) => {
         console.error('Error subiendo avatar:', err);

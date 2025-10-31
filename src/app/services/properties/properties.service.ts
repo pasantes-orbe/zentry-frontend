@@ -1,3 +1,4 @@
+// services/properties/properties.service.ts
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -33,6 +34,48 @@ export class PropertiesService {
 
     return await lastValueFrom(
       this._http.post(`${environment.URL}/api/properties`, formData, httpOptions)
+    );
+  }
+
+  // Editar propiedad enviando archivo de imagen (multipart)
+  public editPropertyMultipart(token: string, id: number, name: string, number: any, address: string, avatarFile: File) {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const formData = new FormData();
+    formData.append('name', String(name ?? ''));
+    formData.append('number', String(number ?? ''));
+    formData.append('address', String(address ?? ''));
+    if (avatarFile) {
+      formData.append('avatar', avatarFile);
+    }
+    return this._http.patch(`${environment.URL}/api/properties/${id}`, formData, { headers });
+  }
+
+  // Trae propiedades por country incluyendo activas e inactivas (sin filtrar isActive)
+  public async getByCountryAllStatuses(): Promise<Observable<any[]>> {
+    const token = await this._authStorageService.getJWT();
+    const country = await this._countryStorageService.getCountry();
+    const countryID = country?.id;
+
+    const httpOptions = {
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+    };
+
+    // Preferir endpoint con includeInactive para traer activas e inactivas
+    const url1 = `${environment.URL}/api/properties/country/get_by_id/${countryID}?includeInactive=true`;
+    const url2 = `${environment.URL}/api/properties?country_id=${countryID}`;
+    const urlAll = `${environment.URL}/api/properties`;
+
+    return this._http.get<any[]>(url1, httpOptions).pipe(
+      catchError(() => this._http.get<any[]>(url2, httpOptions)),
+      catchError(() => this._http.get<any[]>(urlAll, httpOptions)),
+      map(list => {
+        if (!Array.isArray(list)) return [];
+        // Filtrar solo por id_country; NO filtrar por isActive
+        return list.filter((p: any) => {
+          const prop = p?.property ?? p;
+          return Number(prop?.id_country) === Number(countryID);
+        });
+      })
     );
   }
 
@@ -101,10 +144,12 @@ export class PropertiesService {
       catchError(() => this._http.get<any[]>(urlAll, httpOptions)),
       map(list => {
         if (!Array.isArray(list)) return [];
-        // Normaliza y filtra por id_country (soporta property plano o anidado)
+        // Normaliza y filtra por id_country (soporta property plano o anidado) y solo activos
         return list.filter((p: any) => {
           const prop = p?.property ?? p;
-          return Number(prop?.id_country) === Number(countryID);
+          const inCountry = Number(prop?.id_country) === Number(countryID);
+          const isActive = prop?.isActive === true; // si no viene el campo, no lo consideramos activo
+          return inCountry && isActive;
         });
       })
     );
@@ -122,7 +167,8 @@ export class PropertiesService {
     const httpOptions = {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
     };
-    return this._http.patch(`${environment.URL}/api/properties/${id}`, { name, number, address }, httpOptions);
+    const body: any = { name, number, address };
+    return this._http.patch(`${environment.URL}/api/properties/${id}`, body, httpOptions);
   }
 
   public deleteProperty(id: number, token: string) {
@@ -130,5 +176,23 @@ export class PropertiesService {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
     };
     return this._http.delete(`${environment.URL}/api/properties/${id}`, httpOptions);
+  }
+
+  // Actualizar estado activo/inactivo de una propiedad (soft-delete / restaurar)
+  public updatePropertyStatus(id: number, token: string, isActive: boolean) {
+    const httpOptions = {
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+    };
+    const urlStatus = `${environment.URL}/api/properties/${id}/status`;
+    const urlPatch = `${environment.URL}/api/properties/${id}`;
+    return this._http.patch(urlStatus, { isActive }, httpOptions).pipe(
+      catchError((err) => {
+        if (err?.status === 404) {
+          console.warn('[properties] /status 404, intentando PATCH directo en /:id con isActive');
+          return this._http.patch(urlPatch, { isActive }, httpOptions);
+        }
+        throw err;
+      })
+    );
   }
 }

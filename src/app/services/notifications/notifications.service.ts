@@ -91,8 +91,19 @@ export class NotificationsService {
     );
   }
 
-  createNotification(notificationData: NewNotification): Observable<any> {
-    return this.http.post(`${environment.URL}/api/notifications`, notificationData);
+  createNotification(notificationData: any): Observable<any> {
+    // Normalizar para compatibilidad backend
+    const id_user = notificationData?.id_user ?? (
+      notificationData?.ownerId != null
+        ? Number(notificationData.ownerId)
+        : undefined
+    );
+    const title = String(notificationData?.title ?? 'Notificación');
+    const content = notificationData?.content ?? notificationData?.message ?? '';
+    const read = Boolean(notificationData?.read ?? false);
+
+    const body: any = { id_user, title, content, read };
+    return this.http.post(`${environment.URL}/api/notifications`, body);
   }
 
   deleteNotification(notificationId: number): Observable<any> {

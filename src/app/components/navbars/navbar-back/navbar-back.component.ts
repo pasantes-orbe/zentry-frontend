@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 export class NavbarBackComponent implements OnInit {
 
     @Input('title') title: string = '';
-    @Input('defaultHref') defaultHref: string = '/admin/country-dashboard';
+    @Input('defaultHref') defaultHref: string = '/admin/home';
 
     constructor(
         private location: Location,

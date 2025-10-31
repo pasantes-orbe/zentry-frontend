@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { Observable, from, switchMap, catchError, of, lastValueFrom } from 'rxjs';
+import { Observable, from, switchMap, catchError, of, lastValueFrom, map } from 'rxjs';
 
 import { AlertService } from '../helpers/alert.service';
 import { CountryStorageService } from '../storage/country-storage.service';
@@ -26,6 +26,22 @@ export class OwnersService {
   /** Todos los propietarios (sin filtro) */
   public getAll(): Observable<OwnerResponse[]> {
     return this._http.get<OwnerResponse[]>(`${environment.URL}/api/owners`);
+  }
+
+  /** Relacionar sin loaders ni navegación (para asignación múltiple en la misma vista) */
+  public async relationWithPropertySilent(user_id: number, property_id: number): Promise<void> {
+    const token = await this._auth.getJWT();
+    const httpOptions = { headers: new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    })};
+
+    const body = {
+      id_user: Math.floor(Number(user_id)),
+      id_property: Math.floor(Number(property_id))
+    };
+
+    await lastValueFrom(this._http.post(`${environment.URL}/api/owners`, body, httpOptions));
   }
 
   public async unassignOwnerFromProperty(user_id: number, property_id: number): Promise<void> {
@@ -60,6 +76,28 @@ export class OwnersService {
         const url2 = `${environment.URL}/api/users/owners/get_by_country/${id}`;
         return this._http.get<Owner_CountryInterface[]>(url1).pipe(
           catchError(() => this._http.get<Owner_CountryInterface[]>(url2))
+        );
+      })
+    );
+  }
+
+  /** Solo propietarios activos por country actual (para assign) */
+  public getActiveByCountry(): Observable<Owner_CountryInterface[]> {
+    return from(this._countryStorage.getCountry()).pipe(
+      switchMap(country => {
+        const id = country?.id;
+        if (!id) return of<Owner_CountryInterface[]>([]);
+        const urlUsers = `${environment.URL}/api/users/owners/get_by_country/${id}`;
+        return this._http.get<Owner_CountryInterface[]>(urlUsers).pipe(
+          map((list: any[]) => {
+            if (!Array.isArray(list)) return [] as any[];
+            return list.filter((o: any) => {
+              const u = o?.OwnerUser ?? o?.user ?? o?.User ?? o?.owner ?? null;
+              const idUser = Number(u?.id ?? o?.id_user ?? o?.id);
+              const active = typeof u?.isActive === 'boolean' ? u.isActive : true;
+              return Number.isFinite(idUser) && idUser > 0 && active;
+            });
+          })
         );
       })
     );

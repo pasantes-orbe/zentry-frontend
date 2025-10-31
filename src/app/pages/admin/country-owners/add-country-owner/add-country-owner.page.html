@@ -1,3 +1,4 @@
+<!--add-country-owner.page.html-->
 <app-navbar-back title="Nuevo Propietario"></app-navbar-back>
 
 <ion-content [fullscreen]="true">
@@ -7,9 +8,17 @@
       <!-- SECCIÓN DE AVATAR -->
       <div class="avatar-uploader">
         <img class="avatar-preview" [src]="newImg" alt="Vista previa del avatar">
-        <label for="avatar-input" class="upload-button">
+        
+        <label for="owner-avatar-input" class="upload-button">
           <ion-icon name="camera-outline"></ion-icon>
-          <input id="avatar-input" type="file" (change)="onFileChange($event)" formControlName="ownerAvatar" accept="image/*">
+          <!-- <input id="avatar-input" type="file" (change)="onFileChange($event)" formControlName="ownerAvatar" accept="image/*"> -->
+          <!-- ✅ mismo cambio de id aquí -->
+          <input
+            id="owner-avatar-input"
+            type="file"
+            (change)="onFileChange($event)"
+            formControlName="ownerAvatar"  
+            accept="image/*">         
         </label>
       </div>
       <p class="avatar-helper-text">Subir foto de perfil</p>

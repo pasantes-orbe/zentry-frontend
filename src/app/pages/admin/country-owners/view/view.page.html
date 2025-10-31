@@ -1,4 +1,4 @@
-<app-navbar-back title="Gestionar Propietarios"></app-navbar-back>
+<app-navbar-back [defaultHref]="dashboardHref" title="Gestionar Propietarios"></app-navbar-back>
 
 <ion-content [fullscreen]="true">
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">

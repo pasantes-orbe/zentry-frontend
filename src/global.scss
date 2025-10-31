@@ -21,6 +21,34 @@ body {
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
 }
+
+/* ============================= */
+/* Notificaciones (popover global)
+   Aplica a cualquier <ion-popover [cssClass]="'notifications-popover'"> */
+ion-popover.notifications-popover {
+  --width: 340px;
+  --box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  --border-radius: 8px;
+  --max-height: 65vh; /* evita que se corte el contenido */
+}
+
+/* Contenido interno del popover */
+ion-popover.notifications-popover .notifications-popover-content {
+  --padding-top: 0;
+}
+
+/* Listado scrolleable dentro del popover */
+ion-popover.notifications-popover .notifications-list {
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* Responsive: en pantallas muy angostas, usar casi todo el ancho */
+@media (max-width: 420px) {
+  ion-popover.notifications-popover {
+    --width: 90vw;
+  }
+}
 ion-title, .card-title, h1, h2, h3, h4 {
   font-family: var(--font-heading);
   font-weight: 600;

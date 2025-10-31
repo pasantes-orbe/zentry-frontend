@@ -18,25 +18,26 @@
           <ion-searchbar mode="ios" placeholder="Buscar propietario..." (ionInput)="onSearchOwners($event)"></ion-searchbar>
 
           <ion-list class="selection-list">
-            <ion-radio-group formControlName="user_id">
-              <ion-item *ngFor="let owner of filteredOwners; trackBy: trackOwner"
-                        class="selection-item"
-                        [disabled]="ownerId(owner) === null">
-                <ion-avatar slot="start">
-                  <img [src]="ownerAvatar(owner)" />
-                </ion-avatar>
-                <ion-label>
-                  <h2>{{ ownerName(owner) }} {{ ownerLastname(owner) }}</h2>
-                  <p>DNI: {{ ownerDni(owner) }}</p>
-                </ion-label>
-                <ion-radio slot="end" [value]="ownerId(owner)"></ion-radio>
-              </ion-item>
-            </ion-radio-group>
+            <ion-item *ngFor="let owner of filteredOwners; trackBy: trackOwner"
+                      class="selection-item"
+                      [disabled]="ownerId(owner) === null">
+              <ion-checkbox slot="start"
+                            [checked]="isOwnerSelected(ownerId(owner))"
+                            (ionChange)="toggleOwnerSelection(owner)">
+              </ion-checkbox>
+              <ion-avatar slot="start">
+                <img [src]="ownerAvatar(owner)" />
+              </ion-avatar>
+              <ion-label>
+                <h2>{{ ownerName(owner) }} {{ ownerLastname(owner) }}</h2>
+                <p>DNI: {{ ownerDni(owner) }}</p>
+              </ion-label>
+            </ion-item>
           </ion-list>
         </div>
 
         <!-- Propiedades -->
-        <div class="selection-panel" [class.is-disabled]="!form.get('user_id')?.value">
+        <div class="selection-panel" [class.is-disabled]="!hasSelectedOwners()">
           <div class="panel-header"><h4>Paso 2: Seleccionar Propiedad</h4></div>
 
           <ion-searchbar mode="ios" placeholder="Buscar propiedad..." (ionInput)="onSearchProperties($event)"></ion-searchbar>

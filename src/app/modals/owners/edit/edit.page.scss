@@ -1,0 +1,62 @@
+/* Contenedor general */
+:host {
+  display: block;
+}
+
+ion-grid {
+  padding: 12px 16px 24px;
+}
+
+/* Avatar del propietario */
+.owner-avatar {
+  width: 96px;
+  height: 96px;
+  --border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+@media (min-width: 768px) {
+  .owner-avatar {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* Input de archivo bajo el avatar */
+input[type="file"] {
+  margin-top: 8px;
+}
+
+/* Ítems de formulario más aireados */
+ion-item {
+  --inner-padding-end: 8px;
+  --padding-start: 12px;
+  margin-bottom: 10px;
+}
+
+/* Etiquetas y tipografía */
+ion-label[position="floating"] {
+  font-size: 0.95rem;
+}
+ion-input {
+  font-size: 1rem;
+}
+
+/* Fila superior (avatar + campos) alineada */
+ion-row.ion-align-items-center {
+  align-items: center;
+}
+
+/* Botón guardar con separación */
+ion-button.mt-4.mb-4 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* Modal: evitar estirar demasiado en pantallas grandes */
+@media (min-width: 1200px) {
+  ion-grid[fixed] {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+}
