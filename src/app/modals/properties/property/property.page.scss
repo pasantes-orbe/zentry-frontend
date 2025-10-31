@@ -1,0 +1,19 @@
+/* Preview de imagen */
+.prop-preview {
+  width: 88px;
+  height: 88px;
+  --border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+/* Separación y legibilidad de campos */
+.form-item {
+  --inner-padding-top: 10px;
+  --inner-padding-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+ion-label[position="floating"] {
+  letter-spacing: .2px;
+}
+

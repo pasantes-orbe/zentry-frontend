@@ -17,6 +17,7 @@ export interface Property {
     address:    string;
     avatar:     string;
     id_country: number;
+    isActive?:  boolean; // opcional para soft-delete/estado
 }
 
 export interface User {

@@ -64,7 +64,21 @@ export class AddPropertyPage implements OnInit {
     }
 
     const formData = new FormData();
-    formData.append('avatar', this.getForm().get('fileSource')!.value);
+    const rawFile: File | null = this.getForm().get('fileSource')!.value || null;
+    if (rawFile) {
+      if (!/^image\//i.test(rawFile.type)) {
+        await this._alertService.showAlert('Error', 'El archivo seleccionado no es una imagen válida.');
+        return;
+      }
+      let out = await this.compressImage(rawFile, 1080, 0.7);
+      if (out.size > 2 * 1024 * 1024) {
+        out = await this.compressImage(out, 800, 0.6);
+      }
+      if (out.size > 2 * 1024 * 1024) {
+        out = await this.compressImage(out, 640, 0.5);
+      }
+      formData.append('avatar', out);
+    }
     formData.append('name', this.getForm().get('propertyName')!.value);
     formData.append('address', this.getForm().get('propertyAddress')!.value);
     formData.append('number', this.getForm().get('propertyNumber')!.value);
@@ -112,5 +126,26 @@ export class AddPropertyPage implements OnInit {
       propertyAvatar: new FormControl('', [Validators.required]),
       fileSource: new FormControl('', [Validators.required]),
     });
+  }
+
+  private async compressImage(file: File, maxSide = 1280, quality = 0.7): Promise<File> {
+    try {
+      const img = await createImageBitmap(file);
+      const maxDim = Math.max(img.width, img.height);
+      const scale = Math.min(1, maxSide / maxDim);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return file;
+      ctx.drawImage(img, 0, 0, w, h);
+      const outType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const blob: Blob = await new Promise((resolve) => canvas.toBlob(b => resolve(b as Blob), outType, quality));
+      const outFile = new File([blob], file.name || 'avatar.jpg', { type: outType });
+      return outFile;
+    } catch {
+      return file;
+    }
   }
 }

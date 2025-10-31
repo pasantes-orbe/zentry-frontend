@@ -75,12 +75,15 @@
 .owner-cell {
   padding: 4px 0 12px 0;
   &::before { display: none; } // El label no es necesario aquí
-  
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; // asegurar alineación a la izquierda en mobile
+  gap: 12px; // pequeño espacio entre imagen y texto
+
   .owner-info {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-left: 12px;
     .owner-name { font-weight: 600; }
     .owner-property { font-size: 0.8rem; color: var(--ion-color-medium-shade); }
   }
@@ -147,6 +150,8 @@ ion-chip {
   .owner-cell {
     display: flex;
     align-items: center;
+    justify-content: flex-start; // activos a la izquierda en desktop
+    gap: 12px;
     padding: 8px var(--page-padding);
   }
   

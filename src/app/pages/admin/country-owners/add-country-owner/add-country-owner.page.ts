@@ -1,3 +1,4 @@
+//src/app/pages/admin/country-owners/add-country-owner/add-country-owner.page.ts
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -34,44 +35,83 @@ export class AddCountryOwnerPage implements OnInit {
   private formBuilder: FormBuilder;
   private form: FormGroup;
 
-  constructor(private _registerOwner: RegisterService, protected _formBuilder: FormBuilder, protected _alertService: AlertService, private http: HttpClient, private _router: Router, private _emailHelperService: EmailHelperService) {
+  // ✅ NUEVO: guardamos el File real para pasarlo al servicio
+  private avatarFile?: File;
+
+  constructor(
+    private _registerOwner: RegisterService,
+    protected _formBuilder: FormBuilder,
+    protected _alertService: AlertService,
+    private http: HttpClient,
+    private _router: Router,
+    private _emailHelperService: EmailHelperService
+  ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
   }
 
-  ngOnInit() {
+  ngOnInit() {}
 
-  }
+  // onFileChange(event) {
+  //   const file = event.target.files[0];
+  //   const reader = new FileReader();
+  //   reader.onload = e => this.newImg = reader.result;
+  //   reader.readAsDataURL(file);
+  //   if (event.target.files.length > 0) {
+  //     const file = event.target.files[0];
+  //     this.form.patchValue({
+  //       fileSource: file
+  //     });
+  //   }
+  // }
 
-  onFileChange(event) {
-    const file = event.target.files[0];
+  // ✅ CORREGIDO: setea preview, guarda el File y marca ambos controles
+  onFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    if (!file) return;
+
     const reader = new FileReader();
-    reader.onload = e => this.newImg = reader.result;
-
+    reader.onload = () => (this.newImg = reader.result);
     reader.readAsDataURL(file);
 
-    if (event.target.files.length > 0) {
+    this.avatarFile = file;
 
-
-      const file = event.target.files[0];
-      this.form.patchValue({
-        fileSource: file
-      });
-    }
+    // dejamos el mismo esquema de validación que ya tenías:
+    this.form.patchValue({
+      fileSource: file,        // control con el File real
+      //ownerAvatar: file.name   // control “visible” para validar requerido
+    });
+    this.form.get('fileSource')?.updateValueAndValidity();
+    this.form.get('ownerAvatar')?.updateValueAndValidity();
   }
 
+  // register() {
+  //   this._registerOwner.register(this.getForm().get('ownerName').value,
+  //     this.getForm().get('ownerLastname').value,
+  //     this.getForm().get('ownerDNI').value,
+  //     this.getForm().get('ownerEmail').value,
+  //     this.getForm().get('ownerPassword').value,
+  //     this.getForm().get('ownerPhone').value,
+  //     this.getForm().get('ownerBirthdate').value,
+  //     this.getForm().get('fileSource').value,
+  //     'propietario');
+  // }
+
+  // ✅ CORREGIDO: pasamos el File real (this.avatarFile) al servicio
   register() {
-    this._registerOwner.register(this.getForm().get('ownerName').value,
-      this.getForm().get('ownerLastname').value,
-      this.getForm().get('ownerDNI').value,
-      this.getForm().get('ownerEmail').value,
-      this.getForm().get('ownerPassword').value,
-      this.getForm().get('ownerPhone').value,
-      this.getForm().get('ownerBirthdate').value,
-      this.getForm().get('fileSource').value,
-      'propietario');
+    this._registerOwner.register(
+      this.getForm().get('ownerName')!.value,
+      this.getForm().get('ownerLastname')!.value,
+      this.getForm().get('ownerDNI')!.value,
+      this.getForm().get('ownerEmail')!.value,
+      this.getForm().get('ownerPassword')!.value,
+      this.getForm().get('ownerPhone')!.value,
+      this.getForm().get('ownerBirthdate')!.value,
+      this.avatarFile as File,   // <- clave: enviar el File real
+      'propietario'
+    );
   }
-
 
   private createForm(): FormGroup {
     return this.formBuilder.group({
@@ -82,8 +122,8 @@ export class AddCountryOwnerPage implements OnInit {
       ownerPassword: ['', [Validators.required, Validators.minLength(4)]],
       ownerPhone: ['', [Validators.required, Validators.max(10000000000)]],
       ownerBirthdate: ['', Validators.required],
-      ownerAvatar: new FormControl('', [Validators.required]),
-      fileSource: new FormControl('', [Validators.required]),
+      ownerAvatar: new FormControl('', [Validators.required]), // dejamos tu validación
+      fileSource: new FormControl('', [Validators.required]),  // deja el File para quien lo use
     });
   }
 
@@ -91,23 +131,19 @@ export class AddCountryOwnerPage implements OnInit {
     return this.form;
   }
 
-
   private changeIcon(input): void {
     (this.getPasswordType(input) === 'password')
       ? this.passIcon.name = 'eye-outline'
       : this.passIcon.name = 'eye-off-outline';
-
   }
 
   protected showPassword(input): void {
-
     (this.getPasswordType(input) === 'password')
       ? this.setPasswordType(input, 'text')
       : this.setPasswordType(input, 'password');
-
     this.changeIcon(input);
-
   }
+
   private getPasswordType(input): string {
     return input.type;
   }
@@ -115,5 +151,4 @@ export class AddCountryOwnerPage implements OnInit {
   private setPasswordType(input, type): void {
     input.type = type;
   }
-
 }

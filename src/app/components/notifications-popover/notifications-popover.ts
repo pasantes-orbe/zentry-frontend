@@ -77,12 +77,26 @@ export class NotificationsPopoverComponent implements OnInit {
           return;
         }
 
+        const isReservationLike = (
+          t.includes('reservation') ||
+          title.includes('reserva') ||
+          content.includes('reserva') ||
+          title.includes('reservation') ||
+          content.includes('reservation')
+        );
+
         if (notification?.reservation_id) {
           const qp: any = { openReservationId: notification.reservation_id };
           // Detectar si es guardia o admin por la URL actual
           const isGuard = this.router.url.includes('/guards');
           const route = isGuard ? '/view-events' : '/admin/events-historial';
           this.router.navigate([route], { queryParams: qp }).then(() => this.close());
+          return;
+        }
+
+        // Fallback: si luce como notificación de reserva pero no trae ID, navegar igual al historial
+        if (isReservationLike) {
+          this.router.navigate(['/admin/events-historial']).then(() => this.close());
           return;
         }
 

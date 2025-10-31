@@ -75,13 +75,28 @@ export class PasswordRecoverPage implements OnInit {
   }
 
   async send() {
-    const alert = await this._alertController.create({
-      header: 'Solicitud enviada',
-      message: 'El administrador recibió tu solicitud de reestablecimiento de contraseña.',
-    })
-
-    await alert.present();
-    this._passwordRecoverService.requestNewPassword(this.getFormData().get('userInput').value)
+    const email = this.getFormData().get('userInput').value;
+    if (!email) {
+      const a = await this._alertController.create({ header: 'Error', message: 'Ingresá un correo válido.' });
+      await a.present();
+      return;
+    }
+    const sending = await this._alertController.create({ header: 'Enviando', message: 'Procesando solicitud...' });
+    await sending.present();
+    this._passwordRecoverService.requestNewPassword(email).subscribe({
+      next: async () => {
+        await sending.dismiss();
+        const ok = await this._alertController.create({ header: 'Solicitud enviada', message: 'El administrador recibió tu solicitud de reestablecimiento de contraseña.' });
+        await ok.present();
+        this.cancel();
+      },
+      error: async (err) => {
+        await sending.dismiss();
+        const msg = err?.error?.msg || err?.message || 'No se pudo enviar la solicitud. Intentalo nuevamente.';
+        const e = await this._alertController.create({ header: 'Error', message: msg });
+        await e.present();
+      }
+    });
   }
 
   private buildFormData(): void {

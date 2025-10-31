@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 
@@ -44,6 +44,8 @@ export class ViewPage implements OnInit {
     private userService: UserService,
     private ownersService: OwnersService,
     private cdr: ChangeDetectorRef,
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
   ) {}
 
   ngOnInit(): void {
@@ -100,8 +102,8 @@ export class ViewPage implements OnInit {
     try {
       this.loading = true;
 
-      // Tu servicio devuelve Observable<Property_OwnerInterface[]>
-      const obs$ = await this.propertiesService.getAllProperty_OwnerByCountryID();
+      // Cargar propiedades activas e inactivas por country
+      const obs$ = await this.propertiesService.getByCountryAllStatuses();
 
       obs$.subscribe({
         next: (rows) => {
@@ -242,7 +244,11 @@ export class ViewPage implements OnInit {
         const name = data.propertyName;
         const number = data.propertyNumber;
         const address = data.propertyAddress;
-        this.propertiesService.editProperty(token, Number(id), name, number, address).subscribe({
+        const currentAvatar = property?.avatar || (currentRow as any)?.property?.avatar || '';
+        const isActive = typeof data.isActive === 'boolean' ? data.isActive : undefined;
+        // Avatar deshabilitado en edición: siempre usar JSON sin imagen
+        const request$ = this.propertiesService.editProperty(token, Number(id), name, number, address);
+        request$.subscribe({
           next: () => {
             // Actualizar localmente sin recargar toda la lista
             if (index > -1 && index < this.properties.length) {
@@ -250,9 +256,21 @@ export class ViewPage implements OnInit {
               (row as any).property.name = name;
               (row as any).property.number = number;
               (row as any).property.address = address;
+              // Mantener avatar actual, subida de imagen deshabilitada en edición
+              (row as any).property.avatar = currentAvatar || (row as any).property.avatar;
+              if (typeof isActive === 'boolean') {
+                (row as any).property.isActive = isActive;
+              }
               this.properties[index] = { ...(row as any) };
             } else {
               this.loadProperties();
+            }
+            // Actualizar estado si cambió
+            if (typeof isActive === 'boolean') {
+              this.propertiesService.updatePropertyStatus(Number(id), token, isActive).subscribe({
+                next: () => {},
+                error: () => {}
+              });
             }
           },
           error: (err) => {
@@ -271,14 +289,41 @@ export class ViewPage implements OnInit {
     if (!id) return;
     try {
       const token = await this.authStorage.getJWT();
-      this.propertiesService.deleteProperty(id, token).subscribe({
-        next: () => {
-          this.properties.splice(index, 1);
-        },
-        error: (err) => console.error('Error al eliminar propiedad:', err),
+      const alert = await this.alertCtrl.create({
+        header: 'Inhabilitar propiedad',
+        message: 'Esta acción inhabilitará la propiedad. ¿Deseas continuar?',
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          {
+            text: 'Inhabilitar',
+            role: 'destructive',
+            handler: async () => {
+              this.propertiesService.updatePropertyStatus(Number(id), token, false).subscribe({
+                next: async () => {
+                  const t = await this.toastCtrl.create({
+                    message: 'Propiedad inhabilitada correctamente.',
+                    duration: 1500,
+                    color: 'success'
+                  });
+                  await t.present();
+                },
+                error: async (err) => {
+                  console.error('Error al inhabilitar propiedad:', err);
+                  const t = await this.toastCtrl.create({
+                    message: 'Error al inhabilitar propiedad.',
+                    duration: 1800,
+                    color: 'danger'
+                  });
+                  await t.present();
+                },
+              });
+            }
+          }
+        ]
       });
+      await alert.present();
     } catch (error) {
-      console.error('Error al eliminar propiedad:', error);
+      console.error('Error al inhabilitar propiedad:', error);
     }
   }
 

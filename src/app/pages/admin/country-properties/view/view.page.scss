@@ -68,6 +68,22 @@
   --border-radius: 8px;
 }
 
+/* Status dot in photo cell */
+.img-cell {
+  position: relative;
+}
+.status-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+.status-dot.active { background-color: #22c55e; } /* verde */
+.status-dot.inactive { background-color: #ef4444; } /* rojo */
+
 /* Texto que puede ser largo */
 .truncate {
   overflow: hidden;

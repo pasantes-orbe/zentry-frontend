@@ -45,20 +45,90 @@ export class AssignCountryToOwnerPage implements OnInit {
     private _countryStorage: CountryStorageService,
   ) {
     this.form = this._fb.group({
-      user_id: [null, [Validators.required]],
+      // user_id ya no es requerido; se usa selección múltiple por checkboxes
+      user_id: [null],
       property_id: [null, [Validators.required]],
     });
   }
 
+  // IDs de usuarios asignados en cualquier propiedad (para mostrar solo "disponibles")
+  private assignedOwnerIdsGlobally(): Set<number> {
+    const ids: number[] = [];
+    for (const p of (this.properties || [])) {
+      const owners = Array.isArray((p as any)?.owners) ? (p as any).owners : [];
+      owners.forEach((o: any) => {
+        const uid = Number(o?.user?.id ?? o?.OwnerUser?.id ?? o?.id_user ?? o?.id);
+        if (Number.isFinite(uid) && uid > 0) ids.push(uid);
+      });
+    }
+    return new Set<number>(ids);
+  }
+
+  // IDs de usuarios ya asignados a la propiedad seleccionada
+  private assignedOwnerIdsForSelectedProperty(): Set<number> {
+    const pid = Number(this.form.get('property_id')?.value);
+    if (!Number.isFinite(pid) || pid <= 0) return new Set<number>();
+    const match = (this.properties || []).find(p => this.propertyId(p) === pid) as any;
+    const owners = Array.isArray(match?.owners) ? match.owners : [];
+    const ids = owners
+      .map((o: any) => (o?.user?.id ?? o?.OwnerUser?.id ?? o?.id_user ?? o?.id))
+      .map((v: any) => Number(v))
+      .filter((n: number) => Number.isFinite(n) && n > 0);
+    return new Set<number>(ids);
+  }
+
+  // Aplica el filtro de disponibilidad en base a la propiedad seleccionada
+  private recomputeFilteredOwners(): void {
+    const assigned = this.assignedOwnerIdsForSelectedProperty();
+    if (assigned.size === 0) return; // sin propiedad seleccionada, no filtra
+    this.filteredOwners = this.filteredOwners.filter(o => !assigned.has(this.ownerId(o)!));
+    // Además, limpiar selección múltiple si marcaste alguien ya asignado
+    this.selectedOwnerIds = this.selectedOwnerIds.filter(id => !assigned.has(id));
+  }
+
   ngOnInit() {
+    this.loadData();
+    // Refiltrar propietarios cuando cambia la propiedad seleccionada
+    this.form.get('property_id')?.valueChanges.subscribe(() => {
+      this.recomputeFilteredOwners();
+    });
+  }
+
+  ionViewWillEnter() {
     this.loadData();
   }
 
   public getForm(): FormGroup { return this.form; }
 
+  // Selección múltiple de owners
+  private selectedOwnerIds: number[] = [];
+  public isOwnerSelected(id: number | null): boolean {
+    if (!id) return false;
+    return this.selectedOwnerIds.includes(id);
+  }
+  public toggleOwnerSelection(o: any): void {
+    const id = this.ownerId(o);
+    if (!id) return;
+    const idx = this.selectedOwnerIds.indexOf(id);
+    if (idx >= 0) {
+      this.selectedOwnerIds.splice(idx, 1);
+    } else {
+      this.selectedOwnerIds.push(id);
+    }
+  }
+  public hasSelectedOwners(): boolean { return this.selectedOwnerIds.length > 0; }
+
   // Helpers OWNER: soporta OwnerUser, user, User, etc.
   private getUser(o: any): any {
     return o?.OwnerUser ?? o?.user ?? o?.User ?? o?.owner ?? null;
+  }
+  private isValidUser(o: any): boolean {
+    const u = this.getUser(o);
+    return !!u && Number.isFinite(Number(u?.id)) && Number(u?.id) > 0;
+  }
+  private isOwnerActive(o: any): boolean {
+    const u = this.getUser(o);
+    return typeof u?.isActive === 'boolean' ? u.isActive : true;
   }
   public ownerId(o: any): number | null {
     const id = this.getUser(o)?.id ?? o?.id_user ?? o?.id;
@@ -91,13 +161,23 @@ export class AssignCountryToOwnerPage implements OnInit {
   private getProp(p: any): any {
     return p?.property ?? p;
   }
+  private isValidProp(p: any): boolean {
+    const prop = this.getProp(p);
+    return !!prop && Number.isFinite(Number(prop?.id)) && Number(prop?.id) > 0;
+  }
+  private isPropertyActive(p: any): boolean {
+    const prop = this.getProp(p);
+    return typeof prop?.isActive === 'boolean' ? prop.isActive : true;
+  }
   public propertyId(p: any): number | null {
     const id = this.getProp(p)?.id ?? p?.id;
     const n = Number(id);
     return Number.isFinite(n) && n > 0 ? n : null;
   }
   public propertyAvatar(p: any): string {
-    return this.getProp(p)?.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png';
+    const a = this.getProp(p)?.avatar;
+    const url = this.normalizeAvatarUrl(a);
+    return url || 'https://ionicframework.com/docs/img/demos/card-media.png';
   }
   public propertyName(p: any): string {
     return this.getProp(p)?.name ?? 'Sin nombre';
@@ -114,7 +194,7 @@ export class AssignCountryToOwnerPage implements OnInit {
   public async loadData(): Promise<void> {
     this.loading = true;
 
-    const owners$ = this._owners.getAllByCountry().pipe(
+    const owners$ = this._owners.getActiveByCountry().pipe(
       catchError(err => { console.error('Error propietarios:', err); return of<Owner_CountryInterface[]>([]); })
     );
 
@@ -129,8 +209,25 @@ export class AssignCountryToOwnerPage implements OnInit {
       next: ([ownersData, propertiesData]) => {
         this.owners = ownersData || [];
         this.properties = propertiesData || [];
-        this.filteredOwners = this.owners.filter(o => this.ownerId(o) !== null);
-        this.filteredProperties = this.properties.filter(p => this.propertyId(p) !== null);
+        const uniqOwnersMap = new Map<number, any>();
+        (this.owners || []).forEach(o => { const id = this.ownerId(o); if (id) uniqOwnersMap.set(id, o); });
+        this.filteredOwners = Array.from(uniqOwnersMap.values())
+          .filter(o => this.ownerId(o) !== null)
+          .filter(o => this.isValidUser(o))
+          .filter(o => this.isOwnerActive(o));
+        // Mostrar solo propietarios "disponibles" (no asignados a ninguna propiedad)
+        const assignedGlobal = this.assignedOwnerIdsGlobally();
+        this.filteredOwners = this.filteredOwners.filter(o => !assignedGlobal.has(this.ownerId(o)!));
+        // Aplicar filtro de disponibilidad respecto a la propiedad elegida (si hay)
+        this.recomputeFilteredOwners();
+        const uniqPropsMap = new Map<number, any>();
+        (this.properties || []).forEach(p => { const id = this.propertyId(p); if (id) uniqPropsMap.set(id, p); });
+        this.filteredProperties = Array.from(uniqPropsMap.values())
+          .filter(p => this.propertyId(p) !== null)
+          .filter(p => this.isValidProp(p))
+          .filter(p => this.isPropertyActive(p));
+        // Mostrar solo propiedades "disponibles" (sin owners asignados)
+        this.filteredProperties = this.filteredProperties.filter(p => Array.isArray((p as any)?.owners) ? (p as any).owners.length === 0 : true);
       },
       error: (err) => console.error('Fallo inesperado:', err)
     });
@@ -139,51 +236,78 @@ export class AssignCountryToOwnerPage implements OnInit {
   public onSearchOwners(ev: any): void {
     const term = (ev?.target?.value || '').toLowerCase();
     const src = [...this.owners];
-    if (!term) { this.filteredOwners = src.filter(o => this.ownerId(o) !== null); return; }
+    if (!term) { this.filteredOwners = src.filter(o => this.ownerId(o) !== null).filter(o => this.isValidUser(o)).filter(o => this.isOwnerActive(o)); return; }
     this.filteredOwners = src
       .filter(o =>
         this.ownerName(o).toLowerCase().includes(term) ||
         this.ownerLastname(o).toLowerCase().includes(term) ||
         this.ownerDni(o).toLowerCase().includes(term)
       )
-      .filter(o => this.ownerId(o) !== null);
+      .filter(o => this.ownerId(o) !== null)
+      .filter(o => this.isValidUser(o))
+      .filter(o => this.isOwnerActive(o));
+    // Refiltrar por disponibilidad global y con la propiedad seleccionada
+    const assignedGlobal = this.assignedOwnerIdsGlobally();
+    this.filteredOwners = this.filteredOwners.filter(o => !assignedGlobal.has(this.ownerId(o)!));
+    this.recomputeFilteredOwners();
   }
 
   public onSearchProperties(ev: any): void {
     const term = (ev?.target?.value || '').toLowerCase();
     const src = [...this.properties];
-    if (!term) { this.filteredProperties = src.filter(p => this.propertyId(p) !== null); return; }
+    if (!term) { this.filteredProperties = src.filter(p => this.propertyId(p) !== null).filter(p => this.isValidProp(p)).filter(p => this.isPropertyActive(p)); return; }
     this.filteredProperties = src
       .filter(p =>
         this.propertyName(p).toLowerCase().includes(term) ||
         this.propertyNumber(p).toLowerCase().includes(term)
       )
-      .filter(p => this.propertyId(p) !== null);
+      .filter(p => this.propertyId(p) !== null)
+      .filter(p => this.isValidProp(p))
+      .filter(p => this.isPropertyActive(p))
+      .filter(p => Array.isArray((p as any)?.owners) ? (p as any).owners.length === 0 : true);
   }
 
   public async asignarPropiedadAlUsuario() {
-    if (this.form.invalid) {
-      this._alert.presentAlert('Formulario inválido. Seleccioná propietario y propiedad.');
-      return;
-    }
-
-    const userId = Number(this.form.get('user_id')!.value);
     const propertyId = Number(this.form.get('property_id')!.value);
-
-    if (!Number.isFinite(userId) || !Number.isFinite(propertyId) || userId <= 0 || propertyId <= 0) {
-      this._alert.presentAlert('Error: IDs inválidos. Recargá y reintentá.');
+    if (!Number.isFinite(propertyId) || propertyId <= 0) {
+      this._alert.presentAlert('Seleccioná una propiedad válida.');
+      return;
+    }
+    if (!this.hasSelectedOwners()) {
+      this._alert.presentAlert('Seleccioná al menos un propietario.');
       return;
     }
 
+    // Ejecutar asignaciones en serie para feedback consistente
     try {
-      // El OwnersService ya maneja loader/navegación (si lo dejaste así). No duplicamos loader acá.
-      const rel = this._owners.relationWithProperty(userId, propertyId) as any;
-      if (isObservable(rel)) { await lastValueFrom(rel); } else { await rel; }
+      for (const uid of this.selectedOwnerIds) {
+        await this._owners.relationWithPropertySilent(uid, propertyId);
+      }
+      // Limpiar selección y remover propietarios ya asignados de la lista visible
+      const assignedSet = new Set(this.selectedOwnerIds);
+      this.selectedOwnerIds = [];
+      this.filteredOwners = this.filteredOwners.filter(o => !assignedSet.has(this.ownerId(o)!));
+      this.owners = this.owners.filter(o => !assignedSet.has(this.ownerId(o)!));
+      // Marcar localmente la propiedad seleccionada como con owners asignados para que no aparezca más
+      const pid = Number(this.form.get('property_id')!.value);
+      const idx = this.filteredProperties.findIndex(p => this.propertyId(p) === pid);
+      if (idx >= 0) {
+        const propAny: any = this.filteredProperties[idx];
+        if (!Array.isArray(propAny.owners)) propAny.owners = [];
+        // insertar placeholders mínimos para reflejar asignación
+        assignedSet.forEach(uid => { propAny.owners.push({ user: { id: uid } }); });
+        // Volver a filtrar propiedades disponibles
+        this.filteredProperties = this.filteredProperties.filter(p => Array.isArray((p as any)?.owners) ? (p as any).owners.length === 0 : true);
+      }
+      this.form.get('property_id')!.reset();
+      await this.presentToast('Asignación completada', 'success');
 
-      this.form.reset();
-      // Si tu OwnersService no redirige, descomentá esto:
-      // const country = await this._countryStorage.getCountry();
-      // country?.id ? this._router.navigate(['/admin/country-dashboard', country.id]) : this._router.navigate(['/admin/home']);
+      // Redirección opcional al dashboard del country actual
+      const country = await this._countryStorage.getCountry();
+      const countryId = country?.id;
+      if (countryId) {
+        this._router.navigate(['/admin/country-dashboard', countryId]);
+      }
     } catch (err: any) {
       console.error('Error al asignar propiedad:', err);
       const msg = err?.error?.msg || err?.message || 'No se pudo asignar la propiedad.';

@@ -7,9 +7,11 @@ import { checkmarkCircleOutline } from 'ionicons/icons';
 
 //Servicios
 import { UserService } from 'src/app/services/user/user.service';
+import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 
 // Componentes
-import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonDatetimeButton, IonModal, IonDatetime, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonDatetimeButton, IonModal, IonDatetime, IonIcon, IonToggle, IonGrid, IonRow, IonCol, IonAvatar, ModalController } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-edit',
@@ -31,7 +33,12 @@ import { IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, Ion
     IonDatetimeButton,
     IonModal,
     IonDatetime,
-    IonIcon
+    IonIcon,
+    IonToggle,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonAvatar
   ]
 })
 export class EditPage implements OnInit {
@@ -54,9 +61,24 @@ export class EditPage implements OnInit {
     private _route: ActivatedRoute,
     private _router: Router,
     @Optional() private modalCtrl: ModalController,
+    private _userStorage: UserStorageService,
+    private toastController: ToastController,
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
+  }
+
+  // Subir avatar del propietario desde el modal
+  onOwnerAvatarChange(event: Event) {
+    // Función deshabilitada: no se permite subir avatar desde este formulario
+    return;
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'warning') {
+    try {
+      const toast = await this.toastController.create({ message, duration: 2000, color });
+      await toast.present();
+    } catch {}
   }
 
   async ngOnInit() {
@@ -75,6 +97,7 @@ export class EditPage implements OnInit {
         this.form.controls['phone'].setValue(res.phone);
         this.form.controls['birthday'].setValue(res.birthday);
         this.form.controls['email'].setValue(res.email);
+        this.form.controls['isActive'].setValue(!!res.isActive);
 
       }
     )
@@ -94,7 +117,8 @@ export class EditPage implements OnInit {
       lastname: [''],
       phone: [''],
       birthday: [''],
-      email: ['']
+      email: [''],
+      isActive: [true]
     });
   }
 
@@ -102,32 +126,22 @@ export class EditPage implements OnInit {
     if (this.modalCtrl) {
       return this.modalCtrl.dismiss(null, 'cancel');
     }
-    this._router.navigate(['/admin/view-owners']);
+    this._router.navigate(['/admin/view-owners'], { replaceUrl: true });
   }
 
   updateOwner() {
     // this._userService.updateUser(this.user.id, 
     //                               this.form.get('name').value,
     //                               this.form.get('lastname').value,
-    //                               this.form.get('birthday').value,
-    //                               this.form.get('email').value,
-    //                               this.form.get('phone').value)
-
-    //                             this.form.markAsPristine()
-
-    console.log(this.user.id,
-      this.form.get('name').value,
-      this.form.get('lastname').value,
-      this.form.get('birthday').value,
-      this.form.get('email').value,
-      this.form.get('phone').value)
-
     this._userService.updateUser(this.user.id,
       this.form.get('name').value,
       this.form.get('lastname').value,
       this.form.get('birthday').value,
       this.form.get('email').value,
       this.form.get('phone').value)
+
+    // Actualizar estado (habilitado/inhabilitado) vía endpoint de status
+    this._userService.updateUserStatus(this.user.id, !!this.form.get('isActive').value).subscribe();
     this.form.markAsPristine()
   }
 

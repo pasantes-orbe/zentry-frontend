@@ -27,7 +27,7 @@
     </ion-buttons>
   </ion-toolbar>
   <!-- Popover de notificaciones (igual a Admin) -->
-  <ion-popover trigger="owner-tab1-notifications-trigger" triggerAction="click" [dismissOnSelect]="false" class="notifications-popover">
+  <ion-popover trigger="owner-tab1-notifications-trigger" triggerAction="click" [dismissOnSelect]="false" [cssClass]="'notifications-popover'">
     <ng-template>
       <app-notifications-popover [userId]="userID" [navigateOnClick]="false"></app-notifications-popover>
     </ng-template>
@@ -78,13 +78,7 @@
             Autorizar
           </ion-button>
         </div>
-      
-        <div class="action-card notifications-card">
-          <h3 class="card-title">Notificaciones Recientes</h3>
-          <ion-list>
-            <!-- Las notificaciones se cargarán aquí dinámicamente -->
-          </ion-list>
-        </div>
+
       </ion-col>
 
       <!-- Columna Derecha -->
