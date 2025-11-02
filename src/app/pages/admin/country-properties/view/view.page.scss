@@ -1,161 +1,145 @@
 /* Contenedor general */
-.page-container {
-  padding: 16px;
-}
+.page-container { padding: 16px; }
 
+/* Header de página */
 .page-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 12px;
-
-  h1 {
-    margin: 0;
-    font-weight: 700;
-  }
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;
+  h1 { margin: 0; font-weight: 700; }
 }
 
 /* Tabla */
-.pro-table-container {
-  position: relative;
-}
+.pro-table { display: grid; gap: 10px; }
+.pro-table-container { padding-right: 4px; } /* evita que lo último se pegue al borde redondeado */
 
-.pro-table {
-  display: grid;
-  gap: 8px; /* separación entre filas */
-}
-
+/* ---- GRID de columnas ----
+   FOTO | LOTE | DIRECCIÓN | PROPIETARIO | ACCIONES
+*/
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 64px 120px 1fr 1fr 120px; /* Foto | Nº | Dirección | Propietarios | Acciones */
+  grid-template-columns:
+    84px                      /* foto */
+    90px                      /* lote */
+    minmax(260px, 1fr)        /* dirección */
+    minmax(120px, 0.55fr)     /* propietario */
+    max-content;              /* acciones se adapta a sus botones */
+  column-gap: 8px;
   align-items: center;
   background: var(--ion-color-light, #f4f5f8);
   border-radius: 12px;
+  /* IMPORTANTE: sin padding aquí; lo ponemos en celdas para alinear exacto */
+  padding: 0;
 }
 
-.table-header {
-  padding: 8px 12px;
-  background: transparent;
-
-  .header-cell {
-    font-size: 12px;
-    font-weight: 700;
-    color: #8692a6;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-  }
+/* Header: mismo padding que las celdas y misma justificación por columna */
+.table-header { background: transparent; }
+.table-header .header-cell {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;          /* = celdas */
+  font-size: 13px; font-weight: 700;
+  color: #8692a6; text-transform: uppercase; letter-spacing: .04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+/* Alineaciones por columna en HEADER (coinciden con filas) */
+.table-header .header-cell:nth-child(1) { justify-content: flex-start; } /* Propiedad */
+.table-header .header-cell:nth-child(2) { justify-content: center; }     /* Lote N° */
+.table-header .header-cell:nth-child(3) { justify-content: flex-start; }  /* Dirección */
+.table-header .header-cell:nth-child(4) { justify-content: flex-start; }  /* Propietario */
+.table-header .header-cell:nth-child(5) { justify-content: flex-start; }  /* Acciones */
 
-/* Versión compacta: menos padding/altura */
+/* Filas compactas */
 .pro-table--compact .table-row {
-  padding: 6px 12px; /* ↓ padding vertical */
-  background: white;
+  background: #fff;
   border: 1px solid rgba(0,0,0,.06);
 }
 
+/* Celdas: mismo padding que header */
 .table-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px; /* ↓ altura mínima de fila */
+  display: flex; align-items: center; gap: 8px;
+  min-height: 44px; min-width: 0;
+  padding: 8px 10px;          /* = header */
 }
 
-/* Avatar propiedad más chico */
-.prop-avatar {
-  width: 44px;
-  height: 44px;
-  --border-radius: 8px;
+/* Alineaciones por columna en FILAS (deben coincidir con header) */
+.img-cell     { justify-content: flex-start; }
+.number-cell  { justify-content: center; text-align: center; }
+.truncate     { justify-content: flex-start; } /* Dirección */
+.owner-cell   { justify-content: flex-start; }
+.actions-cell { justify-content: flex-start; gap: 8px; white-space: nowrap; overflow: visible; }
+
+/* Botones de acciones */
+.actions-cell ion-button {
+  margin: 0; height: 36px; flex: 0 0 auto;
+  --border-radius: 8px; --padding-start: 10px; --padding-end: 10px;
+  min-width: 96px; /* ajusta a 92 si quieres más compacto */
 }
 
-/* Status dot in photo cell */
-.img-cell {
-  position: relative;
-}
+/* Avatar propiedad */
+.prop-avatar { width: 52px; height: 52px; --border-radius: 10px; }
+
+/* Dot de estado */
+.img-cell { position: relative; }
+/* Coloca el dot pegado a la esquina inferior derecha del avatar */
 .status-dot {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid #fff;
+  bottom: 6px;           /* separación mínima del borde del avatar (desktop) */
+  left: 44px;            /* 52px avatar - 8px aprox para centrar el dot */
+  width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff;
 }
-.status-dot.active { background-color: #22c55e; } /* verde */
-.status-dot.inactive { background-color: #ef4444; } /* rojo */
+.status-dot.active { background-color: #22c55e; }
+.status-dot.inactive { background-color: #ef4444; }
 
-/* Texto que puede ser largo */
-.truncate {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+/* Textos largos */
+.truncate { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-/* Chips de propietarios (compactos) */
-.owner-chips {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  max-width: 100%;
+/* Chips propietario */
+.owner-chips { display: flex; align-items: center; gap: 6px; max-width: 100%; flex-wrap: wrap; }
+.chip-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.more { font-size: 12px; color: #6b7280; }
+
+/* Estados de carga/vacío */
+.loading-container, .empty-state {
+  display: grid; place-items: center; gap: 8px; padding: 24px; color: #6b7280;
+  ion-icon { font-size: 40px; }
 }
 
-.chip-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
+/* Responsive fino */
+@media (max-width: 900px) {
+  .table-header, .table-row {
+    grid-template-columns:
+      72px 80px minmax(220px, 1fr) minmax(110px, 0.5fr) max-content;
+    column-gap: 6px;
+  }
+  .prop-avatar { width: 48px; height: 48px; }
+  /* Ajustar posición del dot para el avatar más chico en mobile */
+  .status-dot { left: 40px; bottom: 4px; }
+  .chip-avatar { width: 26px; height: 26px; }
 }
 
-.more {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-/* Acciones */
-.actions-cell {
-  justify-content: flex-start;
-
-  ion-button {
-    --padding-start: 2px;
-    --padding-end: 2px;
-    --border-radius: 8px;
+/* Preset optimizado para 1366x768 (ancho ~1366px) */
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .table-header, .table-row {
+    /* FOTO | LOTE | DIRECCIÓN | PROPIETARIO | ACCIONES */
+    grid-template-columns:
+      108px                 /* foto */
+      104px                 /* lote */
+      minmax(400px, 1.05fr) /* dirección (ligeramente más compacta) */
+      minmax(260px, 0.9fr)  /* propietario */
+      236px;                /* acciones: 2 botones sin cortes */
+    column-gap: 8px;
   }
 
-  ion-icon {
-    font-size: 18px;
-  }
-}
-
-/* Loading / vacío */
-.loading-container,
-.empty-state {
-  display: grid;
-  place-items: center;
-  gap: 8px;
-  padding: 24px;
-  color: #6b7280;
-
-  ion-icon {
-    font-size: 40px;
-  }
-}
-
-/* Responsivo: en pantallas angostas, apretamos columnas */
-@media (max-width: 768px) {
-  .table-header,
-  .table-row {
-    grid-template-columns: 56px 80px 1fr 1fr 96px;
+  .actions-cell {
+    gap: 8px;
+    padding-right: 0; /* evitar recortes por padding derecho */
   }
 
-  .prop-avatar {
-    width: 40px;
-    height: 40px;
+  .actions-cell .action-btn,
+  .actions-cell .status-btn {
+    flex: 0 0 114px;
+    min-width: 114px; /* 114 + 114 + 8 gap = 236px exactos */
   }
 
-  .chip-avatar {
-    width: 26px;
-    height: 26px;
-  }
+  .prop-avatar { width: 56px; height: 56px; }
 }

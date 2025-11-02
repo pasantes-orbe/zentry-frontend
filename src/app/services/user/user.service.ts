@@ -1,3 +1,4 @@
+//src/app/services/user/user.service.ts
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserInterface } from 'src/app/interfaces/user-interface';
@@ -52,15 +53,7 @@ export class UserService {
         lastname, 
         email, 
         phone
-      }).subscribe(async res => 
-        {
-          await this.correctlyToast()
-          console.log(res);
-        },
-        async err => {
-          await this.errorToast()
-        } 
-        )
+      })
     }
 
     
@@ -85,15 +78,15 @@ export class UserService {
       await toast.present();
     }
 
-    // Subir avatar del usuario (multipart/form-data) con compresión previa
+    // Subir avatar del usuario (multipart/form-data) -> POST /api/users/:id/avatar con campo 'file'
     uploadAvatar(id: number, file: File){
       return from(this.compressImage(file, 1080, 0.7)).pipe(
         switchMap((out: File) => from(this._auth.getJWT()).pipe(
           switchMap(token => {
             const formData = new FormData();
-            formData.append('avatar', out, out.name || (out.type === 'image/png' ? 'avatar.png' : 'avatar.jpg'));
+            formData.append('file', out, out.name || (out.type === 'image/png' ? 'avatar.png' : 'avatar.jpg'));
             const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-            return this._htpp.patch<any>(`${environment.URL}/api/users/avatar/${id}`, formData, { headers });
+            return this._htpp.post<any>(`${environment.URL}/api/users/${id}/avatar`, formData, { headers });
           })
         ))
       );

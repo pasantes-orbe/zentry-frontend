@@ -34,7 +34,6 @@
             <div class="header-cell">Propietario</div>
             <div class="header-cell">DNI</div>
             <div class="header-cell">Email</div>
-            <div class="header-cell">Estado</div>
             <div class="header-cell">Acciones</div>
           </div>
 
@@ -55,18 +54,13 @@
             
             <div class="table-cell" data-label="Email">{{ owner.user.email }}</div>
 
-            <div class="table-cell" data-label="Estado">
-              <ion-chip [outline]="true" [ngClass]="owner.user.isActive ? 'status-active' : 'status-inactive'">
-                <ion-label>{{ owner.user.isActive ? 'Activo' : 'Inactivo' }}</ion-label>
-              </ion-chip>
-            </div>
-
-            <div class="table-cell actions-cell">
-              <ion-button fill="clear" size="small" (click)="editUser(owner.user.id, i)" title="Editar propietario">
-                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            <div class="table-cell actions-cell" data-label="Acciones">
+              <ion-button class="action-btn" size="small" fill="solid" color="primary" (click)="goToEditOwner(owner.user.id)" title="Editar propietario">
+                <ion-icon name="create-outline" slot="start"></ion-icon>
+                Editar
               </ion-button>
-              <ion-button fill="clear" size="small" color="danger" (click)="deleteOwner(owner.user.id, i)" title="Eliminar propietario">
-                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              <ion-button class="status-btn" size="small" fill="outline" [color]="owner.user.isActive ? 'success' : 'medium'" (click)="toggleOwnerStatus(owner.user.id, owner.user.isActive)" [title]="owner.user.isActive ? 'Inhabilitar propietario' : 'Habilitar propietario'">
+                {{ owner.user.isActive ? 'Activo' : 'Inactivo' }}
               </ion-button>
             </div>
           </div>
@@ -82,5 +76,7 @@
       </ng-container>
 
     </div>
+    <!-- Global hidden file input for avatar changes -->
+    <input #globalAvatarInput id="globalAvatarInput" type="file" accept="image/*" (change)="onGlobalAvatarPicked($event)" (input)="onGlobalAvatarPicked($event)" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;" />
   </div>
 </ion-content>

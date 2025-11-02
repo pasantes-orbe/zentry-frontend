@@ -403,6 +403,12 @@ export const routes: Routes = [
         .then(m => m.EditPage),
   },
   {
+    path: 'edit-property/:id',
+    loadComponent: () =>
+      import('../modals/properties/property/property.page')
+        .then(m => m.PropertyPage),
+  },
+  {
     path: 'explore-container',
     loadComponent: () =>
       import('../explore-container/explore-container.component')

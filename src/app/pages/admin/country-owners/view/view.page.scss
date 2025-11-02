@@ -157,6 +157,9 @@ ion-chip {
   
   .actions-cell {
     justify-content: center;
+    .action-btn, .status-btn {
+      min-width: 110px;
+    }
   }
 }
 

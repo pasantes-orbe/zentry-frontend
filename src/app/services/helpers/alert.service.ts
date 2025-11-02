@@ -55,8 +55,8 @@ export class AlertService {
     this.datePipeString = e.income_date ? formatDate(e.income_date, 'short', 'es-Ar') : 'Fecha no disponible';
     
     const alert = await this.alertController.create({
-      header: 'Solicitud de Ingreso',
-      message: `${e.guest_name} <br> ${e.guest_lastname} <br> ${this.datePipeString} <br>`,
+      header: 'Operación realizada correctamente',
+      //message: `${e.guest_name} <br> ${e.guest_lastname} <br> ${this.datePipeString} <br>`,
       backdropDismiss: false,
       buttons: [
         {

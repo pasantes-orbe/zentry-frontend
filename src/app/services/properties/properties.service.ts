@@ -13,20 +13,20 @@ import { Property_OwnerInterface } from '../../interfaces/property_owner-interfa
 @Injectable({ providedIn: 'root' })
 export class PropertiesService {
 
-  constructor(
-    private _http: HttpClient,
-    private _alertService: AlertService,
-    private _router: Router,
-    private _authStorageService: AuthStorageService,
-    private _countryStorageService: CountryStorageService
-  ) {}
+  constructor(
+    private _http: HttpClient,
+    private _alertService: AlertService,
+    private _router: Router,
+    private _authStorageService: AuthStorageService,
+    private _countryStorageService: CountryStorageService
+  ) {}
 
-  // Crea propiedad (el caller maneja spinner/navegación/alerts)
-  public async addProperty(formData: FormData): Promise<any> {
-    const token = await this._authStorageService.getJWT();
-    const country = await this._countryStorageService.getCountry();
-    const countryID = country.id;
-    formData.append('id_country', countryID.toString());
+  // Crea propiedad (el caller maneja spinner/navegación/alerts)
+  public async addProperty(formData: FormData): Promise<any> {
+    const token = await this._authStorageService.getJWT();
+    const country = await this._countryStorageService.getCountry();
+    const countryID = country.id;
+    formData.append('id_country', countryID.toString());
 
     const httpOptions = {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
@@ -37,18 +37,42 @@ export class PropertiesService {
     );
   }
 
+  // Subir avatar de propiedad (multipart) al endpoint dedicado
+  public async uploadPropertyAvatar(id: number, file: File) {
+    const token = await this._authStorageService.getJWT();
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const form = new FormData();
+    form.append('file', file);
+    return this._http.post(`${environment.URL}/api/properties/${id}/avatar`, form, { headers });
+  }
+
   // Editar propiedad enviando archivo de imagen (multipart)
-  public editPropertyMultipart(token: string, id: number, name: string, number: any, address: string, avatarFile: File) {
+// [INICIO CORRECCION] Modificado para recibir 'isActive' opcionalmente y retornar Observable
+  public editPropertyMultipart(
+    token: string,
+    id: number,
+    name: string,
+    number: any,
+    address: string,
+    avatarFile: File,
+    isActive?: boolean // Nuevo parámetro opcional para el estado
+  ) {
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
     const formData = new FormData();
     formData.append('name', String(name ?? ''));
     formData.append('number', String(number ?? ''));
     formData.append('address', String(address ?? ''));
     if (avatarFile) {
-      formData.append('avatar', avatarFile);
+      // Asegurar que el campo se llame 'avatar' como espera el backend
+      formData.append('avatar', avatarFile); 
+    }
+    // Agregar isActive si se proporciona (para actualizar estado junto con los datos)
+    if (typeof isActive === 'boolean') {
+      formData.append('isActive', String(isActive));
     }
     return this._http.patch(`${environment.URL}/api/properties/${id}`, formData, { headers });
   }
+// [FIN CORRECCION]
 
   // Trae propiedades por country incluyendo activas e inactivas (sin filtrar isActive)
   public async getByCountryAllStatuses(): Promise<Observable<any[]>> {
@@ -163,13 +187,19 @@ export class PropertiesService {
     return this._http.get(`${environment.URL}/api/properties/${id}`, httpOptions);
   }
 
-  public editProperty(token: string, id: number, name: string, number: any, address: string) {
+// [INICIO CORRECCION] Modificado para recibir 'isActive' opcionalmente
+  public editProperty(token: string, id: number, name: string, number: any, address: string, isActive?: boolean) {
     const httpOptions = {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
     };
     const body: any = { name, number, address };
+    // Agregar isActive si se proporciona
+    if (typeof isActive === 'boolean') {
+      body.isActive = isActive;
+    }
     return this._http.patch(`${environment.URL}/api/properties/${id}`, body, httpOptions);
   }
+// [FIN CORRECCION]
 
   public deleteProperty(id: number, token: string) {
     const httpOptions = {

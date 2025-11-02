@@ -3,7 +3,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, AlertController, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
 // Servicios
 import { PropertiesService } from 'src/app/services/properties/properties.service';
@@ -41,6 +41,7 @@ export class ViewPage implements OnInit {
     private modalCtrl: ModalController,
     private authStorage: AuthStorageService,
     private route: ActivatedRoute,
+    private router: Router,
     private userService: UserService,
     private ownersService: OwnersService,
     private cdr: ChangeDetectorRef,
@@ -53,6 +54,67 @@ export class ViewPage implements OnInit {
     const cid = this.route.snapshot.queryParamMap.get('countryId');
     this.countryId = cid ? Number(cid) : null;
     this.loadProperties();
+  }
+
+  // Navegar a la página de edición de propiedad
+  public goToEditProperty(id: number | null | undefined): void {
+    if (!id) return;
+    this.router.navigate(['/edit-property', id]);
+  }
+
+  // Alternar estado con confirmación y actualización local
+  public async togglePropertyStatus(id: number | null | undefined, isActive: boolean): Promise<void> {
+    if (!id) return;
+    const enabling = !isActive;
+    const header = enabling ? 'Habilitar propiedad' : 'Inhabilitar propiedad';
+    const message = enabling
+      ? '¿Está seguro que desea habilitar esta propiedad?'
+      : '¿Está seguro que desea inhabilitar esta propiedad?';
+
+    const alert = await this.alertCtrl.create({
+      header,
+      message,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: enabling ? 'Habilitar' : 'Inhabilitar',
+          role: 'confirm',
+          handler: async () => {
+            try {
+              const token = await this.authStorage.getJWT();
+              await new Promise<void>((resolve, reject) => {
+                this.propertiesService.updatePropertyStatus(Number(id), token, enabling).subscribe({
+                  next: () => resolve(),
+                  error: (e) => reject(e),
+                });
+              });
+              // Actualizar localmente
+              this.properties = this.properties.map((row: any) => {
+                if (Number(row?.property?.id) === Number(id)) {
+                  return { ...row, property: { ...row.property, isActive: enabling } };
+                }
+                return row;
+              });
+              const t = await this.toastCtrl.create({
+                message: enabling ? 'Propiedad habilitada.' : 'Propiedad inhabilitada.',
+                duration: 1400,
+                color: 'success',
+              });
+              await t.present();
+            } catch (err) {
+              console.error('Error cambiando estado de propiedad:', err);
+              const t = await this.toastCtrl.create({
+                message: 'No se pudo cambiar el estado.',
+                duration: 1800,
+                color: 'danger',
+              });
+              await t.present();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   // Alternativa: usar el mismo origen que otras vistas (OwnersService) y mapear avatares por id_user
