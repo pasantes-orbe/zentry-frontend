@@ -3,7 +3,6 @@
   --page-padding: 16px;
   --form-padding: 20px;
   --border-radius: 16px;
-  --border-color: rgba(0, 0, 0, 0.08);
 }
 
 .page-container {
@@ -16,10 +15,10 @@
   width: 100%;
   max-width: 800px;
   padding: var(--form-padding);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  background: var(--ion-color-background);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow);
 }
 
 // --- SECCIÓN DE AVATAR (Más compacto) ---
@@ -34,7 +33,7 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--border-color);
+    border: 3px solid var(--color-border);
   }
 
   .upload-button {
@@ -50,8 +49,8 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: 3px solid var(--ion-color-background);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border: 3px solid var(--ion-card-background);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease;
     
     &:hover {
@@ -70,9 +69,9 @@
 
 .avatar-helper-text {
   text-align: center;
-  color: var(--ion-color-step-600);
-  font-size: 0.8rem; // Reducido
-  margin-bottom: 24px; // Reducido
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  margin-bottom: 24px;
 }
 
 // --- GRID DE CAMPOS ---
@@ -91,9 +90,11 @@
 .form-field {
   --padding-start: 0;
   --inner-padding-end: 0;
-  --background: var(--ion-color-light-tint);
+  --background: var(--ion-item-background);
+  --border-color: var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  --min-height: 55px; // Altura controlada
+  --min-height: 55px;
 
   // ✅ SOLUCIÓN DE CLAUDE APLICADA:
   // Añadimos padding superior al input para que no se pise con el label.

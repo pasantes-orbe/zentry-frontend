@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/guards/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Servicios Pendientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <h2>Servicios Técnicos Pendientes</h2>
+      <p>Autorizá el ingreso de servicios sin propietario asignado</p>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando servicios...</span>
+    </div>
+
+    <!-- Lista vacía -->
+    <div class="empty-state" *ngIf="!isLoading && pendingServices.length === 0">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <h3>Todo en orden</h3>
+      <p>No hay servicios pendientes de autorización en este momento.</p>
+    </div>
+
+    <!-- Lista de servicios -->
+    <div class="services-list" *ngIf="!isLoading && pendingServices.length > 0">
+      <div *ngFor="let service of pendingServices" class="service-card">
+        <!-- Header de la tarjeta -->
+        <div class="card-header">
+          <ion-chip color="warning" outline="true">
+            <ion-icon name="construct-outline"></ion-icon>
+            <ion-label>Sin propietario</ion-label>
+          </ion-chip>
+          <span class="service-date">{{ service.income_date | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <!-- Información del visitante -->
+        <div class="card-body">
+          <div class="visitor-info">
+            <div class="info-row">
+              <ion-icon name="person-outline" color="primary"></ion-icon>
+              <div class="info-content">
+                <strong>Visitante:</strong>
+                <span>{{ service.guest_name }} {{ service.guest_lastname }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <ion-icon name="card-outline" color="primary"></ion-icon>
+              <div class="info-content">
+                <strong>DNI:</strong>
+                <span>{{ service.DNI }}</span>
+              </div>
+            </div>
+
+            <div class="info-row" *ngIf="service.details">
+              <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+              <div class="info-content">
+                <strong>Detalles:</strong>
+                <span>{{ service.details }}</span>
+              </div>
+            </div>
+
+            <div class="info-row" *ngIf="service.transport">
+              <ion-icon name="car-outline" color="primary"></ion-icon>
+              <div class="info-content">
+                <strong>Transporte:</strong>
+                <span>{{ service.transport }}
+                  <span *ngIf="service.patent"> ({{ service.patent }})</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="info-row" *ngIf="service.guardUser">
+              <ion-icon name="shield-outline" color="tertiary"></ion-icon>
+              <div class="info-content">
+                <strong>Registrado por:</strong>
+                <span>{{ service.guardUser.name }} {{ service.guardUser.lastname }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="card-actions">
+          <ion-button 
+            expand="block" 
+            color="success" 
+            (click)="approveService(service)"
+            [disabled]="isProcessing === service.id">
+            <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+            {{ isProcessing === service.id ? 'Autorizando...' : 'Autorizar Ingreso' }}
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

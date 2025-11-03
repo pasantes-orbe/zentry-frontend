@@ -14,6 +14,7 @@ import { NotificationsService } from 'src/app/services/notifications/notificatio
 import { NotificationInterface } from 'src/app/interfaces/notification-interface';
 import { UserStorageService } from 'src/app/services/storage/user-storage.service';
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
+import { CheckInService } from 'src/app/services/check-in/check-in.service';
 
 // Componentes
 import { NavbarAdminComponent } from 'src/app/components/navbars/navbar-admin/navbar-admin.component';
@@ -48,6 +49,9 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
   private newNotifSub?: Subscription;
   private notifRefreshSub?: Subscription;
 
+  // Servicios pendientes
+  pendingServicesCount = 0;
+
   // Mock por defecto para poder entrar al dashboard sin data real
   private readonly MOCK_COUNTRY: CountryInteface = {
     id: 0,
@@ -71,7 +75,8 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
     private notificationsSvc: NotificationsService,
     private userStorage: UserStorageService,
     private wsService: WebSocketService,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private checkInService: CheckInService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -103,11 +108,13 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
           this.countryStorage.saveCountry(this.country);
           this.loading = false;
           this.loadNotifications();
+          this.loadPendingServices();
         },
         error: async (err) => {
           console.error('No se pudo cargar el country por id:', err);
           await this.loadFromStorageOrMock();
           this.loadNotifications();
+          this.loadPendingServices();
         }
       });
       return;
@@ -115,6 +122,69 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
 
     await this.loadFromStorageOrMock();
     this.loadNotifications();
+    this.loadPendingServices();
+    this.setupServiceListeners();
+  }
+
+  /**
+   * Configurar listeners de socket para servicios pendientes
+   */
+  private setupServiceListeners(): void {
+    // Suscribirse al observable de servicios pendientes
+    this.wsService.pendingService$.subscribe((event: any) => {
+      console.log('[Admin Dashboard] Evento de servicio pendiente recibido:', event);
+      
+      if (event.type === 'new-service') {
+        // Nuevo servicio sin propietario
+        const service = event.data;
+        this.createServiceNotification({
+          title: 'Nuevo Servicio Pendiente',
+          content: `${service.guest_name} ${service.guest_lastname} requiere autorización`,
+          type: 'service-pending',
+          data: service
+        });
+        this.loadPendingServices();
+      } else if (event.type === 'service-approved') {
+        // Servicio aprobado
+        const approval = event.data;
+        this.createServiceNotification({
+          title: 'Servicio Autorizado',
+          content: `${approval.guest_name} ${approval.guest_lastname} fue autorizado`,
+          type: 'service-approved',
+          data: approval
+        });
+        this.loadPendingServices();
+      }
+    });
+  }
+
+  /**
+   * Crea una notificación de servicio pendiente y la agrega al array
+   */
+  private createServiceNotification(notification: any) {
+    // Crear objeto de notificación
+    const newNotif: any = {
+      id: Date.now(), // ID temporal
+      title: notification.title,
+      content: notification.content,
+      type: notification.type,
+      id_user: this.userIdForNotifications || 0,
+      read: false,
+      createdAt: new Date()
+    };
+
+    // Agregar al inicio del array
+    this.notifications.unshift(newNotif);
+    
+    // Mantener solo las últimas 10
+    if (this.notifications.length > 10) {
+      this.notifications = this.notifications.slice(0, 10);
+    }
+
+    // Incrementar contador de no leídas
+    this.unreadCount++;
+
+    console.log('[Admin Dashboard] Notificación de servicio creada:', newNotif);
   }
 
   private subscribeToNewNotifications(): void {
@@ -279,6 +349,37 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
   }
   goToPasswordRequests() {
     this.router.navigate(['/admin/password-requests'], { queryParams: { countryId: this.country?.id } });
+  }
+  goToServicesPending() {
+    this.router.navigate(['/admin/services-pending'], { queryParams: { countryId: this.country?.id } });
+  }
+
+  /**
+   * Carga el contador de servicios pendientes
+   */
+  loadPendingServices() {
+    if (!this.country?.id) return;
+
+    this.checkInService.getAllCheckInConfirmedByOwner(this.country.id).subscribe({
+      next: (checkins) => {
+        // Filtrar solo los que no tienen propietario (servicios)
+        const pendingServices = checkins.filter(c => c.id_owner === null);
+        this.pendingServicesCount = pendingServices.length;
+        console.log('[Admin Dashboard] Servicios pendientes:', this.pendingServicesCount);
+      },
+      error: (err) => {
+        console.error('[Admin Dashboard] Error al cargar servicios pendientes:', err);
+        this.pendingServicesCount = 0;
+      }
+    });
+  }
+
+  /**
+   * Se ejecuta cada vez que la vista está por entrar
+   */
+  ionViewWillEnter() {
+    this.loadPendingServices();
+    this.loadNotifications();
   }
 
   // Eventos / Amenities

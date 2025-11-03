@@ -8,33 +8,49 @@
   ion-toolbar {
     --background: var(--ion-toolbar-background);
     --color: var(--ion-text-color);
+    --border-width: 0 0 1px 0;
+    --border-color: var(--color-border);
+    --min-height: 56px;
   }
 
   // Styles for the brand logo and title in the header.
   .header-brand {
     display: flex;
     align-items: center;
+    gap: 10px;
+    padding: 0;
   }
+
   .header-logo {
-    height: 32px;
-    margin-left: 12px;
-  }
-  .header-title-text {
+    height: 36px;
+    width: 36px;
+    object-fit: contain;
     margin-left: 8px;
-    font-weight: 600;
+  }
+
+  .header-title-text {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.3rem;
     color: var(--ion-text-color);
+    letter-spacing: 0.5px;
   }
 
   // --- ESTILOS REFINADOS PARA EL MENÚ DE USUARIO ---
   .user-menu-button {
-    // Reducimos el padding para un botón más compacto
     --padding-start: 4px;
     --padding-end: 8px;
+    --color: var(--color-text-secondary);
+
     ion-avatar {
-      width: 32px;
-      height: 32px;
-      border: 2px solid var(--ion-color-light);
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--color-border);
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        border-color: var(--ion-color-primary);
+      }
     }
   }
 

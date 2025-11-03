@@ -18,12 +18,12 @@ export interface CheckInInterfaceResponse {
     confirmed_by_owner: boolean;
     check_in: boolean;
     id_guard: number | null;
-    id_owner: number;
+    id_owner: number | null;  // ✅ Ahora puede ser null (check-ins sin propietario)
 
     // --- CORRECCIÓN ---
     // Se añaden las propiedades 'guard' y 'owner' como opcionales.
     // El '?' significa que pueden venir o no en la respuesta de la API.
-    // Esto soluciona el error y permite que el HTML acceda a 'check.guard.name' de forma segura.
-    guard?: BasicUser;
-    owner?: BasicUser;
+    // owner puede ser null cuando es un check-in sin propietario (servicios, técnicos, etc.)
+    guard?: BasicUser | null;
+    owner?: BasicUser | null;  // ✅ Puede ser null para check-ins sin propietario
 }

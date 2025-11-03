@@ -137,6 +137,13 @@ export const routes: Routes = [
         .then(m => m.CheckoutPage),
   },
   {
+    path: 'guards/services-pending',
+    canActivate: [SecurityGuard],
+    loadComponent: () =>
+      import('../pages/guards/services-pending/services-pending.page')
+        .then(m => m.ServicesPendingPage),
+  },
+  {
     path: 'guards-schedule',
     canActivate: [SecurityGuard],
     loadComponent: () =>
@@ -350,6 +357,12 @@ export const routes: Routes = [
         .then(m => m.AuthIncomesPage),
   },
   {
+    path: 'pending-checkins',
+    loadComponent: () =>
+      import('../pages/owner/pending-checkins/pending-checkins.page')
+        .then(m => m.PendingCheckinsPage),
+  },
+  {
     path: 'new-income',
     loadComponent: () =>
       import('../pages/incomes/new-income/new-income.page')
@@ -379,6 +392,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../pages/admin/map-guards/map-guards.page')
         .then(m => m.MapGuardsPage),
+  },
+  {
+    path: 'admin/services-pending',
+    canActivate: [AdminGuard],
+    loadComponent: () =>
+      import('../pages/guards/services-pending/services-pending.page')
+        .then(m => m.ServicesPendingPage),
   },
 
   // ───────────────────────────────────────────────────────────────────────────────

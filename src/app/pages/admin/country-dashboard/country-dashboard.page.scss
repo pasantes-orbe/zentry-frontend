@@ -2,24 +2,73 @@
   ion-header ion-toolbar {
     --background: var(--ion-toolbar-background);
     --color: var(--ion-text-color);
+    --border-width: 0 0 1px 0;
+    --border-color: var(--color-border);
+    --min-height: 56px;
   }
 
   .header-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 0;
   }
 
   .header-logo {
-    height: 32px;
+    height: 36px;
+    width: 36px;
+    object-fit: contain;
     margin-left: 8px;
+  }
+
+  .header-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   .header-title-text {
     font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 1.2rem;
+    font-weight: 700;
+    font-size: 1.3rem;
     color: var(--ion-text-color);
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+
+  .header-subtitle-text {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    line-height: 1;
+  }
+
+  .notifications-button,
+  .user-menu-button {
+    --color: var(--color-text-secondary);
+    position: relative;
+  }
+
+  .notif-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    padding: 2px 4px;
+  }
+
+  .user-menu-button ion-avatar {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--color-border);
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: var(--ion-color-primary);
+    }
   }
 
   ion-content {
@@ -107,6 +156,15 @@
       box-shadow: 0 6px 24px rgba(0,0,0,.12);
     }
 
+    &.highlight-card {
+      border: 2px solid #ffc107;
+      background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, var(--ion-card-background) 100%);
+      
+      &:hover {
+        box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2);
+      }
+    }
+
     ion-card-header {
       display: flex;
       align-items: center;
@@ -121,6 +179,15 @@
         font-family: var(--font-heading);
         font-weight: 600;
         color: var(--ion-text-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .count-badge {
+          font-size: 0.75rem;
+          padding: 4px 8px;
+        }
       }
     }
 

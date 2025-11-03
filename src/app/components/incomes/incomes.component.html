@@ -21,22 +21,27 @@
         <!-- El bucle recorre la propiedad pública 'checkIn' -->
         <tr *ngFor="let check of checkIn; let i = index">
 
-          <th scope="row">
+          <th scope="row" data-label="Autorizado">
             <ion-toggle (ionChange)="changeAuthorization(check, i)" [checked]="check.confirmed_by_owner" color="success"></ion-toggle>
           </th>
 
-          <td>{{check.guest_name}}</td>
-          <td>{{check.income_date | date : 'shortDate' }}</td>
-          <td>{{check.income_date | date : 'shortTime' }}</td>
+          <td data-label="Nombre" class="name">{{check.guest_name}}</td>
+          <td data-label="Fecha">{{check.income_date | date : 'shortDate' }}</td>
+          <td data-label="Hora">{{check.income_date | date : 'shortTime' }}</td>
           <!-- Se comprueba si 'guard' o 'owner' existen antes de intentar mostrar sus nombres -->
-          <td *ngIf="check.id_guard && check.guard"> {{check.guard?.name}} {{check.guard?.lastname}}
+          <td data-label="Solicitante" *ngIf="check.id_guard && check.guard">
+            {{check.guard?.name}} {{check.guard?.lastname}}
             <ion-icon color="tertiary" name="lock-closed-outline"></ion-icon>
           </td>
-          <td *ngIf="!check.id_guard && check.owner"> {{check.owner?.name}} {{check.owner?.lastname}}
+          <td data-label="Solicitante" *ngIf="!check.id_guard && check.owner">
+            {{check.owner?.name}} {{check.owner?.lastname}}
             <ion-icon color="primary" name="person-circle-outline"></ion-icon>
           </td>
-        </tr>
-        <tr>
+          <td data-label="Solicitante" *ngIf="!check.guard && !check.owner">
+            <ion-chip color="medium" outline="true">
+              <ion-label>Sin propietario</ion-label>
+            </ion-chip>
+          </td>
         </tr>
       </tbody>
     </table>

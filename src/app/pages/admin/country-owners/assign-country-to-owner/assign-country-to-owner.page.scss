@@ -1,9 +1,8 @@
 // Aplicamos las variables de nuestro sistema de diseño (Versión refinada y centrada)
 :host {
-  --page-padding: 24px; // Más aire en los bordes
+  --page-padding: 24px;
   --card-padding: 16px;
   --border-radius: 16px;
-  --border-color: rgba(0, 0, 0, 0.08);
 }
 
 // Contenedor principal para centrar el contenido
@@ -27,13 +26,17 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+  
   h3 {
     margin: 0;
     font-size: 1.3rem;
     font-weight: 600;
+    color: var(--ion-text-color);
   }
+  
   ion-icon {
     font-size: 1.8rem;
+    color: var(--ion-color-primary);
   }
 }
 
@@ -50,10 +53,10 @@
   display: flex;
   flex-direction: column;
   padding: var(--card-padding);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  background: var(--ion-color-background);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow);
 }
 
 .panel-header {
@@ -61,38 +64,46 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
+  
   h3 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
+    color: var(--ion-text-color);
   }
+  
   ion-icon {
     font-size: 1.4rem;
+    color: var(--ion-color-primary);
   }
 }
 
 .selection-list {
   flex: 1;
-  // ✅ CONTENEDORES UN POCO MÁS GRANDES
-  min-height: 300px; // Altura mínima aumentada
-  max-height: 400px; // Altura máxima aumentada
+  min-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
-  border: 1px solid var(--ion-color-light-shade);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
+  background: var(--ion-background-color);
 }
 
 .list-item {
   --padding-start: 12px;
   --inner-padding-end: 12px;
-  --min-height: 65px; // Items de lista más compactos
+  --min-height: 65px;
+  --background: var(--ion-item-background);
+  --border-color: var(--color-border);
 
   h2 {
     font-size: 0.95rem;
     font-weight: 500;
+    color: var(--ion-text-color);
   }
+  
   p {
     font-size: 0.8rem;
-    color: var(--ion-color-medium-shade);
+    color: var(--color-text-secondary);
   }
 }
 

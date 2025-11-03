@@ -4,14 +4,16 @@ export interface CheckInOrOut {
     guest_lastname:     string;
     DNI:                string;
     income_date:        Date;
-    transport:          null;
-    patent:             null;
-    details:            null;
+    transport:          string | null;
+    patent:             string | null;
+    details:            string | null;
     confirmed_by_owner: boolean;
     check_in:           boolean;
-    id_guard:           null;
-    id_owner:           number;
-    user:               User;
+    id_guard:           number | null;
+    id_owner:           number | null;  // ✅ Puede ser null (check-ins sin propietario)
+    user:               User | null;    // ✅ Puede ser null cuando no hay propietario
+    ownerUser?:         User | null;    // Alias alternativo usado en algunos endpoints
+    guardUser?:         User | null;    // Info del guardia cuando está disponible
 }
 
 export interface User {

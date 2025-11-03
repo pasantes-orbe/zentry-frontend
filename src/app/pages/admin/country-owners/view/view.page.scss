@@ -2,7 +2,6 @@
 :host {
   --page-padding: 16px;
   --border-radius: 12px;
-  --border-color: rgba(0, 0, 0, 0.08);
 }
 
 // Contenedor principal
@@ -16,7 +15,7 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 16px;
-    color: var(--ion-color-dark-shade);
+    color: var(--ion-text-color);
   }
   .controls {
     display: flex;
@@ -34,11 +33,11 @@
 
 // Contenedor de la tabla
 .pro-table-container {
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  background: var(--ion-color-background);
+  background: var(--ion-card-background);
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: var(--ion-card-box-shadow);
 }
 
 // ------------------------------------
@@ -51,7 +50,7 @@
 .table-row {
   display: block;
   padding: var(--page-padding);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   &:last-child { border-bottom: none; }
 }
 
@@ -61,13 +60,14 @@
   justify-content: space-between;
   padding: 8px 0;
   text-align: right;
-  word-break: break-all; // Evita desbordamiento de emails largos
+  word-break: break-word; // Evita desbordamiento de emails largos
+  color: var(--ion-text-color);
 
   &::before {
     content: attr(data-label);
     font-weight: 500;
     text-align: left;
-    color: var(--ion-color-dark-shade);
+    color: var(--color-text-secondary);
     margin-right: 16px;
   }
 }
@@ -84,8 +84,14 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    .owner-name { font-weight: 600; }
-    .owner-property { font-size: 0.8rem; color: var(--ion-color-medium-shade); }
+    .owner-name { 
+      font-weight: 600;
+      color: var(--ion-text-color);
+    }
+    .owner-property { 
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
   }
 }
 
@@ -121,12 +127,12 @@ ion-chip {
   .table-header {
     display: grid;
     background-color: var(--ion-color-light);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border);
     text-transform: uppercase;
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.5px;
-    color: var(--ion-color-medium-shade);
+    color: var(--color-text-secondary);
   }
 
   .table-row {
@@ -164,8 +170,21 @@ ion-chip {
 .empty-state {
   text-align: center;
   padding: 48px var(--page-padding);
-  color: var(--ion-color-medium);
-  ion-icon { font-size: 3rem; margin-bottom: 12px; }
-  h3 { font-weight: 600; }
+  color: var(--color-text-secondary);
+  
+  ion-icon { 
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+  
+  h3 { 
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+  
+  p {
+    color: var(--color-text-secondary);
+  }
 }
 

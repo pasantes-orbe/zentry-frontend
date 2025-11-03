@@ -28,7 +28,16 @@
         <td class="text-center" scope="row">{{check.guest_name}}</td>
         <td class="text-center" scope="row">{{check.income_date | date : 'shortDate' }}</td>
         <td>{{check.income_date | date : 'shortTime' }}</td>
-        <td>{{ check.user.name }}</td>
+        <td>
+          <span *ngIf="check.user || check.ownerUser; else noOwner">
+            {{ (check.user || check.ownerUser)?.name }}
+          </span>
+          <ng-template #noOwner>
+            <ion-chip color="medium" outline="true">
+              <ion-label>Sin propietario</ion-label>
+            </ion-chip>
+          </ng-template>
+        </td>
       </tr>
       <tr></tr>
     </tbody>

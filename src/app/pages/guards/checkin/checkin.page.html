@@ -48,8 +48,22 @@
             DNI inválido (7–8 dígitos).
           </ion-note>
 
-          <!-- Buscar propietario (mismo look de input) -->
-          <div class="search-wrap field">
+          <!-- Toggle para ingreso sin propietario -->
+          <ion-item class="field toggle-field" lines="none">
+            <ion-label>
+              <h3>Ingreso sin propietario</h3>
+              <p>Activar para servicios, cambios de turno, etc.</p>
+            </ion-label>
+            <ion-toggle 
+              slot="end" 
+              [(ngModel)]="withoutOwner" 
+              [ngModelOptions]="{standalone: true}"
+              (ionChange)="toggleOwnerRequired()">
+            </ion-toggle>
+          </ion-item>
+
+          <!-- Buscar propietario (solo si withoutOwner es false) -->
+          <div class="search-wrap field" *ngIf="!withoutOwner">
             <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
             <ion-searchbar
               #searchBar
@@ -63,8 +77,8 @@
             </ion-searchbar>
           </div>
 
-          <!-- Lista propietarios -->
-          <ion-list *ngIf="owners?.length">
+          <!-- Lista propietarios (solo si withoutOwner es false) -->
+          <ion-list *ngIf="!withoutOwner && owners?.length">
             <ion-radio-group formControlName="ownerID">
               <ion-item *ngFor="let o of owners; trackBy: trackOwner">
                 <ion-label>
@@ -82,10 +96,7 @@
             </ion-radio-group>
           </ion-list>
 
-
-
-
-          <ion-note color="danger" *ngIf="form.get('ownerID')?.touched && form.get('ownerID')?.invalid">
+          <ion-note color="danger" *ngIf="!withoutOwner && form.get('ownerID')?.touched && form.get('ownerID')?.invalid">
             Seleccioná un propietario.
           </ion-note>
 

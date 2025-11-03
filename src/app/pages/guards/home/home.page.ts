@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 // Servicios
@@ -10,6 +10,7 @@ import { CountryStorageService } from 'src/app/services/storage/country-storage.
 import { WebSocketService } from 'src/app/services/websocket/web-socket.service';
 import { ThemeService } from 'src/app/services/theme/theme.service';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
+import { CheckInService } from 'src/app/services/check-in/check-in.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -27,6 +28,8 @@ export class HomePage implements OnInit, OnDestroy {
   // Propiedad para almacenar el nombre del usuario dinámicamente.
   public userName: string = 'Cargando...';
   public userInitial: string = '';
+  public userId: number | null = null;
+  public countryId: number | null = null;
 
   // Notificaciones
   public notifications: any[] = [];
@@ -34,11 +37,14 @@ export class HomePage implements OnInit, OnDestroy {
   private wsSub?: Subscription;
   private refreshSub?: Subscription;
 
+  // Servicios pendientes
+  public pendingServicesCount: number = 0;
+  private servicesSub?: Subscription;
+  private pendingServiceSub?: Subscription;
+
   // Tracking GPS
-  private locationWatchId: number | null = null;
   private locationInterval: any = null;
-  private userId: number | null = null;
-  private countryId: number | null = null;
+  private locationWatchId: number | null = null;
 
   constructor(
     private router: Router,
@@ -47,7 +53,9 @@ export class HomePage implements OnInit, OnDestroy {
     private _countryStorageService: CountryStorageService,
     private _webSocketService: WebSocketService,
     public theme: ThemeService,
-    private _notificationsService: NotificationsService
+    private _notificationsService: NotificationsService,
+    private _checkInService: CheckInService,
+    private toastController: ToastController
   ) {}
 
   async ngOnInit() {
@@ -55,10 +63,13 @@ export class HomePage implements OnInit, OnDestroy {
     await this.loadUserData();
     
     // Conectar socket ANTES de iniciar tracking
+    console.log('🔌 [HomePage] Conectando socket...');
     await this._webSocketService.conectar();
+    console.log('🔌 [HomePage] Socket conectado, esperando 1 segundo...');
     
     // Esperar 1 segundo para asegurar conexión
     await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('🔌 [HomePage] Listo para registrar listeners');
     
     // Escuchar notificaciones de antipánico
     this._webSocketService.escucharNotificacionesAntipanico();
@@ -79,8 +90,82 @@ export class HomePage implements OnInit, OnDestroy {
         this.loadNotifications(this.userId!);
       });
     }
+
+    // Escuchar cuando el propietario autoriza/rechaza un ingreso (SIEMPRE, no depende de countryId)
+    console.log('🔔 [HomePage] Registrando listener para checkin-confirmado-por-propietario...');
+    this._webSocketService.escucharEvento('checkin-confirmado-por-propietario', (data: any) => {
+      console.log('🔔 [HomePage] ===== EVENTO RECIBIDO =====');
+      console.log('🔔 [HomePage] Evento checkin-confirmado-por-propietario recibido:', data);
+      console.log('🔔 [HomePage] Tipo de data:', typeof data, data);
+      
+      if (data?.checkIn) {
+        const checkIn = data.checkIn;
+        console.log('🔔 [HomePage] CheckIn procesado:', checkIn);
+        
+        const status = checkIn.confirmed_by_owner ? 'AUTORIZADO' : 'RECHAZADO';
+        const color = checkIn.confirmed_by_owner ? 'success' : 'danger';
+        
+        console.log('🔔 [HomePage] Mostrando toast:', status, color);
+        
+        this.showToast(
+          `Ingreso ${status}: ${checkIn.guest_name} ${checkIn.guest_lastname}`,
+          color
+        );
+      } else {
+        console.warn('🔔 [HomePage] Data no tiene checkIn:', data);
+      }
+    });
+
+    // Cargar servicios pendientes y suscribirse a notificaciones
+    if (this.countryId) {
+      this.loadPendingServices();
+      
+      // Suscribirse al observable de servicios pendientes
+      this.pendingServiceSub = this._webSocketService.pendingService$.subscribe((event: any) => {
+        console.log('[HomePage] Evento de servicio pendiente recibido:', event);
+        
+        if (event.type === 'new-service') {
+          // Nuevo servicio sin propietario
+          const service = event.data;
+          this.createServiceNotification({
+            title: 'Nuevo Servicio Pendiente',
+            content: `${service.guest_name} ${service.guest_lastname} requiere autorización`,
+            type: 'service-pending',
+            data: service
+          });
+          this.loadPendingServices();
+        } else if (event.type === 'service-approved') {
+          // Servicio aprobado
+          const approval = event.data;
+          this.createServiceNotification({
+            title: 'Servicio Autorizado',
+            content: `${approval.guest_name} ${approval.guest_lastname} fue autorizado`,
+            type: 'service-approved',
+            data: approval
+          });
+          this.loadPendingServices();
+        }
+      });
+    } else {
+      console.warn('🔔 [HomePage] countryId es null, no se cargan servicios pendientes');
+    }
     
     await this.startLocationTracking();
+  }
+
+  /**
+   * Se ejecuta cada vez que la vista está por entrar
+   * Útil para refrescar datos cuando se vuelve de otra página
+   */
+  ionViewWillEnter() {
+    // Recargar servicios pendientes
+    if (this.countryId) {
+      this.loadPendingServices();
+    }
+    // Recargar notificaciones
+    if (this.userId) {
+      this.loadNotifications(this.userId);
+    }
   }
 
   ngOnDestroy() {
@@ -206,6 +291,30 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigate(['/checkout']);
   }
 
+  navigateToServicesPending() {
+    this.router.navigate(['/guards/services-pending']);
+  }
+
+  /**
+   * Carga el contador de servicios pendientes (check-ins sin propietario)
+   */
+  private loadPendingServices() {
+    if (!this.countryId) return;
+
+    this._checkInService.getAllCheckInConfirmedByOwner(this.countryId).subscribe({
+      next: (checkins) => {
+        // Filtrar solo los que no tienen propietario (servicios)
+        const pendingServices = checkins.filter(c => c.id_owner === null);
+        this.pendingServicesCount = pendingServices.length;
+        console.log('[HomePage] Servicios pendientes:', this.pendingServicesCount);
+      },
+      error: (err) => {
+        console.error('[HomePage] Error al cargar servicios pendientes:', err);
+        this.pendingServicesCount = 0;
+      }
+    });
+  }
+
   logout() {
     console.log('Cerrando sesión del guardia...');
     this.stopLocationTracking();
@@ -238,6 +347,35 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   /**
+   * Crea una notificación de servicio pendiente y la agrega al array
+   */
+  private createServiceNotification(notification: any) {
+    // Crear objeto de notificación
+    const newNotif: any = {
+      id: Date.now(), // ID temporal
+      title: notification.title,
+      content: notification.content,
+      type: notification.type,
+      id_user: this.userId || 0,
+      read: false,
+      createdAt: new Date()
+    };
+
+    // Agregar al inicio del array
+    this.notifications.unshift(newNotif);
+    
+    // Mantener solo las últimas 5
+    if (this.notifications.length > 5) {
+      this.notifications = this.notifications.slice(0, 5);
+    }
+
+    // Incrementar contador de no leídas
+    this.unreadCount++;
+
+    console.log('[HomePage] Notificación de servicio creada:', newNotif);
+  }
+
+  /**
    * Abre una notificación y navega al evento
    */
   public openNotification(notification: any) {
@@ -257,6 +395,32 @@ export class HomePage implements OnInit, OnDestroy {
       this.router.navigate(['/view-events'], { 
         queryParams: { openReservationId: notification.reservation_id } 
       });
+    }
+  }
+
+  /**
+   * Muestra un toast con un mensaje
+   */
+  async showToast(message: string, color: string = 'primary') {
+    console.log('🔔 [showToast] Creando toast:', { message, color });
+    try {
+      const toast = await this.toastController.create({
+        message: message,
+        duration: 3000,
+        position: 'top',
+        color: color,
+        buttons: [
+          {
+            text: 'OK',
+            role: 'cancel'
+          }
+        ]
+      });
+      console.log('🔔 [showToast] Toast creado, presentando...');
+      await toast.present();
+      console.log('🔔 [showToast] Toast presentado exitosamente');
+    } catch (error) {
+      console.error('🔔 [showToast] Error al mostrar toast:', error);
     }
   }
 }

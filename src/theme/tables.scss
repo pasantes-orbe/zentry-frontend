@@ -1,7 +1,257 @@
-//src/theme/tables.scss
-table{
-    margin-top: 1em;
+// =====================================================
+// Sistema de Tablas Responsive - Zentry App
+// Mobile-first: Cards en móvil, tablas en desktop
+// =====================================================
+
+// Variables para tablas
+:root {
+  --table-border-radius: 12px;
+  --table-padding: 16px;
+  --table-row-padding: 12px;
+  --table-border-color: var(--color-border);
+  --table-header-bg: var(--ion-color-light);
+  --table-row-hover: var(--ion-color-light-tint);
+  --table-text-color: var(--ion-text-color);
+  --table-text-secondary: var(--color-text-secondary);
 }
-thead{
-    background-color: var(--ion-color-light);
+
+// =====================================================
+// TABLA ESTÁNDAR (con responsive automático)
+// =====================================================
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 1em;
+}
+
+table, .table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ion-card-background);
+  border-radius: var(--table-border-radius);
+  overflow: hidden;
+  color: var(--table-text-color);
+  
+  // Header
+  thead {
+    background-color: var(--table-header-bg);
+    
+    th {
+      padding: var(--table-row-padding);
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--table-text-secondary);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--table-border-color);
+    }
+  }
+  
+  // Body
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--table-border-color);
+      transition: background-color 0.2s ease;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background-color: var(--table-row-hover);
+      }
+    }
+    
+    td, th {
+      padding: var(--table-row-padding);
+      vertical-align: middle;
+      color: var(--table-text-color);
+      
+      // Manejo de texto largo
+      &.truncate {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      &.wrap {
+        word-break: break-word;
+        white-space: normal;
+      }
+    }
+  }
+}
+
+// =====================================================
+// TABLA COMPACTA (menos padding)
+// =====================================================
+
+.table-compact {
+  thead th {
+    padding: 8px;
+    font-size: 0.75rem;
+  }
+  
+  tbody td, tbody th {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+}
+
+// =====================================================
+// TABLA RESPONSIVE CON CARDS EN MÓVIL
+// =====================================================
+
+.table-card-mobile {
+  
+  // MÓVIL: Mostrar como cards
+  @media (max-width: 767px) {
+    thead {
+      display: none;
+    }
+    
+    tbody tr {
+      display: block;
+      margin-bottom: 16px;
+      border: 1px solid var(--table-border-color);
+      border-radius: var(--table-border-radius);
+      padding: var(--table-padding);
+      background: var(--ion-card-background);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      
+      &:hover {
+        background: var(--ion-card-background);
+      }
+    }
+    
+    tbody td, tbody th {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border: none;
+      text-align: right;
+      
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        text-align: left;
+        color: var(--table-text-secondary);
+        margin-right: 16px;
+        flex-shrink: 0;
+      }
+      
+      &.no-label::before {
+        display: none;
+      }
+    }
+  }
+  
+  // DESKTOP: Tabla normal
+  @media (min-width: 768px) {
+    display: table;
+    width: 100%;
+  }
+}
+
+// =====================================================
+// CONTENEDOR DE TABLA CON BORDE Y SOMBRA
+// =====================================================
+
+.table-container {
+  border: 1px solid var(--table-border-color);
+  border-radius: var(--table-border-radius);
+  background: var(--ion-card-background);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+  
+  table {
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+  }
+}
+
+// =====================================================
+// UTILIDADES PARA TABLAS
+// =====================================================
+
+// Centrar contenido
+.table-center {
+  text-align: center !important;
+  
+  td, th {
+    text-align: center !important;
+  }
+}
+
+// Alinear a la derecha
+.table-right {
+  text-align: right !important;
+  
+  td, th {
+    text-align: right !important;
+  }
+}
+
+// Fila destacada
+.table-row-highlight {
+  background-color: var(--ion-color-primary-tint) !important;
+  font-weight: 600;
+}
+
+// Estado vacío
+.table-empty {
+  text-align: center;
+  padding: 48px var(--table-padding);
+  color: var(--table-text-secondary);
+  
+  ion-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+  
+  h3 {
+    font-weight: 600;
+    margin: 8px 0;
+  }
+  
+  p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+  }
+}
+
+// =====================================================
+// SCROLL HORIZONTAL PARA TABLAS GRANDES
+// =====================================================
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  table {
+    min-width: 700px; // Ajustar según necesidad
+  }
+}
+
+// =====================================================
+// DARK MODE ADJUSTMENTS
+// =====================================================
+
+body[data-theme="dark"] {
+  .table-container {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 }

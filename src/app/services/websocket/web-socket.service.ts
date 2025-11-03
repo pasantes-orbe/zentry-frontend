@@ -24,6 +24,10 @@ export class WebSocketService {
   //Subject y Observable para nuevas notificaciones
   private newNotificationSubject = new Subject<NotificationInterface>();
   public newNotification$ = this.newNotificationSubject.asObservable();
+
+  //Subject y Observable para servicios pendientes
+  private pendingServiceSubject = new Subject<any>();
+  public pendingService$ = this.pendingServiceSubject.asObservable();
   
   private listenersRegistered = false;
 
@@ -90,6 +94,7 @@ export class WebSocketService {
     this.listenersRegistered = true;
     this.registerReservationUpdates();
     this.registerNotificationUpdates();
+    this.registerPendingServiceUpdates();
     this.escucharNotificacionesCheckin();
     
     // Solo escuchar antipánico si NO estamos en rutas de admin
@@ -138,9 +143,50 @@ export class WebSocketService {
       console.log('Escuchando evento: reservation-status-updated');
   }
 
-  // ... (otros métodos como desconectar, getConnectionStatus, emitirEvento, escucharEvento, eliminarListener, etc.)
-  // Se mantienen los otros métodos de tu archivo, solo se muestra aquí lo relevante para las notificaciones principales.
-  
+  // Método para escuchar eventos de servicios pendientes
+  private registerPendingServiceUpdates(): void {
+    if (!this.socket) {
+      console.warn('Socket no inicializado para escuchar servicios pendientes.');
+      return;
+    }
+
+    // Escuchar cuando se crea un nuevo check-in confirmado sin propietario
+    this.socket.off('notificarNuevoConfirmedByOwner');
+    this.socket.on('notificarNuevoConfirmedByOwner', (payload: any) => {
+      console.log('WebSocket: Nuevo check-in confirmado recibido:', payload);
+      
+      // Si es un servicio sin propietario, emitir notificación
+      if (payload?.checkIn && payload.checkIn.id_owner === null) {
+        console.log('WebSocket: Es un servicio sin propietario, emitiendo notificación');
+        this.pendingServiceSubject.next({
+          type: 'new-service',
+          data: payload.checkIn
+        });
+      }
+    });
+
+    // Escuchar cuando se aprueba un servicio
+    this.socket.off('service-approved-by-guard');
+    this.socket.on('service-approved-by-guard', (payload: any) => {
+      console.log('WebSocket: Servicio aprobado por guardia:', payload);
+      this.pendingServiceSubject.next({
+        type: 'service-approved',
+        data: payload
+      });
+    });
+
+    this.socket.off('service-approved-by-admin');
+    this.socket.on('service-approved-by-admin', (payload: any) => {
+      console.log('WebSocket: Servicio aprobado por admin:', payload);
+      this.pendingServiceSubject.next({
+        type: 'service-approved',
+        data: payload
+      });
+    });
+
+    console.log('Escuchando eventos de servicios pendientes');
+  }
+
   /**
    * Desconectar del servidor WebSocket
    */

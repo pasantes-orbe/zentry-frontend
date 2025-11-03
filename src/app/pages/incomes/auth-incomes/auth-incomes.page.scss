@@ -1,0 +1,155 @@
+:host {
+  .loading-container {
+    text-align: center;
+    padding: 40px 20px;
+
+    ion-spinner {
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 0.9rem;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+
+    ion-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 1rem;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .incomes-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+
+    thead {
+      background-color: var(--ion-color-light);
+      
+      th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--ion-color-dark);
+        border-bottom: 2px solid var(--ion-color-medium);
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--ion-color-light);
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: var(--ion-color-light-tint);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      td {
+        padding: 16px;
+        vertical-align: middle;
+
+        strong {
+          font-weight: 600;
+          color: var(--ion-text-color);
+        }
+
+        small {
+          color: var(--ion-color-medium);
+          font-size: 0.85rem;
+        }
+
+        ion-toggle {
+          margin: 0;
+        }
+
+        ion-icon {
+          vertical-align: middle;
+          margin-right: 4px;
+        }
+
+        ion-chip {
+          margin: 0;
+          height: 24px;
+          font-size: 0.75rem;
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          ion-button {
+            margin: 0;
+            --padding-start: 12px;
+            --padding-end: 12px;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .incomes-table {
+      thead {
+        display: none;
+      }
+
+      tbody {
+        tr {
+          display: block;
+          margin-bottom: 16px;
+          border: 1px solid var(--ion-color-light);
+          border-radius: 8px;
+          padding: 12px;
+        }
+
+        td {
+          display: block;
+          padding: 8px 0;
+          border: none;
+
+          &:before {
+            content: attr(data-label);
+            font-weight: 600;
+            display: inline-block;
+            width: 120px;
+            color: var(--ion-color-medium);
+          }
+
+          &:first-child {
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--ion-color-light);
+            margin-bottom: 8px;
+
+            &:before {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}

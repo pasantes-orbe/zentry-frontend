@@ -1,38 +1,43 @@
 <!-- src/app/pages/admin/country-amenities/add-amenity/add-amenity.page.html -->
-<app-navbar-back title="Nuevo Lugar de Reserva"></app-navbar-back>
+<app-navbar-back title="Añadir Amenity"></app-navbar-back>
 <ion-content>
-  <ion-grid class="ion-padding">
+  <div class="form-container">
     <form [formGroup]="form" (keyup.enter)="saveAmenitie()" (ngSubmit)="saveAmenitie()">
-      <ion-row class="ion-justify-content-center">
-        <ion-col size="12">
-          <ion-item counter="true">
-            <ion-label position="floating">Nombre del Lugar de Reserva</ion-label>
-            <ion-input maxlength="50" required type="text" formControlName="name"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
+      <div class="form-section">
+        <h2>Información del Amenity</h2>
+        
+        <ion-item class="form-item" lines="none">
+          <ion-label position="floating">Nombre del Amenity</ion-label>
+          <ion-input maxlength="50" required type="text" formControlName="name"></ion-input>
+          <ion-note slot="helper">Máximo 50 caracteres</ion-note>
+        </ion-item>
 
-      <ion-row class="ion-justify-content-center">
-        <ion-col size="12">
-          <ion-item counter="true">
-            <ion-label position="floating">Dirección</ion-label>
-            <ion-input maxlength="50" required type="text" formControlName="address"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
+        <ion-item class="form-item" lines="none">
+          <ion-label position="floating">Dirección</ion-label>
+          <ion-input maxlength="50" required type="text" formControlName="address"></ion-input>
+          <ion-note slot="helper">Máximo 50 caracteres</ion-note>
+        </ion-item>
+      </div>
 
-      <ion-row>
-        <ion-card>
-          <img [src]="newImg" alt="">
-          <input type="file" (change)="onFileChange($event)" accept="image/*" />
-        </ion-card>
-      </ion-row>
+      <div class="form-section">
+        <h2>Imagen del Amenity</h2>
+        <div class="image-upload-wrapper">
+          <div class="image-preview">
+            <img [src]="newImg" alt="Vista previa" />
+          </div>
+          <label class="file-input-label">
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>Seleccionar imagen</span>
+            <input type="file" (change)="onFileChange($event)" accept="image/*" />
+          </label>
+        </div>
+      </div>
 
-      <ion-button type="submit" [disabled]="form.invalid" expand="block" shape="round">
-        <ion-icon slot="start" name="add"></ion-icon>
-        Añadir Lugar de Reserva
+      <ion-button type="submit" [disabled]="form.invalid" expand="block" color="primary" class="submit-button">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Añadir Amenity
       </ion-button>
     </form>
-  </ion-grid>
+  </div>
 
 </ion-content>

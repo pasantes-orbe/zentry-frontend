@@ -5,19 +5,60 @@
   ion-header {
     ion-toolbar {
       --background: var(--ion-toolbar-background);
+      --border-width: 0 0 1px 0;
+      --border-color: var(--color-border);
+      --min-height: 56px;
     }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0;
+    }
+
     .header-logo {
-      height: 32px;
-      margin-left: 16px;
+      height: 36px;
+      width: 36px;
+      object-fit: contain;
+      margin-left: 8px;
     }
-    .notification-button {
+
+    .header-title-text {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--ion-text-color);
+      letter-spacing: 0.5px;
+    }
+
+    .notifications-button {
       --color: var(--color-text-secondary);
       font-size: 1.4rem;
+      position: relative;
+
+      .notif-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 0.7rem;
+        min-width: 18px;
+        height: 18px;
+        padding: 2px 4px;
+      }
     }
+
     ion-avatar {
       width: 36px;
       height: 36px;
-      margin-right: 16px;
+      margin-right: 12px;
+      cursor: pointer;
+      border: 2px solid var(--color-border);
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        border-color: var(--ion-color-primary);
+      }
     }
   }
 
@@ -152,6 +193,21 @@
           --color-checked: var(--ion-color-primary);
         }
       }
+    }
+  }
+
+  /* Badge de contador en tarjetas */
+  .action-card {
+    position: relative;
+
+    .count-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 12px;
     }
   }
 }

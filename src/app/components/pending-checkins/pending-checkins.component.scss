@@ -1,0 +1,98 @@
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    font-size: 14px;
+  }
+}
+
+.checkins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkin-card {
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  ion-card-content {
+    padding: 16px;
+  }
+}
+
+.checkin-info {
+  margin-bottom: 16px;
+
+  .visitor-info {
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    .dni {
+      margin: 4px 0;
+      font-size: 14px;
+      color: var(--ion-color-medium);
+    }
+
+    .date {
+      margin: 4px 0;
+      font-size: 13px;
+      color: var(--ion-color-medium);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .registered-by {
+    margin-top: 12px;
+
+    ion-chip {
+      margin: 0;
+      height: 28px;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+
+    ion-button {
+      width: 100%;
+    }
+  }
+}

@@ -7,29 +7,41 @@
     </ion-buttons>
     
     <ion-buttons slot="end">
-      <!-- Toggle de tema -->
-      <ion-item lines="none">
-        <ion-icon name="moon" slot="start"></ion-icon>
-        <ion-toggle
-          [checked]="theme.isDark()"
-          (ionChange)="onThemeToggle($event)"
-          aria-label="Cambiar tema">
-        </ion-toggle>
-      </ion-item>
-
+      <!-- Campanita de notificaciones -->
       <ion-button id="owner-tab1-notifications-trigger" class="notifications-button" fill="clear">
         <ion-icon name="notifications-outline"></ion-icon>
         <ion-badge *ngIf="unreadCount > 0" class="notif-badge">{{ unreadCount }}</ion-badge>
       </ion-button>
-      <ion-avatar>
+      
+      <!-- Avatar con trigger para el popover de usuario -->
+      <ion-avatar id="owner-user-menu-trigger">
         <img [src]="getAvatarUrl()" />
       </ion-avatar>
     </ion-buttons>
   </ion-toolbar>
-  <!-- Popover de notificaciones (igual a Admin) -->
+  <!-- Popover de notificaciones -->
   <ion-popover trigger="owner-tab1-notifications-trigger" triggerAction="click" [dismissOnSelect]="false" [cssClass]="'notifications-popover'">
     <ng-template>
       <app-notifications-popover [userId]="userID" [navigateOnClick]="false"></app-notifications-popover>
+    </ng-template>
+  </ion-popover>
+
+  <!-- Popover de menú de usuario -->
+  <ion-popover trigger="owner-user-menu-trigger" triggerAction="click" [dismissOnSelect]="true" class="user-menu-popover">
+    <ng-template>
+      <ion-content>
+        <ion-list lines="full">
+          <ion-item class="popover-item">
+            <ion-icon name="moon-outline" slot="start"></ion-icon>
+            <ion-label>Modo Oscuro</ion-label>
+            <ion-toggle
+              slot="end"
+              [checked]="theme.isDark()"
+              (ionChange)="onThemeToggle($event)">
+            </ion-toggle>
+          </ion-item>
+        </ion-list>
+      </ion-content>
     </ng-template>
   </ion-popover>
 
@@ -92,8 +104,14 @@
           <h3 class="card-title">Gestionar Recurrentes</h3>
           <p>Administre el acceso de su personal.</p>
         </div>
+
+        <div class="action-card secondary-action-card" (click)="managePendingCheckins()">
+          <h3 class="card-title">Gestionar Ingresos</h3>
+          <p>Autoriza o rechaza solicitudes de ingreso.</p>
+        </div>
       </ion-col>
     </ion-row>
+
   </ion-grid>
 
   <!-- Modal para Reservar Amenity -->

@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(220, 38, 38, 0.35); // Rojo translúcido más suave
+  background: rgba(220, 38, 38, 0.35);
   backdrop-filter: blur(10px);
   z-index: 99999;
   display: flex;
@@ -12,6 +12,7 @@
   justify-content: center;
   padding: 20px;
   animation: fadeIn 0.3s ease-in-out;
+  pointer-events: auto; // Asegurar que el overlay capture eventos
 }
 
 @keyframes fadeIn {
@@ -24,13 +25,16 @@
 }
 
 .antipanic-container {
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--ion-card-background);
   border-radius: 24px;
   padding: 32px 24px;
   max-width: 500px;
   width: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   animation: slideUp 0.4s ease-out;
+  position: relative;
+  z-index: 100000; // Mayor que el overlay para estar encima
+  pointer-events: auto; // Permitir interacción con todos los elementos
 }
 
 @keyframes slideUp {
@@ -52,7 +56,7 @@
 
 .alert-icon {
   font-size: 80px;
-  color: #dc2626;
+  color: var(--ion-color-danger);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -70,7 +74,7 @@
 .alert-title {
   font-size: 24px;
   font-weight: 800;
-  color: #dc2626;
+  color: var(--ion-color-danger);
   text-align: center;
   margin: 0 0 24px 0;
   text-transform: uppercase;
@@ -78,7 +82,7 @@
 }
 
 .owner-info {
-  background: #f9fafb;
+  background: var(--ion-color-light);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 24px;
@@ -96,7 +100,7 @@
 
 .info-icon {
   font-size: 24px;
-  color: #dc2626;
+  color: var(--ion-color-danger);
   margin-right: 12px;
   margin-top: 2px;
   flex-shrink: 0;
@@ -111,7 +115,7 @@
 .info-label {
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
@@ -120,7 +124,7 @@
 .info-value {
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--ion-text-color);
   word-break: break-word;
 }
 
@@ -131,23 +135,39 @@
 .form-title {
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
+  color: var(--ion-text-color);
   margin: 0 0 16px 0;
   text-align: center;
 }
 
 .details-input {
-  --background: #f9fafb;
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--color-text-secondary);
   --padding-start: 16px;
   --padding-end: 16px;
   --padding-top: 12px;
   --padding-bottom: 12px;
   border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   font-size: 15px;
+  min-height: 120px;
+  position: relative;
+  z-index: 100001; // Asegurar que esté encima de todo
+  pointer-events: auto; // CRÍTICO: permitir interacción
+  cursor: text; // Mostrar cursor de texto
   
   &:focus-within {
-    border-color: #dc2626;
+    border-color: var(--ion-color-danger);
+    outline: none;
+  }
+  
+  // Asegurar que el textarea interno también sea interactivo
+  textarea {
+    pointer-events: auto !important;
+    cursor: text !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
   }
 }
 

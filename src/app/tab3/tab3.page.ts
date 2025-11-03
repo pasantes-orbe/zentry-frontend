@@ -219,11 +219,7 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.socket?.on('notificacion-check-in', async (payload) => {
       console.log('Payload recibido del socket:', payload);
       if (payload && payload.guestName) {
-        const alertMessage = `
-          <strong>Check-in</strong><br>
-          <strong>Visita:</strong> ${payload.guestName}<br>
-          <strong>Unidad:</strong> ${payload.unitName || 'No especificada'}
-        `;
+        const alertMessage = `<strong>Check-in</strong><br><strong>Visita:</strong> ${payload.guestName}<br><strong>Unidad:</strong> ${payload.unitName || 'No especificada'}`;
         await this.alerts.showAlert('Nueva Entrada', alertMessage);
         this.incomesComponent?.ngOnInit();
       } else {

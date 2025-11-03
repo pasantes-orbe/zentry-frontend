@@ -1,0 +1,78 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Ingresos Pendientes</ion-card-title>
+    <ion-card-subtitle>Autoriza o rechaza las solicitudes de ingreso</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando solicitudes...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && checkIns.length === 0" class="empty-state">
+      <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+      <p>No hay solicitudes pendientes</p>
+    </div>
+
+    <!-- Lista de check-ins pendientes -->
+    <div *ngIf="!loading && checkIns.length > 0" class="checkins-list">
+      <ion-card *ngFor="let checkIn of checkIns; let i = index" class="checkin-card">
+        <ion-card-content>
+
+          <div class="checkin-info">
+            <div class="visitor-info">
+              <h3>{{ checkIn.guest_name }} {{ checkIn.guest_lastname }}</h3>
+              <p class="dni">DNI: {{ checkIn.DNI }}</p>
+              <p class="date">
+                <ion-icon name="time-outline"></ion-icon>
+                {{ checkIn.income_date | date:'short' }}
+              </p>
+
+              <!-- Opcional: datos del vehículo si existen -->
+              <p *ngIf="checkIn.transport || checkIn.patent" class="vehicle">
+                <ion-icon name="car-outline"></ion-icon>
+                {{ checkIn.transport || 'Vehículo' }}
+                <ng-container *ngIf="checkIn.patent">&nbsp;•&nbsp;{{ checkIn.patent }}</ng-container>
+              </p>
+            </div>
+
+            <!-- Quién registró -->
+            <div class="registered-by">
+              <!-- Si lo cargó un guardia -->
+              <ion-chip *ngIf="checkIn.guardUser" color="tertiary" outline="true">
+                <ion-icon name="shield-outline"></ion-icon>
+                <ion-label>
+                  {{ checkIn.guardUser.name }} {{ checkIn.guardUser.lastname }}
+                </ion-label>
+              </ion-chip>
+
+              <!-- Si lo cargó el propietario (visita rápida) -->
+              <ion-chip *ngIf="!checkIn.guardUser && checkIn.ownerUser" color="medium" outline="true">
+                <ion-icon name="person-outline"></ion-icon>
+                <ion-label>
+                  {{ checkIn.ownerUser.name }} {{ checkIn.ownerUser.lastname }}
+                </ion-label>
+              </ion-chip>
+            </div>
+          </div>
+
+          <div class="actions">
+            <ion-button expand="block" color="success" (click)="authorize(checkIn, i)">
+              <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+              Autorizar
+            </ion-button>
+
+            <ion-button expand="block" color="danger" fill="outline" (click)="reject(checkIn, i)">
+              <ion-icon slot="start" name="close-circle"></ion-icon>
+              Rechazar
+            </ion-button>
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </ion-card-content>
+</ion-card>

@@ -71,13 +71,23 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this.subs.push(s);
   }
 
-  // Socket -> refrescar lista cuando el owner confirma
   listenForUpdates() {
-    this.socket.on(this.socketEventName, (payload: any) => {
-      console.log('[socket]', this.socketEventName, payload);
-      this.loadCheckOutList();
+    const events = [
+      'notificarNuevoConfirmedByOwner',     // emitido en create()
+      'notificar-nuevo-confirmedByOwner',   // usado por tu WebSocketService
+      'checkin-confirmado-por-propietario', // el de arriba
+      'notificar-checkout',                 // para limpiar al hacer salida
+  ];
+
+    events.forEach(ev => {
+      this.socket.off(ev); // evita listeners duplicados
+      this.socket.on(ev, (payload: any) => {
+        console.log('[socket]', ev, payload);
+        this.loadCheckOutList();
+      });
     });
   }
+
 
   // Confirmar y ejecutar checkout
   public async checkOut(checkInData: CheckInOrOut, index: number) {

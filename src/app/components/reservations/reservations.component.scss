@@ -1,15 +1,220 @@
-@media (max-width: 768px) {
-    .name{
-        display: inline-block;
-        width: 200px;
+// =====================================================
+// Reservations Component - Responsive Styles
+// =====================================================
+
+// Contenedor principal
+.container {
+  padding: 0 16px;
+  
+  h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--ion-text-color);
+  }
+}
+
+.padding-top {
+  padding-top: 24px;
+}
+
+// =====================================================
+// TABLA RESPONSIVE
+// =====================================================
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
+}
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ion-card-background);
+  border-radius: 8px;
+  overflow: hidden;
+  
+  // Header
+  thead {
+    background-color: var(--ion-color-light);
+    
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--ion-text-color);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--color-border);
     }
-        
+  }
+  
+  // Body
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--color-border);
+      transition: background-color 0.2s ease;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background-color: var(--ion-color-light-tint);
+      }
+    }
+    
+    td {
+      padding: 12px;
+      vertical-align: middle;
+      color: var(--ion-text-color);
+      
+      ion-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+      }
+    }
+    
+    // Fila vacía
+    td.text-center {
+      text-align: center;
+      padding: 32px 12px;
+      color: var(--color-text-secondary);
+      font-style: italic;
+    }
+  }
 }
 
-th, td{
-    color: var(--ion-color-dark);
+// =====================================================
+// RESPONSIVE: MÓVIL
+// =====================================================
+
+@media (max-width: 767px) {
+  // Ocultar header en móvil
+  table.table thead {
+    display: none;
+  }
+  
+  // Convertir filas en cards
+  table.table tbody tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--ion-card-background);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    
+    &:hover {
+      background: var(--ion-card-background);
+    }
+  }
+  
+  // Convertir celdas en filas con labels
+  table.table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border: none;
+    text-align: right;
+    
+    &::before {
+      content: attr(data-label);
+      font-weight: 600;
+      text-align: left;
+      color: var(--color-text-secondary);
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+    
+    // Fila vacía sin label
+    &.text-center {
+      display: block;
+      text-align: center;
+      padding: 16px 0;
+      
+      &::before {
+        display: none;
+      }
+    }
+  }
+  
+  // Ajustar nombres largos
+  .name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
-.padding-top{
-    padding-top: 100px;
+// =====================================================
+// RESPONSIVE: TABLET Y DESKTOP
+// =====================================================
+
+@media (min-width: 768px) {
+  table.table {
+    min-width: 600px;
+  }
+  
+  // Ajustar columnas para mejor distribución
+  table.table thead th,
+  table.table tbody td {
+    &:nth-child(1) { width: 20%; } // Estado
+    &:nth-child(2) { width: 40%; } // Reserva
+    &:nth-child(3) { width: 40%; } // Fecha
+  }
+}
+
+// =====================================================
+// BOTONES
+// =====================================================
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  flex-wrap: wrap;
+  
+  ion-button {
+    margin: 0;
+    
+    ion-icon {
+      margin-left: 4px;
+    }
+  }
+}
+
+// Responsive para botones en móvil
+@media (max-width: 576px) {
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+    
+    ion-button {
+      width: 100%;
+    }
+  }
+}
+
+// =====================================================
+// SKELETON LOADING
+// =====================================================
+
+ion-skeleton-text {
+  border-radius: 4px;
+}
+
+// =====================================================
+// DARK MODE ADJUSTMENTS
+// =====================================================
+
+body[data-theme="dark"] {
+  table.table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 }

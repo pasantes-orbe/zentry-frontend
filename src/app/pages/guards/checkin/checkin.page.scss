@@ -1,6 +1,6 @@
 :host {
   .surface-light {
-    background: var(--surface);
+    background: var(--ion-background-color);
     min-height: 100%;
   }
 
@@ -13,7 +13,7 @@
   /* CARD PRINCIPAL */
   .form-card {
     border-radius: 24px;
-    background: var(--surface-2);
+    background: var(--ion-card-background);
     box-shadow: var(--ion-card-box-shadow);
     border: 1px solid var(--color-border);
     overflow: hidden;
@@ -39,7 +39,7 @@
       align-items: center;
       justify-content: center;
       margin-bottom: 18px;
-      border: 4px solid var(--surface-2);
+      border: 4px solid var(--ion-card-background);
       box-shadow: var(--ion-card-box-shadow);
       transition: transform 0.3s ease;
 
@@ -56,7 +56,7 @@
     .title {
       font-weight: 700;
       font-size: 1.25rem;
-      color: var(--text);
+      color: var(--ion-text-color);
       letter-spacing: 0.5px;
       text-transform: uppercase;
       margin-bottom: 6px;
@@ -64,14 +64,14 @@
 
     .subtitle {
       font-size: 0.98rem;
-      color: var(--text-muted);
+      color: var(--color-text-secondary);
       font-weight: 500;
     }
   }
 
   /* CAMPOS DEL FORMULARIO */
   .field {
-    --background: var(--surface);
+    --background: var(--ion-item-background);
     --border-color: var(--color-border);
     --border-radius: 14px;
     margin-bottom: 18px;
@@ -91,21 +91,52 @@
     ion-select,
     ion-textarea {
       font-size: 0.98rem;
-      color: var(--text);
+      color: var(--ion-text-color);
     }
   }
 
   ion-label[position="stacked"] {
-    color: var(--text);
+    color: var(--ion-text-color);
     font-weight: 600;
     font-size: 0.9rem;
     margin-bottom: 8px;
     letter-spacing: 0.01em;
 
     small {
-      color: var(--text-muted);
+      color: var(--color-text-secondary);
       font-weight: 400;
       font-size: 0.85rem;
+    }
+  }
+
+  /* TOGGLE FIELD (ingreso sin propietario) */
+  .toggle-field {
+    --background: var(--ion-color-light);
+    --padding-start: 16px;
+    --padding-end: 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: var(--ion-box-shadow);
+
+    ion-label {
+      h3 {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--ion-text-color);
+        margin: 0 0 4px 0;
+      }
+
+      p {
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+        margin: 0;
+      }
+    }
+
+    ion-toggle {
+      --handle-background: white;
+      --handle-background-checked: white;
     }
   }
 
@@ -119,7 +150,7 @@
       position: absolute;
       left: 20px;
       font-size: 21px;
-      color: var(--text-muted);
+      color: var(--color-text-secondary);
       transition: color 0.2s ease;
     }
 
@@ -134,8 +165,8 @@
       --border-radius: 0;
       padding-inline-start: 44px;
       flex: 1;
-      --placeholder-color: var(--text-muted);
-      --color: var(--text);
+      --placeholder-color: var(--color-text-secondary);
+      --color: var(--ion-text-color);
     }
   }
 
@@ -145,30 +176,30 @@
     border-radius: 14px;
     margin-bottom: 18px;
     overflow: hidden;
-    background: var(--surface);
+    background: var(--ion-item-background);
     box-shadow: var(--ion-box-shadow);
 
     .owner-item {
       --padding-start: 18px;
       --inner-padding-end: 18px;
       --border-color: var(--color-border);
-      --background: var(--surface);
+      --background: var(--ion-item-background);
       transition: all 0.2s ease;
       cursor: pointer;
 
       h3 {
         font-weight: 600;
-        color: var(--text);
+        color: var(--ion-text-color);
         font-size: 0.98rem;
       }
 
       p {
         font-size: 0.86rem;
-        color: var(--text-muted);
+        color: var(--color-text-secondary);
       }
 
       &:hover {
-        --background: var(--surface-2);
+        --background: var(--ion-card-background);
       }
 
       &.item-radio-checked {

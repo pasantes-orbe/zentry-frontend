@@ -2,30 +2,29 @@
 <app-navbar-back title="Panel de Administración"></app-navbar-back>
 
 <ion-content class="ion-padding">
+  <div class="page-header">
+    <h1>Amenities</h1>
+    <ion-button routerLink="/admin/add-amenity" color="primary">
+      <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+      Añadir Amenity
+    </ion-button>
+  </div>
 
-  <div class="text-center">
-    <ion-button class="top-button" routerLink="/admin/add-amenity" expand="block">
-      <ion-icon slot="start" name="add"></ion-icon>
-      Nuevo Lugar de Reserva
-    </ion-button>
-  </div>
+  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar amenity..."></ion-searchbar>
 
-  <ion-searchbar [(ngModel)]="searchKey" mode="ios" animated debounce="500" placeholder="Buscar por Nombre"></ion-searchbar>
-
-  <ion-row>
-    <!-- CAMBIO: Se reemplazó 'filter' por 'filterBy' para usar el nuevo pipe personalizado. -->
-    <ion-col class="col-6" *ngFor="let amenitie of getAmenities() | filterBy: searchKey ; let i = index">
-      <ion-card 
-      button >
-        <img alt="Imagen de Lugar de Reserva" [src]="amenitie.image" />
-              
-        <ion-card-content>
-          <h3>
-            {{amenitie.name}}
-          </h3>
-        </ion-card-content>
-      </ion-card>
-    </ion-col>
-  </ion-row>
+  <div class="amenities-grid">
+    <ion-card class="amenity-card" *ngFor="let amenitie of getAmenities() | filterBy: searchKey" button>
+      <div class="amenity-image-wrapper">
+        <img alt="Imagen del amenity" [src]="amenitie.image" />
+      </div>
+      <ion-card-content>
+        <h3 class="amenity-name">{{amenitie.name}}</h3>
+        <p class="amenity-address" *ngIf="amenitie.address">
+          <ion-icon name="location-outline"></ion-icon>
+          {{amenitie.address}}
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
 </ion-content>

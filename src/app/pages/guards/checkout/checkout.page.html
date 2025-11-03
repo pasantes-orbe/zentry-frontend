@@ -41,7 +41,13 @@
               <span class="separator">|</span>
               <span>Ingreso: {{ guest.income_date | date: 'dd/MM/yy HH:mm' }}hs</span>
             </p>
-            <p class="guest-owner">Autorizado por: <strong>{{ guest.user?.name }}</strong></p>
+            <p class="guest-owner">
+              Autorizado por: 
+              <strong *ngIf="guest.user || guest.ownerUser">{{ (guest.user || guest.ownerUser)?.name }}</strong>
+              <ion-chip *ngIf="!guest.user && !guest.ownerUser" color="medium" outline="true">
+                <ion-label>Sin propietario</ion-label>
+              </ion-chip>
+            </p>
           </div>
           <div class="action-wrapper">
             <ion-button

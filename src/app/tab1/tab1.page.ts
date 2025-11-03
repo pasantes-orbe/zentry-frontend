@@ -1,6 +1,7 @@
 // src/app/tab1/tab1.page.ts
 
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +13,7 @@ import {
   IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
   IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox,
   IonToggle, IonRefresher, IonRefresherContent, IonLabel, IonListHeader,
-  IonBadge, IonPopover,
+  IonBadge, IonPopover, IonCard, IonCardContent, IonChip,
 } from '@ionic/angular/standalone';
 
 // Theme
@@ -52,7 +53,7 @@ import { IonicModule } from '@ionic/angular';
     IonIcon, IonAvatar, IonGrid, IonRow, IonCol, IonItem, IonInput,
     IonList, IonModal, IonSelect, IonSelectOption, IonDatetime, IonCheckbox,
     IonToggle, IonRefresher, IonRefresherContent, IonLabel, IonListHeader,
-    IonBadge, IonPopover,
+    IonBadge, IonPopover, IonCard, IonCardContent, IonChip,
     NotificationsPopoverComponent,
   ]
 })
@@ -121,6 +122,7 @@ export class Tab1Page implements OnInit, OnDestroy {
   private notificationsSubscription: Subscription;
 
   constructor(
+    private router: Router,
     private _userStorageService: UserStorageService,
     private _ownerStorageService: OwnerStorageService,
     private _ownersService: OwnersService,
@@ -310,6 +312,13 @@ export class Tab1Page implements OnInit, OnDestroy {
     void this.loadRecurrents(); // Recargar recurrentes
     this.loadOwnerReservations(); // Recargar reservas
     this.loadReservationsAndAmenities(); // Cargar amenities
+  }
+
+  /**
+   * Navega a la página de gestión de ingresos pendientes
+   */
+  public managePendingCheckins() {
+    this.router.navigate(['/pending-checkins']);
   }
 
   // --- LÓGICA DE VISITA RÁPIDA ---

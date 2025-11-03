@@ -2,13 +2,13 @@
   <ion-toolbar>
     <ion-buttons slot="start" class="header-brand">
       <img src="assets/logos/logo-48.png" class="header-logo" alt="Zentry Logo" />
-      <span class="header-title-text"></span>
+      <span class="header-title-text">Zentry</span>
     </ion-buttons>
     
     <ion-buttons slot="end">
       <ion-button fill="clear" class="notification-button" id="notifications-trigger">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
-        <ion-badge *ngIf="unreadCount > 0" color="danger" style="position: absolute; top: 8px; right: 8px;">
+        <ion-badge *ngIf="unreadCount > 0" color="danger" class="notif-badge">
           {{unreadCount}}
         </ion-badge>
       </ion-button>
@@ -76,32 +76,42 @@
   </div>
 
   <div class="actions-container">
+    <!-- Tarjeta de Servicios Pendientes -->
+    <div class="action-card" (click)="navigateToServicesPending()" *ngIf="pendingServicesCount > 0">
+      <div class="icon-background warning">
+        <ion-icon name="construct-outline"></ion-icon>
+        <ion-badge color="danger" class="pending-badge">{{ pendingServicesCount }}</ion-badge>
+      </div>
+      <h3>SERVICIOS PENDIENTES</h3>
+      <p class="card-subtitle">Requieren autorización</p>
+    </div>
+
     <div class="action-card" (click)="navigateToCheckin()">
       <div class="icon-background">
         <ion-icon name="arrow-forward-circle-outline"></ion-icon>
       </div>
-      <h3>REGISTRAR INGRESO</h3>
+      <h3>Registrar Ingreso</h3>
     </div>
 
     <div class="action-card" (click)="navigateToAuthorizations()">
       <div class="icon-background">
         <ion-icon name="shield-checkmark-outline"></ion-icon>
       </div>
-      <h3>VER AUTORIZACIONES</h3>
+      <h3>Ver Autorizaciones</h3>
     </div>
 
-        <div class="action-card" (click)="navigateToEvents()">
+    <div class="action-card" (click)="navigateToEvents()">
       <div class="icon-background">
         <ion-icon name="calendar-outline"></ion-icon>
       </div>
-      <h3>VER EVENTOS</h3>
+      <h3>Ver Eventos</h3>
     </div>
 
     <div class="action-card" (click)="navigateToCheckout()">
       <div class="icon-background">
         <ion-icon name="arrow-back-circle-outline"></ion-icon>
       </div>
-      <h3>REGISTRAR EGRESO</h3>
+      <h3>Registrar Egreso</h3>
     </div>
   </div>
 

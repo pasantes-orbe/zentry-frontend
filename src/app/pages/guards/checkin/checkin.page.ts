@@ -55,6 +55,7 @@ export class CheckinPage {
   public term = '';
   private ownersLoaded = false;
   private ownersLoading = false;
+  public withoutOwner = false; // Toggle para ingreso sin propietario
 
   @ViewChild('textArea') public textArea!: IonTextarea;
   @ViewChild('searchBar') public searchBar!: IonSearchbar;
@@ -153,6 +154,21 @@ export class CheckinPage {
     }
   }
 
+  // Método para activar/desactivar validación de propietario
+  toggleOwnerRequired() {
+    const ownerControl = this.form.get('ownerID');
+    if (this.withoutOwner) {
+      // Si está activado "sin propietario", quitar validación requerida
+      ownerControl?.clearValidators();
+      ownerControl?.setValue(''); // Limpiar valor
+      this.searchKey = ''; // Limpiar búsqueda
+    } else {
+      // Si está desactivado, volver a poner validación requerida
+      ownerControl?.setValidators([Validators.required]);
+    }
+    ownerControl?.updateValueAndValidity();
+  }
+
   submitIncome() {
     // Revalidar patente condicional antes de enviar
     const transport = this.form.get('transport')?.value;
@@ -166,22 +182,33 @@ export class CheckinPage {
     }
 
     const v = this.form.getRawValue();
-    const payload = {
+    
+    // Construir payload base
+    const payload: any = {
       name: v.name,
       lastname: v.lastname,
       DNI: v.DNI,
-      ownerID: v.ownerID,
       guardID: this.userID,
       date: v.date,
       observations: v.observations || '',
       transport: v.transport || '',
       patent: v.patent || ''
     };
+    
+    // Determinar el valor de ownerID según el toggle
+    let ownerIdToSend: any;
+    if (this.withoutOwner) {
+      // Si está activado "sin propietario", enviar undefined para que el backend lo maneje como null
+      ownerIdToSend = undefined;
+    } else {
+      // Si hay propietario seleccionado, enviarlo
+      ownerIdToSend = v.ownerID;
+    }
 
     // En estático podés mockear el servicio; si no, esto fallará
     this.checkInService.createCheckin(
       payload.name, payload.lastname, payload.DNI,
-      payload.ownerID, payload.guardID, payload.date,
+      ownerIdToSend, payload.guardID, payload.date,
       payload.observations, payload.transport, payload.patent
     ).then(() => {
       this.alert.presentAlert('Éxito: el check-in se registró correctamente.');
@@ -193,6 +220,9 @@ export class CheckinPage {
   }
 
   resetForm() {
+    // Resetear el toggle
+    this.withoutOwner = false;
+    
     this.form.reset({
       name: '',
       lastname: '',
@@ -203,6 +233,11 @@ export class CheckinPage {
       patent: '',
       observations: ''
     });
+    
+    // Restaurar validación de ownerID
+    const ownerControl = this.form.get('ownerID');
+    ownerControl?.setValidators([Validators.required]);
+    ownerControl?.updateValueAndValidity();
     if (this.textArea) this.textArea.value = '';
     if (this.searchBar) this.searchBar.value = '';
     if (this.ionSelect) this.ionSelect.value = '';
