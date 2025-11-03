@@ -1,5 +1,4 @@
-
-<ion-content>
+<ion-content mode="md">
 
   <ion-header>
     <ion-toolbar>
@@ -10,68 +9,41 @@
     </ion-toolbar>
   </ion-header>
 
-<ion-grid>
-  <form [formGroup]="getForm()" (keyup.enter)="editProperty()" (ngSubmit)="editProperty()">
-  <!-- Preview de imagen de la propiedad (no se pierde al editar/deshabilitar) -->
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12" class="ion-text-center">
-      <ion-avatar class="prop-preview">
-        <img [src]="avatarPreviewUrl || property?.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'" alt="Foto propiedad" />
-      </ion-avatar>
-    </ion-col>
-  </ion-row>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-padding-bottom">
+      <ion-col size="12" class="ion-text-center">
+        <div class="avatar-card">
+          <ion-avatar class="prop-preview">
+            <img [src]="avatarPreviewUrl || property?.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'" alt="Foto propiedad" />
+          </ion-avatar>
+          <div class="avatar-actions">
+            <ion-button size="small" fill="outline" (click)="openAvatarPicker()">Cambiar foto</ion-button>
+            <input id="propertyAvatarInput" type="file" accept="image/*" (change)="onPropertyAvatarChange($event)" hidden />
+          </div>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <!-- Selector de imagen -->
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12" class="ion-text-center">
-      <input type="file" accept="image/*" (change)="onPropertyAvatarChange($event)" />
-    </ion-col>
-  </ion-row>
-
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-  <ion-col size="12">
-    <ion-item counter="true" class="form-item">
-      <ion-label position="floating">Nombre de la Propiedad</ion-label>
-      <ion-input formControlName="propertyName" maxlength="50" type="text"></ion-input>
-    </ion-item>
-  </ion-col>
-  </ion-row>
-
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12">
-    <ion-item  counter="true" class="form-item">
-      <ion-label position="floating">Dirección de la Propiedad</ion-label>
-      <ion-input formControlName="propertyAddress" maxlength="50" ></ion-input>
-    </ion-item>
-  </ion-col>
-  </ion-row>
-
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12">
+  <form class="owner-edit-form" [formGroup]="getForm()" (ngSubmit)="editProperty()">
     <ion-item class="form-item">
-      <ion-label>Numero de Propiedad</ion-label>
-      <ion-input formControlName="propertyNumber" type="number" ></ion-input>
+      <ion-label position="stacked">Nombre de la Propiedad</ion-label>
+      <input formControlName="propertyName" maxlength="50" type="text" />
     </ion-item>
-  </ion-col>
-  </ion-row>
 
-  <ion-row class="ion-justify-content-center ion-padding-bottom">
-    <ion-col size="12">
-      <ion-item class="form-item">
-        <ion-label>Estado</ion-label>
-        <ion-toggle formControlName="isActive">
-          <span slot="start">Inactiva</span>
-          <span slot="end">Activa</span>
-        </ion-toggle>
-      </ion-item>
-    </ion-col>
-  </ion-row>
+    <ion-item class="form-item">
+      <ion-label position="stacked">Dirección de la Propiedad</ion-label>
+      <input formControlName="propertyAddress" maxlength="50" type="text" />
+    </ion-item>
 
-  <ion-button type="submit" expand="block" shape="round">
-    <ion-icon slot="start" name="add"></ion-icon>
-    Editar Propiedad
-  </ion-button>
-</form>
+    <ion-item class="form-item">
+      <ion-label position="stacked">Número de Propiedad</ion-label>
+      <input formControlName="propertyNumber" type="number" />
+    </ion-item>
 
-</ion-grid>
+    <ion-button type="submit" expand="block" fill="solid">
+      Guardar Cambios
+    </ion-button>
+  </form>
+
 </ion-content>

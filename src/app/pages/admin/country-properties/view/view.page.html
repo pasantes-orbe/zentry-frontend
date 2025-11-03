@@ -27,16 +27,16 @@
 
       <div class="pro-table pro-table--compact" *ngIf="!loading && filteredProperties.length > 0">
         <div class="table-header">
-          <div class="header-cell">Foto</div>
-          <div class="header-cell">Lote/N°</div>
+          <div class="header-cell">Propiedad</div>
+          <div class="header-cell">Lote</div>
           <div class="header-cell">Dirección</div>
-          <div class="header-cell">Propietario/s</div>
+          <div class="header-cell">Propietario</div>
           <div class="header-cell">Acciones</div>
         </div>
 
         <div class="table-row" *ngFor="let prop of filteredProperties; let i = index">
           <!-- FOTO -->
-          <div class="table-cell img-cell" data-label="Foto">
+          <div class="table-cell img-cell" data-label="Propiedad">
             <ion-avatar class="prop-avatar">
               <img [src]="getPropImg(prop)" alt="Foto propiedad" />
             </ion-avatar>
@@ -44,17 +44,17 @@
           </div>
 
           <!-- Nº -->
-          <div class="table-cell" data-label="Lote/N°">
+          <div class="table-cell number-cell" data-label="Lote">
             {{ prop?.property?.number ?? '—' }}
           </div>
 
           <!-- Dirección -->
-          <div class="table-cell truncate" data-label="Dirección">
+          <div class="table-cell truncate" data-label="Dirección" [title]="prop?.property?.address || '—'">
             {{ prop?.property?.address ?? '—' }}
           </div>
 
           <!-- Propietarios (chips compactos) -->
-          <div class="table-cell owner-cell" data-label="Propietario/s">
+          <div class="table-cell owner-cell" data-label="Propietario">
             <ng-container *ngIf="prop?.owners?.length; else noOwners">
               <div class="owner-chips">
                 <ng-container *ngFor="let owner of prop.owners | slice:0:4">
@@ -69,26 +69,13 @@
           </div>
 
           <!-- Acciones -->
-          <div class="table-cell actions-cell">
-            <ion-button
-              fill="clear"
-              size="small"
-              (click)="editProperty(prop?.property?.id, i)"
-              [disabled]="!prop?.property?.id"
-              title="Editar propiedad"
-            >
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          <div class="table-cell actions-cell" data-label="Acciones">
+            <ion-button class="action-btn" size="small" fill="solid" color="primary" (click)="goToEditProperty(prop?.property?.id)" [disabled]="!prop?.property?.id" title="Editar propiedad">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar
             </ion-button>
-
-            <ion-button
-              fill="clear"
-              size="small"
-              color="danger"
-              (click)="deleteProperty(prop?.property?.id, i)"
-              [disabled]="!prop?.property?.id"
-              title="Eliminar propiedad"
-            >
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            <ion-button class="status-btn" size="small" fill="outline" [color]="(prop?.property?.isActive === false) ? 'medium' : 'success'" (click)="togglePropertyStatus(prop?.property?.id, prop?.property?.isActive === false ? false : true)" [disabled]="!prop?.property?.id" [title]="(prop?.property?.isActive === false) ? 'Habilitar propiedad' : 'Inhabilitar propiedad'">
+              {{ (prop?.property?.isActive === false) ? 'Inactiva' : 'Activa' }}
             </ion-button>
           </div>
         </div>
