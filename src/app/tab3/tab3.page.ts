@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy, } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import {
   IonItem, IonLabel, IonIcon, IonActionSheet, IonAlert, IonModal,
   IonInput, IonButton, IonButtons
 } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 
 // Interfaces
 import { OwnerResponse } from '../interfaces/ownerResponse-interface';
@@ -32,6 +33,7 @@ import { LoginService } from '../services/auth/login.service';
 
 // Componentes
 import { IncomesComponent } from '../components/incomes/incomes.component';
+import { FullProfileComponent } from '../components/full-profile/full-profile.component';
 
 @Component({
   selector: 'app-tab3',
@@ -90,12 +92,6 @@ export class Tab3Page implements OnInit, OnDestroy {
       icon: 'eye-outline',
       handler: () => { this.viewFullProfile(); return true; }
     },
-    {
-      text: 'Cerrar sesión',
-      icon: 'log-out-outline',
-      role: 'destructive',
-      handler: () => { this.isLogoutAlertOpen = true; return true; }
-    },
     { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
   ];
 
@@ -123,6 +119,7 @@ export class Tab3Page implements OnInit, OnDestroy {
     private _userService: UserService,
     private _loginService: LoginService,
     private cdr: ChangeDetectorRef,
+    private modalCtrl: ModalController,
   ) {
     this.socket = io(environment.URL);
   }
@@ -258,9 +255,20 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.loadEditData();
   }
 
-  private viewFullProfile() {
+  private async viewFullProfile() {
     this.isActionSheetOpen = false;
-    this.isFullProfileModalOpen = true;
+    const modal = await this.modalCtrl.create({
+      component: FullProfileComponent,
+      cssClass: 'full-profile-modal',
+      componentProps: {
+        owner: this.owner,
+        editName: this.editName,
+        editEmail: this.editEmail,
+        editPhone: this.editPhone,
+        avatarUrl: this.getAvatarUrl()
+      }
+    });
+    await modal.present();
   }
 
   public closeFullProfileModal() {

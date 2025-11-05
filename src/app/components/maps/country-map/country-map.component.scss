@@ -66,3 +66,28 @@ ion-fab {
 }
 
 /* Importante: NO dejes estilos viejos de ion-button { position:absolute ... } */
+
+/* ===== Ping rojo anclado al mapa (Leaflet divIcon) ===== */
+.ping-red-wrap { pointer-events: none; }
+.ping-red{
+  position: relative;
+  width: 64px;   /* halo más chico */
+  height: 64px;
+}
+.ping-red .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(239, 68, 68, 0.75);
+  animation: ping 1.6s cubic-bezier(0,0,0.2,1) infinite;
+}
+.ping-red .ring-2 { animation-delay: .8s; }
+.ping-red .dot {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 12px; height: 12px;
+  background: #ef4444;
+  border: 2px solid #b91c1c;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+}

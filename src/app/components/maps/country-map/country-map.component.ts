@@ -22,6 +22,10 @@ L.Icon.Default.mergeOptions({
 
 type LatLngObj = { lat: number; lng: number };
 
+// Fallback por defecto cuando no hay id_country
+const DEFAULT_CENTER: LatLngObj = { lat: -34.6037, lng: -58.3816 }; // CABA
+const DEFAULT_ZOOM = 12;
+
 @Component({
   selector: 'app-country-map',
   standalone: true,
@@ -47,6 +51,8 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
 
   // marker del propietario
   private ownerPointer: L.CircleMarker | null = null;
+  // ping rojo anclado a lat/lng del propietario
+  private ownerPingMarker: L.Marker | null = null;
 
   // NUEVO: Almacena los marcadores de guardias en tiempo real (id_user -> marker)
   private activeGuardMarkers: { [id_user: string]: L.CircleMarker } = {};
@@ -119,9 +125,17 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
 
   private safeLoad(): void {
     if (this.initialized) return;
-    if (!this.id_country) return;
     this.initialized = true;
     this.loading = true;
+
+    // Fallback: si no hay id_country, inicializar mapa con centro/zoom por defecto
+    if (!this.id_country) {
+      this.initMap(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
+      this.map?.setZoom(DEFAULT_ZOOM);
+      setTimeout(() => this.map?.invalidateSize(true), 120);
+      this.loading = false;
+      return;
+    }
 
     this.countrySvc.getByID(this.id_country!).subscribe({
       next: (country: any) => {
@@ -175,9 +189,9 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     if (this.map) { this.map.setView([mapLat, mapLng]); return; }
 
     this.baseLayers = {
-      'Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, attribution: 'Tiles © Esri & partners' }),
-      'Calles':   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }),
-      'Oscuro':   L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '© Stadia Maps, © OpenMapTiles, © OpenStreetMap' })
+      'Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, attribution: 'Tiles &copy; Esri & partners' }),
+      'Calles':   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }),
+      'Oscuro':   L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; Stadia Maps, &copy; OpenMapTiles, &copy; OpenStreetMap' })
     };
 
     this.map = L.map('map', { zoomControl: true, layers: [this.baseLayers['Satélite']] })
@@ -212,6 +226,11 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
         if (this.ownerPointer) {
           this.map?.removeLayer(this.ownerPointer);
           this.ownerPointer = null;
+        }
+
+        if (this.ownerPingMarker) {
+          this.map?.removeLayer(this.ownerPingMarker);
+          this.ownerPingMarker = null;
         }
 
         this.alerts.presentAlert('Antipánico finalizado por administración.');
@@ -426,6 +445,11 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
         this.map?.removeLayer(this.ownerPointer);
         this.ownerPointer = null;
       }
+      // BORRAR PING ROJO
+      if (this.ownerPingMarker) {
+        this.map?.removeLayer(this.ownerPingMarker);
+        this.ownerPingMarker = null;
+      }
 
       this.alerts.presentAlert('Antipánico cancelado.');
     } catch (err) {
@@ -459,6 +483,28 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
       console.log('♻️ Actualizando marcador existente...');
       this.ownerPointer.setLatLng([lat, lng]).openPopup();
       console.log('✅ Marcador actualizado');
+    }
+
+    // Crear/actualizar ping rojo anclado con L.divIcon
+    const html = `
+      <div class="ping-red">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="dot"></div>
+      </div>`;
+
+    const icon = L.divIcon({
+      className: 'ping-red-wrap',
+      html,
+      iconSize: [64, 64],        // tamaño total del halo (ajustable)
+      iconAnchor: [32, 32],      // centrar en la lat/lng
+    });
+
+    if (!this.ownerPingMarker) {
+      this.ownerPingMarker = L.marker([lat, lng], { icon, interactive: false, zIndexOffset: 1000 }).addTo(this.map);
+    } else {
+      this.ownerPingMarker.setLatLng([lat, lng]);
+      this.ownerPingMarker.setIcon(icon);
     }
   }
 
