@@ -1,0 +1,23 @@
+.status-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 12px;
+
+  .label-ok { font-weight: 500; }
+  .label-deny { font-weight: 500; }
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  ion-button {
+    --border-radius: 8px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}
