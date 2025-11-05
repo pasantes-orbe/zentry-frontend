@@ -1,5 +1,5 @@
 <!-- pages/admin/country-recurrents/country-recurrents.page.html -->
-<app-navbar-back title="Invitados Recurrentes"></app-navbar-back>
+<app-navbar-back title="Recurrentes"></app-navbar-back>
 
 <ion-content class="ion-padding">
   <ion-spinner *ngIf="loading"></ion-spinner>
@@ -11,8 +11,10 @@
         <p>DNI: {{ r.dni }}</p>
       </ion-label>
 
-      <!-- Toggle activo/inactivo -->
+      <!-- Toggle activo/inactivo con rótulos -->
+      <ion-text color="success" style="margin-right:8px;">Aprobado</ion-text>
       <ion-toggle [checked]="r.status" (ionChange)="cambiarStatus(r, i)"></ion-toggle>
+      <ion-text color="danger" style="margin-left:8px;">Denegado</ion-text>
 
       <!-- Editar (usa ruta canónica si hay :id de country, sino la plana) -->
       <ion-button fill="clear" slot="end"
