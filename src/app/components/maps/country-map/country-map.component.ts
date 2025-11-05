@@ -22,10 +22,6 @@ L.Icon.Default.mergeOptions({
 
 type LatLngObj = { lat: number; lng: number };
 
-// Fallback por defecto cuando no hay id_country
-const DEFAULT_CENTER: LatLngObj = { lat: -34.6037, lng: -58.3816 }; // CABA
-const DEFAULT_ZOOM = 12;
-
 @Component({
   selector: 'app-country-map',
   standalone: true,
@@ -125,17 +121,9 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
 
   private safeLoad(): void {
     if (this.initialized) return;
+    if (!this.id_country) return;
     this.initialized = true;
     this.loading = true;
-
-    // Fallback: si no hay id_country, inicializar mapa con centro/zoom por defecto
-    if (!this.id_country) {
-      this.initMap(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
-      this.map?.setZoom(DEFAULT_ZOOM);
-      setTimeout(() => this.map?.invalidateSize(true), 120);
-      this.loading = false;
-      return;
-    }
 
     this.countrySvc.getByID(this.id_country!).subscribe({
       next: (country: any) => {
