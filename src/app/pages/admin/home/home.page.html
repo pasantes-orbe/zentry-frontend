@@ -74,7 +74,8 @@
               <ion-card-title>{{ c.name }}</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <p>Lat: {{ c.latitude }} / Lng: {{ c.longitude }}</p>
+              <p>Country: {{ c.name }}</p>
+              <p>Dirección: {{ c.address || '—' }}</p>
               <ion-button fill="clear" expand="block">ADMINISTRAR</ion-button>
             </ion-card-content>
           </ion-card>

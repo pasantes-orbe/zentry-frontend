@@ -73,7 +73,8 @@
     <ion-img [src]="getCountryImage()"></ion-img>
     <div class="hero-overlay">
       <h2>{{ country?.name }}</h2>
-      <p *ngIf="country">Lat: {{ country.latitude }} · Lng: {{ country.longitude }}</p>
+      <p *ngIf="country">Country: {{ country.name }}</p>
+      <p *ngIf="country">Dirección: {{ country.address || '—' }}</p>
     </div>
   </div>
 
