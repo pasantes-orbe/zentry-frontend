@@ -28,12 +28,12 @@
         <!-- Formulario -->
         <form [formGroup]="getForm()" (ngSubmit)="login()">
           <ion-item class="form-field" lines="none">
-            <ion-label position="floating">Usuario o Email</ion-label>
+            <ion-label position="stacked">Usuario o Email</ion-label>
             <ion-input required type="text" formControlName="user"></ion-input>
           </ion-item>
 
           <ion-item class="form-field" lines="none">
-            <ion-label position="floating">Contraseña</ion-label>
+            <ion-label position="stacked">Contraseña</ion-label>
             <ion-input #password required type="password" formControlName="password"></ion-input>
             <ion-icon #passwordShowIcon button (click)="showPassword(password)" slot="end" name="eye-off-outline"></ion-icon>
           </ion-item>

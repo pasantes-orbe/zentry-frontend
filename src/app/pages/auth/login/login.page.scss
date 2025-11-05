@@ -5,6 +5,10 @@
   --field-border-radius: 8px;
 }
 
+.form-field ion-label {
+  font-size: 1.1rem;
+}
+
 ion-content {
   --background: var(--ion-background-color);
 }
