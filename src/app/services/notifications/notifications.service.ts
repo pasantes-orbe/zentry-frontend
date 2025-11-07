@@ -111,8 +111,11 @@ export class NotificationsService {
   }
 
   markAsRead(notificationIds: number[]): Observable<any> {
-    // Llama a la ruta: POST /api/notifications/read
-    return this.http.post(`${environment.URL}/api/notifications/read`, { notificationIds });
+    // Llama a la ruta: POST /api/notifications/read (compat: admite notificationIds o ids)
+    return this.http.post(`${environment.URL}/api/notifications/read`, {
+      notificationIds,
+      ids: notificationIds
+    });
   }
   
   async presentToast(title: string, message: string): Promise<void> {
