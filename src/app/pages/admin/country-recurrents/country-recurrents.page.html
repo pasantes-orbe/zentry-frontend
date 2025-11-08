@@ -1,35 +1,78 @@
-<!-- pages/admin/country-recurrents/country-recurrents.page.html -->
 <app-navbar-back title="Invitados Recurrentes"></app-navbar-back>
 
-<ion-content class="ion-padding">
-  <ion-spinner *ngIf="loading"></ion-spinner>
+<ion-content [fullscreen]="true">
 
-  <ion-list *ngIf="!loading">
-    <ion-item *ngFor="let r of recurrents; let i = index">
-      <ion-label>
-        <h2>{{ r.guest_lastname }} {{ r.guest_name }}</h2>
-        <p>DNI: {{ r.dni }}</p>
-      </ion-label>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-      <!-- Toggle activo/inactivo -->
-      <ion-toggle [checked]="r.status" (ionChange)="cambiarStatus(r, i)"></ion-toggle>
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Invitados Recurrentes</h1>
+      <ion-searchbar mode="ios" animated debounce="500"
+        [(ngModel)]="searchKey"
+        placeholder="Buscar invitado...">
+      </ion-searchbar>
+    </div>
 
-      <!-- Editar (usa ruta canónica si hay :id de country, sino la plana) -->
-      <ion-button fill="clear" slot="end"
-        [routerLink]="countryIdFromUrl
-          ? ['/admin/country', countryIdFromUrl, 'recurrents', 'edit', r.id]
-          : ['/admin/edit-recurrent', r.id]">
-        Editar
-      </ion-button>
+    <div class="pro-table-container">
+      
+      <!-- Loading -->
+      <div class="loading-container" *ngIf="loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando invitados...</p>
+      </div>
 
-      <!-- Eliminar -->
-      <ion-button color="danger" fill="clear" slot="end"
-        (click)="eliminar(r, i)">
-        Eliminar
-      </ion-button>
-    </ion-item>
-  </ion-list>
+      <!-- Tabla -->
+      <div class="pro-table pro-table--compact" *ngIf="!loading && filteredRecurrents.length > 0">
+        
+        <!-- Encabezado -->
+        <div class="table-header">
+          <div class="header-cell">Invitado</div>
+          <div class="header-cell">DNI</div>
+          <div class="header-cell">Estado</div>
+          <div class="header-cell">Acciones</div>
+        </div>
 
-  <p *ngIf="!loading && recurrents.length === 0">No hay invitados recurrentes.</p>
+        <!-- Filas -->
+        <div class="table-row" *ngFor="let r of filteredRecurrents; let i = index">
+          
+          <div class="table-cell">
+            {{ r.guest_lastname }} {{ r.guest_name }}
+          </div>
+
+          <div class="table-cell number-cell">
+            {{ r.dni }}
+          </div>
+
+          <div class="table-cell">
+            <ion-toggle [checked]="r.status" (ionChange)="cambiarStatus(r, i)"></ion-toggle>
+          </div>
+
+          <div class="table-cell actions-cell">
+            <ion-button size="small" fill="solid" color="primary"
+              [routerLink]="countryIdFromUrl
+                ? ['/admin/country', countryIdFromUrl, 'recurrents', 'edit', r.id]
+                : ['/admin/edit-recurrent', r.id]">
+              Editar
+            </ion-button>
+
+            <ion-button size="small" fill="outline" color="danger"
+              (click)="eliminar(r, i)">
+              Eliminar
+            </ion-button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Estado vacío -->
+      <div class="empty-state" *ngIf="!loading && filteredRecurrents.length === 0">
+        <ion-icon name="person-remove-outline"></ion-icon>
+        <h3>No hay invitados recurrentes</h3>
+        <p>No se encontraron resultados.</p>
+      </div>
+
+    </div>
+  </div>
 </ion-content>
-

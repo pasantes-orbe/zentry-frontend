@@ -1,45 +1,88 @@
-<app-navbar-back title="Panel de Administración"></app-navbar-back>
+<app-navbar-back title="Historial Check-In / Check-Out"></app-navbar-back>
 
 <ion-content class="ion-padding">
 
-  <ion-searchbar mode="ios" animated="true" placeholder="Buscar por DNI, fecha, hora..." [(ngModel)]="searchKey"
-    [debounce]="250"></ion-searchbar>
-  <ion-list>
-    <div class="register" *ngFor="let register of registers | filterBy: searchKey">
-      <ion-item lines="none">
-        <!-- CHECKIN   -->
+  <!-- Buscador -->
+  <ion-searchbar mode="ios" animated placeholder="Buscar por nombre, DNI..."
+    [(ngModel)]="searchKey"></ion-searchbar>
 
-        <ion-icon color="success" slot="start" [name]="icons.checkIn"></ion-icon>
-        <ion-text>
-          <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
-          <small>{{register.checkin.DNI}}</small>
-        </ion-text>
-        <ion-text slot="end">
-          <p>{{register.checkin.income_date | date:'shortTime'}} hs</p>
-          <small>{{register.checkin.income_date | date :'shortDate'}}</small>
-        </ion-text>
-      </ion-item>
+  <!-- ========== MODO MOBILE ========== -->
+  <div class="mobile-view">
+    <ion-card *ngFor="let reg of filteredAndSortedRegisters" class="register-card">
+      <ion-card-content>
 
-      <ion-item lines="none" *ngIf="register.checkout != null">
-        <!--  CHECKOUT  -->
-        <ion-icon color="danger" slot="start" [name]="icons.checkOut"></ion-icon>
-        <ion-text>
-          <p>{{register.checkin.guest_name}} {{register.checkin.guest_lastname}}</p>
-          <small>{{register.checkin.DNI}}</small>
-        </ion-text>
-        <ion-text slot="end">
-          <p>{{register.checkout.out_date | date:'shortTime'}} hs</p>
-          <small>{{register.checkout.out_date | date :'shortDate'}}</small>
-        </ion-text>
-      </ion-item>
+        <h3>{{ reg.checkin.guest_lastname }}, {{ reg.checkin.guest_name }}</h3>
+        <p class="dni">DNI: {{ reg.checkin.DNI }}</p>
 
-      <ion-item lines="none" *ngIf="register.checkout == null">
-        <!--    CHECKOUT EMPTY  -->
-        <ion-icon color="danger" slot="start" [name]="icons.noCheckOut"></ion-icon>
-        <ion-text>
-          <small>No se registró CheckOut</small>
-        </ion-text>
-      </ion-item>
-    </div>
-  </ion-list>
+        <div class="info-row">
+          <span>Entrada:</span>
+          <strong>
+            <ion-icon name="arrow-forward-outline" class="in-icon"></ion-icon>
+            {{ reg.checkin.income_date | date:'shortTime' }} hs
+          </strong>
+        </div>
+
+        <div class="info-row">
+          <span>Salida:</span>
+          <strong>
+            <ng-container *ngIf="reg.checkout?.date; else mobilePending">
+              <ion-icon name="arrow-back-outline" class="out-icon"></ion-icon>
+              {{ reg.checkout.date | date:'shortTime' }} hs
+            </ng-container>
+          </strong>
+        </div>
+
+        <ng-template #mobilePending>
+          <span class="pending">Pendiente</span>
+        </ng-template>
+
+        <ion-badge [color]="reg.checkout?.date ? 'success' : 'danger'">
+          {{ reg.checkout?.date ? 'Completado' : 'Pendiente' }}
+        </ion-badge>
+
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- ========== MODO DESKTOP ========== -->
+  <div class="desktop-view table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>NOMBRE</th>
+          <th>DNI</th>
+          <th>ENTRADA</th>
+          <th>SALIDA</th>
+          <th>ESTADO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reg of filteredAndSortedRegisters">
+          <td>{{ reg.checkin.guest_lastname }}, {{ reg.checkin.guest_name }}</td>
+          <td>{{ reg.checkin.DNI }}</td>
+
+          <td>
+            <ion-icon name="arrow-forward-outline" class="in-icon"></ion-icon>
+            {{ reg.checkin.income_date | date:'shortTime' }} hs
+          </td>
+
+          <td *ngIf="reg.checkout?.date; else noCheckoutDesktop">
+            <ion-icon name="arrow-back-outline" class="out-icon"></ion-icon>
+            {{ reg.checkout.date | date:'shortTime' }} hs
+          </td>
+
+          <ng-template #noCheckoutDesktop>
+            <td><span class="pending">Pendiente</span></td>
+          </ng-template>
+
+          <td>
+            <ion-badge [color]="reg.checkout?.date ? 'success' : 'danger'">
+              {{ reg.checkout?.date ? 'Completado' : 'Pendiente' }}
+            </ion-badge>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
 </ion-content>

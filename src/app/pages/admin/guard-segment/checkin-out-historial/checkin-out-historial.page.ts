@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
-//Servicios
+// Servicios
 import { CheckInService } from 'src/app/services/check-in/check-in.service';
 import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
-//Interfaces
+// Interfaces
 import { CheckInOrOut } from 'src/app/interfaces/checkInOrOut-interface';
 
 // Componentes
@@ -31,40 +31,56 @@ import { FilterByPipe } from 'src/app/pipes/filter-by.pipe';
 })
 export class CheckinOutHistorialPage implements OnInit {
 
-  public registers: any[]
-  public checkIns: CheckInOrOut[] = []
+  public registers: any[] = [];
+  public checkIns: CheckInOrOut[] = [];
+  public searchKey: string = '';
+
   public icons = {
     checkIn: 'caret-forward-outline',
     checkOut: 'caret-back-outline',
     noCheckOut: 'close-circle-outline'
-  }
+  };
 
-  searchKey: string;
-
-  constructor(private _checkInService: CheckInService,
-              private _countryStorage: CountryStorageService
-  ) { }
+  constructor(
+    private _checkInService: CheckInService,
+    private _countryStorage: CountryStorageService
+  ) {}
 
   async ngOnInit() {
-    const country = await this._countryStorage.getCountry()
-    const id_country = country.id
-    this._checkInService.getAllRegisters(id_country).subscribe(
-      data =>{
-        console.log(data)
-        this.registers = data
-      } 
-      
-    )
+    const country = await this._countryStorage.getCountry();
+    const id_country = country.id;
+
+    this._checkInService.getAllRegisters(id_country).subscribe(data => {
+      // Ordenamos desde el más reciente al más antiguo
+      this.registers = data.sort((a, b) =>
+        new Date(b.checkin.income_date).getTime() -
+        new Date(a.checkin.income_date).getTime()
+      );
+    });
   }
 
-  isEmptyObject(obj){
-    return JSON.stringify(obj) === '{}'
+  // ✅ FILTRADO + ORDENADO
+  get filteredAndSortedRegisters() {
+    const term = this.searchKey?.toLowerCase() || '';
+
+    return this.registers
+      ?.filter(reg =>
+        reg.checkin.guest_name.toLowerCase().includes(term) ||
+        reg.checkin.guest_lastname.toLowerCase().includes(term) ||
+        reg.checkin.DNI.toString().includes(term)
+      )
+      ?.sort((a, b) =>
+        new Date(b.checkin.income_date).getTime() -
+        new Date(a.checkin.income_date).getTime()
+      );
   }
 
+  isEmptyObject(obj) {
+    return JSON.stringify(obj) === '{}';
+  }
 }
 
-interface Register{
-
+interface Register {
   checkIn: {
     DNI: any,
     guest_name: string,
@@ -90,5 +106,4 @@ interface Register{
     date?: string,
     time?: string
   }
-
 }

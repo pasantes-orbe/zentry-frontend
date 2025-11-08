@@ -191,3 +191,44 @@ ion-chip {
   }
 }
 
+// Mejorar separación y bordes de cada tarjeta en mobile
+.mobile-view {
+  display: block;
+  padding: 8px 0;
+}
+
+.prop-card {
+  border-radius: 18px !important;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.08), 0 0.5px 2px rgba(44,62,80,0.03);
+  margin-bottom: 18px;
+  margin-left: 6px;
+  margin-right: 6px;
+  border: 1.5px solid var(--ion-color-light-shade, #f1f1f1);
+  overflow: hidden;
+  
+  // Aumentar contraste en fondo si lo deseas
+  background: #fff;
+}
+
+.prop-header {
+  margin-bottom: 10px;
+}
+
+// Si querés que todo el contenido de mobile quede centrado (opcional)
+.mobile-view {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+// Opcional: Si querés más separación visual entre cards y el fondo general
+ion-content {
+  background: #fafbfc !important; // Tono sutilmente gris, cambia según esquema de tu app
+}
+
+// Opcional: Efecto de "hover" leve (solo mobile si querés)
+.prop-card:hover {
+  box-shadow: 0 4px 18px rgba(44,62,80,0.13);
+  transition: box-shadow 0.18s;
+}
+
