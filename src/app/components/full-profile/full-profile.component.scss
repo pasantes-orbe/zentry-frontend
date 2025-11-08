@@ -1,0 +1,53 @@
+:host {
+  .full-profile {
+    padding: 20px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .full-profile__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 16px;
+
+    .full-profile__avatar {
+      width: 96px; height: 96px; border-radius: 50%;
+      border: 3px solid var(--ion-border-color);
+    }
+    .full-profile__id {
+      margin-top: 6px; font-size: 0.9rem; color: var(--zentry-color-text-secondary);
+    }
+    .full-profile__names {
+      h2 { margin: 0; font-size: 1.3rem; font-weight: 600; color: var(--ion-text-color); }
+      p  { margin: 0; font-size: 0.9rem; color: var(--zentry-color-text-secondary); }
+    }
+  }
+
+  .full-profile__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    width: 100% !important;
+    max-width: none !important; /* evita límites heredados */
+
+    @media (min-width: 560px) {
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
+  }
+
+  .full-profile__item {
+    background: var(--ion-card-background);
+    border: 1px solid var(--ion-border-color);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: grid; grid-template-columns: 32px 1fr; align-items: center; column-gap: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+
+    ion-icon { width: 22px; height: 22px; color: var(--zentry-color-text-secondary); justify-self: center; grid-row: 1 / span 2; align-self: start; }
+    label   { margin: 0; font-size: 0.8rem; color: var(--zentry-color-text-secondary); font-weight: 500; grid-column: 2; }
+    span    { display: block; margin-top: 2px; color: var(--ion-text-color); font-weight: 600; font-size: 12px; line-height: 1.3; white-space: normal; word-break: break-word; grid-column: 2; }
+  }
+}

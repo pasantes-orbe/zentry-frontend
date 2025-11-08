@@ -57,26 +57,26 @@
       color: var(--ion-text-color); /* Usar variable */
     }
   }
- /* Modal: Perfil completo */
-.full-profile-modal::part(content) {
-  display: flex;
-  align-items: center;   /* Centra verticalmente */
-  justify-content: center; /* Centra horizontalmente */
-}
+ /* Modal: Perfil completo (scoped) */
+ :host ::ng-deep ion-modal.full-profile-modal::part(content) {
+  /* Evitar flex aquí para no desalinear header del modal */
+  display: block;
+  max-height: 90vh;
+  overflow: auto;
+ }
 
-.full-profile {
+:host ::ng-deep .full-profile {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  align-items: stretch; /* contenido a lo ancho */
+  text-align: left;    /* por defecto a la izquierda */
   padding: 24px;
   width: 100%;
   max-width: 500px;
   margin: auto;
 }
 
-.full-profile__header {
+:host ::ng-deep .full-profile__header {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,22 +104,30 @@
       color: var(--zentry-color-text-secondary);
     }
   }
+
+  /* ID del usuario debajo del avatar */
+  .full-profile__id {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--zentry-color-text-secondary);
+  }
 }
 
-.full-profile__grid,
-.full-profile__props {
+:host ::ng-deep .full-profile__grid,
+:host ::ng-deep .full-profile__props {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
   text-align: center;
 }
 
-.full-profile-modal .full-profile__grid {
+:host ::ng-deep .full-profile-modal .full-profile__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 20px;
 
+  /* En pantallas medianas+, usar dos columnas */
   @media (min-width: 560px) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -127,23 +135,42 @@
   .full-profile__item {
     background: var(--ion-card-background);
     border: 1px solid var(--ion-border-color);
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
+    border-radius: 10px;
+    padding: 14px 16px;
+    width: 100%;
+
+    /* Layout en 2 columnas: icono + texto apilado (label/valor) */
+    display: grid;
+    grid-template-columns: 40px 1fr;
     align-items: center;
-    justify-content: center;
-    gap: 8px; /* Separación entre etiqueta y dato */
-    text-align: center;
+    column-gap: 12px;
+
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    transition: transform .15s ease, box-shadow .15s ease;
+    will-change: transform;
+
+    &:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.09); }
+
+    ion-icon {
+      width: 24px; height: 24px;
+      color: var(--zentry-color-text-secondary);
+      justify-self: center;
+    }
 
     label {
       margin: 0;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: var(--zentry-color-text-secondary);
+      font-weight: 500;
+      line-height: 1.2;
     }
     span {
+      display: block;
+      margin-top: 2px;
       color: var(--ion-text-color);
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1rem;
+      line-height: 1.25;
     }
   }
 }
@@ -172,3 +199,45 @@
   }
 }
 } 
+
+/* ========================= */
+/* FIX SOLO MÁRGENES/ESPACIOS */
+/* ========================= */
+
+/* --- Lista de opciones del tab --- */
+:host .settings-list-container { padding: 0 16px; }
+:host ion-item.settings-item {
+  margin: 0 0 12px 0;              /* más separación entre ítems */
+  --padding-start: 12px;           /* espacio interno izquierda */
+  --inner-padding-end: 12px;       /* espacio interno derecha */
+}
+
+/* --- Modal: contenido pegado a los bordes --- */
+/* Ruta A (Ionic 6/7): si tu ::part funciona */
+:host ::ng-deep ion-modal.full-profile-modal::part(content) {
+  padding: 16px;                   /* aire alrededor de TODO el contenido del modal */
+}
+
+/* Ruta B (fallback si ::part no aplica en tu build) */
+:host ::ng-deep .full-profile {
+  padding: 0 16px 24px !important; /* aire lateral y abajo dentro del modal */
+  margin: 0 auto;                  /* centrar el bloque */
+  max-width: 520px;                /* opcional: ancho cómodo */
+}
+
+/* --- Grid del perfil completo --- */
+:host ::ng-deep .full-profile__grid {
+  gap: 16px;                       /* separación entre tarjetas */
+  margin: 16px auto 20px auto;     /* espacio arriba/abajo del grid */
+}
+
+/* Las tarjetas NO necesitan margen si ya hay gap, pero
+   si querés un respiro extra vertical, descomentá: */
+/*
+:host ::ng-deep .full-profile__item { margin: 2px 0; }
+*/
+
+/* --- Header del modal (avatar + nombre) --- */
+:host ::ng-deep .full-profile__header {
+  margin-bottom: 16px;             /* menos espacio debajo del header */
+}

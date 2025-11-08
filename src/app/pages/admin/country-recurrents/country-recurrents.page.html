@@ -6,6 +6,7 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+<<<<<<< HEAD
   <div class="page-container">
     <div class="page-header">
       <h1>Invitados Recurrentes</h1>
@@ -33,6 +34,29 @@
           <div class="header-cell">Estado</div>
           <div class="header-cell">Acciones</div>
         </div>
+=======
+      <!-- Estado con rótulos + toggle -->
+      <div class="status-toggle">
+        <ion-text color="success" class="label-ok">Aprobado</ion-text>
+        <ion-toggle [checked]="r.status" (ionChange)="cambiarStatus(r, i)"></ion-toggle>
+        <ion-text color="danger" class="label-deny">Denegado</ion-text>
+      </div>
+
+      <!-- Acciones -->
+      <div class="actions" slot="end">
+        <ion-button fill="outline" size="small"
+          [routerLink]="countryIdFromUrl
+            ? ['/admin/country', countryIdFromUrl, 'recurrents', 'edit', r.id]
+            : ['/admin/edit-recurrent', r.id]">
+          Editar
+        </ion-button>
+        <ion-button color="danger" fill="outline" size="small" (click)="eliminar(r, i)">
+          Eliminar
+        </ion-button>
+      </div>
+    </ion-item>
+  </ion-list>
+>>>>>>> 97ec65cc724b4041d4f0bc1e94ad783c6d54095d
 
         <!-- Filas -->
         <div class="table-row" *ngFor="let r of filteredRecurrents; let i = index">

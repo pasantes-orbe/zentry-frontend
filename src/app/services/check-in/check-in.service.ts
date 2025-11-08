@@ -92,21 +92,6 @@ export class CheckInService {
       // Socket: aviso de nuevo check-in
       this._socketService.notificarCheckIn(res['checkIn']);
 
-      // Notificación al propietario
-      try {
-        const guardUser = await this._userStorageService.getUser();
-        const timeStr = new Date(body.income_date || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const title = 'Vigilador';
-        const content = `Ingreso de visitante (${guest_name} ${guest_lastname}, ${timeStr}) SOLICITADO por vigilador (${guardUser?.name || ''} ${guardUser?.lastname || ''})`;
-        const payload: any = {
-          id_user: Number(body.id_owner ?? 0),
-          title,
-          content,
-          read: false
-        };
-        await firstValueFrom(this._notificationsService.createNotification(payload));
-      } catch {}
-
       await this._alertService.removeLoading();
       await this._alertService.showAlert('¡Listo!', 'El Check-in fue enviado con exito al propietario');
       await this._router.navigate(['/vigiladores/home']);

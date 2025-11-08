@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .page-container {
   padding: 16px;
 }
@@ -101,5 +102,28 @@
 @media (max-width: 900px) {
   .table-header, .table-row {
     grid-template-columns: 1.7fr 1fr 1fr max-content;
+=======
+.status-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 12px;
+
+  .label-ok { font-weight: 500; }
+  .label-deny { font-weight: 500; }
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  ion-button {
+    --border-radius: 8px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+>>>>>>> 97ec65cc724b4041d4f0bc1e94ad783c6d54095d
   }
 }

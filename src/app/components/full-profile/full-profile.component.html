@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfil completo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="full-profile">
+    <div class="full-profile__header">
+      <ion-avatar class="full-profile__avatar">
+        <img [src]="avatarUrl" />
+      </ion-avatar>
+      <div class="full-profile__id">N° ID Usuario: <strong>{{ owner?.user?.id || '—' }}</strong></div>
+      <div class="full-profile__names">
+        <h2>{{ getOwnerName() }}</h2>
+        <p>{{ editEmail }}</p>
+      </div>
+    </div>
+
+    <div class="full-profile__grid">
+      <div class="full-profile__item">
+        <ion-icon name="person-outline"></ion-icon>
+        <label>Nombre</label>
+        <span>{{ editName || '—' }}</span>
+      </div>
+      <div class="full-profile__item">
+        <ion-icon name="mail-outline"></ion-icon>
+        <label>Email</label>
+        <span>{{ editEmail || '—' }}</span>
+      </div>
+      <div class="full-profile__item">
+        <ion-icon name="call-outline"></ion-icon>
+        <label>Teléfono</label>
+        <span>{{ editPhone || '—' }}</span>
+      </div>
+      <div class="full-profile__item">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <label>Estado</label>
+        <span>
+          {{ $any(owner)?.user?.isActive === true ? 'Activo' : $any(owner)?.user?.isActive === false ? 'Inactivo' : '—' }}
+        </span>
+      </div>
+      <div class="full-profile__item">
+        <ion-icon name="briefcase-outline"></ion-icon>
+        <label>Personal</label>
+        <span>Propietario</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

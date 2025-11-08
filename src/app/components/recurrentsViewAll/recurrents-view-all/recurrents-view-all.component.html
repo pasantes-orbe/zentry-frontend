@@ -33,7 +33,9 @@
         <td class="text-center">{{recurrent.guest_lastname}}</td>
         <td>{{recurrent.guest_name}}</td>
         <td *ngIf="readOnly == false">
-          <ion-toggle  slot="end" [checked]="recurrent.status" (click)="cambiarStatus(recurrent, i)"></ion-toggle>
+          <ion-text color="success" style="margin-right:8px;">Aprobado</ion-text>
+          <ion-toggle slot="end" [checked]="recurrent.status" (click)="cambiarStatus(recurrent, i)"></ion-toggle>
+          <ion-text color="danger" style="margin-left:8px;">Denegado</ion-text>
         </td>
         <td *ngIf="readOnly == true">
           <ion-badge *ngIf="recurrent.status === true" color="success" mode="ios">SI</ion-badge>
