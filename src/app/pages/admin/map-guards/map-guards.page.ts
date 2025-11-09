@@ -296,23 +296,14 @@ export class MapGuardsPage implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.baseLayers = {
-      'Satélite': L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        { maxZoom: 20, attribution: 'Tiles © Esri & partners' }
-      ),
-      'Calles': L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        { maxZoom: 19, attribution: '© OpenStreetMap contributors' }
-      ),
-      'Oscuro': L.tileLayer(
-        'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
-        { maxZoom: 20, attribution: '© Stadia Maps, © OpenMapTiles, © OpenStreetMap' }
-      )
-    };
+          'Calles':   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }),
+          'Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, attribution: 'Tiles &copy; Esri & partners' }),
+          'Obscuro': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; CARTO' }),
+        };
 
     this.map = L.map('adminMap', {
       zoomControl: true,
-      layers: [this.baseLayers['Satélite']],
+      layers: [this.baseLayers['Calles']],
     }).setView([mapLat, mapLng], 15);
 
     this.map.setMinZoom(13);

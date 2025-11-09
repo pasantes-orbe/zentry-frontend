@@ -38,6 +38,10 @@ export class EventReservationPage implements OnInit {
 
   public guests: any[] = []
   private owner: OwnerResponse | null = null;
+  
+  selectedDate: string = '';
+  occupied: any[] = [];
+
 
   constructor(private modalCtrl: ModalController, 
     private reservationService: ReservationsService, 
@@ -71,6 +75,23 @@ export class EventReservationPage implements OnInit {
     // Es buena práctica llamar al método que carga los datos, en lugar de ngOnInit()
     this.ngOnInit() 
   }
+  onDateSelected(event: any) {
+    this.selectedDate = event.detail.value;
+
+    const amenityID = this.getForm().get('amenitieID')?.value;
+    
+    if (!amenityID) {
+      console.warn("⚠ Primero selecciona un Amenity");
+      return;
+    }
+
+    this._reservationsService.getOccupied(amenityID, this.selectedDate)
+      .subscribe((res) => {
+        this.occupied = res;
+        console.log("⛔ Horarios ocupados:", this.occupied);
+      });
+  }
+
 
   async reservation() {
     // Este método está incompleto, pero asumimos que es para mostrar una alerta de éxito
@@ -97,42 +118,68 @@ export class EventReservationPage implements OnInit {
     return this.form;
   }
 
+  async onDateChange(event: any) {
+  const value = event?.detail?.value;
+  this.selectedDate = value;
+
+  const amenityID = this.getForm().get('amenitieID')?.value;
+  if (!amenityID || !value) return;
+
+  this._reservationsService.getReservationsByAmenityAndDate(amenityID, value)
+    .subscribe((occupied) => {
+      this.occupied = occupied;
+      console.log("⛔ Horarios ocupados:", occupied);
+      
+      if (occupied.length > 0) {
+        this.alertCtrl.create({
+          header: 'Horario No Disponible',
+          message: 'Ya existe una reserva activa en este horario.',
+          buttons: ['OK']
+        }).then(a => a.present());
+      }
+    });
+}
+
+
   public saveAmenitie() {
-    const rawGuests = Array.isArray(this.guests) ? this.guests : [];
-    const normalizedGuests = rawGuests
-      .map(g => ({
-        nombre: String(g?.nombre ?? g?.name ?? '').trim(),
-        apellido: String(g?.apellido ?? g?.lastname ?? '').trim(),
-        dni: String(g?.dni ?? g?.idNumber ?? g?.documento ?? '').trim()
-      }))
-      .filter(g => g.nombre && g.apellido && g.dni);
+  const rawGuests = Array.isArray(this.guests) ? this.guests : [];
+  const normalizedGuests = rawGuests
+    .map(g => ({
+      nombre: String(g?.nombre ?? '').trim(),
+      apellido: String(g?.apellido ?? '').trim(),
+      dni: String(g?.dni ?? '').trim()
+    }))
+    .filter(g => g.nombre && g.apellido && g.dni);
 
-    const reservationData = {
-      id_amenity: this.getForm().get('amenitieID').value,
-      date: this.getForm().get('fecha').value,
-      details: this.getForm().get('detalles').value,
-      guests: normalizedGuests
-    };
+  const reservationData = {
+    id_amenity: this.getForm().get('amenitieID')?.value,
+    date: this.getForm().get('fecha')?.value,
+    details: this.getForm().get('detalles')?.value,
+    guests: normalizedGuests
+  };
 
-    console.log('FRONTEND: Enviando datos de reserva:', reservationData);
+  console.log('FRONTEND: Enviando datos de reserva:', reservationData);
 
-    // Muestra loading y ejecuta la petición suscribiéndose al Observable
-    this._reservationsService
-      .createReservation(reservationData)
-      .subscribe({
-        next: async () => {
-          const alert = await this.alertController.create({
-            header: 'Solicitud Enviada',
-            message: 'El estado de reserva permanecerá como "Pendiente" hasta que el administrador confirme la disponibilidad.',
-            buttons: ['OK'],
-          });
-          await alert.present();
-        },
-        error: (err) => {
-          console.error('Error al solicitar reserva:', err);
-        }
+  this._reservationsService.createReservation(reservationData).subscribe({
+    next: async () => {
+      const alert = await this.alertController.create({
+        header: 'Solicitud Enviada',
+        message: 'Tu reserva fue enviada al administrador.',
+        buttons: ['OK']
       });
+      await alert.present();
+    },
+    error: async (err) => {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: err?.error?.msg || 'No se pudo crear la reserva.',
+        buttons: ['OK']
+      });
+      await alert.present();
+      }
+    });
   }
+
 
   addGuest() {
     this.guests.push({

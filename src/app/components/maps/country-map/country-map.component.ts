@@ -177,13 +177,26 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     if (this.map) { this.map.setView([mapLat, mapLng]); return; }
 
     this.baseLayers = {
-      'Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, attribution: 'Tiles &copy; Esri & partners' }),
       'Calles':   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }),
-      'Oscuro':   L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; Stadia Maps, &copy; OpenMapTiles, &copy; OpenStreetMap' })
+      'Satélite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 20, attribution: 'Tiles &copy; Esri & partners' }),
+      'obscuro': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; CARTO' }),
     };
 
-    this.map = L.map('map', { zoomControl: true, layers: [this.baseLayers['Satélite']] })
-                .setView([mapLat, mapLng], 15);
+    this.map = L.map('map', {
+      zoomControl: false,        // ❌ sin botones de zoom
+      scrollWheelZoom: false,    // ❌ sin zoom con rueda
+      doubleClickZoom: false,    // ❌ sin zoom doble click
+      touchZoom: false,          // ❌ sin pinch zoom
+      dragging: true,            // ✅ se puede mover dentro del perímetro
+      layers: [this.baseLayers['Calles']] 
+    }).setView([mapLat, mapLng], 16);
+
+// ❌ No permitir alejar demasiado
+this.map.setMinZoom(13);
+
+// ❌ Ocultar selector de capas para que NO pueda cambiar el mapa
+// this.layersControl = L.control.layers(this.baseLayers, {}, { collapsed: true }).addTo(this.map);
+
 
     this.map.setMinZoom(13);
     this.layersControl = L.control.layers(this.baseLayers, {}, { collapsed: true }).addTo(this.map);
@@ -192,12 +205,22 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
   private drawPolygonOutline(points: LatLngObj[]): void {
     if (!this.map) return;
     if (this.perimeterPolygon) { this.map.removeLayer(this.perimeterPolygon); this.perimeterPolygon = null; }
+    
     this.perimeterPolygon = L.polygon(points as any, {
       color: '#10b981', weight: 3, opacity: 1, fill: false, fillOpacity: 0
     }).addTo(this.map);
+
     const bounds = this.perimeterPolygon.getBounds();
+
     this.map.fitBounds(bounds, { padding: [50, 50] });
+
+    // 🔒 Bloquear mapa dentro del perímetro
+    this.map.setMaxBounds(bounds);
+    this.map.setMinZoom(this.map.getBoundsZoom(bounds));
+
+    
   }
+
 
   // ----------------- WebSocket / Real-Time (AGREGADO) -----------------
 
@@ -302,7 +325,7 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
   //    Antipánico
   // ========================
   public onAntipanicClick(): void {
-// ... (resto del código sin cambios) ...
+
     if (!this.antipanicState) this.activateAntipanic();
     else this.desactivateAntipanic();
   }
@@ -333,6 +356,13 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+
+        // 🚫 Bloquear si está fuera del perímetro
+        if (!this.isInsidePerimeter(lat, lng)) {
+          this.alerts.presentAlert('Estás fuera del country. No puedes activar el botón de pánico.');
+          this.isSending = false;
+          return;
+        }
 
         const payload: AntipanicCreateDto = {
           id_owner, address, id_country: this.id_country!, propertyNumber, latitude: lat, longitude: lng
@@ -585,4 +615,30 @@ export class CountryMapComponent implements OnInit, AfterViewInit, OnDestroy, On
     const a = this.perimeterPath[edgeIdx], b = this.perimeterPath[edgeIdx + 1];
     return L.latLng(a.lat + (b.lat - a.lat) * t, a.lng + (b.lng - a.lng) * t);
   }
+  // --- Helpers de contención de punto en polígono ---
+// Si no hay perímetro, no bloqueamos (permite activar)
+private isInsidePerimeter(lat: number, lng: number): boolean {
+  if (!this.perimeterPolygon) return true;
+
+  // 1) Filtro rápido por bounding box (rápido)
+  const ll = L.latLng(lat, lng);
+  const bounds = this.perimeterPolygon.getBounds();
+  if (!bounds.contains(ll)) return false;
+
+  // 2) Chequeo exacto punto-en-polígono (ray casting)
+  const rings = this.perimeterPolygon.getLatLngs() as L.LatLng[][] | L.LatLng[];
+  const ring: L.LatLng[] = Array.isArray(rings[0]) ? (rings as L.LatLng[][])[0] : (rings as L.LatLng[]);
+
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i].lat, yi = ring[i].lng;
+    const xj = ring[j].lat, yj = ring[j].lng;
+
+    const intersect = ((yi > lng) !== (yj > lng)) &&
+                      (lat < (xj - xi) * (lng - yi) / (yj - yi + 1e-12) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
 }

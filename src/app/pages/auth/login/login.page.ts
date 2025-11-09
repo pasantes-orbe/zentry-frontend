@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } 
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
+import { ThemeService } from 'src/app/services/theme/theme.service';
 
 // Componentes Standalone de Ionic
 import {
@@ -76,7 +77,8 @@ export class LoginPage implements OnInit {
     private _redirectService: RedirectService,
     private _webSocketService: WebSocketService,
     private _pushService: PushService,
-    private _ownerStorage: OwnerStorageService
+    private _ownerStorage: OwnerStorageService,
+    private _themeService: ThemeService
   ) {
     this.formBuilder = _formBuilder;
     this.form = this.createForm();
@@ -87,12 +89,15 @@ export class LoginPage implements OnInit {
     //this._webSocketService.conectar();
   }
 
-  private async ionViewWillEnter() {
-    this.setErrorMessage(false);
-    const user = await this._userStorage.getUser();
-    // Comentario: Se mantiene el chequeo de sesión activa, si el usuario existe, se redirige.
-    if (user) this._redirectService.redirectByRole(user['role'].name);
-  }
+  async ionViewDidEnter() {
+  // ✅ Forzar login SIEMPRE en claro sin pisar preferencias guardadas
+    document.body.setAttribute('data-theme', 'light');
+
+    this.setErrorMessage(false);
+
+    const user = await this._userStorage.getUser();
+    if (user) this._redirectService.redirectByRole(user['role'].name);
+  }
 
   // INICIO DE MODIFICACIÓN: Se cambia el método 'login()' a 'async login()' (Línea 134)
   async login() { 

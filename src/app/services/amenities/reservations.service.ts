@@ -142,16 +142,31 @@ private async fetchReservationsByOwner(): Promise<ReservationsInterface[]> {
           tap(async () => {
             console.log('Reserva creada.');
             await this.loadOwnerReservations();
-            await this._alertService.removeLoading();
           }),
+            catchError(async err => {
+              console.error('Error al crear reserva (HTTP):', err);
+               this._alertService.removeLoading();
+            }),
           map(res => res),
           catchError(async err => {
             console.error('Error al crear reserva (HTTP):', err);
-            await this._alertService.removeLoading();
+             this._alertService.removeLoading();
+
+            if (err.status === 409) {
+              // 💥 Horario Ocupado
+              this._alertService.showAlert(
+          'Horario no disponible',
+          err?.error?.msg || 'Ya existe otra reserva en este horario.'
+              );
+              return throwError(() => err);
+            }
+
+            // Otros errores
             this._alertService.showAlert(
               '¡Ooops!',
               `${err?.error?.msg || 'Error al crear la reserva.'}`
             );
+
             return throwError(() => err);
           })
         );
@@ -161,7 +176,7 @@ private async fetchReservationsByOwner(): Promise<ReservationsInterface[]> {
         if (err.message === 'No se pudo obtener el ID del usuario.') {
           this._alertService.showAlert('Error', err.message);
         }
-        await this._alertService.removeLoading();
+        this._alertService.removeLoading();
         return throwError(() => err);
       })
     );
@@ -170,6 +185,11 @@ private async fetchReservationsByOwner(): Promise<ReservationsInterface[]> {
   public getReservationsByOwner(): Observable<ReservationsInterface[]> {
     return this.ownerReservations$;
   }
+
+  public getReservationsByAmenityAndDate(id_amenity: number, date: string) {
+  return this._http.get<any[]>(`${environment.URL}/api/reservations/check/${id_amenity}/${date}`);
+  }
+
 
   public getAllByUser(userID: number): Observable<ReservationsInterface[]> {
     return this._http.get<ReservationsInterface[]>(
@@ -210,4 +230,14 @@ public getAllByCountry(): Observable<ReservationsInterface[]> {
   public reservationGuests(id_reservation: number) {
     return this._http.get<any[]>(`${environment.URL}/api/invitation/${id_reservation}`);
   }
+  public getOccupied(id_amenity: number, date: string): Observable<any[]> {
+  return this._http.get<any[]>(
+    `${environment.URL}/api/reservations/occupied/${id_amenity}/${date}`
+    );
+  }
+  public getOccupiedHours(id_amenity: number, date: string): Observable<string[]> {
+  return this._http.get<string[]>(`${environment.URL}/api/reservations/occupied/${id_amenity}/${date}`);
+  }
+
+
 }

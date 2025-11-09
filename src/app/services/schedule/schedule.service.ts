@@ -118,17 +118,14 @@ public deleteScheduleById(id){
   return this._http.delete(`${environment.URL}/api/guards/schedule/${id}`);
 }
 
-public newHourOnSchedule(id_user, id_country, week_day, start, exit){
-
-    return this._http.post(`${environment.URL}/api/guards/new-schedule`, 
-    {
-      id_user,
-      id_country,
-      week_day,
-      start,
-      exit
-    })
-
-  }
+public newHourOnSchedule(id_user, id_country, week_day, start, exit) {
+  return this._http.post(`${environment.URL}/api/guards/schedule`, {
+    id_user,
+    id_country,
+    week_day,
+    start,
+    exit
+  });
+}
 
 }
