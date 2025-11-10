@@ -3,5 +3,6 @@
   publish = "www/browser"
 
 [[plugins]]
-  package = "@netlify/angular-runtime"
-  enabled = false
+package = "@netlify/angular-runtime"
+  [plugins.inputs]
+  disabled = true
