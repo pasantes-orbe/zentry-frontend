@@ -20,6 +20,11 @@
           <h2>Iniciar Sesión</h2>
         </div>
 
+        <!-- Mensaje de Estado (azul) -->
+        <ion-text class="error-message" *ngIf="getStatusMessage()" color="primary">
+          <p>{{ getStatusMessage() }}</p>
+        </ion-text>
+
         <!-- Mensaje de Error -->
         <ion-text class="error-message" *ngIf="getErrorMessage()" color="danger">
           <p>{{ getErrorMessage() }}</p>
