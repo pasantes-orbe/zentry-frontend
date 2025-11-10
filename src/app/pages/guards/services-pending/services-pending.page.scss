@@ -184,4 +184,16 @@
       }
     }
   }
+
+  // Estilos para el Alert de confirmación
+  ::ng-deep .confirm-approve-alert {
+    .alert-title {
+      font-weight: 700;
+    }
+    .alert-message {
+      white-space: pre-line;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  }
 }

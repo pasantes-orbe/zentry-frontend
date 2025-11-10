@@ -107,7 +107,8 @@ export class ServicesPendingPage implements OnInit, OnDestroy {
   public async approveService(service: CheckInOrOut) {
     const alert = await this.alertController.create({
       header: 'Autorizar Ingreso',
-      message: `¿Confirmar ingreso de <strong>${service.guest_name} ${service.guest_lastname}</strong>?<br><br><small>DNI: ${service.DNI}</small><br><small>${service.details || 'Servicio técnico'}</small>`,
+      message: `¿Confirmar ingreso de ${service.guest_name} ${service.guest_lastname}?\n\nDNI: ${service.DNI}\n${service.details || 'Servicio técnico'}`,
+      cssClass: 'confirm-approve-alert',
       buttons: [
         {
           text: 'Cancelar',
