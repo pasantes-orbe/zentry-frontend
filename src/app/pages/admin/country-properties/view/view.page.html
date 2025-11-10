@@ -1,90 +1,151 @@
 <app-navbar-back title="Administración de Propiedades"></app-navbar-back>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="page-container">
-    <div class="page-header">
-      <h1>Listado de Propiedades</h1>
-      <div class="controls">
-        <ion-searchbar
-          [(ngModel)]="searchKey"
-          mode="ios"
-          animated="true"
-          debounce="500"
-          placeholder="Buscar propiedad o propietario..."
-        ></ion-searchbar>
-      </div>
-    </div>
+  <!-- Buscador -->
+  <ion-searchbar
+    [(ngModel)]="searchKey"
+    mode="ios"
+    animated="true"
+    debounce="500"
+    placeholder="Buscar propiedad o propietario...">
+  </ion-searchbar>
 
-    <div class="pro-table-container">
-      <div *ngIf="loading" class="loading-container">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Cargando propiedades...</p>
-      </div>
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando propiedades…</p>
+  </div>
 
-      <div class="pro-table pro-table--compact" *ngIf="!loading && filteredProperties.length > 0">
-        <div class="table-header">
-          <div class="header-cell">Propiedad</div>
-          <div class="header-cell">Lote</div>
-          <div class="header-cell">Dirección</div>
-          <div class="header-cell">Propietario</div>
-          <div class="header-cell">Acciones</div>
+  <!-- ==================== MOBILE: CARDS ==================== -->
+  <div class="mobile-view" *ngIf="!loading">
+    <ion-card class="prop-card" *ngFor="let prop of filteredProperties">
+      <ion-card-content>
+        <div class="prop-header">
+          <ion-avatar class="prop-avatar">
+            <img [src]="getPropImg(prop)" alt="Foto propiedad">
+          </ion-avatar>
+
+          <div class="prop-head-text">
+            <h3>Lote {{ prop?.property?.number ?? '—' }}</h3>
+            <p class="address" [title]="prop?.property?.address || '—'">
+              {{ prop?.property?.address ?? '—' }}
+            </p>
+          </div>
+
+          <div class="status-indicator">
+            <span class="dot"></span>
+            <span class="label">Activa</span>
+          </div>
         </div>
 
-        <div class="table-row" *ngFor="let prop of filteredProperties; let i = index">
-          <!-- FOTO -->
-          <div class="table-cell img-cell" data-label="Propiedad">
-            <ion-avatar class="prop-avatar">
-              <img [src]="getPropImg(prop)" alt="Foto propiedad" />
-            </ion-avatar>
-            <span class="status-dot" [ngClass]="(prop?.property?.isActive === false) ? 'inactive' : 'active'" title="{{ (prop?.property?.isActive === false) ? 'Inactiva' : 'Activa' }}"></span>
-          </div>
-
-          <!-- Nº -->
-          <div class="table-cell number-cell" data-label="Lote">
-            {{ prop?.property?.number ?? '—' }}
-          </div>
-
-          <!-- Dirección -->
-          <div class="table-cell truncate" data-label="Dirección" [title]="prop?.property?.address || '—'">
-            {{ prop?.property?.address ?? '—' }}
-          </div>
-
-          <!-- Propietarios (chips compactos) -->
-          <div class="table-cell owner-cell" data-label="Propietario">
-            <ng-container *ngIf="prop?.owners?.length; else noOwners">
-              <div class="owner-chips">
-                <ng-container *ngFor="let owner of prop.owners | slice:0:4">
-                  <ion-avatar class="chip-avatar" title="Avatar propietario">
-                    <img [src]="getOwnerAvatar(owner)" [alt]="(owner?.user?.name || '') + ' ' + (owner?.user?.lastname || '')" />
-                  </ion-avatar>
-                </ng-container>
-                <span class="more" *ngIf="prop.owners.length > 4">+{{ prop.owners.length - 4 }}</span>
-              </div>
+        <div class="owners-block">
+          <label>Propietarios</label>
+          <div class="owner-chips" *ngIf="prop?.owners?.length; else noOwnersM">
+            <ng-container *ngFor="let owner of prop.owners | slice:0:5">
+              <ion-avatar class="chip-avatar"
+                [title]="(owner?.user?.lastname || '') + ', ' + (owner?.user?.name || '')">
+                <img [src]="getOwnerAvatar(owner)">
+              </ion-avatar>
             </ng-container>
-            <ng-template #noOwners>—</ng-template>
+            <span class="more" *ngIf="prop.owners.length > 5">+{{ prop.owners.length - 5 }}</span>
           </div>
-
-          <!-- Acciones -->
-          <div class="table-cell actions-cell" data-label="Acciones">
-            <ion-button class="action-btn" size="small" fill="solid" color="primary" (click)="goToEditProperty(prop?.property?.id)" [disabled]="!prop?.property?.id" title="Editar propiedad">
-              <ion-icon name="create-outline" slot="start"></ion-icon>
-              Editar
-            </ion-button>
-            <ion-button class="status-btn" size="small" fill="outline" [color]="(prop?.property?.isActive === false) ? 'medium' : 'success'" (click)="togglePropertyStatus(prop?.property?.id, prop?.property?.isActive === false ? false : true)" [disabled]="!prop?.property?.id" [title]="(prop?.property?.isActive === false) ? 'Habilitar propiedad' : 'Inhabilitar propiedad'">
-              {{ (prop?.property?.isActive === false) ? 'Inactiva' : 'Activa' }}
-            </ion-button>
-          </div>
+          <ng-template #noOwnersM>—</ng-template>
         </div>
-      </div>
 
-      <div class="empty-state" *ngIf="!loading && filteredProperties.length === 0">
+        <div class="actions">
+          <ion-button size="small" fill="solid" color="primary"
+            (click)="goToEditProperty(prop?.property?.id)" [disabled]="!prop?.property?.id">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button size="small" fill="outline"
+            [color]="(prop?.property?.isActive === false) ? 'medium' : 'success'"
+            (click)="togglePropertyStatus(prop?.property?.id, prop?.property?.isActive !== false)"
+            [disabled]="!prop?.property?.id">
+            {{ (prop?.property?.isActive === false) ? 'Inactiva' : 'Activa' }}
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-text color="medium" class="empty" *ngIf="filteredProperties.length === 0">
+      No se encontraron propiedades.
+    </ion-text>
+  </div>
+
+  <!-- ==================== DESKTOP: TABLE ==================== -->
+  <div class="desktop-view" *ngIf="!loading">
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Propiedad</th>
+            <th>Lote</th>
+            <th>Dirección</th>
+            <th>Propietarios</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let prop of filteredProperties">
+            <td class="prop-col">
+              <ion-avatar class="prop-avatar">
+                <img [src]="getPropImg(prop)" alt="Foto propiedad">
+              </ion-avatar>
+              <div class="status-indicator">
+                <span class="dot"></span>
+                <span class="label">Activa</span>
+              </div>
+            </td>
+
+            <td>{{ prop?.property?.number ?? '—' }}</td>
+
+            <td class="truncate" [title]="prop?.property?.address || '—'">
+              {{ prop?.property?.address ?? '—' }}
+            </td>
+
+            <td class="owners-col">
+              <ng-container *ngIf="prop?.owners?.length; else noOwnersD">
+                <div class="owner-chips">
+                  <ng-container *ngFor="let owner of prop.owners | slice:0:6">
+                    <ion-avatar class="chip-avatar"
+                      [title]="(owner?.user?.lastname || '') + ', ' + (owner?.user?.name || '')">
+                      <img [src]="getOwnerAvatar(owner)">
+                    </ion-avatar>
+                  </ng-container>
+                  <span class="more" *ngIf="prop.owners.length > 6">+{{ prop.owners.length - 6 }}</span>
+                </div>
+              </ng-container>
+              <ng-template #noOwnersD>—</ng-template>
+            </td>
+
+            <td class="actions-col">
+              <ion-button size="small" fill="solid" color="primary"
+                (click)="goToEditProperty(prop?.property?.id)" [disabled]="!prop?.property?.id">
+                <ion-icon slot="start" name="create-outline"></ion-icon>
+                Editar
+              </ion-button>
+
+              <ion-button size="small" fill="outline"
+                [color]="(prop?.property?.isActive === false) ? 'medium' : 'success'"
+                (click)="togglePropertyStatus(prop?.property?.id, prop?.property?.isActive !== false)"
+                [disabled]="!prop?.property?.id">
+                {{ (prop?.property?.isActive === false) ? 'Inactiva' : 'Activa' }}
+              </ion-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-table" *ngIf="filteredProperties.length === 0">
         <ion-icon name="business-outline"></ion-icon>
-        <h3>No se encontraron propiedades</h3>
-        <p>No hay propiedades que coincidan con tu búsqueda o aún no se han creado.</p>
+        <p>No se encontraron propiedades.</p>
       </div>
     </div>
   </div>

@@ -46,10 +46,16 @@
 
     <ion-modal [keepContentsMounted]="true">
       <ng-template>
-        <ion-datetime formControlName="fecha" presentation="date-time" color="primary" [showDefaultTitle]="true"
-          id="datetime">
-          <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
-        </ion-datetime>
+        <ion-datetime 
+  formControlName="fecha" 
+  presentation="date-time" 
+  color="primary" 
+  [showDefaultTitle]="true"
+  id="datetime"
+  (ionChange)="onDateChange($event)">
+  <span slot="title">SELECCIONA LA FECHA DE INGRESO</span>
+</ion-datetime>
+
       </ng-template>
     </ion-modal>
 

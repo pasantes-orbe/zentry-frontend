@@ -34,9 +34,16 @@ export class AlertService {
     await this.loading.present();
   }
 
-  public async removeLoading() {
-    await this.loading.dismiss();
-  }
+  async removeLoading() {
+  try {
+    if (this.loading) {
+      await this.loading.dismiss();
+      this.loading = null;
+    }
+  } catch (_) {}
+}
+
+
 
   // Método para mostrar un alert genérico
   public async showAlert(header: string = "", message: string = "", buttons: any[] = []){

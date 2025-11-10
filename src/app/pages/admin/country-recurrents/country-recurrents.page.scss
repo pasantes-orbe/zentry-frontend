@@ -1,11 +1,125 @@
+.page-container {
+  padding: 16px;
+}
+
+/* Responsive tabla tipo GRID: Mobile-first */
+.pro-table-container {
+  padding-right: 4px;
+}
+
+/* Estructura GRID para encabezado y filas */
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns:
+    2fr    /* Nombre */
+    1fr    /* DNI */
+    1fr    /* Toggle */
+    max-content; /* Acciones */;
+  column-gap: 8px;
+  align-items: center;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 0;
+}
+
+.pro-table--compact .table-row {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.06);
+  margin-bottom: 12px;
+  border-radius: 12px;
+}
+
+.header-cell,
+.table-cell {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.header-cell {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8692a6;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+.actions-cell ion-button {
+  height: 36px;
+  --border-radius: 8px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  min-width: 82px;
+}
+
+.number-cell {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.09em;
+}
+
+/* Loading y vacío */
+.loading-container, .empty-state {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 24px;
+  color: #6b7280;
+  ion-icon { font-size: 40px; }
+}
+
+/* Mobile */
+@media (max-width: 680px) {
+  .page-container { padding: 5px; }
+
+  .pro-table--compact .table-row {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    padding: 0;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    border-width: 1.5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+
+  .table-header { display: none; }
+
+  .table-cell,
+  .actions-cell {
+    padding: 10px 12px;
+    font-size: 1.01em;
+    justify-content: flex-start;
+    border-bottom: 1px solid #f0f2f5;
+  }
+
+  .table-cell:last-child,
+  .actions-cell:last-child { border-bottom: none; }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1.7fr 1fr 1fr max-content;
+  }
+}
+
+/* ✅ Estilos que venían de la otra rama y se deben conservar */
 .status-toggle {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   margin-right: 12px;
 
-  .label-ok { font-weight: 500; }
-  .label-deny { font-weight: 500; }
+  .label-ok,
+  .label-deny {
+    font-weight: 500;
+  }
 }
 
 .actions {

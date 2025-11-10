@@ -1,3 +1,96 @@
-ion-icon{
-    height: 45px;
+:host {
+  display: block;
+}
+
+/* ---- HEADER ---- */
+ion-header ion-toolbar {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-dark);
+  border-bottom: 1px solid var(--ion-color-step-150);
+}
+
+ion-title {
+  font-weight: 600;
+  font-size: 17px;
+}
+
+ion-button[color="medium"] {
+  --color: var(--ion-color-medium-shade);
+}
+
+/* ---- TABLA ---- */
+.table-responsive {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ion-background-color);
+}
+
+thead {
+  background: var(--ion-color-step-100);
+}
+
+th {
+  padding: 10px 6px;
+  font-size: 13px;
+  color: var(--ion-color-dark);
+  font-weight: 600;
+  text-align: center;
+}
+
+td {
+  padding: 8px 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Select más chico */
+ion-item {
+  --background: transparent;
+  border-radius: 6px;
+  height: 38px;
+  padding: 0;
+}
+
+/* Botones datetime más discretos */
+ion-datetime-button {
+  --background: var(--ion-color-step-150);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+/* Iconos más chicos */
+ion-icon {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+ion-icon[name="save-outline"] {
+  color: var(--ion-color-success);
+}
+
+ion-icon[name="trash-outline"] {
+  color: var(--ion-color-danger);
+}
+
+/* Botón añadir horario */
+ion-button {
+  margin-top: 18px;
+  --border-radius: 8px;
+}
+
+/* ---- MODO OSCURO ---- */
+[data-theme="dark"] ion-header ion-toolbar {
+  --background: #1e1e1e;
+  --color: #ffffff;
+}
+
+[data-theme="dark"] thead {
+  background: #2c2c2c;
 }

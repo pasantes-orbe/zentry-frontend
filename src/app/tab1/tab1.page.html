@@ -139,22 +139,48 @@
             </ion-select>
           </ion-item>
           
+          <!-- FECHA -->
           <ion-item>
+            <ion-label position="stacked">Fecha</ion-label>
             <ion-datetime 
-              presentation="date" 
-              placeholder="Seleccionar Fecha" 
-              [(ngModel)]="selectedDate">
+              presentation="date"
+              [(ngModel)]="selectedDate"
+              (ionChange)="onDateSelected($event)">
             </ion-datetime>
           </ion-item>
 
+          <!-- HORARIOS DISPONIBLES -->
+          <!-- HORARIO -->
           <ion-item>
-            <ion-input 
-              type="time" 
-              placeholder="Hora" 
-              [(ngModel)]="selectedTime">
-            </ion-input>
+            <ion-label position="stacked">Horario</ion-label>
+            <ion-select [(ngModel)]="selectedTime" interface="popover">
+              
+              <ion-select-option
+                *ngFor="let hour of availableHours"
+                [value]="hour"
+                [disabled]="occupiedHours.includes(hour)"
+                [class.hour-disabled]="occupiedHours.includes(hour)"
+                [class.hour-available]="!occupiedHours.includes(hour)"
+              >
+                <ion-icon 
+                  *ngIf="occupiedHours.includes(hour)" 
+                  name="close-circle" 
+                  style="color: #ff4c4c; margin-right: 6px;">
+                </ion-icon>
+
+                <ion-icon 
+                  *ngIf="!occupiedHours.includes(hour)" 
+                  name="checkmark-circle" 
+                  style="color: #32cd32; margin-right: 6px;">
+                </ion-icon>
+
+                {{ hour }}
+              </ion-select-option>
+
+            </ion-select>
           </ion-item>
-        </ion-list>
+
+
 
         <!-- ▼▼▼ BLOQUE AGREGADO ANTES DEL BOTÓN "Confirmar Reserva" ▼▼▼ -->
         <div style="height: 1px; background: #eee; margin: 20px 0;"></div>
@@ -225,6 +251,7 @@
           style="margin: 20px;">
           Confirmar Reserva
         </ion-button>
+        </ion-list>
       </ion-content>
     </ng-template>
   </ion-modal>

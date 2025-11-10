@@ -4,6 +4,7 @@ import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { RecurrentsService } from 'src/app/services/recurrents/recurrents.service';
 import { OwnerStorageService } from 'src/app/services/storage/owner-interface-storage.service';
@@ -17,7 +18,7 @@ import { NavbarBackComponent } from 'src/app/components/navbars/navbar-back/navb
   templateUrl: './country-recurrents.page.html',
   styleUrls: ['./country-recurrents.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, ReactiveFormsModule, RouterModule, NavbarBackComponent]
+  imports: [CommonModule, IonicModule, ReactiveFormsModule, RouterModule, NavbarBackComponent, FormsModule]
 })
 export class RecurrentsViewAllComponent implements OnInit {
   @Input() role: 'admin' | 'owner' | '' = '';
@@ -148,4 +149,21 @@ export class RecurrentsViewAllComponent implements OnInit {
     const t = await this.toastCtrl.create({ message, duration: 1800, position: 'bottom' });
     await t.present();
   }
+  
+  public async handleRefresh(event: any) {
+    await this.loadDataSafe();
+    event.target.complete();
+  }
+
+  get filteredRecurrents(): RecurrentsInterface[] {
+  const q = (this.searchKey || '').trim().toLowerCase();
+  if (!q) return this.recurrents;
+  return this.recurrents.filter(r => {
+    const nombre = `${r.guest_lastname || ''} ${r.guest_name || ''}`.toLowerCase();
+    const dni = String((r as any).dni ?? (r as any).DNI ?? '');
+    return nombre.includes(q) || dni.includes(q);
+  });
+}
+
+
 }

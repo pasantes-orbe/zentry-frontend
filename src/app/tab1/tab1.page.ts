@@ -78,6 +78,14 @@ export class Tab1Page implements OnInit, OnDestroy {
   public selectedAmenityId: number | null = null;
   public selectedDate: string = '';
   public selectedTime: string = '';
+  public occupiedHours: string[] = [];
+public availableHours: string[] = [
+  '08:00', '09:00', '10:00', '11:00', '12:00',
+  '13:00', '14:00', '15:00', '16:00', '17:00',
+  '18:00', '19:00', '20:00', '21:00'
+];
+
+
 
   public amenities$: Observable<AmenitieInterface[]> | undefined;
 
@@ -393,56 +401,69 @@ export class Tab1Page implements OnInit, OnDestroy {
 
   // confirmReservation usando firstValueFrom y actualización reactiva interna
   public async confirmReservation() {
-    if (this.selectedAmenityId === null || !this.selectedDate || !this.selectedTime) {
-      this.alerts.showAlert('Error', 'Por favor complete todos los campos.');
-      return;
-    }
+  if (this.selectedAmenityId === null || !this.selectedDate || !this.selectedTime) {
+    this.alerts.showAlert('Error', 'Por favor complete todos los campos.');
+    return;
+  }
+  
+  if (this.occupiedHours.includes(this.selectedTime)) {
+  this.alerts.showAlert('Horario ocupado', 'Ese horario ya está reservado para este amenity.');
+  return;
+  }
 
-await this.ensureOwnerContext();
+  await this.ensureOwnerContext();
   const id_property = (this.owner as any)?.property?.id;
   if (!id_property) {
     this.alerts.showAlert('Error', 'No se pudo obtener la propiedad del propietario. Reingresá.');
     return;
   }
 
-    const dateObj = new Date(this.selectedDate);
-    const [hours, minutes] = this.selectedTime.split(':').map(Number);
-    dateObj.setHours(hours, minutes, 0, 0);
-    const combinedDateTime = dateObj.toISOString();
+  const dateObj = new Date(this.selectedDate);
+  const [hours, minutes] = this.selectedTime.split(':').map(Number);
+  dateObj.setHours(hours, minutes, 0, 0);
+  const combinedDateTime = dateObj.toISOString();
 
-    const reservationData = {
-      id_amenity: Number (this.selectedAmenityId),
-      date: combinedDateTime,
-      id_property,
-      details: this.details ?? null,
-      guests: this.guests.map(g => ({
+  const reservationData = {
+    id_amenity: Number(this.selectedAmenityId),
+    date: combinedDateTime,
+    id_property,
+    details: this.details ?? null,
+    guests: this.guests.map(g => ({
       guest_name: g.name,
-        guest_lastname: g.lastname,
-        DNI: g.dni
-      })) 
-    };
+      guest_lastname: g.lastname,
+      dni: g.dni
+    }))
+  };
 
-    try {
-      // Obtener el nombre del amenity para el mensaje de confirmación
-      let amenityName = 'Amenity Desconocido';
-      const amenities = await firstValueFrom(this.amenities$ as Observable<AmenitieInterface[]>);
-      const selectedAmenity = amenities.find(a => a.id === this.selectedAmenityId);
-      if(selectedAmenity) {
-        amenityName = selectedAmenity.name;
-      }
-      
-      // Esperar la respuesta del POST; la lista se actualiza vía el servicio (loadOwnerReservations)
-      await firstValueFrom(this._reservationsService.createReservation(reservationData));
+  try {
+    await firstValueFrom(this._reservationsService.createReservation(reservationData));
 
-      this.alerts.showAlert('Pedido de Reserva enviada al Administrador');
-      this.closeReservationModal();
-    } catch (error: any) {
-      console.error('Error al crear la reserva:', error);
-      if (error?.error?.errors?.length > 0) {
-        const msg = error.error.errors[0].msg;
-        this.alerts.showAlert('Error', msg);
-      } else {
-        this.alerts.showAlert('Error', 'Hubo un problema al crear la reserva. Intente de nuevo.');
+    // ✅ ÉXITO (solo si realmente se creó)
+    this.alerts.showAlert(
+      'Pedido de Reserva enviada',
+      'El administrador revisará la disponibilidad del horario.'
+    );
+    this.closeReservationModal();
+
+  } catch (error: any) {
+
+    // ✅ ERROR REAL DEL BACKEND → MOSTRARLO
+    const msg = error?.error?.msg || 'No se pudo crear la reserva.';
+    this.alerts.showAlert('Error', msg);
+  }
+}
+
+  async onDateSelected(ev: any) {
+    this.selectedDate = ev.detail.value.split('T')[0]; // yyyy-mm-dd
+
+    if (this.selectedAmenityId) {
+      try {
+        this.occupiedHours = await firstValueFrom(
+          this._reservationsService.getOccupiedHours(this.selectedAmenityId, this.selectedDate)
+        );
+        console.log("Horas ocupadas ese día:", this.occupiedHours);
+      } catch (e) {
+        console.error("Error obteniendo horarios ocupados", e);
       }
     }
   }

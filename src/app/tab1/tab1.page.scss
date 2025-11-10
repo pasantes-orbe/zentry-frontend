@@ -211,3 +211,12 @@
     }
   }
 }
+.hour-disabled {
+  color: #ff4c4c !important;   /* rojo */
+  opacity: 0.7;
+  pointer-events: none;        /* que no se pueda clickear */
+}
+
+.hour-available {
+  color: var(--ion-text-color);
+}
