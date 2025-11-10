@@ -58,7 +58,7 @@ export class AmenitieService {
           console.log(res);
           await this._alertService.removeLoading();
           this._alertService.showAlert("¡Listo!", "El Lugar de Reserva se agregó con éxito");
-          this._router.navigate(['/admin/view-all-amenities']);
+          this._router.navigate(['/admin/view-all-amenities'], { replaceUrl: true });
         },
         async (err) => {
           console.error("Error al agregar amenity:", err);
@@ -68,7 +68,7 @@ export class AmenitieService {
             await this._alertService.showAlert("Por favor subí una foto desde tu galería o archivos!", ``);
           } else {
             await this._alertService.showAlert("¡Ooops!", `${err.error?.msg || 'Error al crear el amenity'}`);
-            this._router.navigate(['/admin/ver-amenities']);
+            this._router.navigate(['/admin/view-all-amenities'], { replaceUrl: true });
           }
         }
       );

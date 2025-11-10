@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
+import { CountryStorageService } from 'src/app/services/storage/country-storage.service';
 
 //Servicios
 import { AmenitieService } from '../../../../services/amenities/amenitie.service';
@@ -35,15 +36,27 @@ export class ViewAllPage implements OnInit {
 
   public amenities: AmenitieInterface[] = [];
   public searchKey: string = '';
+  public dashboardHref: string = '/admin/home';
 
   constructor(
     private _amenitiesService: AmenitieService,
     private _router: Router, 
-    private _alertService: AlertService, 
-    private _alertController: AlertController 
+    private _alertService: AlertService, 
+    private _alertController: AlertController,
+    private _countryStorage: CountryStorageService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    try {
+      const country = await this._countryStorage.getCountry().catch(() => null as any);
+      if (country?.id) {
+        this.dashboardHref = `/admin/country-dashboard/${country.id}`;
+      } else {
+        this.dashboardHref = '/admin/home';
+      }
+    } catch {
+      this.dashboardHref = '/admin/home';
+    }
     this.loadAmenities();
   }
 
