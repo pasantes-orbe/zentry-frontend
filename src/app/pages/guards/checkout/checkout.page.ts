@@ -92,12 +92,13 @@ export class CheckoutPage implements OnInit, OnDestroy {
   // Confirmar y ejecutar checkout
   public async checkOut(checkInData: CheckInOrOut, index: number) {
     const alert = await this.alertController.create({
-      header: 'Confirmar Check Out',
-      message: `Persona: <b>${checkInData.guest_name}</b><br>DNI: <b>${checkInData.DNI}</b>`,
+      header: 'Confirmar salida',
+      subHeader: `${checkInData.guest_name} (DNI ${checkInData.DNI})`,
+      message: '¿Deseás confirmar la salida?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Check Out',
+          text: 'Confirmar',
           handler: async (data) => {
             try {
               this.isProcessingId = checkInData.id as unknown as number;
