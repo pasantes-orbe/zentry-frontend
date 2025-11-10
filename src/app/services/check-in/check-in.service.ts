@@ -93,7 +93,8 @@ export class CheckInService {
       this._socketService.notificarCheckIn(res['checkIn']);
 
       await this._alertService.removeLoading();
-      await this._alertService.showAlert('¡Listo!', 'El Check-in fue enviado con exito al propietario');
+      const destinatario = body.id_owner != null ? 'propietario' : 'administrador';
+      await this._alertService.showAlert('¡Listo!', `El Check-in fue enviado con exito al ${destinatario}`);
       await this._router.navigate(['/vigiladores/home']);
       return res;
     } catch (err) {
