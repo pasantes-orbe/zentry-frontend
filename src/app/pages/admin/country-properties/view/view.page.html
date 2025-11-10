@@ -35,11 +35,6 @@
               {{ prop?.property?.address ?? '—' }}
             </p>
           </div>
-
-          <div class="status-indicator">
-            <span class="dot"></span>
-            <span class="label">Activa</span>
-          </div>
         </div>
 
         <div class="owners-block">
@@ -98,10 +93,6 @@
               <ion-avatar class="prop-avatar">
                 <img [src]="getPropImg(prop)" alt="Foto propiedad">
               </ion-avatar>
-              <div class="status-indicator">
-                <span class="dot"></span>
-                <span class="label">Activa</span>
-              </div>
             </td>
 
             <td>{{ prop?.property?.number ?? '—' }}</td>

@@ -164,7 +164,8 @@ ion-chip {
   .actions-cell {
     justify-content: center;
     .action-btn, .status-btn {
-      min-width: 110px;
+      min-width: 120px; /* evita recorte de 'Eliminar' */
+      white-space: nowrap; /* evita salto de línea dentro del botón */
     }
   }
 }
