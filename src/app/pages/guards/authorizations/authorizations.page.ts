@@ -257,7 +257,14 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
 
       // Cargar feed unificado (pendientes de check-in y reservas futuras)
       try {
-        const params = this.countryID ? { id_country: this.countryID } as any : {};
+        const params: any = {};
+        if (this.countryID) params.id_country = this.countryID;
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        const toISO = (d: Date) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds())).toISOString();
+        params.from = toISO(start);
+        params.to = toISO(end);
         const feed = await this.guardsService.getPendingCheckinFeed(params).toPromise();
         this.pendingFeed = Array.isArray(feed?.pending) ? feed!.pending.map(it => this.normalizePendingItem(it)) : [];
         this.futureFeed = Array.isArray(feed?.future) ? feed!.future.map(it => this.normalizePendingItem(it)) : [];
@@ -413,19 +420,21 @@ export class AuthorizationsPage implements OnInit, OnDestroy {
     const dni = raw?.DNI ?? raw?.guest?.dni ?? raw?.dni ?? '';
 
     const lot = raw?.owner?.property?.number ?? raw?.lot ?? raw?.owner?.lot ?? '';
-    const family =
-      raw?.owner?.family_name ??
-      raw?.owner?.name ??
-      raw?.user?.name ??
-      'Propietario';
+    const ownerName = `${raw?.owner?.name ?? ''} ${raw?.owner?.lastname ?? ''}`.trim();
+    const ownerUserName = `${raw?.owner?.OwnerUser?.name ?? ''} ${raw?.owner?.OwnerUser?.lastname ?? ''}`.trim();
+    const userName = `${raw?.user?.name ?? ''} ${raw?.user?.lastname ?? ''}`.trim();
+    const familyName = (raw?.owner?.family_name ?? '').toString().trim();
+    const ownerFull = ownerName || ownerUserName || userName || familyName || 'Propietario';
+    const authorizedLabel = lot ? `${ownerFull} (Lote ${lot})` : ownerFull;
 
-    const authorizedLabel = lot ? `${family} (Lote ${lot})` : family;
+    const t = (raw?.type ?? '').toString().toLowerCase();
+    const typeLabel = t === 'invitado' ? 'Invitado' : t === 'recurrente' ? 'Recurrente' : (t ? t : 'Visita');
 
     return {
       id: raw?.id ?? raw?._id ?? `${name}-${dni}`,
       guest_name: name || '—',
       DNI: dni || '—',
-      type: raw?.type ?? 'Visita',
+      type: typeLabel,
       authorized_by: authorizedLabel,
       created_at: raw?.income_date ?? raw?.created_at ?? raw?.date
     };
