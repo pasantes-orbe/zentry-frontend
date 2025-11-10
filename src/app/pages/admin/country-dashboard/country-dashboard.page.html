@@ -17,7 +17,7 @@
       </ion-button>
 
       <!-- Menú de usuario -->
-      <ion-button id="user-menu-trigger" class="user-menu-button">
+      <ion-button class="user-menu-button" (click)="openUserMenu($event)">
         <ion-avatar>
           <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="User Avatar"/>
         </ion-avatar>
@@ -34,7 +34,7 @@
 </ion-popover>
 
 <!-- Popover de usuario -->
-<ion-popover trigger="user-menu-trigger" triggerAction="click" [dismissOnSelect]="true" class="user-menu-popover">
+<ion-popover [isOpen]="isUserMenuOpen" [event]="userMenuEvent" (didDismiss)="onUserMenuDidDismiss()" [dismissOnSelect]="true" class="user-menu-popover">
   <ng-template>
     <ion-content>
       <ion-list lines="full">

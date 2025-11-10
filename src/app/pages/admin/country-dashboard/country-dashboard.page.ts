@@ -41,6 +41,9 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
   loading = true;
   type = 'propiedades'; // segmento activo
   country: CountryInteface | null = null;
+  // Control popover usuario
+  isUserMenuOpen = false;
+  userMenuEvent: any = null;
 
   // Notificaciones
   notifications: NotificationInterface[] = [];
@@ -280,6 +283,16 @@ export class CountryDashboardPage implements OnInit, OnDestroy {
   // ==========================
   // UI helpers
   // ==========================
+  openUserMenu(ev: any) {
+    this.userMenuEvent = ev;
+    this.isUserMenuOpen = true;
+  }
+
+  onUserMenuDidDismiss() {
+    this.isUserMenuOpen = false;
+    this.userMenuEvent = null;
+  }
+
   onThemeToggle(ev: any) {
     const checked = ev?.detail?.checked ?? (ev?.target as HTMLInputElement)?.checked ?? false;
     this.theme.set('admin', checked ? 'dark' : 'light');
