@@ -1,7 +1,7 @@
 <ion-header mode="ios" [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button default-href="/guards/home"></ion-back-button>
+      <ion-back-button default-href="/guards/home" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Autorizaciones</ion-title>
   </ion-toolbar>
@@ -9,6 +9,53 @@
 
 <ion-content class="ion-padding surface-light">
   <div class="container">
+    <!-- Feed unificado: Pendientes de Check-In y Reservas Futuras -->
+    <ion-card class="list-card" *ngIf="pendingFeed?.length || futureFeed?.length">
+      <div class="card-header">
+        <div>
+          <div class="title">Autorizaciones del día</div>
+          <div class="subtitle">Pendientes de check-in y reservas futuras</div>
+        </div>
+      </div>
+
+      <!-- Pendientes de Check-In -->
+      <ion-list *ngIf="pendingFeed?.length">
+        <ion-item lines="full" *ngFor="let p of pendingFeed">
+          <ion-label>
+            <div class="name-row">
+              <span class="name">{{ p.guest_name }} {{ p.guest_lastname }}</span>
+              <ion-chip *ngIf="p?.available_for_checkin === true" color="success" outline>Disponible</ion-chip>
+              <ion-chip *ngIf="p?.available_for_checkin === false" color="medium" outline>No disponible</ion-chip>
+            </div>
+            <div class="meta">
+              <span class="dni">DNI: <b>{{ p.dni }}</b></span>
+              <span class="authby" *ngIf="p.scheduled_at"> Programado: <b>{{ p.scheduled_at | date:'dd/MM/yy HH:mm' }}</b></span>
+            </div>
+          </ion-label>
+          <ion-button *ngIf="p?.available_for_checkin === true" slot="end" color="primary" size="small" (click)="goToCheckinFromItem(p)">
+            Registrar ingreso
+          </ion-button>
+        </ion-item>
+      </ion-list>
+
+      <!-- Reservas futuras -->
+      <ion-list *ngIf="futureFeed?.length">
+        <ion-item lines="full" *ngFor="let f of futureFeed">
+          <ion-label>
+            <div class="name-row">
+              <span class="name">{{ f.guest_name }} {{ f.guest_lastname }}</span>
+              <ion-chip color="medium" outline>No disponible</ion-chip>
+            </div>
+            <div class="meta">
+              <span class="dni">DNI: <b>{{ f.dni }}</b></span>
+              <span class="authby" *ngIf="f.scheduled_at"> Reserva: <b>{{ f.scheduled_at | date:'dd/MM/yy HH:mm' }}</b></span>
+              <span class="authby" *ngIf="f.reason_unavailable"> ({{ f.reason_unavailable }})</span>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+
     <ion-card class="list-card">
       <div class="card-header">
         <div>
@@ -61,6 +108,36 @@
       <div *ngIf="recurrentsState" class="recurrents-wrap">
         <app-recurrents-view-all [role]="'guard'" [readOnly]="true"></app-recurrents-view-all>
       </div>
+    </ion-card>
+
+    <!-- Resumen de asistencia por recurrente (semana actual) -->
+    <ion-card class="list-card" *ngIf="attendanceItems?.length">
+      <div class="card-header">
+        <div>
+          <div class="title">Resumen semanal de recurrentes</div>
+          <div class="subtitle">Desde {{ attendanceFromISO | date:'dd/MM' }} hasta {{ attendanceToISO | date:'dd/MM' }}</div>
+        </div>
+      </div>
+
+      <ion-list>
+        <ion-item lines="full" *ngFor="let r of attendanceItems">
+          <ion-label>
+            <div class="name-row">
+              <span class="name">{{ r.guest_name }} {{ r.guest_lastname }}</span>
+            </div>
+            <div class="chips-row">
+              <ng-container *ngFor="let d of attendanceDays">
+                <ion-chip *ngIf="isAuthorized(r, d)"
+                          [color]="getDayColor(r, d)"
+                          [outline]="getDayOutline(r, d)"
+                          class="day-chip">
+                  {{ formatDayEs(d) }}
+                </ion-chip>
+              </ng-container>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
     </ion-card>
   </div>
 </ion-content>

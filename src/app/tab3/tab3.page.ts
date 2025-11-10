@@ -150,6 +150,11 @@ export class Tab3Page implements OnInit, OnDestroy {
               (this as any).owner.user.avatar = u?.avatar ?? (this as any).owner.user.avatar;
               (this as any).owner.user.name = name;
               (this as any).owner.user.lastname = lastname;
+              // Sincronizar estado activo con el backend
+              const activeVal = (u as any)?.isActive ?? (u as any)?.is_active;
+              if (typeof activeVal === 'boolean') {
+                (this as any).owner.user.isActive = activeVal;
+              }
             }
             this.userAvatar = u?.avatar ?? this.userAvatar;
             try { this.cdr.detectChanges(); } catch {}
@@ -178,6 +183,13 @@ export class Tab3Page implements OnInit, OnDestroy {
           this.editName = `${name ?? ''} ${lastname ?? ''}`.trim();
           this.editEmail = u?.email ?? this.editEmail;
           this.editPhone = u?.phone ?? this.editPhone;
+          // Sincronizar estado activo con el backend
+          if ((this as any).owner?.user) {
+            const activeVal = u?.isActive ?? u?.is_active;
+            if (typeof activeVal === 'boolean') {
+              (this as any).owner.user.isActive = activeVal;
+            }
+          }
           try { this.cdr.detectChanges(); } catch {}
         });
       }

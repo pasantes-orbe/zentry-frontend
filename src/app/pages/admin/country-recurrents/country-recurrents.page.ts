@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
@@ -35,7 +35,8 @@ export class RecurrentsViewAllComponent implements OnInit {
     private recurrentsSvc: RecurrentsService,
     private ownerStorage: OwnerStorageService,
     private countryStorage: CountryStorageService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -102,14 +103,45 @@ export class RecurrentsViewAllComponent implements OnInit {
     });
   }
 
-  // ← NUEVO: eliminar (hard delete). Si preferís soft, usá patchStatus(id,false)
-  public eliminar(recurrent: RecurrentsInterface, i: number): void {
-    if (!recurrent?.id) return;
-    // Backend ahora expone DELETE /api/recurrents/:id → eliminamos físicamente
-    this.recurrentsSvc.deleteRecurrent(Number(recurrent.id)).subscribe({
-      next: () => { this.recurrents.splice(i, 1); },
-      error: (err) => console.error('deleteRecurrent error', err)
+  public activar(recurrent: RecurrentsInterface, i: number): void {
+    if (!recurrent || recurrent.id == null) return;
+    this.recurrentsSvc.patchStatus(recurrent.id, true).subscribe({
+      next: () => { if (this.recurrents[i]) this.recurrents[i].status = true; },
+      error: (err) => console.error('patchStatus error', err)
     });
+  }
+
+  public desactivar(recurrent: RecurrentsInterface, i: number): void {
+    if (!recurrent || recurrent.id == null) return;
+    this.recurrentsSvc.patchStatus(recurrent.id, false).subscribe({
+      next: () => { if (this.recurrents[i]) this.recurrents[i].status = false; },
+      error: (err) => console.error('patchStatus error', err)
+    });
+  }
+
+  // ← NUEVO: eliminar con confirmación (hard delete). Si preferís soft, usá patchStatus(id,false)
+  public async eliminar(recurrent: RecurrentsInterface, i: number): Promise<void> {
+    if (!recurrent?.id) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmar eliminación',
+      message: '¿Desea eliminar definitivamente al recurrente?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => {
+            this.recurrentsSvc.deleteRecurrent(Number(recurrent.id)).subscribe({
+              next: () => { this.recurrents.splice(i, 1); },
+              error: (err) => console.error('deleteRecurrent error', err)
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   private async toast(message: string) {

@@ -100,6 +100,44 @@ export class NotificationsPopoverComponent implements OnInit {
           return;
         }
 
+        // Detectar notificaciones de recurrentes para admins y redirigir a la gestión de recurrentes
+        const isRecurrentLike = (
+          t.includes('recurrent') || t.includes('recurrente') || t.includes('recurrent_request') ||
+          title.includes('recurrente') || title.includes('recurrent') ||
+          content.includes('recurrente') || content.includes('recurrent') ||
+          content.includes('solicitud de recurrent')
+        );
+
+        if (isRecurrentLike) {
+          // Redirigir a la vista admin de invitados recurrentes (route sin :id usa fallback a storage)
+          this.router.navigate(['/admin/country-recurrents'], { queryParams: { role: 'admin' } }).then(() => this.close());
+          return;
+        }
+
+        // Detectar notificaciones de check-in/ingreso y redirigir a gestionar ingresos pendientes (propietario)
+        const isCheckinLike = (
+          t.includes('checkin') ||
+          t.includes('check-in') ||
+          title.includes('checkin') ||
+          title.includes('check-in') ||
+          content.includes('checkin') ||
+          content.includes('check-in') ||
+          content.includes('ingreso')
+        );
+
+        if (isCheckinLike) {
+          // Solo propietario: evitar navegar en contextos de guardia o admin
+          const isGuardCtx = this.router.url.includes('/guards');
+          const isAdminCtx = this.router.url.includes('/admin');
+          if (!isGuardCtx && !isAdminCtx) {
+            this.router.navigate(['/pending-checkins']).then(() => this.close());
+          } else {
+            // En guardia/admin no redirigimos a la vista de propietario
+            this.close();
+          }
+          return;
+        }
+
         // Si no matchea nada conocido, solo cerrar para evitar redirecciones equivocadas
         this.close();
       } else {

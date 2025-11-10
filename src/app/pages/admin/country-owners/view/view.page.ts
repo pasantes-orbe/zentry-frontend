@@ -66,6 +66,38 @@ export class ViewPage implements OnInit {
     addIcons({ cameraOutline });
   }
 
+  public async deleteOwnerHard(userId: number, index: number) {
+    if (!userId) return;
+    const alert = await this.alertCtrl.create({
+      header: '¿Eliminar definitivamente?',
+      message: 'Esta acción eliminará al propietario de forma permanente.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await firstValueFrom(this.userSvc.deleteUserById(Number(userId)));
+              // Remover de la lista local
+              if (index > -1 && index < this.owners.length) {
+                this.owners.splice(index, 1);
+                this.owners = [...this.owners];
+              }
+              const t = await this.toastCtrl.create({ message: 'Propietario eliminado.', duration: 1400, color: 'success' });
+              await t.present();
+            } catch (err) {
+              console.error('Error eliminando propietario:', err);
+              const t = await this.toastCtrl.create({ message: 'No se pudo eliminar el propietario.', duration: 1800, color: 'danger' });
+              await t.present();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   public goToEditOwner(userId: number) {
     if (!userId) return;
     this.router.navigate(['/edit-owner', userId]);

@@ -23,10 +23,18 @@ export class PropertiesService {
 
   // Crea propiedad (el caller maneja spinner/navegación/alerts)
   public async addProperty(formData: FormData): Promise<any> {
-    const token = await this._authStorageService.getJWT();
-    const country = await this._countryStorageService.getCountry();
-    const countryID = country.id;
-    formData.append('id_country', countryID.toString());
+    const token = await this._authStorageService.getJWT();
+    const country = await this._countryStorageService.getCountry();
+    const countryID = country.id;
+    formData.append('id_country', countryID.toString());
+    // Compatibilidad: algunos backends esperan 'country_id'
+    if (!formData.has('country_id')) {
+      formData.append('country_id', countryID.toString());
+    }
+    // Estado por defecto activo si el backend lo requiere
+    if (!formData.has('isActive')) {
+      formData.append('isActive', 'true');
+    }
 
     const httpOptions = {
       headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),

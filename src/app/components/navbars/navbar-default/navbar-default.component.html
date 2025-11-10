@@ -131,7 +131,7 @@
   <!-- Popover de notificaciones (igual a Admin) -->
   <ion-popover trigger="owner-notifications-trigger" triggerAction="click" [dismissOnSelect]="false" [cssClass]="'notifications-popover'">
     <ng-template>
-      <app-notifications-popover [userId]="user?.id" [navigateOnClick]="false"></app-notifications-popover>
+      <app-notifications-popover [userId]="user?.id" [navigateOnClick]="true"></app-notifications-popover>
     </ng-template>
   </ion-popover>
 

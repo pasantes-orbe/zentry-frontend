@@ -74,6 +74,40 @@ export class GuardsService {
       recurrents: this.getRecurrentsByCountry(idCountry),
     }).pipe(map(res => res));
   }
+
+  // ====== NUEVO FEED UNIFICADO (pendientes de check-in y reservas futuras) ======
+  // GET /api/authorizations/pending-checkin?id_country=...&id_property=...&from=...&to=...
+  public getPendingCheckinFeed(params: {
+    id_country?: string | number;
+    id_property?: string | number;
+    from?: string;
+    to?: string;
+  }): Observable<{ pending: any[]; future: any[]; window?: any; total?: any }> {
+    const qs: string[] = [];
+    if (params?.id_country != null) qs.push(`id_country=${encodeURIComponent(String(params.id_country))}`);
+    if (params?.id_property != null) qs.push(`id_property=${encodeURIComponent(String(params.id_property))}`);
+    if (params?.from) qs.push(`from=${encodeURIComponent(params.from)}`);
+    if (params?.to) qs.push(`to=${encodeURIComponent(params.to)}`);
+    const url = `${this.base}/api/authorizations/pending-checkin${qs.length ? '?' + qs.join('&') : ''}`;
+    return this._http.get<{ pending: any[]; future: any[]; window?: any; total?: any }>(url);
+  }
+
+  // ====== RESUMEN DE ASISTENCIA POR RECURRENTE ======
+  // GET /api/authorizations/recurrent-attendance?id_country=...&from=...&to=...
+  public getRecurrentAttendance(params: {
+    id_country?: string | number;
+    id_property?: string | number;
+    from: string; // ISO
+    to: string;   // ISO
+  }): Observable<{ from: string; to: string; items: any[] }> {
+    const qs: string[] = [];
+    if (params?.id_country != null) qs.push(`id_country=${encodeURIComponent(String(params.id_country))}`);
+    if (params?.id_property != null) qs.push(`id_property=${encodeURIComponent(String(params.id_property))}`);
+    qs.push(`from=${encodeURIComponent(params.from)}`);
+    qs.push(`to=${encodeURIComponent(params.to)}`);
+    const url = `${this.base}/api/authorizations/recurrent-attendance?${qs.join('&')}`;
+    return this._http.get<{ from: string; to: string; items: any[] }>(url);
+  }
   
 }
 

@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonAvatar } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonAvatar, IonBadge } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular';
 import { OwnerResponse } from '../../interfaces/ownerResponse-interface';
 
 @Component({
   selector: 'app-full-profile',
   standalone: true,
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonAvatar],
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonAvatar, IonBadge],
   templateUrl: './full-profile.component.html',
   styleUrls: ['./full-profile.component.scss']
 })

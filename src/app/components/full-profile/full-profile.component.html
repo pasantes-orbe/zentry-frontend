@@ -15,7 +15,6 @@
       <ion-avatar class="full-profile__avatar">
         <img [src]="avatarUrl" />
       </ion-avatar>
-      <div class="full-profile__id">N° ID Usuario: <strong>{{ owner?.user?.id || '—' }}</strong></div>
       <div class="full-profile__names">
         <h2>{{ getOwnerName() }}</h2>
         <p>{{ editEmail }}</p>
@@ -38,13 +37,7 @@
         <label>Teléfono</label>
         <span>{{ editPhone || '—' }}</span>
       </div>
-      <div class="full-profile__item">
-        <ion-icon name="shield-checkmark-outline"></ion-icon>
-        <label>Estado</label>
-        <span>
-          {{ $any(owner)?.user?.isActive === true ? 'Activo' : $any(owner)?.user?.isActive === false ? 'Inactivo' : '—' }}
-        </span>
-      </div>
+      
       <div class="full-profile__item">
         <ion-icon name="briefcase-outline"></ion-icon>
         <label>Personal</label>

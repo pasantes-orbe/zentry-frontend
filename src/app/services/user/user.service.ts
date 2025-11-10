@@ -7,6 +7,7 @@ import { UserStorageService } from '../storage/user-storage.service';
 import { ToastController } from '@ionic/angular';
 import { AuthStorageService } from '../storage/auth-storage.service';
 import { from, switchMap, firstValueFrom } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -21,9 +22,15 @@ export class UserService {
   ) { }
 
     getUserByID(id){
-
-      return this._htpp.get<any>(`${environment.URL}/api/users/${id}`)
-
+      const url = `${environment.URL}/api/users/${id}`;
+      const params = { _ts: String(Date.now()) };
+      // No enviar 'Cache-Control' como header de request para evitar CORS
+      return this._htpp.get<any>(url, { params }).pipe(
+        map((u: any) => ({
+          ...u,
+          isActive: (u?.isActive ?? u?.is_active)
+        }))
+      );
     }
 
     updateMyUser(id, name, lastname, birthday, email, phone){
