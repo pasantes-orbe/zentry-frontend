@@ -364,7 +364,7 @@ public availableHours: string[] = [
 
       await this.alerts.showAlert(
         'Visita Autorizada',
-        `Visita autorizada para:<br><strong>${this.guestName} ${this.guestLastname}</strong><br>DNI: ${this.guestDNI}`
+        `Visita autorizada para:\n${this.guestName} ${this.guestLastname}\nDNI: ${this.guestDNI}`
       );
 
       this.guestName = '';
